@@ -1,0 +1,11 @@
+{
+  "fields": [
+    {
+      "id": "m2",
+      "label": "Alan (m²)",
+      "type": "select",
+      "options": ["0-50", "50-100", "100+", "200+"],
+      "required": true
+    }
+  ]
+}

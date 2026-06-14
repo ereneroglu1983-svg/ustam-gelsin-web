@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "715610995273",
+    "project_id": "device-streaming-6f29b03c",
+    "storage_bucket": "device-streaming-6f29b03c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715610995273:android:a9455e1d89e7324f5a1d98",
+        "android_client_info": {
+          "package_name": "com.ustamgelsin.app.ustam_gelsin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1vi6WcCMAwA_BK_1I9QBUo93480b1V4g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

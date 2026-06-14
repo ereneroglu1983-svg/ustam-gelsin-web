@@ -1,0 +1,365 @@
+{
+  "anahtar_teslim_tadilat": {
+    "kategori_id": "40",
+    "sorular": [
+      { "id": "m2", "label": "Toplam Uygulama Alanı (m²)", "type": "select", "options": ["0-50", "51-100", "101-150", "151-200", "200+"] },
+      { "id": "malzeme", "label": "Kullanılacak Malzeme Kalitesi", "type": "select", "options": ["Ekonomik", "Standart", "Lüks (Premium)"] },
+      { "id": "kapsam", "label": "İşin Kapsamı (Çoklu Seçim)", "type": "multi_select", "options": ["Demolisyon/Kırım", "Sıva/Şap", "Elektrik Tesisatı", "Su Tesisatı", "Doğramalar", "Mutfak Yenileme", "Banyo Yenileme", "Zemin Kaplama"] }
+    ]
+  },
+  "asansor_bakim": {
+    "kategori_id": "41",
+    "sorular": [
+      { "id": "tip", "label": "Asansör Tipi", "type": "select", "options": ["Hidrolik", "Trak (Halatlı)", "Makine Dairesiz (MRL)"] },
+      { "id": "durak", "label": "Kat ve Durak Sayısı", "type": "select", "options": ["1-5 Durak", "6-10 Durak", "11-15 Durak", "15+ Durak"] },
+      { "id": "kapsam", "label": "İşin Kapsamı", "type": "select", "options": ["Periyodik Bakım", "Arıza Onarımı", "Büyük Revizyon/Modernizasyon"] },
+      { "id": "parca", "label": "Yedek Parça Tercihi", "type": "select", "options": ["Orijinal", "Eşdeğer Sertifikalı", "İkinci El Revizyonlu"] }
+    ]
+  },
+  "uydu_internet_kamera": {
+    "kategori_id": "42",
+    "sorular": [
+      { "id": "tur", "label": "İşin Türü", "type": "select", "options": ["Uydu TV Kurulum", "İnternet Abonelik/Kurulum", "Güvenlik Kamerası Sistemi"] },
+      { "id": "yer", "label": "Kurulum Yeri Tipi", "type": "select", "options": ["Daire", "Villa", "İşyeri", "Site", "Fabrika"] },
+      { "id": "kamera_ozellik", "label": "Kamera Özellikleri", "type": "multi_select", "options": ["2K Çözünürlük", "4K Ultra HD", "Gece Görüşü", "PTZ (Hareketli)", "AI (Yapay Zeka Analiz)", "Sesli Kayıt", "Su Geçirmez"] },
+      { "id": "kablo", "label": "Kablolama Türü", "type": "select", "options": ["Gizli (Sıva Altı)", "Yüzeysel (Kanal içi)", "Fiber Optik", "UTP/Ethernet"] },
+      { "id": "zorluk", "label": "Montaj Zorluğu", "type": "select", "options": ["Standart (Erişilebilir)", "Yüksek Bina/Çatı Erişimi", "Vinç Gerekli"] }
+    ]
+  },
+  "konteyner_bungalov_prefabrik": {
+    "kategori_id": "43_44_45",
+    "sorular": [
+      { "id": "adet", "label": "Adet", "type": "select", "options": ["1", "2", "3", "4", "5+"] },
+      { "id": "m2", "label": "Metrekare (m²)", "type": "select", "options": ["0-20", "21-40", "41-60", "61-80", "81-100", "100+"] },
+      { "id": "malzeme", "label": "Malzeme Kalitesi", "type": "select", "options": ["Sandviç Panel", "OSB/Ahşap", "Lambri", "İzolasyonlu/Su Yalıtımlı"] },
+      { "id": "modifikasyon", "label": "Modifikasyon Kapsamı", "type": "multi_select", "options": ["Ek Yalıtım", "İç/Dış Kaplama", "Bölme Duvar Ekleme"] },
+      { "id": "plan", "label": "Plan Karmaşıklığı", "type": "select", "options": ["Standart", "Özel Tasarım (Banyolu/Odalı)", "Çok Katlı Yapı"] },
+      { "id": "kapi_pencere", "label": "Doğrama Kalitesi", "type": "select", "options": ["PVC Standart", "Alüminyum Konfor", "Çift Camlı Isıcam"] },
+      { "id": "iklim", "label": "Isıtma/Soğutma", "type": "select", "options": ["Klima Hazırlık", "Soba/Baca", "Yerden Isıtma", "Kombi Sistemi"] },
+      { "id": "cati", "label": "Çatı Tipi", "type": "select", "options": ["Eğimli (Beşik)", "Teras Tipi", "Sundurma Eklemeli"] },
+      { "id": "altyapi", "label": "Temel Gereksinimi", "type": "select", "options": ["Beton Kaide", "Vidalı Kazık", "Çelik Şase"] },
+      { "id": "nakliye", "label": "Nakliye Mesafesi", "type": "select", "options": ["Şehir İçi (0-50km)", "Yakın (51-150km)", "Uzak (150km+)"] },
+      { "id": "montaj_yeri", "label": "Montaj Yeri Zorluğu", "type": "select", "options": ["Düz Arazi", "Eğimli/Zorlu Arazi", "Dar Alan / Erişim Kısıtlı"] }
+    ]
+  },
+  "ferforje_korkuluk_kapi": {
+    "kategori_id": "46",
+    "sorular": [
+      { "id": "olcu", "label": "Ölçü (Metretül veya EnxBoy)", "type": "select", "options": ["0-5m", "6-10m", "11-20m", "21-30m", "30m+"] },
+      { "id": "tasarim", "label": "Tasarım Karmaşıklığı", "type": "select", "options": ["Basit/Modern", "Klasik/Ferforje", "Özel Motifli/El İşçiliği"] },
+      { "id": "kalite", "label": "Malzeme Kalınlığı", "type": "select", "options": ["Standart (2mm)", "Etli Profil (3mm+)", "Çelik Cinsi"] },
+      { "id": "yuzey", "label": "Yüzey İşlem", "type": "select", "options": ["Sıcak Daldırma Galvaniz", "Toz Boya", "Fırın Boya", "Patina/Eskitme"] },
+      { "id": "tip", "label": "Korkuluk Tipi", "type": "select", "options": ["Balkon", "Merdiven", "Teras", "Bahçe"] },
+      { "id": "bahce_kapi", "label": "Bahçe Kapısı Türü", "type": "select", "options": ["Tek Kanat", "Çift Kanat", "Sürgülü", "Otomatik Motorlu"] },
+      { "id": "aksesuar", "label": "Ek Aksesuarlar", "type": "multi_select", "options": ["Özel Kilit", "Dekoratif Uçlar (Mızrak vb.)", "Mektup Kutusu"] }
+    ]
+  },
+  "havuz_yapim_bakim": {
+    "kategori_id": "47",
+    "sorular": [
+      { "id": "tip", "label": "Havuz Tipi", "type": "select", "options": ["Betonarme", "Fiberglass", "Liner Kaplama", "Prefabrik", "Infinity (Sonsuzluk)"] },
+      { "id": "hacim", "label": "Ölçü ve Su Hacmi", "type": "select", "options": ["Küçük (0-20m³)", "Orta (21-50m³)", "Büyük (50m³+)", "Olimpik"] },
+      { "id": "sekil", "label": "Şekil Karmaşıklığı", "type": "select", "options": ["Standart Dikdörtgen", "Özel Form / Jakuzili", "Çocuk Bölmeli"] },
+      { "id": "malzeme", "label": "Kaplama Malzemesi", "type": "select", "options": ["Standart Seramik", "Cam Mozaik", "Doğal Taş Kaplama"] },
+      { "id": "ek_ozellik", "label": "Ek Özellikler", "type": "multi_select", "options": ["Isıtma Sistemi", "RGB Aydınlatma", "Şelale/Fıskiye", "Tuz Klorlama (Tuzlu Su)"] },
+      { "id": "zemin", "label": "Arazi Şartları", "type": "select", "options": ["Kolay (Yumuşak Toprak)", "Zor (Kayalık/Sert)", "Yüksek Su Seviyesi"] },
+      { "id": "konum", "label": "Montaj Konumu", "type": "select", "options": ["Bahçe", "Çatı/Teras", "Kapalı Alan"] }
+    ]
+  },
+  "otomatik_sulama": {
+    "kategori_id": "48",
+    "sorular": [
+      { "id": "alan", "label": "Alan Büyüklüğü (m²)", "type": "select", "options": ["0-100", "101-500", "501-1000", "1000+"] },
+      { "id": "tip", "label": "Sulama Sistemi Tipi", "type": "select", "options": ["Damlama", "Yağmurlama (Pop-up)", "Karışık Sistem"] },
+      { "id": "zon", "label": "Bölge (Zon) Sayısı", "type": "select", "options": ["1-2 Bölge", "3-5 Bölge", "6+ Bölge"] },
+      { "id": "kontrol", "label": "Kontrol Paneli", "type": "select", "options": ["Mekanik Timer", "Dijital", "WiFi / Akıllı Telefon Kontrollü"] },
+      { "id": "sensor", "label": "Sensörler", "type": "multi_select", "options": ["Yağmur Sensörü", "Toprak Nem Sensörü", "Freeze (Don) Sensörü"] },
+      { "id": "kaynak", "label": "Su Kaynağı", "type": "select", "options": ["Şebeke", "Kuyu (Pompa Gerekli)", "Depo"] },
+      { "id": "tesisat", "label": "Boru Döşeme", "type": "select", "options": ["Gizli Gömme", "Yüzeysel"] }
+    ]
+  },
+  "bahce_peyzaj_cim": {
+    "kategori_id": "49",
+    "sorular": [
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-50", "51-150", "151-300", "300+"] },
+      { "id": "zemin", "label": "Zemin ve Arazi Durumu", "type": "multi_select", "options": ["Eğimli Arsa", "Sert/Kayalık Zemin", "Tesviye Gerekli", "Drenaj İhtiyacı"] },
+      { "id": "sulama", "label": "Sulama Sistemi Kurulsun mu?", "type": "select", "options": ["Hayır", "Evet"] },
+      { "id": "sulama_hat", "label": "Sulama Hattı Uzunluğu", "type": "select", "options": ["10-30m", "31-60m", "61m+"], "depends_on": { "id": "sulama", "value": "Evet" } },
+      { "id": "cim", "label": "Çim Türü", "type": "select", "options": ["Rulo Çim (Hazır)", "Tohum Çim"] },
+      { "id": "iyilestirme", "label": "Toprak ve Bakım", "type": "multi_select", "options": ["Gübre Kullanımı", "Toprak İyileştirici", "Keçe/Geotekstil"] },
+      { "id": "peyzaj", "label": "Ekstra Uygulamalar", "type": "multi_select", "options": ["Peyzaj Taşı", "Bordür", "Yürüyüş Yolu", "Bahçe Aydınlatma"] }
+    ]
+  },
+  "su_yalitimi": {
+    "kategori_id": "50",
+    "sorular": [
+      { "id": "alan", "label": "Temel Alanı (m²)", "type": "select", "options": ["0-100", "101-250", "250+"] },
+      { "id": "yukseklik", "label": "Bodrum Duvar Yüksekliği", "type": "select", "options": ["2.5m", "3m", "4m+"] },
+      { "id": "perde", "label": "Perde Beton Uzunluğu", "type": "select", "options": ["10-30m", "31-60m", "61m+"] },
+      { "id": "derinlik", "label": "Yapı Derinliği", "type": "select", "options": ["Standart", "Derin Temel"] }
+    ]
+  },
+  "sandvic_panel_singil": {
+    "kategori_id": "51",
+    "sorular": [
+      { "id": "m2", "label": "Çatı Alanı (m²)", "type": "select", "options": ["0-100", "101-200", "201-300", "300+"] },
+      { "id": "egim", "label": "Çatı Eğimi", "type": "select", "options": ["Düşük", "Orta", "Dik/Yüksek"] },
+      { "id": "tip", "label": "Çatı Tipi", "type": "select", "options": ["Tek Eğim", "Beşik Çatı", "Zarf Çatı"] },
+      { "id": "sokum", "label": "Eski Kaplama Sökülsün mü?", "type": "select", "options": ["Hayır", "Evet"] },
+      { "id": "kalinlik", "label": "Panel Kalınlığı", "type": "select", "options": ["40mm", "50mm", "60mm+"] },
+      { "id": "yalitim", "label": "Ekstra Yalıtım", "type": "multi_select", "options": ["Isı Yalıtımı", "Su Yalıtımı"] }
+    ]
+  },
+  "cati_yapimi_aktarma": {
+    "kategori_id": "52",
+    "sorular": [
+      { "id": "m2", "label": "Çatı Alanı (m²)", "type": "select", "options": ["0-100", "101-200", "201-300", "300+"] },
+      { "id": "islem", "label": "Yapılacak İşlem", "type": "select", "options": ["Sıfır Çatı Yapımı", "Çatı Aktarma / Tamir", "İzolasyon Yenileme"] },
+      { "id": "kiremit", "label": "Kiremit Durumu", "type": "select", "options": ["Mevcutlar Kullanılsın", "Sıfır Kiremit İstiyorum"] },
+      { "id": "yalitim", "label": "Yalıtım Tercihi", "type": "multi_select", "options": ["Isı Yalıtımı", "Su Yalıtımı"] }
+    ]
+  },
+  "marangoz_mobilya": {
+    "kategori_id": "53",
+    "sorular": [
+      { "id": "is_turu", "label": "İşin Türü", "type": "select", "options": ["Tamir / Onarım", "Sıfır Özel Üretim"] },
+      { "id": "mobilya_tipi", "label": "Mobilya Türü", "type": "select", "options": ["Masa", "Sandalye", "Sehpa", "TV Ünitesi", "Kitaplık", "Diğer"] },
+      { "id": "malzeme", "label": "Malzeme Kalitesi", "type": "select", "options": ["MDF (Kaliteli)", "Suntalam (Ekonomik)", "Masif Ahşap"] },
+      { "id": "yuzey", "label": "Yüzey İşlemi", "type": "multi_select", "options": ["Renk Değişimi", "Vernik", "Cila"] }
+    ]
+  },
+  "gomme_ray_dolap": {
+    "kategori_id": "54",
+    "sorular": [
+      { "id": "olcu", "label": "Dolap Genişliği", "type": "select", "options": ["1-2 Metre", "2-3 Metre", "3-4 Metre", "4 Metre+"] },
+      { "id": "kapak", "label": "Kapak Türü", "type": "select", "options": ["Sürgülü (Raylı)", "Menteşeli", "Aynalı Kapak", "Cam Kapak"] },
+      { "id": "malzeme", "label": "Kasa/Kapak Malzemesi", "type": "select", "options": ["Lake Boyalı", "Membran", "MDF", "Suntalam"] },
+      { "id": "isik", "label": "Aydınlatma", "type": "select", "options": ["Yok", "İç LED Aydınlatma"] }
+    ]
+  },
+  "banyo_vestiyer": {
+    "kategori_id": "55",
+    "sorular": [
+      { "id": "tur", "label": "Uygulama Türü", "type": "select", "options": ["Banyo Dolabı", "Vestiyer / Portmanto"] },
+      { "id": "olcu", "label": "Genişlik Ölçüsü", "type": "select", "options": ["60-100cm", "101-150cm", "151-200cm", "200cm+"] },
+      { "id": "malzeme", "label": "Malzeme", "type": "select", "options": ["Lake", "Membran", "MDF", "Suntalam"] },
+      { "id": "isik", "label": "Aydınlatma", "type": "select", "options": ["Yok", "Sensörlü LED", "Standart LED"] }
+    ]
+  },
+  "mutfak_dolabi_tezgah": {
+    "kategori_id": "56",
+    "sorular": [
+      { "id": "metretul", "label": "Mutfak Toplam Uzunluğu (Metretül)", "type": "select", "options": ["2-3m", "4-5m", "6-7m", "8m+"] },
+      { "id": "sekil", "label": "Mutfak Şekli", "type": "select", "options": ["Düz", "L Mutfak", "U Mutfak", "Adalı Mutfak"] },
+      { "id": "kapak", "label": "Kapak Seçimi", "type": "select", "options": ["Lake", "Akrilik", "Membran", "MDF Lam"] },
+      { "id": "donanim", "label": "Donanım Özellikleri", "type": "multi_select", "options": ["Frenli Ray/Menteşe", "Ankastre Uyumu", "Kiler Sistemi"] },
+      { "id": "tezgah", "label": "Tezgah Malzemesi", "type": "select", "options": ["Mermer", "Granit", "Çimstone", "Laminat", "Porselen"] }
+    ]
+  },
+  "sineklik_panjur": {
+    "kategori_id": "57",
+    "sorular": [
+      { "id": "adet", "label": "Pencere/Kapı Sayısı", "type": "select", "options": ["1-3", "4-6", "7-10", "10+"] },
+      { "id": "sineklik", "label": "Sineklik Türü", "type": "select", "options": ["Plise (Akordiyon)", "Sabit", "Sürgülü"] },
+      { "id": "panjur", "label": "Panjur Türü", "type": "select", "options": ["Yok", "Manuel Panjur", "Motorlu Otomatik", "Akıllı Ev Uyumlu"] }
+    ]
+  },
+  "oda_kapi_celik_kapi": {
+    "kategori_id": "58_59",
+    "sorular": [
+      { "id": "adet", "label": "Kapı Sayısı", "type": "select", "options": ["1", "2-4", "5-7", "8+"] },
+      { "id": "tip", "label": "Kapı Türü", "type": "select", "options": ["Panel Oda Kapısı", "Lake Oda Kapısı", "Amerikan Kapı", "Çelik Kapı (Daire Giriş)"] },
+      { "id": "ozellik", "label": "Ek Özellikler", "type": "multi_select", "options": ["Camlı Model", "Akıllı Kilit Sistemi", "Yüksek Güvenlikli Kilit"] }
+    ]
+  },
+  "cam_balkon_giyotin": {
+    "kategori_id": "60",
+    "sorular": [
+      { "id": "olcu", "label": "Balkon Ölçüsü (En x Boy)", "type": "select", "options": ["0-5m²", "6-10m²", "11-15m²", "15m²+"] },
+      { "id": "sistem", "label": "Sistem Tipi", "type": "select", "options": ["Katlanır Cam Balkon", "Sürgülü Cam Balkon", "Giyotin Cam (Motorlu)"] },
+      { "id": "cam", "label": "Cam Tercihi", "type": "select", "options": ["8mm Temperli", "10mm Temperli", "Isıcamlı (Lamine)"] }
+    ]
+  },
+  "aluminyum_dograma_cephe": {
+    "kategori_id": "61",
+    "sorular": [
+      { "id": "metraj", "label": "Toplam Metraj / Ölçü", "type": "select", "options": ["0-10m²", "11-30m²", "31-60m²", "60m²+"] },
+      { "id": "tip", "label": "Doğrama Tipi", "type": "select", "options": ["Isı Yalıtımlı", "Yalıtımsız (Ekonomik)"] },
+      { "id": "sistem", "label": "Cephe Sistemi", "type": "select", "options": ["Kompozit Kaplama", "Giydirme Cephe", "Alüminyum Doğrama"] }
+    ]
+  },
+  "pvc_dograma": {
+    "kategori_id": "62",
+    "sorular": [
+      { "id": "adet", "label": "Pencere/Kapı Sayısı", "type": "select", "options": ["1-3", "4-7", "8-12", "12+"] },
+      { "id": "marka", "label": "Profil Segmenti", "type": "select", "options": ["Ekonomik", "Standart (70'lik)", "Üst Segment (80'lik/Konfor)"] },
+      { "id": "cam", "label": "Cam Tipi", "type": "select", "options": ["Çift Cam", "Isıcam Sinerji/Konfor", "Üçlü Cam"] }
+    ]
+  },
+  "klima_isleri": {
+    "kategori_id": "63",
+    "sorular": [
+      { "id": "islem", "label": "Yapılacak İşlem", "type": "select", "options": ["Sadece Montaj", "Sökme ve Takma", "Bakım ve Gaz Dolumu"] },
+      { "id": "kapasite", "label": "Klima Kapasitesi", "type": "select", "options": ["9.000 BTU", "12.000 BTU", "18.000 BTU", "24.000 BTU+"] },
+      { "id": "hat", "label": "Elektrik Hattı Çekilsin mi?", "type": "select", "options": ["Yok (Mevcut)", "Var (Yeni Çekilecek)"] }
+    ]
+  },
+  "yerden_isitma": {
+    "kategori_id": "64",
+    "sorular": [
+      { "id": "alan", "label": "Uygulama Alanı (m²)", "type": "select", "options": ["0-60", "61-120", "121-200", "200+"] },
+      { "id": "yapi", "label": "Yapı Tipi", "type": "select", "options": ["Daire", "Villa", "Ticari Alan"] },
+      { "id": "kaynak", "label": "Isı Kaynağı", "type": "select", "options": ["Doğalgaz Kombi", "Isı Pompası", "Merkezi Sistem"] }
+    ]
+  },
+  "gunes_enerjisi_termosifon": {
+    "kategori_id": "65",
+    "sorular": [
+      { "id": "tur", "label": "Cihaz Seçimi", "type": "select", "options": ["Güneş Enerjisi Sistemi", "Termosifon"] },
+      { "id": "sistem", "label": "Sistem Tipi", "type": "select", "options": ["Basınçlı (Kapalı Devre)", "Basınçsız (Açık Devre)"], "depends_on": { "id": "tur", "value": "Güneş Enerjisi Sistemi" } },
+      { "id": "kapasite", "label": "Tank Kapasitesi", "type": "select", "options": ["50-80 LT", "100-150 LT", "200-300 LT"] }
+    ]
+  },
+  "dogalgaz_kombi": {
+    "kategori_id": "66",
+    "sorular": [
+      { "id": "islem", "label": "Yapılacak İş", "type": "select", "options": ["Sıfır Doğalgaz Tesisatı", "Kombi Montajı", "Kombi/Petek Bakımı"] },
+      { "id": "petek", "label": "Petek Sayısı", "type": "select", "options": ["1-4", "5-8", "9-12", "12+"], "depends_on": { "id": "islem", "value": "Sıfır Doğalgaz Tesisatı" } },
+      { "id": "yer", "label": "Kombi Montaj Yeri", "type": "select", "options": ["Balkon", "Mutfak", "Banyo"] }
+    ]
+  },
+  "elektrik_tesisati": {
+    "kategori_id": "67",
+    "sorular": [
+      { "id": "is_turu", "label": "İşin Türü", "type": "select", "options": ["Yeni Tesisat", "Tadilat / Yenileme", "Noktasal Tamirat"] },
+      { "id": "priz", "label": "Priz/Anahtar Sayısı", "type": "select", "options": ["0-10", "11-30", "31-60", "60+"] },
+      { "id": "hat", "label": "Hat Döşeme", "type": "select", "options": ["Duvar İçi (Sıva Altı)", "Sıva Üstü (Kanal)"] }
+    ]
+  },
+  "sihhi_pis_su_tesisat": {
+    "kategori_id": "68",
+    "sorular": [
+      { "id": "durum", "label": "Arıza / İş Durumu", "type": "select", "options": ["Su Kaçağı Tespiti/Onarım", "Tıkanıklık Açma", "Genel Tesisat Yenileme"] },
+      { "id": "tespit", "label": "Kaçak Yeri Biliniyor mu?", "type": "select", "options": ["Evet", "Hayır (Cihazla Bakılmalı)"] },
+      { "id": "kirma", "label": "Kırma/Dökme Onayı", "type": "select", "options": ["Mümkünse Kırmadan", "Gerekli Durumda Onaylıyorum"] }
+    ]
+  },
+  "sistre_cila": {
+    "kategori_id": "69",
+    "sorular": [
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-30", "31-60", "61-100", "100+"] },
+      { "id": "zemin", "label": "Zemin Tipi", "type": "select", "options": ["Masif Parke", "Lamine Parke"] },
+      { "id": "hasar", "label": "Hasar Durumu", "type": "select", "options": ["Sadece Matlaşma", "Derin Çizik ve Deformasyon"] }
+    ]
+  },
+  "epoksi_zemin": {
+    "kategori_id": "70",
+    "sorular": [
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-50", "51-150", "151-300", "300+"] },
+      { "id": "zemin", "label": "Mevcut Zemin", "type": "select", "options": ["Beton / Şap", "Eski Kaplama (Seramik vb.)"] },
+      { "id": "durum", "label": "Zemin Şartları", "type": "multi_select", "options": ["Çatlak/Kırık Var", "Çok Tozlu", "Sağlam/Düzgün"] }
+    ]
+  },
+  "mermer_granit_traverten": {
+    "kategori_id": "71",
+    "sorular": [
+      { "id": "alan", "label": "Uygulama Alanı", "type": "select", "options": ["Mutfak Tezgahı", "Banyo / Islak Hacim", "Zemin Kaplama", "Dış Mekan / Basamak"] },
+      { "id": "malzeme", "label": "Malzeme Türü", "type": "select", "options": ["Mermer", "Granit", "Traverten"] },
+      { "id": "m2", "label": "Ölçü (Metretül veya m²)", "type": "select", "options": ["0-5", "6-15", "16-30", "30+"] }
+    ]
+  },
+  "parke_isleri": {
+    "kategori_id": "72",
+    "sorular": [
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-40", "41-80", "81-120", "120+"] },
+      { "id": "malzeme", "label": "Malzeme Türü", "type": "select", "options": ["Laminat Parke", "Lamine Parke", "Masif Parke"] },
+      { "id": "zemin", "label": "Zemin Durumu", "type": "select", "options": ["Düzgün Şap", "Eski Parke Üstü", "Bozuk Zemin (Tesviye Gerekli)"] }
+    ]
+  },
+  "fayans_seramik": {
+    "kategori_id": "73",
+    "sorular": [
+      { "id": "alan", "label": "Uygulama Yeri", "type": "multi_select", "options": ["Banyo / WC", "Mutfak Tezgah Arası", "Zemin", "Balkon / Teras"] },
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-20", "21-50", "51-100", "100+"] },
+      { "id": "sokum", "label": "Eski Kaplama Sökülsün mü?", "type": "select", "options": ["Evet", "Hayır (Üstüne Uygulama)"] },
+      { "id": "ebat", "label": "Seramik Ebatı", "type": "select", "options": ["Standart (30x60)", "Büyük (60x60 / 60x120)", "Küçük (Mozaik/Dekoratif)"] }
+    ]
+  },
+  "bolme_duvar": {
+    "kategori_id": "74",
+    "sorular": [
+      { "id": "tip", "label": "Duvar Tipi", "type": "select", "options": ["Alçıpan", "Betopan", "Cam Bölme"] },
+      { "id": "m2", "label": "Toplam Metraj (m²)", "type": "select", "options": ["0-20", "21-50", "51-100", "100+"] },
+      { "id": "yalitim", "label": "Yalıtım İhtiyacı", "type": "multi_select", "options": ["Ses Yalıtımı", "Isı Yalıtımı"] },
+      { "id": "kapi", "label": "Kapı Eklensin mi?", "type": "select", "options": ["Hayır", "Sürgülü Kapı", "Menteşeli Kapı"] }
+    ]
+  },
+  "alci_siva": {
+    "kategori_id": "75",
+    "sorular": [
+      { "id": "alan", "label": "Uygulama Yeri", "type": "select", "options": ["Duvarlar", "Tavanlar", "Komple Daire"] },
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-50", "51-150", "151-300", "300+"] },
+      { "id": "durum", "label": "Yüzey Durumu", "type": "select", "options": ["Kaba İnşaat (Sıfır)", "Eski Sıva Üstü", "Çatlak/Yıpranmış"] }
+    ]
+  },
+  "kartonpiyer_stropiyer": {
+    "kategori_id": "76",
+    "sorular": [
+      { "id": "malzeme", "label": "Malzeme Kalitesi", "type": "select", "options": ["Alçı (Klasik)", "Strafor (Ekonomik)", "Poliüretan (Lüks)"] },
+      { "id": "metraj", "label": "Toplam Uzunluk (Metre)", "type": "select", "options": ["0-20m", "21-50m", "51-100m", "100m+"] },
+      { "id": "isik", "label": "Işık Kanalı", "type": "select", "options": ["Yok", "Gizli LED Kanalı"] }
+    ]
+  },
+  "gergi_tavan": {
+    "kategori_id": "77",
+    "sorular": [
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-10", "11-30", "31-60", "60+"] },
+      { "id": "sistem", "label": "Sistem Tipi", "type": "select", "options": ["Işıklı (Transparan)", "Dijital Baskılı", "Akustik Kumaş"] },
+      { "id": "yuzey", "label": "Yüzey Tercihi", "type": "select", "options": ["Parlak", "Mat", "Saten"] }
+    ]
+  },
+  "asma_tavan": {
+    "kategori_id": "78",
+    "sorular": [
+      { "id": "tip", "label": "Tavan Tipi", "type": "select", "options": ["Alçıpan Asma Tavan", "Metal Tavan (Clip-in/Lay-in)", "Vektörel Tavan"] },
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-30", "31-70", "71-150", "150+"] },
+      { "id": "amac", "label": "Kullanım Amacı", "type": "select", "options": ["Dekoratif / Gizli Işık", "Ses Yalıtımı", "Teknik Tesisat Gizleme"] }
+    ]
+  },
+  "italyan_boya_dekoratif_siva": {
+    "kategori_id": "79",
+    "sorular": [
+      { "id": "tur", "label": "Uygulama Türü", "type": "select", "options": ["İtalyan Boya", "Dekoratif Sıva / Beton Efekt"] },
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-15", "16-40", "41-80", "80+"] },
+      { "id": "beklenti", "label": "Beklenti", "type": "multi_select", "options": ["Suya/Neme Dayanıklı", "Yüksek Silinebilirlik", "Antik Görünüm"] }
+    ]
+  },
+  "duvar_kagidi_poster": {
+    "kategori_id": "80",
+    "sorular": [
+      { "id": "m2", "label": "Toplam Alan (m²)", "type": "select", "options": ["0-15", "16-40", "41-80", "80+"] },
+      { "id": "tur", "label": "Kağıt Türü", "type": "select", "options": ["Vinil (Dayanıklı)", "Tekstil / Kumaş", "3D / Poster Baskı", "Ekonomik Kağıt"] },
+      { "id": "durum", "label": "Duvar Durumu", "type": "select", "options": ["Düz/Hazır", "Pürüzlü (Tamir Gerekli)"] }
+    ]
+  },
+  "dis_cephe_mantolama": {
+    "kategori_id": "81",
+    "sorular": [
+      { "id": "tip", "label": "Bina Tipi", "type": "select", "options": ["Müstakil Villa", "Apartman (1-4 Kat)", "Yüksek Bina (5 Kat+)"] },
+      { "id": "m2", "label": "Toplam Cephe Alanı (m²)", "type": "select", "options": ["0-200", "201-500", "501-1000", "1000+"] },
+      { "id": "malzeme", "label": "Yalıtım Malzemesi", "type": "select", "options": ["EPS (Standart)", "Taş Yünü (Yangına Dayanıklı)", "XPS"] },
+      { "id": "boya", "label": "Boya Türü", "type": "select", "options": ["Akrilik", "Silikonlu", "Grenli (Desenli)"] }
+    ]
+  },
+  "ic_cephe_boya_badana": {
+    "kategori_id": "82",
+    "sorular": [
+      { "id": "alan", "label": "Uygulama Alanı", "type": "select", "options": ["1+1 Daire", "2+1 Daire", "3+1 Daire", "4+1 / Dubleks", "Tek Oda / Salon"] },
+      { "id": "m2", "label": "Tahmini m²", "type": "select", "options": ["0-50", "51-100", "101-150", "151+"] },
+      { "id": "tavan", "label": "Tavan Boyanacak mı?", "type": "select", "options": ["Evet", "Hayır"] },
+      { "id": "durum", "label": "Duvarların Durumu", "type": "multi_select", "options": ["Yıpranmış / Çatlak Var", "Renk Değişimi Olacak", "Macun/Astar Gerekli"] },
+      { "id": "boya_tipi", "label": "Boya Türü", "type": "select", "options": ["Silikonlu / Tam Silinebilir", "Plastik Boya (Ekonomik)", "Yarı Mat"] },
+      { "id": "esya", "label": "Eşya Durumu", "type": "select", "options": ["Boş Daire", "Eşyalı (Koruma Gerekli)"] }
+    ]
+  }
+}

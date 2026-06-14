@@ -1,0 +1,11 @@
+{
+  "fields": [
+    {
+      "id": "ozellik",
+      "label": "Teknik Özellik",
+      "type": "select",
+      "options": ["Standart", "Gelişmiş", "Profesyonel"],
+      "required": true
+    }
+  ]
+}

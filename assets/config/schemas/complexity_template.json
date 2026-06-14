@@ -1,0 +1,11 @@
+{
+  "fields": [
+    {
+      "id": "kapsam",
+      "label": "İş Kapsamı",
+      "type": "select",
+      "options": ["Basit", "Orta", "Komple"],
+      "required": true
+    }
+  ]
+}

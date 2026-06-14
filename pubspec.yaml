@@ -1,0 +1,103 @@
+name: ustam_gelsin
+description: Usta-Müşteri uygulaması
+publish_to: 'none'
+version: 1.0.0+1
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.20.0
+  cloud_firestore: ^4.17.5
+  firebase_storage: ^11.7.0
+  firebase_messaging: ^14.9.4
+  cloud_functions: ^4.7.6
+  flutter_local_notifications: ^17.2.1
+  http: ^1.2.2
+  cupertino_icons: ^1.0.8
+  google_generative_ai: ^0.4.7
+  intl: ^0.20.2
+  shared_preferences: ^2.3.5
+  google_fonts: ^6.2.1
+  url_launcher: ^6.3.2
+  image_picker: ^1.1.2
+  flutter_dotenv: ^5.1.0
+  geolocator: ^12.0.0
+  geocoding: ^4.0.0
+  dart_geohash: ^2.1.0
+  dart_ipify: ^1.1.1
+  permission_handler: ^12.0.2
+  csv: ^6.0.0
+  universal_html: ^2.2.4
+  firebase_remote_config: ^4.4.7
+  marquee: ^2.3.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/app_logo.png
+    - assets/web_logo.png
+    - assets/data/sehirler.json
+    - assets/data/ilceler.json
+    - assets/data/usta_sozlesme.json
+    - assets/data/musteri_sozlesme.json
+    - assets/data/meslekler.json
+    - assets/data/is_kollari.json
+    - assets/data/is_kolu_detaylari.json
+    - assets/config/app_catalog.json
+    - assets/images/acil_logo.png
+    - assets/images/acil_usta_logo.png
+    - assets/usta.png
+    - assets/linkedin.png
+    - assets/insta.png
+    - assets/face.png
+    - assets/data/biz_kimiz.json
+    - assets/images/nasil_calisir.png
+    - assets/images/destek_iletisim.png
+    - assets/meslek_resimleri/alcisiva.png
+    - assets/meslek_resimleri/aluminyum.png
+    - assets/meslek_resimleri/anahtar_teslim.png
+    - assets/meslek_resimleri/asansor.png
+    - assets/meslek_resimleri/asmatavan.png
+    - assets/meslek_resimleri/banyo.png
+    - assets/meslek_resimleri/boya.png
+    - assets/meslek_resimleri/cambalkon.png
+    - assets/meslek_resimleri/cambolme.png
+    - assets/meslek_resimleri/camera.png
+    - assets/meslek_resimleri/cati.png
+    - assets/meslek_resimleri/dogalgaz.png
+    - assets/meslek_resimleri/duvarkagidi.png
+    - assets/meslek_resimleri/elektrik.png
+    - assets/meslek_resimleri/epoksi.png
+    - assets/meslek_resimleri/ferforje.png
+    - assets/meslek_resimleri/gergitavan.png
+    - assets/meslek_resimleri/gomme.png
+    - assets/meslek_resimleri/gunes.png
+    - assets/meslek_resimleri/havuz.png
+    - assets/meslek_resimleri/italyan.png
+    - assets/meslek_resimleri/kapi.png
+    - assets/meslek_resimleri/kartonpiyer.png
+    - assets/meslek_resimleri/klima.png
+    - assets/meslek_resimleri/laminat.png
+    - assets/meslek_resimleri/mantoloma.png
+    - assets/meslek_resimleri/marangoz.png
+    - assets/meslek_resimleri/mermer.png
+    - assets/meslek_resimleri/mutfak.png
+    - assets/meslek_resimleri/panjur.png
+    - assets/meslek_resimleri/peyzaj.png
+    - assets/meslek_resimleri/prefabrik.png
+    - assets/meslek_resimleri/pvc.png
+    - assets/meslek_resimleri/sandvic.png
+    - assets/meslek_resimleri/seramik.png
+    - assets/meslek_resimleri/sihhi.png
+    - assets/meslek_resimleri/sistre.png
+    - assets/meslek_resimleri/sulama.png
+    - assets/meslek_resimleri/temel.png
+    - assets/meslek_resimleri/yerdenisitma.png
+    - assets/data/yorumlar.json
+    - assets/images/ai_page.png
+    - .env
