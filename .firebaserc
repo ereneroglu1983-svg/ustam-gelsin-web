@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "device-streaming-6f29b03c"
-  }
+  },
+  "targets": {
+    "device-streaming-6f29b03c": {
+      "hosting": {
+        "ustam-gelsin-web": [
+          "ustam-gelsin-web"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
