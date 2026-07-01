@@ -1,0 +1,134 @@
+[33mcommit 3fbb7416e283ee4149bb27aef51c8a3d86f715e9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;32mbackup-local[m[33m)[m
+Author: ereneroglu1983-svg <ereneroglu1983@gmail.com>
+Date:   Wed Jul 1 20:01:43 2026 +0300
+
+    clean repo for cloudflare deploy
+
+[1mdiff --git a/.firebaserc b/.firebaserc[m
+[1mindex 8548851..b333334 100644[m
+[1m--- a/.firebaserc[m
+[1m+++ b/.firebaserc[m
+[36m@@ -1,5 +1,15 @@[m
+ {[m
+   "projects": {[m
+     "default": "device-streaming-6f29b03c"[m
+[31m-  }[m
+[31m-}[m
+[32m+[m[32m  },[m
+[32m+[m[32m  "targets": {[m
+[32m+[m[32m    "device-streaming-6f29b03c": {[m
+[32m+[m[32m      "hosting": {[m
+[32m+[m[32m        "ustam-gelsin-web": [[m
+[32m+[m[32m          "ustam-gelsin-web"[m
+[32m+[m[32m        ][m
+[32m+[m[32m      }[m
+[32m+[m[32m    }[m
+[32m+[m[32m  },[m
+[32m+[m[32m  "etags": {}[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/.gitignore b/.gitignore[m
+[1mnew file mode 100644[m
+[1mindex 0000000..6579c53[m
+[1m--- /dev/null[m
+[1m+++ b/.gitignore[m
+[36m@@ -0,0 +1,9 @@[m
+[32m+[m[32m.dart_tool/[m
+[32m+[m[32m.pub/[m
+[32m+[m[32mbuild/[m
+[32m+[m[32m.build/[m
+[32m+[m[32m.flutter-plugins[m
+[32m+[m[32m.flutter-plugins-dependencies[m
+[32m+[m[32m.packages[m
+[32m+[m[32m.env[m
+[32m+[m[32m*.log[m
+\ No newline at end of file[m
+[1mdiff --git a/.idea/Ustam_Gelsin.iml b/.idea/Ustam_Gelsin.iml[m
+[1mindex e865453..1875e62 100644[m
+[1m--- a/.idea/Ustam_Gelsin.iml[m
+[1m+++ b/.idea/Ustam_Gelsin.iml[m
+[36m@@ -48,6 +48,9 @@[m
+       <excludeFolder url="file://$MODULE_DIR$/.dart_tool" />[m
+       <excludeFolder url="file://$MODULE_DIR$/.pub" />[m
+       <excludeFolder url="file://$MODULE_DIR$/build" />[m
+[32m+[m[32m      <excludeFolder url="file://$MODULE_DIR$/.dart_tool" />[m
+[32m+[m[32m      <excludeFolder url="file://$MODULE_DIR$/.pub" />[m
+[32m+[m[32m      <excludeFolder url="file://$MODULE_DIR$/build" />[m
+     </content>[m
+     <orderEntry type="inheritedJdk" />[m
+     <orderEntry type="sourceFolder" forTests="false" />[m
+[1mdiff --git a/.idea/modules.xml b/.idea/modules.xml[m
+[1mindex a83a803..6c82f48 100644[m
+[1m--- a/.idea/modules.xml[m
+[1m+++ b/.idea/modules.xml[m
+[36m@@ -3,6 +3,7 @@[m
+   <component name="ProjectModuleManager">[m
+     <modules>[m
+       <module fileurl="file://$PROJECT_DIR$/.idea/Ustam_Gelsin.iml" filepath="$PROJECT_DIR$/.idea/Ustam_Gelsin.iml" />[m
+[32m+[m[32m      <module fileurl="file://$PROJECT_DIR$/android/ustam_gelsin_android.iml" filepath="$PROJECT_DIR$/android/ustam_gelsin_android.iml" />[m
+     </modules>[m
+   </component>[m
+ </project>[m
+\ No newline at end of file[m
+
+[33mcommit 3ffb2d48743f39bbd0c3c618f5e97e01c44bb258[m
+Author: ereneroglu1983-svg <ereneroglu1983@gmail.com>
+Date:   Wed Jul 1 19:11:00 2026 +0300
+
+    Hızlı güncelleme
+
+[1mdiff --git a/.dart_tool/dartpad/web_plugin_registrant.dart b/.dart_tool/dartpad/web_plugin_registrant.dart[m
+[1mnew file mode 100644[m
+[1mindex 0000000..5f821aa[m
+[1m--- /dev/null[m
+[1m+++ b/.dart_tool/dartpad/web_plugin_registrant.dart[m
+[36m@@ -0,0 +1,42 @@[m
+[32m+[m[32m// Flutter web plugin registrant file.[m
+[32m+[m[32m//[m
+[32m+[m[32m// Generated file. Do not edit.[m
+[32m+[m[32m//[m
+[32m+[m
+[32m+[m[32m// @dart = 2.13[m
+[32m+[m[32m// ignore_for_file: type=lint[m
+[32m+[m
+[32m+[m[32mimport 'package:cloud_firestore_web/cloud_firestore_web.dart';[m
+[32m+[m[32mimport 'package:cloud_functions_web/cloud_functions_web.dart';[m
+[32m+[m[32mimport 'package:firebase_app_check_web/firebase_app_check_web.dart';[m
+[32m+[m[32mimport 'package:firebase_auth_web/firebase_auth_web.dart';[m
+[32m+[m[32mimport 'package:firebase_core_web/firebase_core_web.dart';[m
+[32m+[m[32mimport 'package:firebase_messaging_web/firebase_messaging_web.dart';[m
+[32m+[m[32mimport 'package:firebase_remote_config_web/firebase_remote_config_web.dart';[m
+[32m+[m[32mimport 'package:firebase_storage_web/firebase_storage_web.dart';[m
+[32m+[m[32mimport 'package:flutter_native_splash/flutter_native_splash_web.dart';[m
+[32m+[m[32mimport 'package:geolocator_web/geolocator_web.dart';[m
+[32m+[m[32mimport 'package:image_picker_for_web/image_picker_for_web.dart';[m
+[32m+[m[32mimport 'package:permission_handler_html/permission_handler_html.dart';[m
+[32m+[m[32mimport 'package:shared_preferences_web/shared_preferences_web.dart';[m
+[32m+[m[32mimport 'package:url_launcher_web/url_launcher_web.dart';[m
+[32m+[m[32mimport 'package:flutter_web_plugins/flutter_web_plugins.dart';[m
+[32m+[m
+[32m+[m[32mvoid registerPlugins([final Registrar? pluginRegistrar]) {[m
+[32m+[m[32m  final Registrar registrar = pluginRegistrar ?? webPluginRegistrar;[m
+[32m+[m[32m  FirebaseFirestoreWeb.registerWith(registrar);[m
+[32m+[m[32m  FirebaseFunctionsWeb.registerWith(registrar);[m
+[32m+[m[32m  FirebaseAppCheckWeb.registerWith(registrar);[m
+[32m+[m[32m  FirebaseAuthWeb.registerWith(registrar);[m
+[32m+[m[32m  FirebaseCoreWeb.registerWith(registrar);[m
+[32m+[m[32m  FirebaseMessagingWeb.registerWith(registrar);[m
+[32m+[m[32m  FirebaseRemoteConfigWeb.registerWith(registrar);[m
+[32m+[m[32m  FirebaseStorageWeb.registerWith(registrar);[m
+[32m+[m[32m  FlutterNativeSplashWeb.registerWith(registrar);[m
+[32m+[m[32m  GeolocatorPlugin.registerWith(registrar);[m
+[32m+[m[32m  ImagePickerPlugin.registerWith(registrar);[m
+[32m+[m[32m  WebPermissionHandler.registerWith(registrar);[m
+[32m+[m[32m  SharedPreferencesPlugin.registerWith(registrar);[m
+[32m+[m[32m  UrlLauncherPlugin.registerWith(registrar);[m
+[32m+[m[32m  registrar.registerMessageHandler();[m
+[32m+[m[32m}[m
+[1mdiff --git a/.dart_tool/flutter_build/673d79d2516fe958605391d6c82b2391/.filecache b/.dart_tool/flutter_build/673d79d2516fe958605391d6c82b2391/.filecache[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2379a98[m
+[1m--- /dev/null[m
+[1m+++ b/.dart_tool/flutter_build/673d79d2516fe958605391d6c82b2391/.filecache[m
+[36m@@ -0,0 +1 @@[m
+[32m+[m[32m{"version":2,"files":[{"path":"C:\\Users\\erene\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\web-0.5.1\\lib\\src\\helpers\\extensions.dart","hash":"bddcf849bee48dc0dd5c3474c7234704"},{"path":"C:\\flutter\\packages\\flutter\\lib\\src\\widgets\\notification_listener.dart","hash":"096a125e0b6d03283fda3959aa657e23"},{"path":"C:\\Users\\erene\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\http_parser-4.1.2\\lib\\src\\chunked_coding\\decoder.dart","hash":"e6069a6342a49cdb410fbccfbe4e8557"},{"path":"C:\\Users\\erene\\StudioProjects\\Ustam_Gelsin\\build\\web\\index.html","hash":"71ddad0b70f44fa884760cadc0e16a22"},{"path":"C:\\flutter\\packages\\flutter\\lib\\src\\gestures\\lsq_solver.dart","hash":"3e1f8918dfc4c773b35f568c8907221f"},{"path":"C:\\flutter\\packages\\flutter\\lib\\src\\rendering\\stack.dart","hash":"cea2237f09873a1d9b1f818b1eac15c0"},{"path":"C:\\Users\\erene\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\crypto-3.0.7\\lib\\src\\digest_sink.dart","hash":"038a6fc8c86b9aab7ef668688a077234"},{"path":"C:\\Users\\erene\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\cloud_firestore-4.17.5\\lib\\src\\transaction.dart","hash":"d12b8020c52bb28003a8ec7109557f84"},{"path":"C:\\Users\\erene\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_core_web-2.17.5\\lib\\src\\interop\\utils\\utils.dart","hash":"fb14d876dbe0ddb29976a8f6ae222c7f"},{"path":"C:\\flutter\\packages\\flutter\\lib\\src\\material\\selection_area.dart","hash":"fd1e888f48f9b2411ee9f3d8a5146397"},{"path":"C:\\Users\\erene\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\shared_preferences_platform_interface-2.4.2\\LICENSE","hash":"2b36ca50262dc615e560c27654badb26"},{"path":"C:\\flutter\\packages\\flutter\\lib\\src\\gestures\\drag_details.dart","hash":"09325621b84b25497a2d19b7f3636884"},{"path":"C:\\flutter\\packages\\flutter\\lib\\src\\services\\autofill.dart","hash":"1c23614b3a58c2cc762d1a8d9b668f3d"},{"path":"C:\\Users\\erene\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\firebase_app_check_platform_interface-0.1.0+29\\lib\\src\\platfor
