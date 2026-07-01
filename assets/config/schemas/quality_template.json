@@ -1,0 +1,11 @@
+{
+  "fields": [
+    {
+      "id": "kalite",
+      "label": "Malzeme Kalitesi",
+      "type": "select",
+      "options": ["Ekonomik", "Standart", "Premium", "Lüks"],
+      "required": true
+    }
+  ]
+}

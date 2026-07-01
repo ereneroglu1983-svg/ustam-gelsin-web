@@ -1,0 +1,30 @@
+{
+  "baslik": "Biz Kimiz?",
+  "slogan": "Ustan bir tık uzağında.",
+  "icerik": [
+    {
+      "baslik": "HEMEN USTAM GELSİN NEDİR?",
+      "metin": "HEMEN USTAM GELSİN; ev, iş yeri, tadilat, tamirat ve teknik hizmet ihtiyaçlarını doğru ustalarla hızlı şekilde buluşturmak amacıyla geliştirilmiş yeni nesil dijital hizmet platformudur."
+    },
+    {
+      "baslik": "NEDEN KURULDU?",
+      "metin": "Bugün bir usta bulmak çoğu zaman güven problemi, zaman kaybı, yüksek fiyat karmaşası ve düzensiz iletişim süreçlerine dönüşebiliyor. Biz bu sistemi daha hızlı, daha güvenilir ve daha organize hale getirmek için yola çıktık."
+    },
+    {
+      "baslik": "MÜŞTERİLER İÇİN",
+      "metin": "Müşteriler ihtiyaçlarına uygun ilan oluşturabilir, farklı ustalardan teklif alabilir, ustaların profillerini inceleyebilir, belge ve değerlendirme bilgilerini görüntüleyebilir."
+    },
+    {
+      "baslik": "USTALAR İÇİN",
+      "metin": "Ustalar kendi uzmanlık alanlarında gerçek iş fırsatlarına ulaşabilir, doğrudan müşterilerle iletişim kurabilir ve dijital ortamda daha güçlü görünürlük elde edebilir."
+    },
+    {
+      "baslik": "PLATFORM YAPISI",
+      "metin": "Platform yalnızca dijital aracılık altyapısı sağlar. Müşteri ile ustayı buluşturur, teklif ve iletişim süreçlerini kolaylaştırır."
+    },
+    {
+      "baslik": "VİZYONUMUZ",
+      "metin": "HEMEN USTAM GELSİN; güven, hız, şeffaflık ve erişilebilirlik odaklı bir sistem kurmayı hedefler. Amacımız Türkiye’nin en organize, en güvenilir ve en güçlü dijital usta ağı haline gelmektir."
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "fields": [
+    {
+      "id": "islem",
+      "label": "İşlem Türü",
+      "type": "select",
+      "options": ["Montaj", "Bakım", "Onarım", "Kurulum"],
+      "required": true
+    }
+  ]
+}

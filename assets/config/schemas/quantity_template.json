@@ -1,0 +1,11 @@
+{
+  "fields": [
+    {
+      "id": "adet",
+      "label": "Adet",
+      "type": "select",
+      "options": ["1", "2-5", "5-10", "10+"],
+      "required": true
+    }
+  ]
+}

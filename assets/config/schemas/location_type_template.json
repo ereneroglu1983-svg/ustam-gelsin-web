@@ -1,0 +1,11 @@
+{
+  "fields": [
+    {
+      "id": "tur",
+      "label": "İş Türü",
+      "type": "select",
+      "options": ["Standart", "Özel", "Endüstriyel"],
+      "required": true
+    }
+  ]
+}
