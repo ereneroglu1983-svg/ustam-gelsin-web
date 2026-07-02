@@ -130,4 +130,3 @@ flutter:
     - assets/data/yorumlar.json
     - assets/images/ai_page.png
     - assets/images/usta_rozet.png
-    - .env
