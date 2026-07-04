@@ -67,6 +67,9 @@ abstract class Env {
   @EnviedField(varName: 'R2_FLUTTER_ENDPOINT')
   static final String r2FlutterEndpoint = _Env.r2FlutterEndpoint;
 
+  @EnviedField(varName: 'R2_PUBLIC_URL') // Bu GÖRÜNTÜLEME için yenisini ekliyoruz
+  static final String r2PublicUrl = _Env.r2PublicUrl;
+
   @EnviedField(varName: 'FACEBOOK_PAGE_TOKEN')
   static final String facebookPageToken = _Env.facebookPageToken;
 

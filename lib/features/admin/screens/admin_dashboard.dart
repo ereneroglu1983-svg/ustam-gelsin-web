@@ -8,6 +8,8 @@ import 'stats_view.dart';
 import 'user_view.dart';
 import 'robot_view.dart';
 import 'content_view.dart';
+// YENİ EKLENEN IMPORT: Blog ekleme ekranı
+import 'blog_ekle_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -47,6 +49,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       const ContentView(),
                       FinansView(),
                       ModerasyonView(),
+                      // YENİ EKLENEN SAYFA: Blog Ekle ekranı
+                      const BlogEkleScreen(),
                     ],
                   ),
                 ),
@@ -77,6 +81,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
         NavigationRailDestination(icon: Icon(Icons.article_outlined), label: Text("İçerik")),
         NavigationRailDestination(icon: Icon(Icons.account_balance_wallet_outlined), label: Text("Finans")),
         NavigationRailDestination(icon: Icon(Icons.admin_panel_settings_outlined), label: Text("Modere")),
+        // YENİ EKLENEN BUTON: Modere'nin altına Blog butonu
+        NavigationRailDestination(icon: Icon(Icons.post_add_outlined), label: Text("Blog")),
       ],
     );
   }

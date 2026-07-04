@@ -15,12 +15,14 @@ import 'package:ustam_gelsin/features/usta/screens/usta_profil_sayfasi.dart';
 import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dart';
 import 'package:ustam_gelsin/features/home/widgets/hizmetler_slider.dart';
 import 'package:ustam_gelsin/features/home/widgets/ilan_akisi_slider.dart';
+import 'package:ustam_gelsin/features/home/widgets/insaat_rehberi_slider.dart'; // EKLENDİ
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:ustam_gelsin/features/home/screens/nasil_calisir.dart';
 import 'package:ustam_gelsin/features/home/screens/home_page_ai.dart';
 import 'package:ustam_gelsin/features/home/screens/biz_kimiz_page.dart';
 import 'package:ustam_gelsin/features/home/screens/destek_iletisim.dart';
+import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
+import 'package:ustam_gelsin/features/home/screens/insaat_rehberi.dart';
 
 Future<void> showSozlesmeDialog(BuildContext context, String documentId, String defaultBaslik) async {
   showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
@@ -32,8 +34,8 @@ Future<void> showSozlesmeDialog(BuildContext context, String documentId, String 
       return;
     }
     final data = doc.data()!;
-    final String baslik = data['baslik'] ?? defaultBaslik;
-    final String metin = data['metin'] ?? 'İçerik yüklenemedi.';
+    final String baslik = data['baslik']?? defaultBaslik;
+    final String metin = data['metin']?? 'İçerik yüklenemedi.';
     showDialog(context: context, builder: (_) => AlertDialog(title: Text(baslik, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)), content: SizedBox(width: double.maxFinite, height: MediaQuery.of(context).size.height * 0.6, child: SingleChildScrollView(child: Text(metin))), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Kapat'))]));
   } catch (e) {
     Navigator.pop(context);
@@ -73,8 +75,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     if (kIsWeb) {
       try {
         final position = await html.window.navigator.geolocation?.getCurrentPosition();
-        if (mounted && position?.coords != null) {
-          setState(() { _lat = (position!.coords!.latitude ?? 39.9334).toDouble(); _lng = (position!.coords!.longitude ?? 32.8597).toDouble(); _isLocationLoading = false; });
+        if (mounted && position?.coords!= null) {
+          setState(() { _lat = (position!.coords!.latitude?? 39.9334).toDouble(); _lng = (position!.coords!.longitude?? 32.8597).toDouble(); _isLocationLoading = false; });
         } else { _setFallback(); }
       } catch (e) { _setFallback(); }
     } else { await _determineMobilePosition(); }
@@ -92,7 +94,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   void _setFallback() { if (mounted) setState(() { _isLocationLoading = false; }); }
 
   Widget _buildCanliIlanlarSection() {
-    return Padding(padding: const EdgeInsets.symmetric(vertical: 40), child: Column(children: [Text("Canlı İlanlar", style: GoogleFonts.poppins(fontSize: 36, fontWeight: FontWeight.bold)), const SizedBox(height: 32), _isLocationLoading ? const SizedBox(height: 240, child: Center(child: CircularProgressIndicator())) : IlanAkisiSlider(ustaLat: _lat, ustaLng: _lng)]));
+    return Padding(padding: const EdgeInsets.symmetric(vertical: 40), child: Column(children: [Text("Canlı İlanlar", style: GoogleFonts.poppins(fontSize: 36, fontWeight: FontWeight.bold)), const SizedBox(height: 32), _isLocationLoading? const SizedBox(height: 240, child: Center(child: CircularProgressIndicator())) : IlanAkisiSlider(ustaLat: _lat, ustaLng: _lng)]));
   }
 
   @override
@@ -113,14 +115,23 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       {"title": "İletişim", "page": const DestekIletisimPage()},
     ];
     return LayoutBuilder(builder: (context, constraints) {
-      return Padding(padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16), child: Row(children: [Image.asset('assets/web_logo.png', height: 88), SizedBox(width: constraints.maxWidth > 900 ? 50 : 20), Expanded(child: Wrap(spacing: 28, runSpacing: 10, alignment: WrapAlignment.center, children: menuItems.map((item) => InkWell(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => item['page'] as Widget)), child: Text(item['title'] as String, style: GoogleFonts.poppins(fontSize: 15.5, fontWeight: FontWeight.w500)))).toList())), const SizedBox(width: 20), _currentUser == null ? Row(mainAxisSize: MainAxisSize.min, children: [ElevatedButton(onPressed: () => _showSelectionDialog(context, true), style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14)), child: const Text("Üye Ol", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white))), const SizedBox(width: 12), ElevatedButton(onPressed: () => _showSelectionDialog(context, false), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14)), child: const Text("GİRİŞ YAP", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)))]) : Row(mainAxisSize: MainAxisSize.min, children: [ElevatedButton(onPressed: _isProfileLoading ? null : () async { setState(() => _isProfileLoading = true); String? role = await _authService.getUserRole(); if (!mounted) return; setState(() => _isProfileLoading = false); if (role == 'usta' || role == 'master') Navigator.push(context, MaterialPageRoute(builder: (context) => UstaProfilSayfasi())); else Navigator.push(context, MaterialPageRoute(builder: (context) => MusteriProfilSayfasi())); }, style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14)), child: _isProfileLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text("Profilim", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white))), const SizedBox(width: 12), OutlinedButton(onPressed: () async => await _authService.signOut(), style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14)), child: const Text("Çıkış Yap", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)))])]));
+      return Padding(padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16), child: Row(children: [Image.asset('assets/web_logo.png', height: 88), SizedBox(width: constraints.maxWidth > 900? 50 : 20), Expanded(child: Wrap(spacing: 28, runSpacing: 10, alignment: WrapAlignment.center, children: menuItems.map((item) => InkWell(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => item['page'] as Widget)), child: Text(item['title'] as String, style: GoogleFonts.poppins(fontSize: 15.5, fontWeight: FontWeight.w500)))).toList())), const SizedBox(width: 20), _currentUser == null? Row(mainAxisSize: MainAxisSize.min, children: [ElevatedButton(onPressed: () => _showSelectionDialog(context, true), style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14)), child: const Text("Üye Ol", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white))), const SizedBox(width: 12), ElevatedButton(onPressed: () => _showSelectionDialog(context, false), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14)), child: const Text("GİRİŞ YAP", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)))]) : Row(mainAxisSize: MainAxisSize.min, children: [ElevatedButton(onPressed: _isProfileLoading? null : () async { setState(() => _isProfileLoading = true); bool adminMi = await _authService.isAdmin(); String? role = await _authService.getUserRole(); if (!mounted) return; setState(() => _isProfileLoading = false); if (adminMi) Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboard())); else if (role == 'usta' || role == 'master') Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaProfilSayfasi())); else Navigator.push(context, MaterialPageRoute(builder: (context) => const MusteriProfilSayfasi())); }, style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14)), child: _isProfileLoading? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text("Profilim", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white))), const SizedBox(width: 12), OutlinedButton(onPressed: () async => await _authService.signOut(), style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14)), child: const Text("Çıkış Yap", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)))])]));
     });
   }
 
   Widget _buildHero(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       bool isNarrow = constraints.maxWidth < 1000;
-      return Padding(padding: const EdgeInsets.fromLTRB(80, 20, 80, 40), child: Flex(direction: isNarrow ? Axis.vertical : Axis.horizontal, crossAxisAlignment: CrossAxisAlignment.center, children: [Expanded(flex: 5, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Chip(label: Text("YAPAY ZEKA DESTEĞİ İLE", style: TextStyle(color: Color(0xFFDC143C), fontWeight: FontWeight.bold)), backgroundColor: Color(0xFFFFEBEE), side: BorderSide.none), const SizedBox(height: 12), RichText(text: TextSpan(style: GoogleFonts.poppins(fontSize: 62, fontWeight: FontWeight.bold, height: 1.05), children: const [TextSpan(text: "Ustanızı ", style: TextStyle(color: Colors.black87)), TextSpan(text: "Dakikalar ", style: TextStyle(color: Color(0xFFDC143C))), TextSpan(text: "İçinde Bulun", style: TextStyle(color: Colors.black87))])), const SizedBox(height: 12), const Text("Yapay zeka ile anında fiyat tahmini alın, doğrulanmış ustalardan\nteklifler alın ve işinizi güvenle tamamlayın.", style: TextStyle(fontSize: 20, height: 1.6, color: Colors.black87)), const SizedBox(height: 18), Row(children: [ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 22), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text("İLAN VER", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white))), const SizedBox(width: 16), OutlinedButton(onPressed: () {}, style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 22), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text("Usta Ol →", style: TextStyle(fontSize: 18)))])])), if (!isNarrow) const SizedBox(width: 60), Expanded(flex: 5, child: Align(alignment: Alignment.centerRight, child: Image.asset('assets/usta.png', height: 600, fit: BoxFit.contain, errorBuilder: (c, e, s) => Container(height: 600, color: Colors.grey[100], child: const Center(child: Text("usta.png yüklenemedi"))))))]));
+      return Padding(padding: const EdgeInsets.fromLTRB(80, 0, 80, 40), child: Flex(direction: isNarrow? Axis.vertical : Axis.horizontal, crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Expanded(flex: 5, child: Transform.translate(offset: const Offset(0, -40), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // CHIP SİLİNDİ
+          const SizedBox(height: 12),
+          RichText(text: TextSpan(style: GoogleFonts.poppins(fontSize: 62, fontWeight: FontWeight.bold, height: 1.05), children: const [TextSpan(text: "Ustanızı ", style: TextStyle(color: Colors.black87)), TextSpan(text: "Dakikalar ", style: TextStyle(color: Color(0xFFDC143C))), TextSpan(text: "İçinde Bulun", style: TextStyle(color: Colors.black87))])), const SizedBox(height: 12), const Text("Yapay zeka ile anında fiyat tahmini alın, doğrulanmış ustalardan\nteklifler alın ve işinizi güvenle tamamlayın.", style: TextStyle(fontSize: 20, height: 1.6, color: Colors.black87)), const SizedBox(height: 18),
+          // İLAN VER ve Usta Ol → BUTONLARI SİLİNDİ
+          const InsaatRehberiSlider() // WIDGET ÇAĞRILDI
+        ]))),
+        if (!isNarrow) const SizedBox(width: 60),
+        Expanded(flex: 5, child: Align(alignment: Alignment.centerRight, child: Image.asset('assets/usta.png', height: 600, fit: BoxFit.contain, errorBuilder: (c, e, s) => Container(height: 600, color: Colors.grey[100], child: const Center(child: Text("usta.png yüklenemedi"))))))]));
     });
   }
 
@@ -147,7 +158,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
           return Column(
             children: [
               Flex(
-                direction: isNarrow ? Axis.vertical : Axis.horizontal,
+                direction: isNarrow? Axis.vertical : Axis.horizontal,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -173,7 +184,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   Widget _buildFooterLink(BuildContext context, String text, String documentId) => Padding(padding: const EdgeInsets.only(bottom: 4), child: InkWell(onTap: () => showSozlesmeDialog(context, documentId, text), child: Text(text, style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 12, decoration: TextDecoration.underline))));
 
   void _showSelectionDialog(BuildContext context, bool isRegister) {
-    showDialog(context: context, builder: (context) => AlertDialog(title: Text(isRegister ? "Üyelik Tipi Seçin" : "Giriş Tipi Seçin"), content: Column(mainAxisSize: MainAxisSize.min, children: [ListTile(title: const Text("Usta Olarak"), onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (context) => isRegister ? UstaKayitEkrani() : UstaGirisEkrani())); }), ListTile(title: const Text("Müşteri Olarak"), onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (context) => isRegister ? MusteriKayitEkrani() : MusteriGirisEkrani())); })])));
+    showDialog(context: context, builder: (context) => AlertDialog(title: Text(isRegister? "Üyelik Tipi Seçin" : "Giriş Tipi Seçin"), content: Column(mainAxisSize: MainAxisSize.min, children: [ListTile(title: const Text("Usta Olarak"), onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (context) => isRegister? UstaKayitEkrani() : UstaGirisEkrani())); }), ListTile(title: const Text("Müşteri Olarak"), onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (context) => isRegister? MusteriKayitEkrani() : MusteriGirisEkrani())); })])));
   }
 }
 

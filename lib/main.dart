@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:ustam_gelsin/core/config/firebase_options.dart';
 import 'package:ustam_gelsin/core/services/notification_service.dart';
@@ -16,6 +15,8 @@ import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dar
 import 'package:ustam_gelsin/core/theme/usta_theme.dart';
 import 'package:ustam_gelsin/services/yorum_service.dart';
 import 'package:ustam_gelsin/env.dart';
+import 'package:ustam_gelsin/features/admin/screens/blog_ekle_screen.dart';
+import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
 
 // Arka plan bildirim işleyicisi
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -30,12 +31,6 @@ void main() async {
 
   // 2. Kritik başlangıç verilerini yükle
   await YorumService.loadData();
-
-  try {
-    await dotenv.load(fileName: ".env");
-  } catch (e) {
-    debugPrint("Env dosyası yüklenemedi: $e");
-  }
 
   // 3. Firebase Başlatma
   await Firebase.initializeApp(
@@ -74,8 +69,13 @@ void main() async {
 // App Check başlatma fonksiyonu (Temiz hali)
 void _initializeAppCheck() {
   FirebaseAppCheck.instance.activate(
-    androidProvider: kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-    webProvider: kIsWeb ? ReCaptchaEnterpriseProvider('6Lcc_B4tAAAAAMgSTPKVFEPM88Wdoy-1AWmqs68L') : null,
+    androidProvider:
+    kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+    webProvider: kIsWeb
+        ? ReCaptchaEnterpriseProvider(
+      '6Lcc_B4tAAAAAMgSTPKVFEPM88Wdoy-1AWmqs68L',
+    )
+        : null,
   );
 }
 
@@ -100,8 +100,11 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       initialRoute: '/',
       routes: {
-        '/': (context) => kIsWeb ? const WebHomeScreen() : const HomeScreen(),
+        '/': (context) =>
+        kIsWeb ? const WebHomeScreen() : const HomeScreen(),
         '/musteri_profil': (context) => const MusteriProfilSayfasi(),
+        '/admin': (context) => const AdminDashboard(),
+        '/admin/blog-ekle': (context) => const BlogEkleScreen(),
       },
     );
   }
