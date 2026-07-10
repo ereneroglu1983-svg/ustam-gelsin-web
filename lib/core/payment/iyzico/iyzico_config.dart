@@ -8,8 +8,8 @@ class IyzicoConfig {
   // Direkt function adını kullanacağız
 
   // Kullanıcı ödeme sonrası yönleneceği sayfalar
-  static const String successUrl = "https://ustamgelsin.com/odeme/basarili";
-  static const String failUrl = "https://ustamgelsin.com/odeme/basarisiz";
+  static const String successUrl = "https://hemenustamgelsin.com/odeme-basarili";
+  static const String failUrl = "https://hemenustamgelsin.com/odeme-basarisiz";
 
 // Callback'i Firebase Function handle ediyor, bizim URL vermemize gerek yok
 // iyzicoCallback function'ı otomatik /iyzicoCallback endpointini açıyor
