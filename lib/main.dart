@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:ustam_gelsin/core/config/firebase_options.dart';
 import 'package:ustam_gelsin/core/services/notification_service.dart';
@@ -17,6 +16,7 @@ import 'package:ustam_gelsin/services/yorum_service.dart';
 import 'package:ustam_gelsin/env.dart';
 import 'package:ustam_gelsin/features/admin/screens/blog_ekle_screen.dart';
 import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
+import 'package:ustam_gelsin/core/payment/screens/odeme_basarili_page.dart';
 
 // Arka plan bildirim işleyicisi
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -46,8 +46,9 @@ void main() async {
         : DefaultFirebaseOptions.currentPlatform,
   );
 
-  // 4. App Check'i arka planda başlat
-  _initializeAppCheck();
+  // 4. APP CHECK KODLARI TAMAMEN KALDIRILDI
+  // Güvenlik mekanizması kaynaklı "Too many attempts" ve "Timeout" hatalarını engellemek için
+  // Firebase SDK'sının otomatik token sorgulaması devre dışı bırakıldı.
 
   // 5. Diğer servisleri başlat
   if (!kIsWeb) {
@@ -64,19 +65,6 @@ void main() async {
   FlutterNativeSplash.remove();
 
   runApp(const MyApp());
-}
-
-// App Check başlatma fonksiyonu (Temiz hali)
-void _initializeAppCheck() {
-  FirebaseAppCheck.instance.activate(
-    androidProvider:
-    kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
-    webProvider: kIsWeb
-        ? ReCaptchaEnterpriseProvider(
-      '6Lcc_B4tAAAAAMgSTPKVFEPM88Wdoy-1AWmqs68L',
-    )
-        : null,
-  );
 }
 
 class MyApp extends StatelessWidget {
@@ -105,6 +93,7 @@ class MyApp extends StatelessWidget {
         '/musteri_profil': (context) => const MusteriProfilSayfasi(),
         '/admin': (context) => const AdminDashboard(),
         '/admin/blog-ekle': (context) => const BlogEkleScreen(),
+        '/odeme-basarili': (context) => const OdemeBasariliPage(), // EKLENDİ
       },
     );
   }

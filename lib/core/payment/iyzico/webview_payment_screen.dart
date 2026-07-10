@@ -1,10 +1,8 @@
-// lib/core/payment/akbank/webview_payment_screen.dart
+// lib/core/payment/iyzico/webview_payment_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'akbank_config.dart';
-import 'akbank_manager.dart';
+import 'iyzico_config.dart';
 
 class WebviewPaymentScreen extends StatefulWidget {
   final String paymentUrl;
@@ -22,9 +20,7 @@ class WebviewPaymentScreen extends StatefulWidget {
 
 class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
   late final WebViewController _controller;
-  final AkbankManager _manager = AkbankManager();
   bool _isLoading = true;
-  bool _isProcessing = false;
   bool _hasFinished = false;
 
   @override
@@ -47,14 +43,14 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
           onNavigationRequest: (request) {
             final url = request.url;
 
-            if (url.startsWith(AkbankConfig.successUrl)) {
-              // DÜZELTME: async kaldırıldı, Future microtask
-              Future.microtask(() => _handlePaymentResult(true));
+            // SİLİNDİ: AkbankConfig → IyzicoConfig
+            if (url.startsWith(IyzicoConfig.successUrl)) {
+              _finishWithResult(true, "Ödeme başarılı! Bakiye yükleniyor...");
               return NavigationDecision.prevent;
             }
 
-            if (url.startsWith(AkbankConfig.failUrl)) {
-              Future.microtask(() => _handlePaymentResult(false));
+            if (url.startsWith(IyzicoConfig.failUrl)) {
+              _finishWithResult(false, "Ödeme başarısız veya iptal edildi.");
               return NavigationDecision.prevent;
             }
 
@@ -62,37 +58,15 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
           },
           onWebResourceError: (error) {
             debugPrint("WebView Error: ${error.description}");
-            _handlePaymentResult(false, errorMsg: "Bağlantı hatası oluştu");
+            _finishWithResult(false, "Bağlantı hatası oluştu");
           },
         ),
       )
       ..loadRequest(Uri.parse(widget.paymentUrl));
   }
 
-  Future<void> _handlePaymentResult(bool isSuccess, {String? errorMsg}) async {
-    if (_isProcessing || _hasFinished) return;
-    _isProcessing = true;
-    if (mounted) setState(() {});
-
-    try {
-      if (isSuccess) {
-        final verified = await _manager.verifyAndCompletePayment(widget.orderId);
-        if (!mounted) return;
-
-        if (verified) {
-          _finishWithResult(true, "Ödeme başarılı! Bakiyeniz yüklendi.");
-        } else {
-          _finishWithResult(false, "Ödeme doğrulanamadı. Lütfen bakiyenizi kontrol edin.");
-        }
-      } else {
-        _finishWithResult(false, errorMsg ?? "Ödeme iptal edildi veya başarısız oldu.");
-      }
-    } catch (e) {
-      _finishWithResult(false, "İşlem sırasında hata: $e");
-    } finally {
-      _isProcessing = false;
-    }
-  }
+  // SİLİNDİ: _handlePaymentResult komple gitti
+  // Sebep: verifyAndCompletePayment yok. Bakiye yüklemeyi backend yaptı.
 
   void _finishWithResult(bool success, String message) {
     if (_hasFinished) return;
@@ -103,14 +77,15 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
         SnackBar(
           content: Text(message),
           backgroundColor: success ? Colors.green : Colors.red,
+          duration: const Duration(seconds: 3),
         ),
       );
+      // true dönerse bir önceki sayfa "bakiye stream'i dinle" diyecek
       Navigator.of(context).pop(success);
     }
   }
 
   Future<bool> _onWillPop() async {
-    if (_isProcessing) return false;
     _finishWithResult(false, "Ödeme iptal edildi.");
     return false;
   }
@@ -126,14 +101,14 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
           actions: [
             IconButton(
               icon: const Icon(Icons.close),
-              onPressed: _isProcessing ? null : () => _finishWithResult(false, "Ödeme iptal edildi."),
+              onPressed: () => _finishWithResult(false, "Ödeme iptal edildi."),
             ),
           ],
         ),
         body: Stack(
           children: [
             WebViewWidget(controller: _controller),
-            if (_isLoading || _isProcessing)
+            if (_isLoading)
               Container(
                 color: Colors.black26,
                 child: const Center(child: CircularProgressIndicator()),

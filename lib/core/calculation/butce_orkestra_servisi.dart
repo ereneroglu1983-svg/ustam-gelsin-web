@@ -2,16 +2,15 @@
 
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart'; // debugPrint için gerekli
 import '../constants/is_sorulari_data.dart';
-
-// 41 Mesleğin Güncel Hesaplayıcı Servis Importları
 import 'meslekler/alci_siva.dart';
 import 'meslekler/aluminyum_cephe.dart';
 import 'meslekler/asansor_servis.dart';
 import 'meslekler/asma_tavan.dart';
 import 'meslekler/bahce_peyzaj.dart';
 import 'meslekler/banyo_vestiyer.dart';
-import 'meslekler/bina_temizlik_hesaplayici.dart';
+import 'meslekler/temizlik_hizmetleri.dart';
 import 'meslekler/bolme_duvar.dart';
 import 'meslekler/cam_balkon.dart';
 import 'meslekler/cati_isleri.dart';
@@ -45,6 +44,12 @@ import 'meslekler/sineklik_panjur.dart';
 import 'meslekler/sistre_cila.dart';
 import 'meslekler/su_yalitimi.dart';
 import 'meslekler/uydu_kamera.dart';
+import 'meslekler/cilingir.dart';
+import 'meslekler/hesap_yenilenebilir_enerji/hesap_elektrikli_arac.dart';
+import 'meslekler/hesap_yenilenebilir_enerji/hesap_enerji_depolama.dart';
+import 'meslekler/hesap_yenilenebilir_enerji/hesap_ges.dart';
+import 'meslekler/hesap_yenilenebilir_enerji/hesap_off_grid_mobil_enerji.dart';
+import 'meslekler/hesap_yenilenebilir_enerji/hesap_res.dart';
 
 class ButceOrkestraServisi {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -53,97 +58,61 @@ class ButceOrkestraServisi {
     required String kategori,
     required List<dynamic> gelenCevaplar,
   }) {
-    final String arananKategori = kategori.trim().toUpperCase();
+    final String aranan = kategori.trim().toUpperCase();
 
-    switch (arananKategori) {
-      case "İÇ CEPHE BOYA VE BADANA":
-        return IcBoyaHesaplayici.hesapla(gelenCevaplar);
-      case "DIŞ CEPHE BOYA VE MANTOLAMA":
-        return DisCepheHesaplayici.hesapla(gelenCevaplar);
-      case "DUVAR KAĞIDI VE POSTER UYGULAMASI":
-        return DuvarKagidiHesaplayici.hesapla(gelenCevaplar);
-      case "İTALYAN BOYA VE DEKORATİF SIVA":
-        return ItalyanBoyaHesaplayici.hesapla(gelenCevaplar);
-      case "ASMA TAVAN":
-        return AsmaTavanHesaplayici.hesapla(gelenCevaplar);
-      case "GERGİ TAVAN SİSTEMLERİ":
-        return GergiTavanHesaplayici.hesapla(gelenCevaplar);
-      case "KARTONPİYER, STROPİYER VE ÇITALAMA":
-        return KartonpiyerHesaplayici.hesapla(gelenCevaplar);
-      case "ALÇI SIVA VE SATEN ALÇI":
-        return AlciSivaHesaplayici.hesapla(gelenCevaplar);
-      case "BÖLME DUVAR (ALÇIPAN/BETOBAN/CAM)":
-        return BolmeDuvarHesaplayici.hesapla(gelenCevaplar);
-      case "FAYANS , SERAMİK VE KALEBODUR":
-        return FayansSeramikHesaplayici.hesapla(gelenCevaplar);
-      case "LAMİNAT , LAMİNE VE MASİF PARKE":
-        return ParkeDosemeHesaplayici.hesapla(gelenCevaplar);
-      case "MERMER , GRANİT VE TRAVERTEN":
-        return MermerGranitHesaplayici.hesapla(gelenCevaplar);
-      case "EPOKSİ ZEMİN KAPLAMA":
-        return EpoksiZeminHesaplayici.hesapla(gelenCevaplar);
-      case "SİSTRE CİLA İŞLERİ":
-        return SistreCilaHesaplayici.hesapla(gelenCevaplar);
-      case "SIHHİ TESİSAT VE PİS SU TESİSATI":
-        return SihhiTesisatHesaplayici.hesapla(gelenCevaplar);
-      case "ELEKTRİK TESİSATI":
-        return ElektrikTesisatHesaplayici.hesapla(gelenCevaplar);
-      case "DOĞALGAZ TESİSATI VE KOMBİ MONTAJI/BAKIMI":
-        return DogalgazKombiHesaplayici.hesapla(gelenCevaplar);
-      case "GÜNEŞ ENERJİSİ VE TERMOSİFON":
-        return GunesEnerjisiHesaplayici.hesapla(gelenCevaplar);
-      case "KLİMA MONTAJ , BAKIM VE GAZ DOLUMU":
-        return KlimaServisHesaplayici.hesapla(gelenCevaplar);
-      case "PVC DOĞRAMA":
-        return PvcDogramaHesaplayici.hesapla(gelenCevaplar);
-      case "ALÜMİNYUM DOĞRAMA VE CEPHE":
-        return AluminyumCepheHesaplayici.hesapla(gelenCevaplar);
-      case "CAM BALKON VE GİYOTİN CAM":
-        return CamBalkonHesaplayici.hesapla(gelenCevaplar);
-      case "ODA KAPISI VE ÇELİK KAPI":
-        return KapiSistemleriHesaplayici.hesapla(gelenCevaplar);
-      case "SİNEKLİK VE PANJUR SİSTEMLERİ":
-        return SineklikPanjurHesaplayici.hesapla(gelenCevaplar);
-      case "MUTFAK DOLABI VE TEZGAHI":
-        return MutfakDolabiHesaplayici.hesapla(gelenCevaplar);
-      case "BANYO DOLABI VE VESTİYER":
-        return BanyoVestiyerHesaplayici.hesapla(gelenCevaplar);
-      case "GÖMME DOLAP VE RAY DOLAP":
-        return RayDolapHesaplayici.hesapla(gelenCevaplar);
-      case "MARANGOZLUK VE MOBİLYA TAMİRİ":
-        return MarangozlukHesaplayici.hesapla(gelenCevaplar);
-      case "ÇATI YAPIMI AKTARMA VE İZALASYON":
-        return CatiIsleriHesaplayici.hesapla(gelenCevaplar);
-      case "SANDVİÇ PANEL VE ŞİNGIL KAPLAMA":
-        return PanelSingilHesaplayici.hesapla(gelenCevaplar);
-      case "TEMEL VE BODRUM SU YALITIMI":
-        return SuYalitimiHesaplayici.hesapla(gelenCevaplar);
-      case "BAHÇE PEYZAJ VE ÇİM EKİMİ":
-        return BahcePeyzajHesaplayici.hesapla(gelenCevaplar);
-      case "OTAMATİK SULAMA SİSTEMLERİ":
-        return OtomatikSulamaHesaplayici.hesapla(gelenCevaplar);
-      case "HAVUZ YAPIMI VE BAKIMI":
-        return HavuzSistemleriHesaplayici.hesapla(gelenCevaplar);
-      case "FERFORJE KORKULUK VE BAHÇE KAPISI":
-        return FerforjeMetalHesaplayici.hesapla(gelenCevaplar);
-      case "KONTEYNER, BUNGALOV VE PREFABRİK":
-        return PrefabrikYapiHesaplayici.hesapla(gelenCevaplar);
-      case "UYDU, INTERNET VE KAMERA SİTEMLERİ":
-        return UyduKameraHesaplayici.hesapla(gelenCevaplar);
-      case "ASANSÖR BAKIM VE ONARIM":
-        return AsansorHesaplayici.hesapla(gelenCevaplar);
-      case "ANAHTAR TESLİM KOMPLE TADİLAT":
-        return KompleTadilatHesaplayici.hesapla(gelenCevaplar);
-      case "BİNA, OFİS VE DIŞ CEPHE TEMİZLİĞİ":
-        return BinaTemizlikHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("LAMİNAT") || aranan.contains("PARKE")) return ParkeDosemeHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("İÇ CEPHE") || aranan.contains("BOYA")) return IcBoyaHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("FAYANS") || aranan.contains("SERAMİK")) return FayansSeramikHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("MERMER") || aranan.contains("GRANİT")) return MermerGranitHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("ALÇI") || aranan.contains("SIVA")) return AlciSivaHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("ASMA TAVAN")) return AsmaTavanHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("GERGİ TAVAN")) return GergiTavanHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("KARTONPİYER")) return KartonpiyerHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("BÖLME DUVAR")) return BolmeDuvarHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("EPOKSİ")) return EpoksiZeminHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("SİSTRE")) return SistreCilaHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("SIHHİ") || aranan.contains("TESİSAT")) return SihhiTesisatHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("ELEKTRİK")) return ElektrikTesisatHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("DOĞALGAZ") || aranan.contains("KOMBİ")) return DogalgazKombiHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("GÜNEŞ") || aranan.contains("ENERJİ")) return GunesEnerjisiHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("KLİMA")) return KlimaServisHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("PVC")) return PvcDogramaHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("ALÜMİNYUM")) return AluminyumCepheHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("CAM BALKON")) return CamBalkonHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("KAPI")) return KapiSistemleriHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("SİNEKLİK") || aranan.contains("PANJUR")) return SineklikPanjurHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("MUTFAK")) return MutfakDolabiHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("BANYO")) return BanyoVestiyerHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("GÖMME") || aranan.contains("RAY DOLAP")) return RayDolapHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("MARANGOZ")) return MarangozlukHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("ÇATI")) return CatiIsleriHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("SANDVİÇ") || aranan.contains("ŞİNGIL")) return PanelSingilHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("YALITIM") || aranan.contains("SU YALITIMI")) return SuYalitimiHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("BAHÇE") || aranan.contains("PEYZAJ")) return BahcePeyzajHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("SULAMA")) return OtomatikSulamaHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("HAVUZ")) return HavuzSistemleriHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("FERFORJE")) return FerforjeMetalHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("PREFABRİK") || aranan.contains("BUNGALOV")) return PrefabrikYapiHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("UYDU") || aranan.contains("KAMERA")) return UyduKameraHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("ASANSÖR")) return AsansorHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("TADİLAT")) return KompleTadilatHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("TEMİZLİK")) return TemizlikHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("ÇİLİNGİR")) return CilingirHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("ELEKTRİKLİ ARAÇ")) return ElektrikliAracHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("ENERJİ DEPOLAMA")) return EnerjiDepolamaHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("GES")) return GESHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("OFF-GRID")) return OffGridMobilEnerjiHesaplayici.hesapla(gelenCevaplar);
+    if (aranan.contains("RÜZGAR")) return RESHesaplayici.hesapla(gelenCevaplar);
 
-      default:
-        print("!!! HATA: ButceOrkestraServisi'nde eşleşen case bulunamadı. Kategori: $arananKategori");
-        return {
-          "hata": "Eşleşen yerel robot hesaplayıcı bulunamadı.",
-          "kategori": kategori
-        };
-    }
+    debugPrint("!!! KRİTİK: Kategori eşleşmedi, Fallback devrede. Aranan: $aranan");
+    return {
+      "hata": "Eşleşen yerel robot hesaplayıcı bulunamadı.",
+      "kategori": aranan,
+      "minimumButce": 1000.0,
+      "muhtemelButce": 3000.0,
+      "maksimumButce": 5000.0,
+      "durum": "HATA"
+    };
   }
 
   static Future<Map<String, dynamic>> silsileYurut({
@@ -156,7 +125,7 @@ class ButceOrkestraServisi {
   }) async {
     print("--- SİLSİLE MOTORU BAŞLATILDI (Talep ID: $talepId) ---");
 
-    if (yerelHafizaVerisi.containsKey(talepId) && yerelHafizaVerisi[talepId] != null) {
+    if (yerelHafizaVerisi.containsKey(talepId) && yerelHafizaVerisi[talepId]!= null) {
       print("[SİLSİLE 1] Veri RAM üzerinde bulundu. Doğrudan ekrana basılıyor.");
       return yerelHafizaVerisi[talepId];
     }
@@ -183,7 +152,7 @@ class ButceOrkestraServisi {
       }
       print("[SİLSİLE 2] Ortak havuzda eşleşme yok. Yeni arama olarak işleniyor.");
     } catch (e) {
-      print("[SİLSİLE HATA] Firebase sorgulanırken hata oluştu (İndeks gerekiyorsa logdaki linki kullan): $e");
+      print("[SİLSİLE HATA] Firebase sorgulanırken hata oluştu: $e");
     }
 
     print("[SİLSİLE 4] Veriler yerel hesaplama robotuna gönderiliyor...");

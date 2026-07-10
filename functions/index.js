@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const axios = require("axios");
 const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 
 admin.initializeApp();
 
@@ -11,7 +12,7 @@ exports.adminKritikAlarm = onDocumentCreated('system_alerts/{alertId}', async (e
         const alertData = event.data.data();
         const message = {
             token: functions.config().admin?.phone_token,
-            notification: { title: '⚠️ KRİTİK SİSTEM ALARMI', body: alertData.message || 'Sistemde müdahale gerektiren bir durum var!' },
+            notification: { title: '⚠ KRİTİK SİSTEM ALARMI', body: alertData.message || 'Sistemde müdahale gerektiren bir durum var!' },
             android: { priority: 'high', notification: { channelId: 'high_importance_channel', sound: 'default', visibility: 'public' } },
         };
         return await admin.messaging().send(message);
@@ -158,14 +159,13 @@ exports.sendSupportNotification = onDocumentCreated('admin_messages/{messageId}'
     }
 });
 
-// 8. Usta İşi Kabul Edince Müşteriye Bildirim Gönderen Fonksiyon (Robust Mantık)
+// 8. Usta İşi Kabul Edince Müşteriye Bildirim Gönderen Fonksiyon
 exports.ustaIsiKabulEdinceMusteriyeBildir = onDocumentUpdated('acil_cagri/{cagriId}', async (event) => {
     const newData = event.data.after.data();
     const previousData = event.data.before.data();
 
     if (previousData.durum !== 'atandi' && newData.durum === 'atandi') {
         const customerId = newData.userId;
-        // Eğer ustaAd boş gelirse "Ustanız" olarak göster
         const ustaAd = (newData.ustaAd && newData.ustaAd.length > 0) ? newData.ustaAd : "Ustanız";
         const ustaTel = newData.ustaTelefon || "bilinmiyor";
 
@@ -192,4 +192,51 @@ exports.ustaIsiKabulEdinceMusteriyeBildir = onDocumentUpdated('acil_cagri/{cagri
         }
     }
     return null;
+});
+
+// 9. ADMİN MANUEL BAKİYE YÜKLEME - FRANKFURT v2
+exports.adminBakiyeYukle = onCall({ region: "europe-west3" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Giriş yapmalısın');
+  }
+
+  if (request.auth.token.admin !== true) {
+    throw new HttpsError('permission-denied', 'Admin yetkin yok');
+  }
+
+  const { hedefUid, amount, note } = request.data;
+
+  if (!hedefUid || !amount || amount <= 0) {
+    throw new HttpsError('invalid-argument', 'hedefUid ve amount zorunlu');
+  }
+
+  const db = admin.firestore();
+  const walletRef = db.collection('wallets').doc(hedefUid);
+  const transRef = walletRef.collection('transactions').doc();
+
+  try {
+    await db.runTransaction(async (transaction) => {
+      const walletDoc = await transaction.get(walletRef);
+      const currentBalance = walletDoc.exists ? (walletDoc.data().balance || 0) : 0;
+      const newBalance = currentBalance + amount;
+
+      transaction.set(walletRef, {
+        balance: newBalance,
+        lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      transaction.set(transRef, {
+        amount: amount,
+        type: 'deposit',
+        description: note || 'Admin Manuel Yükleme',
+        date: admin.firestore.FieldValue.serverTimestamp(),
+        adminUid: request.auth.uid,
+      });
+    });
+
+    return { success: true, message: 'Bakiye yüklendi' };
+  } catch (error) {
+    console.error('Admin bakiye yükleme hatası:', error);
+    throw new HttpsError('internal', 'Bakiye yüklenemedi');
+  }
 });

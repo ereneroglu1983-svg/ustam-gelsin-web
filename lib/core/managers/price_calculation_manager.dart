@@ -44,7 +44,7 @@ class PriceCalculationManager {
         kategoriAdi: kategori,
         kategoriId: kategoriId,
         detaylar: detaylar,
-      ).timeout(const Duration(seconds: 8));
+      ).timeout(const Duration(seconds: 60));
 
       if (aiRaw.isEmpty || aiRaw == "0" || aiRaw.length > 10) throw Exception("Geçersiz AI");
       sonuc = aiRaw;

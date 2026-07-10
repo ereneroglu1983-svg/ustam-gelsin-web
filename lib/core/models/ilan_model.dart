@@ -1,5 +1,3 @@
-// lib/core/models/ilan_model.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class IlanModel {
@@ -10,7 +8,7 @@ class IlanModel {
   final String durum;
   final String tarih;
   final String userId;
-  final String fiyatBilgisi;
+  final String fiyatBilgisi; // ESKİ SİSTEM: Sadece String
   final String detaylar;
   final String musteriAd;
   final String maskeliAd;
@@ -32,6 +30,8 @@ class IlanModel {
   final double longitude;
   final String? musteriAdSoyad;
   final String? sehirIlceMetni;
+  final List<String> resimler;
+  final int teklifSayisi;
 
   IlanModel({
     required this.id,
@@ -63,6 +63,8 @@ class IlanModel {
     this.longitude = 0.0,
     this.musteriAdSoyad,
     this.sehirIlceMetni,
+    this.resimler = const [],
+    this.teklifSayisi = 0,
   });
 
   IlanModel copyWith({
@@ -73,7 +75,7 @@ class IlanModel {
     String? durum,
     String? tarih,
     String? userId,
-    String? fiyatBilgisi,
+    String? fiyatBilgisi, // ESKİ SİSTEM: String
     String? detaylar,
     String? musteriAd,
     String? maskeliAd,
@@ -95,37 +97,41 @@ class IlanModel {
     double? longitude,
     String? musteriAdSoyad,
     String? sehirIlceMetni,
+    List<String>? resimler,
+    int? teklifSayisi,
   }) {
     return IlanModel(
-      id: id ?? this.id,
-      baslik: baslik ?? this.baslik,
-      kategoriId: kategoriId ?? this.kategoriId,
-      kategori: kategori ?? this.kategori,
-      durum: durum ?? this.durum,
-      tarih: tarih ?? this.tarih,
-      userId: userId ?? this.userId,
-      fiyatBilgisi: fiyatBilgisi ?? this.fiyatBilgisi,
-      detaylar: detaylar ?? this.detaylar,
-      musteriAd: musteriAd ?? this.musteriAd,
-      maskeliAd: maskeliAd ?? this.maskeliAd,
-      musteriTelefon: musteriTelefon ?? this.musteriTelefon,
-      konumMetin: konumMetin ?? this.konumMetin,
-      acikAdres: acikAdres ?? this.acikAdres,
-      ilId: ilId ?? this.ilId,
-      ilceId: ilceId ?? this.ilceId,
-      ilanCode: ilanCode ?? this.ilanCode,
-      isTanimi: isTanimi ?? this.isTanimi,
-      komisyonTutari: komisyonTutari ?? this.komisyonTutari,
-      komisyonOdendiMi: komisyonOdendiMi ?? this.komisyonOdendiMi,
-      isAcil: isAcil ?? this.isAcil,
-      metreKare: metreKare ?? this.metreKare,
-      odaSayisi: odaSayisi ?? this.odaSayisi,
-      hizmetTipi: hizmetTipi ?? this.hizmetTipi,
-      teknikDetaylar: teknikDetaylar ?? this.teknikDetaylar,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
-      musteriAdSoyad: musteriAdSoyad ?? this.musteriAdSoyad,
-      sehirIlceMetni: sehirIlceMetni ?? this.sehirIlceMetni,
+      id: id?? this.id,
+      baslik: baslik?? this.baslik,
+      kategoriId: kategoriId?? this.kategoriId,
+      kategori: kategori?? this.kategori,
+      durum: durum?? this.durum,
+      tarih: tarih?? this.tarih,
+      userId: userId?? this.userId,
+      fiyatBilgisi: fiyatBilgisi?? this.fiyatBilgisi,
+      detaylar: detaylar?? this.detaylar,
+      musteriAd: musteriAd?? this.musteriAd,
+      maskeliAd: maskeliAd?? this.maskeliAd,
+      musteriTelefon: musteriTelefon?? this.musteriTelefon,
+      konumMetin: konumMetin?? this.konumMetin,
+      acikAdres: acikAdres?? this.acikAdres,
+      ilId: ilId?? this.ilId,
+      ilceId: ilceId?? this.ilceId,
+      ilanCode: ilanCode?? this.ilanCode,
+      isTanimi: isTanimi?? this.isTanimi,
+      komisyonTutari: komisyonTutari?? this.komisyonTutari,
+      komisyonOdendiMi: komisyonOdendiMi?? this.komisyonOdendiMi,
+      isAcil: isAcil?? this.isAcil,
+      metreKare: metreKare?? this.metreKare,
+      odaSayisi: odaSayisi?? this.odaSayisi,
+      hizmetTipi: hizmetTipi?? this.hizmetTipi,
+      teknikDetaylar: teknikDetaylar?? this.teknikDetaylar,
+      latitude: latitude?? this.latitude,
+      longitude: longitude?? this.longitude,
+      musteriAdSoyad: musteriAdSoyad?? this.musteriAdSoyad,
+      sehirIlceMetni: sehirIlceMetni?? this.sehirIlceMetni,
+      resimler: resimler?? this.resimler,
+      teklifSayisi: teklifSayisi?? this.teklifSayisi,
     );
   }
 
@@ -140,10 +146,17 @@ class IlanModel {
     return adSoyad.toUpperCase();
   }
 
+  // ESKİ SİSTEM: Sadece String fiyat destekli komisyon hesaplama
   static double _komisyonHesapla(String fiyat) {
     String temizFiyat = fiyat.replaceAll(RegExp(r'[^0-9]'), '');
-    double tutar = double.tryParse(temizFiyat) ?? 0.0;
-    return tutar * 0.01;
+    double tutar = double.tryParse(temizFiyat)?? 0.0;
+
+    // Kural: 15k altı sabit 150 TL, üstü %1
+    if (tutar >= 15000) {
+      return tutar * 0.01;
+    } else {
+      return 150.0;
+    }
   }
 
   static Map<String, dynamic> _teknikDetaylariNormalizeEt(Map<String, dynamic> hamDetaylar) {
@@ -152,8 +165,9 @@ class IlanModel {
   }
 
   factory IlanModel.fromMap(Map<String, dynamic> map, [String? docId]) {
-    String ad = map['musteriAd']?.toString() ?? map['name']?.toString() ?? '';
-    String fiyat = map['fiyatBilgisi']?.toString() ?? '0';
+    String ad = map['musteriAd']?.toString()?? map['name']?.toString()?? '';
+    // ESKİ SİSTEM: Fiyat bilgisi String gelir
+    String fiyat = map['fiyatBilgisi']?.toString()?? '0 ₺';
 
     Map<String, dynamic> hamTeknikDetaylar = map['teknikDetaylar'] is Map
         ? Map<String, dynamic>.from(map['teknikDetaylar'])
@@ -162,35 +176,37 @@ class IlanModel {
     Map<String, dynamic> temizTeknikDetaylar = _teknikDetaylariNormalizeEt(hamTeknikDetaylar);
 
     return IlanModel(
-      id: docId ?? map['id']?.toString() ?? '',
-      baslik: map['baslik']?.toString() ?? '',
-      kategoriId: map['kategoriId']?.toString() ?? '',
-      kategori: map['kategori']?.toString() ?? '',
-      durum: map['durum']?.toString() ?? 'aktif',
-      tarih: map['tarih']?.toString() ?? DateTime.now().toIso8601String(),
-      userId: map['userId']?.toString() ?? map['uid']?.toString() ?? '',
+      id: docId?? map['id']?.toString()?? '',
+      baslik: map['baslik']?.toString()?? '',
+      kategoriId: map['kategoriId']?.toString()?? '',
+      kategori: map['kategori']?.toString()?? '',
+      durum: map['durum']?.toString()?? 'aktif',
+      tarih: map['tarih']?.toString()?? DateTime.now().toIso8601String(),
+      userId: map['userId']?.toString()?? map['uid']?.toString()?? '',
       fiyatBilgisi: fiyat,
-      detaylar: map['detaylar']?.toString() ?? '',
+      detaylar: map['detaylar']?.toString()?? '',
       musteriAd: ad,
       maskeliAd: _maskele(ad),
-      musteriTelefon: map['musteriTelefon']?.toString() ?? map['phone']?.toString() ?? '',
-      konumMetin: map['konumMetin']?.toString() ?? '',
-      acikAdres: map['acikAdres']?.toString() ?? map['adres']?.toString() ?? '',
-      ilId: map['ilId']?.toString() ?? map['sehir_id']?.toString() ?? '',
-      ilceId: map['ilceId']?.toString() ?? map['ilce_id']?.toString() ?? '',
-      ilanCode: map['ilanCode']?.toString() ?? '',
-      isTanimi: map['isTanimi']?.toString() ?? '',
+      musteriTelefon: map['musteriTelefon']?.toString()?? map['phone']?.toString()?? '',
+      konumMetin: map['konumMetin']?.toString()?? '',
+      acikAdres: map['acikAdres']?.toString()?? map['adres']?.toString()?? '',
+      ilId: map['ilId']?.toString()?? map['sehir_id']?.toString()?? '',
+      ilceId: map['ilceId']?.toString()?? map['ilce_id']?.toString()?? '',
+      ilanCode: map['ilanCode']?.toString()?? '',
+      isTanimi: map['isTanimi']?.toString()?? '',
       komisyonTutari: _komisyonHesapla(fiyat),
-      komisyonOdendiMi: map['komisyonOdendiMi'] ?? false,
-      isAcil: map['isAcil'] ?? (hamTeknikDetaylar['isAcil'] == true),
+      komisyonOdendiMi: map['komisyonOdendiMi']?? false,
+      isAcil: map['isAcil']?? (hamTeknikDetaylar['isAcil'] == true),
       metreKare: map['metreKare']?.toString(),
       odaSayisi: map['odaSayisi']?.toString(),
       hizmetTipi: map['hizmetTipi']?.toString(),
       teknikDetaylar: temizTeknikDetaylar,
-      latitude: (map['latitude'] as num?)?.toDouble() ?? 0.0,
-      longitude: (map['longitude'] as num?)?.toDouble() ?? 0.0,
+      latitude: (map['latitude'] as num?)?.toDouble()?? 0.0,
+      longitude: (map['longitude'] as num?)?.toDouble()?? 0.0,
       musteriAdSoyad: map['musteriAdSoyad']?.toString(),
-      sehirIlceMetni: map['sehirIlceMetni']?.toString() ?? map['konumMetin']?.toString(),
+      sehirIlceMetni: map['sehirIlceMetni']?.toString()?? map['konumMetin']?.toString(),
+      resimler: map['resimler']!= null? List<String>.from(map['resimler']) : [],
+      teklifSayisi: (map['teklifSayisi'] as num?)?.toInt()?? 0,
     );
   }
 
@@ -225,6 +241,8 @@ class IlanModel {
       'longitude': longitude,
       'musteriAdSoyad': musteriAdSoyad,
       'sehirIlceMetni': sehirIlceMetni,
+      'resimler': resimler,
+      'teklifSayisi': teklifSayisi,
     };
   }
 }

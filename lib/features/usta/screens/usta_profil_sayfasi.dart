@@ -23,6 +23,7 @@ import 'package:ustam_gelsin/features/usta/screens/usta_ilan_detay_sayfasi.dart'
 import 'package:ustam_gelsin/features/usta/screens/profil_bilgilerim.dart';
 import 'package:ustam_gelsin/features/chat/screens/mesajlarim_sayfasi.dart';
 import 'package:ustam_gelsin/features/usta/screens/usta_acil_is_detay_sayfasi.dart';
+import 'package:ustam_gelsin/features/usta/screens/usta_cuzdanim.dart'; // EKLENDİ
 
 class UstaProfilSayfasi extends StatefulWidget {
   const UstaProfilSayfasi({super.key});
@@ -38,7 +39,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
   final ProfileImageService _imageService = ProfileImageService();
   final AcilIsYonetimServisi _acilServisi = AcilIsYonetimServisi();
   final NotificationService _notificationService = NotificationService();
-  final TextEditingController _tutarController = TextEditingController();
 
   StreamSubscription? _cagriSubscription;
 
@@ -116,7 +116,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
   @override
   void dispose() {
     _cagriSubscription?.cancel();
-    _tutarController.dispose();
     super.dispose();
   }
 
@@ -127,9 +126,9 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
 
   void _resimGuncelle(String uid) async {
     File? secilenDosya = await _imageService.resimSec(ImageSource.gallery);
-    if (secilenDosya != null) {
+    if (secilenDosya!= null) {
       String? downloadUrl = await _imageService.resimYukle(secilenDosya);
-      if (downloadUrl != null) {
+      if (downloadUrl!= null) {
         await FirebaseFirestore.instance.collection('users').doc(uid).update({'photoUrl': downloadUrl});
       }
     }
@@ -155,8 +154,8 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(val ? "Artık acil işlere açıksınız!" : "Acil iş bildirimleri kapandı."),
-                    backgroundColor: val ? Colors.green : Colors.red,
+                    content: Text(val? "Artık acil işlere açıksınız!" : "Acil iş bildirimleri kapandı."),
+                    backgroundColor: val? Colors.green : Colors.red,
                   ),
                 );
               }
@@ -193,21 +192,21 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
           var userData = userSnapshot.data?.data() as Map<String, dynamic>?;
 
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _updateUstaBildirimBilgisi(user.uid, userData?['uzmanliklar'] ?? userData?['uzmanlikAlani']);
+            _updateUstaBildirimBilgisi(user.uid, userData?['uzmanliklar']?? userData?['uzmanlikAlani']);
           });
 
-          String ad = userData?['firstName'] ?? "";
-          String soyad = userData?['lastName'] ?? "";
+          String ad = userData?['firstName']?? "";
+          String soyad = userData?['lastName']?? "";
           String ustaAdi = (ad.isNotEmpty || soyad.isNotEmpty)
               ? "$ad $soyad".trim()
-              : (userData?['name'] ?? "İsimsiz Usta");
+              : (userData?['name']?? "İsimsiz Usta");
 
           String? photoUrl = userData?['photoUrl'];
-          bool is724Active = userData?['is724Active'] ?? false;
-          bool ustalikiBelgesiVar = userData?['ustalikBelgesiVarMi'] ?? false;
+          bool is724Active = userData?['is724Active']?? false;
+          bool ustalikiBelgesiVar = userData?['ustalikBelgesiVarMi']?? false;
 
-          double rating = (userData?['rating'] ?? 0.0).toDouble();
-          int ratingCount = (userData?['ratingCount'] ?? 0).toInt();
+          double rating = (userData?['rating']?? 0.0).toDouble();
+          int ratingCount = (userData?['ratingCount']?? 0).toInt();
 
           return SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -291,7 +290,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
             if (teklifSnapshot.hasData) {
               for (var doc in teklifSnapshot.data!.docs) {
                 var data = doc.data() as Map<String, dynamic>;
-                String durum = (data['durum'] ?? '').toString();
+                String durum = (data['durum']?? '').toString();
                 if (durum == 'beklemede') {
                   bekleyen++;
                 } else if (durum == 'onaylandi') {
@@ -338,53 +337,11 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
   }
 
   void _cuzdanSayfasiniAc(BuildContext context, String uid) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance.collection('wallets').doc(uid).snapshots(),
-          builder: (context, snapshot) {
-            double bakiye = 0.0;
-            if (snapshot.hasData && snapshot.data!.exists) {
-              bakiye = (snapshot.data!.data() as Map<String, dynamic>)['balance']?.toDouble() ?? 0.0;
-            }
-            return Container(
-              height: MediaQuery.of(context).size.height * 0.9,
-              decoration: const BoxDecoration(color: Color(0xFFF8F9FA), borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
-              child: Column(
-                children: [
-                  const SizedBox(height: 15),
-                  Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10))),
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Cüzdanım", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                        IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
-                      ],
-                    ),
-                  ),
-                  _buildCuzdanKarti(bakiye),
-                  const SizedBox(height: 25),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 25),
-                    child: Align(alignment: Alignment.centerLeft, child: Text("Son İşlemler", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-                  ),
-                  Expanded(child: _buildIslemGecmisi(uid)),
-                  Padding(
-                    padding: const EdgeInsets.all(25),
-                    child: ElevatedButton(
-                      onPressed: () => _sanalPosEkraniniAc(context, uid),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE30613), minimumSize: const Size(double.infinity, 55), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), elevation: 4),
-                      child: const Text("BAKİYE YÜKLE", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
+    // DÜZELTİLDİ: Artık modal yerine tam sayfa açıyoruz
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => UstaCuzdanim(uid: uid),
       ),
     );
   }
@@ -411,7 +368,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
             },
             leading: const CircleAvatar(backgroundColor: Colors.blue, child: Icon(Icons.chat_bubble, color: Colors.white, size: 20)),
             title: const Text("YENİ MESAJ", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black, fontSize: 13)),
-            subtitle: Text(mesajData['mesajMetni'] ?? "", maxLines: 1, overflow: TextOverflow.ellipsis),
+            subtitle: Text(mesajData['mesajMetni']?? "", maxLines: 1, overflow: TextOverflow.ellipsis),
             trailing: const Icon(Icons.chevron_right, color: Colors.blue),
           ),
         );
@@ -425,7 +382,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
         builder: (context, snapshot) {
           double bakiye = 0.0;
           if (snapshot.hasData && snapshot.data!.exists) {
-            bakiye = (snapshot.data!.data() as Map<String, dynamic>)['balance']?.toDouble() ?? 0.0;
+            bakiye = (snapshot.data!.data() as Map<String, dynamic>)['balance']?.toDouble()?? 0.0;
           }
           return _buildProfileCard(uid, ad, photoUrl, bakiye, rating, count, is724Active, ustalikiBelgesiVar);
         }
@@ -450,8 +407,8 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                     CircleAvatar(
                       radius: 35,
                       backgroundColor: Colors.grey.shade200,
-                      backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-                      child: photoUrl == null ? const Icon(Icons.person, size: 40, color: Colors.grey) : null,
+                      backgroundImage: photoUrl!= null? NetworkImage(photoUrl) : null,
+                      child: photoUrl == null? const Icon(Icons.person, size: 40, color: Colors.grey) : null,
                     ),
                     Positioned(
                       bottom: 0, right: 0,
@@ -525,7 +482,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                   children: [
                     const Text("7/24 Durumu", style: TextStyle(fontSize: 12, color: Colors.grey)),
                     const SizedBox(height: 5),
-                    Text(is724Active ? "ONLİNE" : "OFFLİNE", style: TextStyle(color: is724Active ? Colors.green : Colors.red, fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(is724Active? "ONLİNE" : "OFFLİNE", style: TextStyle(color: is724Active? Colors.green : Colors.red, fontWeight: FontWeight.bold, fontSize: 16)),
                   ],
                 ),
               ),
@@ -596,72 +553,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
         },
         icon: const Icon(Icons.logout, color: Colors.red),
         label: const Text("Çıkış Yap", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 15)),
-      ),
-    );
-  }
-
-  Widget _buildCuzdanKarti(double bakiye) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 25),
-      padding: const EdgeInsets.all(25),
-      width: double.infinity,
-      decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF0F2027), Color(0xFF203A43)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))]),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Mevcut Bakiyeniz", style: TextStyle(color: Colors.white70, fontSize: 14)),
-          const SizedBox(height: 10),
-          Text(_formatPrice(bakiye), style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIslemGecmisi(String uid) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('wallets').doc(uid).collection('transactions').orderBy('date', descending: true).limit(10).snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return const Center(child: Text("Henüz bir işlem bulunmuyor.", style: TextStyle(color: Colors.grey)));
-        return ListView.builder(
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index) {
-            var data = snapshot.data!.docs[index].data() as Map<String, dynamic>;
-            bool isPositive = data['type'] == 'deposit';
-            return ListTile(
-              leading: Icon(isPositive ? Icons.add_circle : Icons.remove_circle, color: isPositive ? Colors.green : Colors.red),
-              title: Text(data['description'] ?? "İşlem"),
-              subtitle: Text(DateFormat('dd.MM.yyyy HH:mm').format((data['date'] as Timestamp).toDate())),
-              trailing: Text("${isPositive ? '+' : '-'}${data['amount']} TL", style: TextStyle(fontWeight: FontWeight.bold, color: isPositive ? Colors.green : Colors.red)),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _sanalPosEkraniniAc(BuildContext context, String uid) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Bakiye Yükle (Test)"),
-        content: TextField(
-          controller: _tutarController,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: "Tutar (TL)"),
-        ),
-        actions: [
-          TextButton(onPressed: () { _tutarController.clear(); Navigator.pop(context); }, child: const Text("İptal")),
-          ElevatedButton(
-            onPressed: () async {
-              double miktar = double.tryParse(_tutarController.text) ?? 0;
-              if (miktar > 0) {
-                await _walletService.bakiyeYukle(uid, miktar, "Kredi Kartı Yükleme (Test)");
-                if (context.mounted) { _tutarController.clear(); Navigator.pop(context); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Bakiye başarıyla yüklendi!"))); }
-              }
-            },
-            child: const Text("YÜKLE"),
-          ),
-        ],
       ),
     );
   }

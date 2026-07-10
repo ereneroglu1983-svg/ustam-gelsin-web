@@ -77,8 +77,10 @@ class _DestekIletisimPageState extends State<DestekIletisimPage> {
             TextField(
               controller: _msgController,
               maxLines: 4,
+              style: const TextStyle(color: Colors.black), // YAZI RENGİNİ SİYAH YAPTIK
               decoration: const InputDecoration(
                 hintText: "Mesajınızı buraya yazın...",
+                hintStyle: TextStyle(color: Colors.black54), // HINT RENGİNİ BELİRGİN YAPTIK
                 border: OutlineInputBorder(),
                 filled: true,
                 fillColor: Color(0xFFF5F5F5),
