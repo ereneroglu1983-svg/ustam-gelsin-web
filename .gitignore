@@ -1,3 +1,4 @@
+# Flutter / Dart
 .dart_tool/
 .pub/
 build/
@@ -8,11 +9,28 @@ build/
 .packages
 .env
 *.log
+*.lock
+
+# Firebase / Functions
+functions/node_modules/
+.firebase/
+.firebaserc
+.runtimeconfig.json
+
+# İşletim sistemi dosyaları
+.DS_Store
+Thumbs.db
 
 # Service Account Key - GITHUB'A ASLA ATMA!
 assets/credentials/
 service-account.json
 
-# Firebase config dosyaları hariç tutma
+# Firebase config dosyaları hariç tutma (İstisnalar)
 !google-services.json
 !GoogleService-Info.plist
+
+# IDE ve Editörler
+.vscode/
+.settings/
+.project
+.classpath
