@@ -1,10 +1,10 @@
-// lib/core/payment/akbank/akbank_manager.dart
+// lib/core/payment/iyzico/akbank_manager.dart
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ustam_gelsin/core/services/payment_tracking_service.dart';
 import 'package:ustam_gelsin/core/services/wallet_service.dart';
-import 'akbank_provider.dart';
-import 'akbank_config.dart';
+import 'iyzico_provider.dart';
+import 'iyzico_config.dart';
 
 class AkbankManager {
   final AkbankProvider _provider = AkbankProvider();
@@ -28,7 +28,7 @@ class AkbankManager {
       orderId: orderId,
       uid: user.uid,
       amount: amount,
-      provider: 'akbank',
+      provider: 'iyzico',
     );
 
     final response = await _provider.initiatePayment(

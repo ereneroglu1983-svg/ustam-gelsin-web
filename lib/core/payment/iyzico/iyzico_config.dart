@@ -1,4 +1,4 @@
-// lib/core/payment/akbank/akbank_config.dart
+// lib/core/payment/iyzico/akbank_config.dart
 
 import 'package:ustam_gelsin/env.dart';
 
@@ -11,7 +11,7 @@ class AkbankConfig {
   static String get baseUrl => Env.akbankBaseUrl;
 
   // 3D Secure callback ve yönlendirme URL'leri - BANKA BUNLARI İSTER
-  static String get callbackUrl => "${Env.baseAppUrl}/api/payment/akbank/callback";
+  static String get callbackUrl => "${Env.baseAppUrl}/api/payment/iyzico/callback";
   static String get successUrl => "${Env.baseAppUrl}/odeme/basarili";
   static String get failUrl => "${Env.baseAppUrl}/odeme/basarisiz";
 }
