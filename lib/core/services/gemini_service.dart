@@ -1,26 +1,11 @@
 // lib/core/services/gemini_service.dart
 
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
-import 'dart:async';
-import 'package:ustam_gelsin/env.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class GeminiService {
-  String get _apiKey => Env.geminiApiKey;
-
-  GenerativeModel _getModel() {
-    return GenerativeModel(
-      model: 'models/gemini-3.1-flash-lite',
-      apiKey: _apiKey,
-      generationConfig: GenerationConfig(
-        temperature: 0.0, // Deterministik, yaratıcılık yok.
-        maxOutputTokens: 15, // Token'ı 15'e çektik, konuşmasına imkan yok.
-        topP: 0.1,
-        topK: 1,
-      ),
-    );
-  }
+  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'europe-west3');
 
   Future<String> getFiyatTahmini({
     required String musteriId,
@@ -30,63 +15,203 @@ class GeminiService {
     Map<String, dynamic>? detaylar,
   }) async {
     try {
-      final model = _getModel();
+      // 1. Prompt hazırla - MASTER PROMPT v2.0 - DEĞİŞMEDİ
       String teknikDetaylar = detaylar?.entries
           .map((e) => "${e.key.toUpperCase()}: ${e.value}")
           .join(", ") ?? "Belirtilmedi";
 
-      final prompt = """
-Rol: Türkiye inşaat ve hizmet sektöründe uzman, piyasa birim fiyatlarına hakim bir Maliyet Analistisin.
+      final String userPrompt = """
+Sen artık Hemen Ustam Gelsin Yapay Zekâ Maliyet Motoru olarak görev yapıyorsun.
 
-Görev: $isAdi ($kategoriAdi) işi için malzeme ve işçilik dahil anahtar teslim maliyeti hesapla.
+Amacın, Türkiye'de hizmet almak isteyen müşterilere gerçek piyasa koşullarına uygun tek bir yaklaşık toplam maliyet üretmektir.
 
-GİRDİLER:
-- İş: $isAdi
-- Kategori: $kategoriAdi
-- Detaylar: $teknikDetaylar
+Sen profesyonel bir inşaat maliyet uzmanı gibi düşünürsün.
 
-ANALİZ VE HESAPLAMA ADIMLARI:
-1. Verilen detayları standart Türkiye piyasa birim fiyatları ile eşleştir.
-2. Bölgesel değişkenleri ve malzeme kalitesini (yoksa standart varsay) hesaba kat.
-3. Toplam maliyeti tam sayı olarak belirle.
+Verilen bilgilerden;
 
-KURALLAR (KESİN UYULACAK):
-- SADECE bir tamsayı sonucu döndür.
-- Asla açıklama, TL, birim, aralık veya sembol ekleme.
-- Çıktı sadece ve sadece rakamlardan oluşmalı.
-- Eğer detaylar yetersizse en makul standart piyasa değerini uygula.
-- Hesaplaman mantıksal bir birim fiyata dayanmalı.
--GÖNDERİLEN TÜM DETAYLARI KESİN BAZ AL, HİÇBİR VERİYİ GÖZARDI ETME VE HESAPLAMAYI SADECE BU DETAYLARIN TOPLAM MALİYETİ ÜZERİNE KUR.
+işin kapsamını,
+işçilik ihtiyacını,
+malzeme ihtiyacını,
+ekipman gereksinimini,
+nakliye maliyetini,
+saha zorluğunu,
+iş süresini,
+riskleri
 
-Örnek Çıktı:
+analiz ederek tek bir toplam maliyet hesaplamalısın.
+
+GÖREVİN
+
+Kullanıcı sana yalnızca şu bilgileri gönderir:
+
+İş Adı
+Kategori
+Teknik Detaylar
+
+Bu bilgilerden yola çıkarak tek bir toplam fiyat hesaplayacaksın.
+
+Bu fiyat;
+
+Türkiye'de aynı işe teklif verecek deneyimli ustaların büyük çoğunluğunun vereceği yaklaşık teklif fiyatını temsil etmelidir.
+
+ZORUNLU ARAŞTIRMA KURALI
+
+İnternet erişimin varsa;
+
+cevap üretmeden önce güncel Türkiye piyasasını değerlendir.
+
+Fiyat uydurma.
+
+Türkiye'deki güncel ekonomik şartları dikkate al.
+
+İnternet erişimin yoksa;
+
+elindeki güncel bilgiye göre en gerçekçi fiyatı üret.
+
+KULLANILACAK VERİLER
+
+Maliyet hesabında gerektiğinde aşağıdaki unsurları dikkate al.
+
+Malzeme fiyatları
+İşçilik ücretleri
+Nakliye
+Yakıt
+Ekip maliyeti
+Araç giderleri
+Bölgesel işçilik farkları
+Fire oranı
+Zor çalışma koşulları
+İskele
+Vinç
+Moloz
+Kat farkı
+Risk
+Sezon etkisi
+Güncel ekonomik koşullar
+REFERANS KAYNAKLAR
+
+Öncelikli olarak Türkiye kaynaklarını esas al.
+
+Örneğin;
+
+Koçtaş
+Bauhaus
+Türkiye yapı marketleri
+Bölgesel yapı malzemesi satıcıları
+Armut
+UstasıBurada
+SGK işçilik verileri
+TÜİK
+Çevre Şehircilik ve İklim Değişikliği Bakanlığı
+Türkiye Müteahhitler Birliği
+
+Türkiye dışındaki fiyatları referans alma.
+
+MALİYET FELSEFESİ
+
+Amaç en ucuz fiyatı vermek değildir.
+
+Amaç en pahalı fiyatı vermek değildir.
+
+Amaç;
+
+Türkiye'deki gerçek piyasa tekliflerine mümkün olduğunca yakın tek bir maliyet üretmektir.
+
+Ürettiğin fiyat;
+
+müşteriye mantıklı,
+
+ustaya uygulanabilir,
+
+piyasa şartlarına uygun olmalıdır.
+
+USTA VİCDAN TESTİ
+
+Fiyatı oluşturmadan önce kendine şu soruyu sor:
+
+"15 yıllık profesyonel bir usta olsaydım bu işi bu fiyata gerçekten yapar mıydım?"
+
+Eğer cevap hayır ise fiyatı yeniden değerlendir.
+
+ÇIKTI KURALLARI (EN KRİTİK KISIM)
+
+Bu kurallar kesinlikle ihlal edilemez.
+
+Sadece tek bir tamsayı üret.
+Açıklama yazma.
+Gerekçe yazma.
+Liste yazma.
+Markdown kullanma.
+JSON üretme.
+Kod üretme.
+Nokta kullanma.
+Virgül kullanma.
+TL yazma.
+₺ yazma.
+Yaklaşık kelimesini yazma.
+En düşük, en yüksek veya fiyat aralığı üretme.
+Minimum, Muhtemel veya Maksimum fiyat üretme.
+Birden fazla sayı üretme.
+DOĞRU ÇIKTI ÖRNEKLERİ
 45000
+8750
+162500
+YANLIŞ ÇIKTI ÖRNEKLERİ
+45.000 TL
+Yaklaşık 45000 TL
+40000 - 50000
+Minimum: 40000
+45000 ₺
+{"price":45000}
+Bu iş yaklaşık 45000 TL tutar.
+SON KURAL
 
-Şimdi sonucu üret:
+Üreteceğin cevap yalnızca tek bir tamsayı olmalıdır.
+
+Cevabında tek sayı dışında hiçbir karakter bulunmamalıdır.
+
+KULLANICI VERİLERİ:
+İş: $isAdi
+Kategori: $kategoriAdi
+Teknik Detaylar: $teknikDetaylar
 """;
 
-      final response = await model.generateContent([Content.text(prompt)]);
-      String rawText = response.text?.trim() ?? "0";
+      // 2. Cloud Function çağır - HttpsCallableOptions ile timeout eklendi
+      final callable = _functions.httpsCallable(
+        'hesaplaFiyat',
+        options: HttpsCallableOptions(
+          timeout: const Duration(seconds: 60),
+        ),
+      );
+
+      final result = await callable.call(<String, dynamic>{
+        'prompt': userPrompt,
+      });
+
+      // 3. Cevabı parse et
+      String rawText = result.data['fiyat']?.toString().trim() ?? "";
 
       final String? formatliFiyat = _formatSafePrice(rawText);
 
-      if (formatliFiyat == null) throw Exception("AI geçersiz veya yasaklı format üretti");
+      if (formatliFiyat == null) {
+        throw Exception("AI geçersiz veya yasaklı format üretti: $rawText");
+      }
 
       return formatliFiyat;
 
+    } on FirebaseFunctionsException catch (e) {
+      debugPrint("❌ CLOUD FUNCTION HATASI: ${e.code} - ${e.message}");
+      throw Exception("AI başarısız: ${e.message}");
     } catch (e) {
       debugPrint("❌ AI SERVİS HATASI: $e");
       throw Exception("AI başarısız");
     }
   }
 
+  // DEĞİŞMEDİ
   String? _formatSafePrice(String text) {
-    // Sadece rakamlar kalsın, aradaki her türlü çöpü (boşluk, nokta, vs) temizle
-    String clean = text.replaceAll(RegExp(r'[^0-9]'), '');
-    if (clean.isEmpty) return null;
+    int? price = int.tryParse(text);
 
-    int? price = int.tryParse(clean);
-
-    // 1.000 TL altı (belirsiz) veya 100.000.000 TL üstü (saçmalama) ise hata fırlat.
     if (price == null || price < 1000 || price > 100000000) {
       return null;
     }
