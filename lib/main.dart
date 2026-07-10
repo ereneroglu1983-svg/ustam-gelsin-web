@@ -16,7 +16,7 @@ import 'package:ustam_gelsin/services/yorum_service.dart';
 import 'package:ustam_gelsin/env.dart';
 import 'package:ustam_gelsin/features/admin/screens/blog_ekle_screen.dart';
 import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
-import 'package:ustam_gelsin/core/payment/screens/odeme_basarili_page.dart';
+
 
 // Arka plan bildirim işleyicisi
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -93,7 +93,7 @@ class MyApp extends StatelessWidget {
         '/musteri_profil': (context) => const MusteriProfilSayfasi(),
         '/admin': (context) => const AdminDashboard(),
         '/admin/blog-ekle': (context) => const BlogEkleScreen(),
-        '/odeme-basarili': (context) => const OdemeBasariliPage(), // EKLENDİ
+
       },
     );
   }
