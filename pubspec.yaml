@@ -6,6 +6,7 @@ version: 1.0.0+1
 environment:
   sdk: ">=3.0.0 <4.0.0"
 
+
 dependencies:
   flutter:
     sdk: flutter
@@ -14,11 +15,10 @@ dependencies:
   cloud_firestore: ^5.4.4
   firebase_storage: ^12.3.2
   firebase_messaging: ^15.1.3
-  cloud_functions: ^5.1.3
+  cloud_functions: ^5.6.2
   flutter_local_notifications: ^17.2.1
   http: ^1.6.0
   cupertino_icons: ^1.0.8
-  google_generative_ai: ^0.4.7
   intl: ^0.20.2
   shared_preferences: ^2.3.5
   google_fonts: ^6.2.1
@@ -37,7 +37,6 @@ dependencies:
   cached_network_image: ^3.4.0
   minio: ^3.5.8
   envied: ^1.3.5
-  firebase_app_check: ^0.3.1+3
   flutter_native_splash: ^2.4.0
   webview_flutter: ^4.14.0
   youtube_player_iframe: ^5.1.0
@@ -87,11 +86,18 @@ flutter:
     - assets/images/acil_usta_logo.png
     - assets/usta.png
     - assets/linkedin.png
-    - assets/insta.png
-    - assets/face.png
+    - assets/instagram.png
+    - assets/facebook.png
+    - assets/x.png
+    - assets/tiktok.png
+    - assets/youtube.png
+    - assets/kesinti_yok.png
+    - assets/kesinti_yok_2.png
     - assets/data/biz_kimiz.json
     - assets/images/nasil_calisir.png
     - assets/images/destek_iletisim.png
+    - assets/meslek_resimleri/temizlik.png
+    - assets/meslek_resimleri/yenilenebilir_enerji.png
     - assets/meslek_resimleri/alcisiva.png
     - assets/meslek_resimleri/aluminyum.png
     - assets/meslek_resimleri/anahtar_teslim.png
