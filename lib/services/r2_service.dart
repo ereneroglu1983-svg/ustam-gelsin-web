@@ -28,4 +28,24 @@ class R2Service {
       rethrow;
     }
   }
+
+  // ==================== YENİ EKLENDİ ====================
+  Future<void> deleteFile(String fileUrl) async {
+    try {
+      // URL'den dosya adını çıkar (örnek: https://.../abc123.jpg → abc123.jpg)
+      final uri = Uri.parse(fileUrl);
+      final fileName = uri.pathSegments.last;
+
+      await minio.removeObject(
+        bucket,
+        fileName,
+      );
+
+      print("Dosya silindi: $fileName");
+    } catch (e) {
+      print("R2 silme hatası: $e");
+      rethrow;
+    }
+  }
+// ====================================================
 }

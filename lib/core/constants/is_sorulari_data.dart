@@ -10,6 +10,7 @@ import '../calculation/meslek_sorulari/bina_temizlik.dart';
 import '../calculation/meslek_sorulari/bolme_duvar.dart';
 import '../calculation/meslek_sorulari/cam_balkon.dart';
 import '../calculation/meslek_sorulari/cati_isleri.dart';
+import '../calculation/meslek_sorulari/cilingir.dart';
 import '../calculation/meslek_sorulari/dis_cephe.dart';
 import '../calculation/meslek_sorulari/dogalgaz_kombi.dart';
 import '../calculation/meslek_sorulari/duvar_kagidi.dart';
@@ -39,7 +40,9 @@ import '../calculation/meslek_sorulari/sihhi_tesisat.dart';
 import '../calculation/meslek_sorulari/sineklik_panjur.dart';
 import '../calculation/meslek_sorulari/sistre_cila.dart';
 import '../calculation/meslek_sorulari/su_yalitimi.dart';
+import '../calculation/meslek_sorulari/temizlik_hizmetleri.dart';
 import '../calculation/meslek_sorulari/uydu_kamera.dart';
+import '../calculation/meslek_sorulari/yenilenebilir_enerji/yenilenebilir_enerji.dart';
 
 class IsSorulariData {
   static final Map<String, List<Map<String, dynamic>>> banka = {
@@ -82,14 +85,16 @@ class IsSorulariData {
     "UYDU, INTERNET VE KAMERA SİTEMLERİ": UyduKameraSorulari.sorular,
     "ASANSÖR BAKIM VE ONARIM": AsansorSorulari.sorular,
     "ANAHTAR TESLİM KOMPLE TADİLAT": KompleTadilatSorulari.sorular,
-    "BİNA, OFİS VE DIŞ CEPHE TEMİZLİĞİ": BinaTemizlikSorulari.sorular,
+    "TEMİZLİK HİZMETLERİ": TemizlikHizmetleriSorulari.sorular,
+    "ÇİLİNGİR": CilingirSorulari.sorular,
+    "YENİLENEBİLİR ENERJİ": YenilenebilirEnerjiSorulari.sorular,
   };
 
   static String _enYalinHaleGetir(String metin) {
     return metin
         .toLowerCase()
         .trim()
-        .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '') // Her türlü özel karakteri temizle
+        .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
         .replaceAll('ş', 's')
         .replaceAll('ı', 'i')
         .replaceAll('ç', 'c')

@@ -24,7 +24,7 @@ class MesleklerData {
     "SANDVİÇ PANEL VE ŞİNGIL KAPLAMA", "TEMEL VE BODRUM SU YALITIMI", "BAHÇE PEYZAJ VE ÇİM EKİMİ",
     "OTAMATİK SULAMA SİSTEMLERİ", "HAVUZ YAPIMI VE BAKIMI", "FERFORJE KORKULUK VE BAHÇE KAPISI",
     "KONTEYNER, BUNGALOV VE PREFABRİK", "UYDU, INTERNET VE KAMERA SİTEMLERİ", "ASANSÖR BAKIM VE ONARIM",
-    "ANAHTAR TESLİM KOMPLE TADİLAT", "ÇİLİNGİR" // Eklendi
+    "ANAHTAR TESLİM KOMPLE TADİLAT", "ÇİLİNGİR", "TEMİZLİK HİZMETLERİ", "YENİLENEBİLİR ENERJİ"
   ];
 
   static final List<MeslekModel> hizmetlerDetayli = [
@@ -34,7 +34,7 @@ class MesleklerData {
     MeslekModel("ASANSÖR BAKIM", "assets/meslek_resimleri/asansor.png", "4.7", "56"),
     MeslekModel("ASMA TAVAN", "assets/meslek_resimleri/asmatavan.png", "4.8", "92"),
     MeslekModel("BANYO DOLABI", "assets/meslek_resimleri/banyo.png", "4.9", "77"),
-    MeslekModel("ÇİLİNGİR", "assets/meslek_resimleri/cilingir.png", "4.9", "180"), // Eklendi
+    MeslekModel("ÇİLİNGİR", "assets/meslek_resimleri/cilingir.png", "4.9", "180"),
     MeslekModel("İÇ CEPHE BOYA VE BADANA", "assets/meslek_resimleri/boya.png", "4.9", "340"),
     MeslekModel("CAM BALKON", "assets/meslek_resimleri/cambalkon.png", "4.8", "155"),
     MeslekModel("CAM BÖLME", "assets/meslek_resimleri/cambolme.png", "4.7", "45"),
@@ -68,6 +68,8 @@ class MesleklerData {
     MeslekModel("SİSTRE CİLA İŞLERİ", "assets/meslek_resimleri/sistre.png", "4.7", "48"),
     MeslekModel("OTAMATİK SULAMA SİSTEMLERİ", "assets/meslek_resimleri/sulama.png", "4.6", "22"),
     MeslekModel("TEMEL VE BODRUM SU YALITIMI", "assets/meslek_resimleri/temel.png", "4.9", "60"),
-    MeslekModel("YERDEN ISITMA SİSTEMLERİ", "assets/meslek_resimleri/yerdenisitma.png", "4.8", "75"),
+    MeslekModel("TEMİZLİK HİZMETLERİ", "assets/meslek_resimleri/temizlik.png", "4.8", "110"),
+    MeslekModel("YENİLENEBİLİR ENERJİ", "assets/meslek_resimleri/yenilenebilir_enerji.png", "5.0", "45"),
+
   ];
 }

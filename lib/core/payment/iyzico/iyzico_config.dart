@@ -1,17 +1,16 @@
-// lib/core/payment/iyzico/akbank_config.dart
+// lib/core/payment/iyzico/iyzico_config.dart
 
-import 'package:ustam_gelsin/env.dart';
+class IyzicoConfig {
+  // SADECE BACKEND BİLİR - FRONTEND'DE KEY YOK
+  // baseUrl da yok. iyzico ile direkt konuşmuyoruz.
 
-class AkbankConfig {
-  // Banka tarafından verilen kimlik bilgileri
-  static String get merchantId => Env.akbankMerchantId;
-  static String get apiKey => Env.akbankApiKey;
-  static String get secretKey => Env.akbankSecretKey;
-  static String get storeKey => Env.akbankStoreKey; // Hash için zorunlu
-  static String get baseUrl => Env.akbankBaseUrl;
+  // Firebase Function endpointleri - callable kullandığımız için URL yok
+  // Direkt function adını kullanacağız
 
-  // 3D Secure callback ve yönlendirme URL'leri - BANKA BUNLARI İSTER
-  static String get callbackUrl => "${Env.baseAppUrl}/api/payment/iyzico/callback";
-  static String get successUrl => "${Env.baseAppUrl}/odeme/basarili";
-  static String get failUrl => "${Env.baseAppUrl}/odeme/basarisiz";
+  // Kullanıcı ödeme sonrası yönleneceği sayfalar
+  static const String successUrl = "https://ustamgelsin.com/odeme/basarili";
+  static const String failUrl = "https://ustamgelsin.com/odeme/basarisiz";
+
+// Callback'i Firebase Function handle ediyor, bizim URL vermemize gerek yok
+// iyzicoCallback function'ı otomatik /iyzicoCallback endpointini açıyor
 }

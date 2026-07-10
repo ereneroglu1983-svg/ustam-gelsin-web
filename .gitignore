@@ -8,3 +8,11 @@ build/
 .packages
 .env
 *.log
+
+# Service Account Key - GITHUB'A ASLA ATMA!
+assets/credentials/
+service-account.json
+
+# Firebase config dosyaları hariç tutma
+!google-services.json
+!GoogleService-Info.plist

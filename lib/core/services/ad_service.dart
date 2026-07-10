@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_functions/cloud_functions.dart'; // EKLENDİ
 import 'package:ustam_gelsin/core/models/ilan_model.dart';
 import 'package:ustam_gelsin/core/services/wallet_service.dart';
 import 'package:ustam_gelsin/core/services/notification_service.dart';
@@ -12,12 +13,28 @@ class AdService {
   final WalletService _walletService = WalletService();
   final NotificationService _notificationService = NotificationService();
   final AnalyticsService _analyticsService = AnalyticsService();
+  final FirebaseFunctions _functions = FirebaseFunctions.instance; // EKLENDİ
   final String _collectionName = "ilanlar";
 
-  // --- BAKİYE VE YARDIMCI ---
-  Future<void> addBalance(String uid, double amount) async {
+  // --- ADMİN BAKİYE YÜKLEME ---
+  // Sadece senin uid'in backend'de kontrol edilip izin verilecek
+  Future<void> adminBakiyeYukle({
+    required String hedefUid,
+    required double amount,
+    required String note
+  }) async {
     try {
-      await _walletService.bakiyeYukle(uid, amount, "Manuel Bakiye Yükleme");
+      final result = await _functions.httpsCallable('adminBakiyeYukle').call({
+        'hedefUid': hedefUid,
+        'amount': amount,
+        'note': note,
+      });
+
+      if (result.data['success'] != true) {
+        throw Exception(result.data['error'] ?? 'Bakiye yüklenemedi');
+      }
+    } on FirebaseFunctionsException catch (e) {
+      throw Exception("Hata: ${e.message}");
     } catch (e) {
       throw Exception("Bakiye yüklenemedi: $e");
     }
@@ -105,13 +122,13 @@ class AdService {
     });
   }
 
-  // --- ACİL İLAN STREAMLERİ (REVİZE EDİLDİ: 'bekliyor' sorgusu) ---
+  // --- ACİL İLAN STREAMLERİ ---
 
   Stream<List<IlanModel>> getAcilCagrilar(List<String> ustaUzmanliklari) {
     if (ustaUzmanliklari.isEmpty) return Stream.value([]);
 
     return _firestore.collection("acil_cagri")
-        .where('durum', isEqualTo: 'bekliyor') // Müşteri tarafıyla uyumlu hale getirildi
+        .where('durum', isEqualTo: 'bekliyor')
         .where('kategoriId', whereIn: ustaUzmanliklari)
         .snapshots()
         .map((snapshot) => snapshot.docs
@@ -119,7 +136,7 @@ class AdService {
         .toList());
   }
 
-  // --- NORMAL İLAN STREAMLERİ (Dokunulmadı) ---
+  // --- NORMAL İLAN STREAMLERİ ---
 
   Stream<List<IlanModel>> aktifIlanlariGetir(String userId) {
     return _firestore.collection(_collectionName)
@@ -153,7 +170,7 @@ class AdService {
     return await _firestore.runTransaction((transaction) async {
       var acilSnap = await transaction.get(_firestore.collection("acil_cagri").doc(ilanId));
       bool acilMi = acilSnap.exists;
-      double finalKomisyon = acilMi ? 250.0 : komisyonTutari;
+      double finalKomisyon = acilMi? 250.0 : komisyonTutari;
 
       var checkQuery = await _firestore.collection("teklifler")
           .where('ilanId', isEqualTo: ilanId)
@@ -171,7 +188,7 @@ class AdService {
         'ustaId': ustaId,
         'teklifFiyat': teklifFiyat,
         'mesaj': mesaj,
-        'komisyonTutari': isMuaf ? 0.0 : finalKomisyon,
+        'komisyonTutari': isMuaf? 0.0 : finalKomisyon,
         'sehir': sehir,
         'tarih': DateTime.now().toIso8601String(),
         'durum': 'beklemede',

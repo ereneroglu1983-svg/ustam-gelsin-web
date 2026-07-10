@@ -23,20 +23,21 @@ android {
 
     defaultConfig {
         applicationId = "com.ustamgelsin.app.ustam_gelsin"
-        minSdk = flutter.minSdkVersion
+        minSdk = flutter.minSdkVersion // flutter.minSdkVersion yerine sabit 21 kullanmak bağlantı kararlılığı sağlar
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
-        // MİMARİ İÇİN KRİTİK EKLEME:
         multiDexEnabled = true
     }
 
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // Native kanal hatalarını önlemek için release modunda minify'ı test amaçlı kapalı tutabilirsin
+            // Eğer minify gerekiyorsa, proguard-rules.pro içine Flutter kurallarını eklediğinden emin ol
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -47,8 +48,6 @@ android {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.0")
-
-    // MİMARİ İÇİN KRİTİK EKLEME:
     implementation("androidx.multidex:multidex:2.0.1")
 }
 

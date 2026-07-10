@@ -1,3 +1,5 @@
+// lib/core/managers/ilan_yayinlama_motoru.dart
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,12 +9,24 @@ import 'package:ustam_gelsin/core/services/sosyal_medya.dart';
 import 'package:ustam_gelsin/core/managers/price_calculation_manager.dart';
 
 class IlanYayinlamaMotoru {
+  static const String _defaultGorselUrl = 'https://pub-63efa1c2a7de49f4a20c67bfcefeb342.r2.dev/default.jpg';
+
+  // Komisyon hesaplama kuralı
+  static double _komisyonHesapla(double muhtemelTutar) {
+    if (muhtemelTutar >= 15000) {
+      return muhtemelTutar * 0.01;
+    } else {
+      return 150.0;
+    }
+  }
+
   static Future<void> ilanYayinla({
     required BuildContext context,
     required IlanModel ilan,
     required Map<String, dynamic> detaylar,
+    required List<String> resimler,
     required String notlar,
-    required String guncelFiyat,
+    required String fiyatBilgisi, // Map yerine String
     required String secilenIl,
     required String secilenIlce,
     required String secilenIlId,
@@ -25,7 +39,10 @@ class IlanYayinlamaMotoru {
     required Function(String title, String content) onResult,
   }) async {
     final User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      onResult("Hata", "Oturum bulunamadı. Lütfen tekrar giriş yapın.");
+      return;
+    }
 
     // Moderasyon Kontrolü
     bool ilanOnayBekliyorMu = false;
@@ -41,15 +58,19 @@ class IlanYayinlamaMotoru {
       debugPrint("Moderasyon kontrol hatası: $e");
     }
 
-    final double netTutar = PriceCalculationManager.fiyatTemizle(guncelFiyat);
-
-    // REVİZE: Detaylar içindeki 'isAcil' bilgisini modelin yeni 'isAcil' alanına aktarıyoruz
+    // ESKİ SİSTEM: String'den komisyon için sayıya çevir
+    final double muhtemelTutar = PriceCalculationManager.fiyatTemizle(fiyatBilgisi);
     final bool isAcilMi = detaylar['isAcil'] == true;
 
+    // Teknik detayları güncelle - fiyatYapisi YOK artık
+    Map<String, dynamic> guncelTeknikDetaylar = Map<String, dynamic>.from(detaylar);
+    // guncelTeknikDetaylar['fiyatYapisi'] = fiyatYapisi; // SİLİNDİ
+
     final yeniIlan = ilan.copyWith(
-      teknikDetaylar: Map<String, dynamic>.from(detaylar),
+      teknikDetaylar: guncelTeknikDetaylar,
+      resimler: resimler,
       detaylar: notlar,
-      fiyatBilgisi: guncelFiyat,
+      fiyatBilgisi: fiyatBilgisi, // Direkt String
       durum: ilanOnayBekliyorMu ? 'onay_bekliyor' : 'aktif',
       musteriAd: user.displayName ?? "Müşteri",
       konumMetin: "$secilenIl / $secilenIlce",
@@ -57,28 +78,34 @@ class IlanYayinlamaMotoru {
       ilceId: secilenIlceId,
       latitude: lat,
       longitude: lng,
-      komisyonTutari: netTutar * 0.01,
-      isAcil: isAcilMi, // Betonarme bağlantı
+      komisyonTutari: _komisyonHesapla(muhtemelTutar),
+      isAcil: isAcilMi,
     );
 
     try {
       await AdService().ilanOlustur(yeniIlan);
 
-      // Sosyal Medya (Sadece Facebook)
       if (!ilanOnayBekliyorMu) {
-        await SosyalMedyaMotoru.facebookPaylas(yeniIlan.baslik, yeniIlan.konumMetin, yeniIlan.kategori, detaylar, "");
+        final String gorsel = resimler.isNotEmpty ? resimler.first : _defaultGorselUrl;
+        try {
+          await SosyalMedyaMotoru.facebookPaylas(yeniIlan.baslik, yeniIlan.konumMetin, yeniIlan.kategori, detaylar, gorsel);
+        } catch (e) {
+          debugPrint("Sosyal medya paylaşım hatası: $e");
+        }
       }
 
-      // AI Veri Kaydı
+      // AI Veri Kaydı - Map tutabilir, sorun yok
       await FirebaseFirestore.instance.collection('app_ai_data').add({
         'userId': user.uid,
         'kategori': ilan.kategori,
-        'sistemFiyat': netTutar,
+        'fiyatBilgisi': fiyatBilgisi, // String
+        'muhtemelTutar': muhtemelTutar, // Sayısal da tut
         'musteriDegerlendirmesi': secilenGeriBildirim ?? "Belirtilmedi",
         'musterininIstedigiFiyat': (ozelFiyatGoster && fiyatDuzenleMetin.isNotEmpty)
             ? double.tryParse(fiyatDuzenleMetin.replaceAll('.', ''))
             : null,
         'detaylar': detaylar,
+        'resimler': resimler,
         'notlar': notlar,
         'tarih': FieldValue.serverTimestamp(),
         'konum': "$secilenIl / $secilenIlce",
@@ -91,7 +118,8 @@ class IlanYayinlamaMotoru {
           ilanOnayBekliyorMu ? "İlanınız moderasyon sürecine alındı." : "İlanınız başarıyla yayına girdi."
       );
     } catch (e) {
-      rethrow;
+      debugPrint("IlanYayinlamaMotoru hata: $e");
+      onResult("Hata Oluştu", "İlan yayınlanırken bir sorun oluştu.");
     }
   }
 }

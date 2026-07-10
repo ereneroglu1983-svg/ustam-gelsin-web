@@ -13,7 +13,7 @@ class PaymentTrackingService {
     required String orderId,
     required String uid,
     required double amount,
-    required String provider, // 'akbank' gibi
+    required String provider, // 'iyzico' gibi
   }) async {
     try {
       await _firestore.collection(_collection).doc(orderId).set({

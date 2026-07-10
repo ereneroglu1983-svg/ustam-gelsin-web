@@ -1,18 +1,13 @@
-// lib/core/payment/iyzico/akbank_manager.dart
+// lib/core/payment/iyzico/iyzico_manager.dart
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:ustam_gelsin/core/services/payment_tracking_service.dart';
-import 'package:ustam_gelsin/core/services/wallet_service.dart';
-import 'iyzico_provider.dart';
-import 'iyzico_config.dart';
 
-class AkbankManager {
-  final AkbankProvider _provider = AkbankProvider();
-  final PaymentTrackingService _trackingService = PaymentTrackingService();
-  final WalletService _walletService = WalletService();
+class IyzicoManager {
+  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'europe-west3');
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// DÜZELTME: Artık hem url hem orderId dönüyor
+  /// Ödeme başlatır. Backend'e amount yollar, iyzico ödeme sayfası URL'ini alır.
   Future<({String url, String orderId})> triggerPaymentProcess({
     required double amount,
   }) async {
@@ -20,73 +15,34 @@ class AkbankManager {
     if (user == null) {
       throw Exception("Ödeme için giriş yapmalısınız.");
     }
-
-    final String orderId = "${user.uid}_${DateTime.now().millisecondsSinceEpoch}";
-    final String amountStr = amount.toStringAsFixed(2);
-
-    await _trackingService.createPendingPayment(
-      orderId: orderId,
-      uid: user.uid,
-      amount: amount,
-      provider: 'iyzico',
-    );
-
-    final response = await _provider.initiatePayment(
-      orderId: orderId,
-      amount: amountStr,
-      userEmail: user.email ?? '',
-      userId: user.uid,
-    );
-
-    if (response['status'] == 'success') {
-      final String payment3DUrl = response['redirectUrl'] ?? response['paymentUrl'] ?? '';
-
-      if (payment3DUrl.isEmpty) {
-        await _trackingService.updatePaymentStatus(orderId, 'failed', 'Banka 3D URL dönmedi');
-        throw Exception("Banka ödeme sayfası oluşturamadı.");
-      }
-
-      return (url: payment3DUrl, orderId: orderId); // DÜZELTME
-    } else {
-      await _trackingService.updatePaymentStatus(
-          orderId,
-          'failed',
-          response['message']?.toString() ?? 'Bilinmeyen hata'
-      );
-      throw Exception("Ödeme başlatılamadı: ${response['message']}");
+    if (amount <= 0) {
+      throw Exception("Geçersiz tutar.");
     }
-  }
 
-  Future<bool> verifyAndCompletePayment(String orderId) async {
     try {
-      final statusResponse = await _provider.queryPaymentStatus(orderId);
+      final callable = _functions.httpsCallable('iyzicoCheckout');
+      final result = await callable.call<Map<String, dynamic>>({
+        'amount': amount,
+      });
 
-      if (statusResponse != null &&
-          (statusResponse['status']?.toString().toLowerCase() == 'success' ||
-              statusResponse['status']?.toString().toLowerCase() == 'approved')) {
+      final data = result.data;
+      final String paymentPageUrl = data['paymentPageUrl'] as String? ?? '';
+      final String orderId = data['orderId'] as String? ?? '';
 
-        final pendingDoc = await _trackingService.getPendingPayment(orderId);
-        if (pendingDoc != null) {
-          final String uid = pendingDoc['uid'] as String;
-          final double amount = (pendingDoc['amount'] as num).toDouble();
-
-          await _walletService.bakiyeYukle(uid, amount, 'Akbank Yükleme - $orderId');
-
-          await _trackingService.updatePaymentStatus(orderId, 'completed', 'Manuel doğrulama ile tamamlandı');
-          await _trackingService.logBankResponse(orderId, statusResponse);
-          return true;
-        }
+      if (paymentPageUrl.isEmpty) {
+        throw Exception("Ödeme sayfası URL'i alınamadı.");
       }
 
-      await _trackingService.updatePaymentStatus(
-          orderId,
-          'failed',
-          statusResponse?['message']?.toString() ?? 'Doğrulama başarısız'
-      );
-      return false;
+      return (url: paymentPageUrl, orderId: orderId);
+    } on FirebaseFunctionsException catch (e) {
+      throw Exception("Ödeme başlatılamadı: ${e.message}");
     } catch (e) {
-      await _trackingService.updatePaymentStatus(orderId, 'error', e.toString());
-      return false;
+      throw Exception("Beklenmedik hata: $e");
     }
   }
+
+// SİLİNDİ: verifyAndCompletePayment
+// Sebep: Doğrulamayı backend iyzicoCallback yapıyor.
+// Frontend manuel bakiye yükleyemez. Güvenlik riski.
+// Bakiye güncellenince Firestore'dan dinleyip UI'ı güncelleyeceksin.
 }

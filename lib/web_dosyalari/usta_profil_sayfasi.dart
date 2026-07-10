@@ -21,6 +21,7 @@ import 'package:ustam_gelsin/features/usta/screens/usta_tekliflerim_sayfasi.dart
 import 'package:ustam_gelsin/features/usta/screens/usta_ilan_detay_sayfasi.dart';
 import 'package:ustam_gelsin/features/usta/screens/profil_bilgilerim.dart';
 import 'package:ustam_gelsin/features/chat/screens/mesajlarim_sayfasi.dart';
+import 'package:ustam_gelsin/features/usta/screens/usta_cuzdanim.dart'; // EKLENDİ
 
 class UstaProfilSayfasi extends StatefulWidget {
   const UstaProfilSayfasi({super.key});
@@ -36,7 +37,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
   final ProfileImageService _imageService = ProfileImageService();
   final AcilIsYonetimServisi _acilServisi = AcilIsYonetimServisi();
   final NotificationService _notificationService = NotificationService();
-  final TextEditingController _tutarController = TextEditingController();
+  // SİLİNDİ: _tutarController - Bu sayfada yükleme yok
 
   StreamSubscription? _cagriSubscription;
 
@@ -100,7 +101,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
   @override
   void dispose() {
     _cagriSubscription?.cancel();
-    _tutarController.dispose();
     super.dispose();
   }
 
@@ -160,7 +160,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
     if (user == null) return const Scaffold(body: Center(child: Text("Oturum bulunamadı.")));
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2),
+      backgroundColor: const Color(0xFFF2F2F2),
       appBar: AppBar(
         leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -285,53 +285,11 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
   }
 
   void _cuzdanSayfasiniAc(BuildContext context, String uid) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance.collection('wallets').doc(uid).snapshots(),
-          builder: (context, snapshot) {
-            double bakiye = 0.0;
-            if (snapshot.hasData && snapshot.data!.exists) {
-              bakiye = (snapshot.data!.data() as Map<String, dynamic>)['balance']?.toDouble()?? 0.0;
-            }
-            return Container(
-              height: MediaQuery.of(context).size.height * 0.9,
-              decoration: const BoxDecoration(color: Color(0xFFF8F9FA), borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
-              child: Column(
-                children: [
-                  const SizedBox(height: 15),
-                  Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10))),
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Hesabım", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                        IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
-                      ],
-                    ),
-                  ),
-                  _buildCuzdanKarti(bakiye),
-                  const SizedBox(height: 25),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 25),
-                    child: Align(alignment: Alignment.centerLeft, child: Text("Son İşlemler", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))),
-                  ),
-                  Expanded(child: _buildIslemGecmisi(uid)),
-                  Padding(
-                    padding: const EdgeInsets.all(25),
-                    child: ElevatedButton(
-                      onPressed: () => _sanalPosEkraniniAc(context, uid),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE30613), minimumSize: const Size(double.infinity, 55), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)), elevation: 4),
-                      child: const Text("KREDİ SATIN AL", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
+    // DÜZELTİLDİ: Modal yerine sayfa aç
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => UstaCuzdanim(uid: uid),
       ),
     );
   }
@@ -545,69 +503,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
     );
   }
 
-  Widget _buildCuzdanKarti(double bakiye) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 25),
-      padding: const EdgeInsets.all(25),
-      width: double.infinity,
-      decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF0F2027), Color(0xFF203A43)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))]),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Mevcut Krediniz", style: TextStyle(color: Colors.white70, fontSize: 14)),
-          const SizedBox(height: 10),
-          Text(_formatPrice(bakiye), style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIslemGecmisi(String uid) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('wallets').doc(uid).collection('transactions').orderBy('date', descending: true).limit(10).snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return const Center(child: Text("Henüz bir işlem bulunmuyor.", style: TextStyle(color: Colors.grey)));
-        return ListView.builder(
-          itemCount: snapshot.data!.docs.length,
-          itemBuilder: (context, index) {
-            var data = snapshot.data!.docs[index].data() as Map<String, dynamic>;
-            bool isPositive = data['type'] == 'deposit';
-            return ListTile(
-              leading: Icon(isPositive? Icons.add_circle : Icons.remove_circle, color: isPositive? Colors.green : Colors.red),
-              title: Text(data['description']?? "İşlem"),
-              subtitle: Text(DateFormat('dd.MM.yyyy HH:mm').format((data['date'] as Timestamp).toDate())),
-              trailing: Text("${isPositive? '+' : '-'}${data['amount']} TL", style: TextStyle(fontWeight: FontWeight.bold, color: isPositive? Colors.green : Colors.red)),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _sanalPosEkraniniAc(BuildContext context, String uid) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Kredi Satın Al (Test)"),
-        content: TextField(
-          controller: _tutarController,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: "Tutar (TL)"),
-        ),
-        actions: [
-          TextButton(onPressed: () { _tutarController.clear(); Navigator.pop(context); }, child: const Text("İptal")),
-          ElevatedButton(
-            onPressed: () async {
-              double miktar = double.tryParse(_tutarController.text)?? 0;
-              if (miktar > 0) {
-                await _walletService.bakiyeYukle(uid, miktar, "Kredi Kartı Yükleme (Test)");
-                if (context.mounted) { _tutarController.clear(); Navigator.pop(context); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Kredi başarıyla yüklendi!"))); }
-              }
-            },
-            child: const Text("YÜKLE"),
-          ),
-        ],
-      ),
-    );
-  }
+// SİLİNDİ: _buildCuzdanKarti - Artık UstaCuzdanim sayfasında
+// SİLİNDİ: _buildIslemGecmisi - Artık UstaCuzdanim sayfasında
+// SİLİNDİ: _sanalPosEkraniniAc - Artık UstaCuzdanim sayfasına yönlendiriyor
 }

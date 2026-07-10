@@ -2,99 +2,19 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
 
 class WalletService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collection = 'wallets';
 
-  /// 1. MANUEL YÜKLEME - Admin panel veya test için
-  Future<void> bakiyeYukle(String uid, double miktar, String aciklama) async {
-    if (miktar <= 0) throw Exception("Geçersiz miktar: $miktar");
+  // SİLİNDİ: bakiyeYukle()
+  // Sebep: Manuel yükleme backend işi. Frontend'den kaldırıldı.
 
-    try {
-      DocumentReference walletRef = _firestore.collection(_collection).doc(uid);
+  // SİLİNDİ: bakiyeYukleTransaction()
+  // Sebep: iyzicoCallback function'ı backend'de transaction ile yüklüyor.
 
-      // Idempotency key: Aynı açıklama 2 kez işlenmesin
-      final String idempotencyKey = _generateIdempotencyKey(uid, miktar, aciklama);
-      final DocumentReference txnRef = walletRef.collection('transactions').doc(idempotencyKey);
-
-      await _firestore.runTransaction((transaction) async {
-        final txnDoc = await transaction.get(txnRef);
-        if (txnDoc.exists) {
-          debugPrint("UYARI: Bu işlem zaten yapılmış. Key: $idempotencyKey");
-          return; // Çifte işlem engeli
-        }
-
-        transaction.set(txnRef, {
-          'amount': miktar,
-          'type': 'deposit',
-          'description': aciklama,
-          'date': FieldValue.serverTimestamp(),
-          'idempotencyKey': idempotencyKey,
-        });
-
-        transaction.set(walletRef, {
-          'balance': FieldValue.increment(miktar),
-          'lastUpdated': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
-      });
-    } catch (e) {
-      debugPrint("Bakiye yükleme hatası: $e");
-      throw Exception("Bakiye yükleme hatası: $e");
-    }
-  }
-
-  /// 2. TRANSACTION İÇİ YÜKLEME - AkbankCallbackHandler bunu kullanır
-  /// ÇİFTE YÜKLEME ENGELLİ - IDEMPOTENCY KEY ZORUNLU
-  Future<void> bakiyeYukleTransaction(
-      Transaction transaction,
-      String uid,
-      double miktar,
-      String aciklama,
-      ) async {
-    if (miktar <= 0) throw Exception("Geçersiz miktar: $miktar");
-
-    final DocumentReference walletRef = _firestore.collection(_collection).doc(uid);
-
-    // Idempotency: OrderID bazlı unique key
-    final String idempotencyKey = _generateIdempotencyKey(uid, miktar, aciklama);
-    final DocumentReference txnRef = walletRef.collection('transactions').doc(idempotencyKey);
-
-    // Transaction içinde read yap
-    final txnDoc = await transaction.get(txnRef);
-    if (txnDoc.exists) {
-      throw Exception("ÇİFTE İŞLEM ENGELİ: Bu bakiye zaten yüklendi. Key: $idempotencyKey");
-    }
-
-    // Wallet doc yoksa oluştur
-    final walletDoc = await transaction.get(walletRef);
-    if (!walletDoc.exists) {
-      transaction.set(walletRef, {
-        'balance': 0.0,
-        'createdAt': FieldValue.serverTimestamp(),
-        'uid': uid,
-      });
-    }
-
-    // Atomic işlem: Transaction + Balance aynı anda
-    transaction.set(txnRef, {
-      'amount': miktar,
-      'type': 'deposit',
-      'description': aciklama,
-      'date': FieldValue.serverTimestamp(),
-      'idempotencyKey': idempotencyKey,
-      'source': 'akbank', // Banka denetimi için
-    });
-
-    transaction.update(walletRef, {
-      'balance': FieldValue.increment(miktar),
-      'lastUpdated': FieldValue.serverTimestamp(),
-    });
-  }
-
-  /// 3. TEKLİF VERDİKÇE BAKİYEDEN DÜŞME - Transaction güvenli
+  /// 1. TEKLİF VERDİKÇE BAKİYEDEN DÜŞME - Transaction güvenli
+  /// KALDI: Bu senin sistemin. Teklif verince komisyon düşüyor.
   Future<bool> bakiyeDus(String uid, double miktar, {String? aciklama}) async {
     if (miktar <= 0) return false;
 
@@ -137,7 +57,8 @@ class WalletService {
     }
   }
 
-  /// 4. BAKİYE SORGULA
+  /// 2. BAKİYE SORGULA
+  /// KALDI: UI'da bakiye göstermek için lazım.
   Future<double> getBakiye(String uid) async {
     try {
       final doc = await _firestore.collection(_collection).doc(uid).get();
@@ -149,18 +70,30 @@ class WalletService {
     }
   }
 
-  /// 5. IDEMPOTENCY KEY ÜRET - Aynı işlem 2 kez işlenmesin
-  String _generateIdempotencyKey(String uid, double miktar, String aciklama) {
-    final String raw = "$uid-$miktar-$aciklama";
-    final bytes = utf8.encode(raw);
-    final digest = sha256.convert(bytes);
-    return digest.toString();
+  /// 3. BAKİYE STREAM - Anlık dinleme için
+  /// EKLENDİ: Ödeme başarılı olunca bakiyenin artmasını dinleyeceksin.
+  Stream<double> streamBakiye(String uid) {
+    return _firestore.collection(_collection).doc(uid).snapshots().map((doc) {
+      if (!doc.exists) return 0.0;
+      return (doc.data()?['balance'] ?? 0.0).toDouble();
+    });
   }
 
-  /// 6. AKBANK POS - KALDIRILDI
-  /// Bu metod artık kullanılmıyor. AkbankManager kullan.
-  @Deprecated('AkbankManager.triggerPaymentProcess kullan')
-  Future<void> akbankPosEntegrasyonuBaslat(double miktar) async {
-    throw UnimplementedError('Bu metod kaldırıldı. AkbankManager kullan.');
+  /// 4. İŞLEM GEÇMİŞİ STREAM
+  /// KALDI: Kullanıcıya hareketleri göstermek için.
+  Stream<QuerySnapshot> streamTransactions(String uid) {
+    return _firestore
+        .collection(_collection)
+        .doc(uid)
+        .collection('transactions')
+        .orderBy('date', descending: true)
+        .limit(50)
+        .snapshots();
   }
+
+// SİLİNDİ: _generateIdempotencyKey
+// Sebep: Idempotency kontrolünü backend yapıyor.
+
+// SİLİNDİ: akbankPosEntegrasyonuBaslat
+// Sebep: Zaten deprecated'ti. IyzicoManager kullanıyoruz.
 }
