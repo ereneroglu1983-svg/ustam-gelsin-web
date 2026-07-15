@@ -7,12 +7,6 @@ class WalletService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String _collection = 'wallets';
 
-  // SİLİNDİ: bakiyeYukle()
-  // Sebep: Manuel yükleme backend işi. Frontend'den kaldırıldı.
-
-  // SİLİNDİ: bakiyeYukleTransaction()
-  // Sebep: iyzicoCallback function'ı backend'de transaction ile yüklüyor.
-
   /// 1. TEKLİF VERDİKÇE BAKİYEDEN DÜŞME - Transaction güvenli
   /// KALDI: Bu senin sistemin. Teklif verince komisyon düşüyor.
   Future<bool> bakiyeDus(String uid, double miktar, {String? aciklama}) async {
@@ -29,7 +23,9 @@ class WalletService {
           return false;
         }
 
-        double mevcutBakiye = (snapshot.data() as Map<String, dynamic>)['balance']?.toDouble() ?? 0.0;
+        double mevcutBakiye = (snapshot.data() as Map<String, dynamic>)['balance'] != null
+            ? ((snapshot.data() as Map<String, dynamic>)['balance'] as num).toDouble()
+            : 0.0;
 
         if (mevcutBakiye < miktar) {
           debugPrint("Yetersiz bakiye: $mevcutBakiye < $miktar");
@@ -46,7 +42,7 @@ class WalletService {
           'amount': miktar,
           'type': 'withdrawal',
           'description': aciklama ?? 'Teklif komisyonu',
-          'date': FieldValue.serverTimestamp(),
+          'date': FieldValue.serverTimestamp(), // SENİN TARİH/SAAT ALANIN
         });
 
         return true;
@@ -63,7 +59,7 @@ class WalletService {
     try {
       final doc = await _firestore.collection(_collection).doc(uid).get();
       if (!doc.exists) return 0.0;
-      return (doc.data()?['balance'] ?? 0.0).toDouble();
+      return ((doc.data()?['balance'] as num?) ?? 0).toDouble();
     } catch (e) {
       debugPrint("Bakiye sorgu hatası: $e");
       return 0.0;
@@ -75,12 +71,12 @@ class WalletService {
   Stream<double> streamBakiye(String uid) {
     return _firestore.collection(_collection).doc(uid).snapshots().map((doc) {
       if (!doc.exists) return 0.0;
-      return (doc.data()?['balance'] ?? 0.0).toDouble();
+      return ((doc.data()?['balance'] as num?) ?? 0).toDouble();
     });
   }
 
   /// 4. İŞLEM GEÇMİŞİ STREAM
-  /// KALDI: Kullanıcıya hareketleri göstermek için.
+  /// KALDI: Kullanıcıya hareketleri göstermek için. date'e göre sıralı.
   Stream<QuerySnapshot> streamTransactions(String uid) {
     return _firestore
         .collection(_collection)
@@ -90,10 +86,4 @@ class WalletService {
         .limit(50)
         .snapshots();
   }
-
-// SİLİNDİ: _generateIdempotencyKey
-// Sebep: Idempotency kontrolünü backend yapıyor.
-
-// SİLİNDİ: akbankPosEntegrasyonuBaslat
-// Sebep: Zaten deprecated'ti. IyzicoManager kullanıyoruz.
 }

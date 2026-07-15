@@ -1,5 +1,3 @@
-// lib/features/home/screens/home_screen.dart
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -8,30 +6,34 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ustam_gelsin/core/theme/app_theme.dart';
 import 'package:ustam_gelsin/features/musteri/screens/musteri_auth_page.dart';
+import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dart'; // DOĞRU YOL KORUNDU
 import 'package:ustam_gelsin/features/usta/screens/usta_auth_page.dart';
+import 'package:ustam_gelsin/features/usta/screens/usta_profil_sayfasi.dart';
 import 'package:ustam_gelsin/features/home/screens/home_page_ai.dart';
 import 'package:ustam_gelsin/features/home/widgets/hizmetler_slider.dart';
 import 'package:ustam_gelsin/features/home/widgets/ilan_akisi_slider.dart';
+import 'package:ustam_gelsin/features/home/widgets/insaat_rehberi_slider.dart';
 import 'web_home_screen.dart';
 import 'nasil_calisir.dart';
 import 'destek_iletisim.dart';
 import 'insaat_rehberi.dart';
 
-// Firebase'den veri çeken güncellenmiş sözleşme fonksiyonu
 Future<void> showSozlesmeDialog(BuildContext context, String documentId, String defaultBaslik) async {
   showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
   try {
     final doc = await FirebaseFirestore.instance.collection('config').doc(documentId).get();
-    Navigator.pop(context);
+    if(context.mounted) Navigator.pop(context);
     if (!doc.exists) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sözleşme bulunamadı')));
+      if(context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sözleşme bulunamadı')));
       return;
     }
     final data = doc.data()!;
-    final String baslik = data['baslik'] ?? defaultBaslik;
-    final String metin = data['metin'] ?? 'İçerik yüklenemedi.';
+    final String baslik = data['baslik']?? defaultBaslik;
+    final String metin = data['metin']?? 'İçerik yüklenemedi.';
+    if(!context.mounted) return;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -45,14 +47,15 @@ Future<void> showSozlesmeDialog(BuildContext context, String documentId, String 
       ),
     );
   } catch (e) {
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+    if(context.mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+    }
   }
 }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -61,6 +64,9 @@ class _HomeScreenState extends State<HomeScreen> {
   double _lat = 0.0;
   double _lng = 0.0;
   bool _konumYukleniyor = true;
+  User? _currentUser;
+  String? _userRole;
+  bool _roleYukleniyor = true;
 
   static const String FIRMA_UNVANI = "Hemen Ustam Gelsin";
   static const String FIRMA_ADRES = "Sağlık Mh. Kurudere Cd. No:76/9 Salihli - MANİSA";
@@ -73,6 +79,54 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _konumuBelirle();
+    _authDinle();
+  }
+
+  void _authDinle() {
+    FirebaseAuth.instance.authStateChanges().listen((user) async {
+      if (mounted) setState(() { _currentUser = user; _roleYukleniyor = true; });
+      if (user == null) {
+        if (mounted) setState(() { _userRole = null; _roleYukleniyor = false; });
+        return;
+      }
+      try {
+        final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        if (doc.exists && mounted) {
+          setState(() {
+            _userRole = doc.data()?['role'] as String?;
+            _roleYukleniyor = false;
+          });
+        } else {
+          if (mounted) setState(() { _userRole = null; _roleYukleniyor = false; });
+        }
+      } catch (e) {
+        if (mounted) setState(() => _roleYukleniyor = false);
+      }
+    });
+  }
+
+  void _handleMusteriAction() {
+    if (_currentUser == null) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerAuthPage(role: "customer")));
+      return;
+    }
+    if (_userRole == 'usta') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bu alan sadece müşteriler içindir.')));
+      return;
+    }
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const MusteriProfilSayfasi()));
+  }
+
+  void _handleUstaAction() {
+    if (_currentUser == null) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta")));
+      return;
+    }
+    if (_userRole == 'customer') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bu alan sadece ustalar içindir.')));
+      return;
+    }
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaProfilSayfasi()));
   }
 
   Future<void> _konumuBelirle() async {
@@ -118,12 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
         title: Image.asset('assets/app_logo.png', height: 80, fit: BoxFit.contain),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none_rounded, color: Colors.black, size: 30),
-          ),
-        ],
+        actions: [ IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none_rounded, color: Colors.black, size: 30)) ],
       ),
       drawer: Drawer(
         backgroundColor: Colors.white,
@@ -133,14 +182,30 @@ class _HomeScreenState extends State<HomeScreen> {
               DrawerHeader(decoration: const BoxDecoration(color: Colors.white), child: Column(children: [Image.asset('assets/app_logo.png', height: 90, fit: BoxFit.contain), const SizedBox(height: 2), Text("İşin Ustası, Hep Yanında", style: GoogleFonts.caveat(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black))])),
               Expanded(
                 child: ListView(padding: EdgeInsets.zero, children: [
-                  ListTile(leading: const Icon(Icons.badge_outlined, color: Color(0xFF2979FF)), title: const Text("MÜŞTERİ GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerAuthPage(role: "customer")))),
-                  ListTile(leading: Icon(Icons.construction, color: AppColors.ustaColor), title: const Text("USTA GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta")))),
+                  if (_roleYukleniyor)
+                    const ListTile(leading: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)), title: Text("Yükleniyor..."))
+                  else if (_currentUser!= null)
+                    ListTile(
+                      leading: const Icon(Icons.person, color: Color(0xFF2DB34A)),
+                      title: Text(_userRole == 'usta'? "USTA PROFİLİM" : "PROFİLİM"),
+                      titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                      onTap: () {
+                        Navigator.pop(context);
+                        if (_userRole == 'usta') {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const UstaProfilSayfasi()));
+                        } else {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const MusteriProfilSayfasi()));
+                        }
+                      },
+                    )
+                  else...[
+                      ListTile(leading: const Icon(Icons.badge_outlined, color: Color(0xFF2979FF)), title: const Text("MÜŞTERİ GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerAuthPage(role: "customer")))),
+                      ListTile(leading: Icon(Icons.construction, color: AppColors.ustaColor), title: const Text("USTA GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta")))),
+                    ],
                   const Divider(),
                   ListTile(leading: const Icon(Icons.fingerprint, color: Colors.black), title: const Text("Biz Kimiz"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BizKimizPage()))),
                   ListTile(leading: const Icon(Icons.settings_suggest, color: Colors.black), title: const Text("Nasıl Çalışır"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NasilCalisirPage()))),
                   ListTile(leading: const Icon(Icons.support_agent, color: Colors.black), title: const Text("Destek & İletişim"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DestekIletisimPage()))),
-
-                  // Sosyal medya başlığı ve ikonları
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
                     child: Column(
@@ -187,10 +252,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text("Güvenilir ustalar, şeffaf fiyatlar, hızlı çözümler.", style: GoogleFonts.poppins(fontSize: 14, color: Colors.black54)),
                   const SizedBox(height: 22),
                   Row(children: [
-                    Expanded(child: SizedBox(height: 58, child: ElevatedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerAuthPage(role: "customer"))), icon: const Icon(Icons.add, color: Colors.white), label: Text("ÜCRETSİZ İLAN OLUŞTUR", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
+                    Expanded(child: SizedBox(height: 58, child: ElevatedButton.icon(onPressed: _handleMusteriAction, icon: const Icon(Icons.add, color: Colors.white), label: Text("ÜCRETSİZ İLAN OLUŞTUR", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: ElevatedButton.styleFrom(backgroundColor: _userRole == 'usta'? Colors.grey : Colors.red, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
                     const SizedBox(width: 10),
                     Expanded(child: SizedBox(height: 58, child: OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePageAI())), icon: const Icon(Icons.calculate_outlined), label: Text("AI MALİYET HESAPLA", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: OutlinedButton.styleFrom(foregroundColor: Colors.black, side: const BorderSide(color: Colors.black, width: 1.3), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
                   ]),
+                  const SizedBox(height: 20),
+                  const InsaatRehberiSlider(),
                 ]),
               ),
               const SizedBox(height: 20),
@@ -202,14 +269,12 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
               Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Container(padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(.05), blurRadius: 10)]), child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [_buildStat(Icons.groups, "12.500+", "Tamamlanan İş"), _buildStat(Icons.verified_user, "3.200+", "Doğrulanmış Usta"), _buildStat(Icons.location_on, "81 İlde", "Hizmet")]))),
               const SizedBox(height: 30),
-              Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("SON İLANLAR", style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold)), InkWell(onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta"))), child: const Text("Tümünü Gör →", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)) )])),
+              Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("SON İLANLAR", style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold)), InkWell(onTap: _handleUstaAction, child: Text("Tümünü Gör →", style: TextStyle(color: _userRole == 'customer'? Colors.grey : Colors.red, fontWeight: FontWeight.bold)))])),
               const SizedBox(height: 12),
-              _konumYukleniyor ? const Center(child: CircularProgressIndicator()) : IlanAkisiSlider(ustaLat: _lat, ustaLng: _lng),
+              _konumYukleniyor? const Center(child: CircularProgressIndicator()) : Opacity(opacity: _userRole == 'customer'? 0.5 : 1.0, child: IgnorePointer(ignoring: _userRole == 'customer', child: IlanAkisiSlider(ustaLat: _lat, ustaLng: _lng))),
               const SizedBox(height: 15),
               Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Image.asset('assets/kesinti_yok_2.png', fit: BoxFit.contain)),
               const SizedBox(height: 30),
-
-              // FOOTER ALANI
               Container(
                 width: double.infinity,
                 color: const Color(0xFF1A1A1A),
@@ -220,7 +285,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 10),
                     Text("Adres: $FIRMA_ADRES", textAlign: TextAlign.center, style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 12)),
                     Text("Tel: $FIRMA_TELEFON | Mail: $FIRMA_MAIL", textAlign: TextAlign.center, style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 12)),
-
                     const SizedBox(height: 20),
                     Text("GÜVENLİ ÖDEME", style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
@@ -231,7 +295,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       Image.asset('assets/iyzico.png', height: 30, errorBuilder: (c, e, s) => const Icon(Icons.payment, color: Colors.grey)),
                       Image.asset('assets/3D_secure.png', height: 30, errorBuilder: (c, e, s) => const Icon(Icons.security, color: Colors.grey)),
                     ]),
-
                     const SizedBox(height: 20),
                     Text("SÖZLEŞMELER", style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
@@ -241,7 +304,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       InkWell(onTap: () => showSozlesmeDialog(context, "kullanim_kosullari", "Kullanım Koşulları"), child: const Text("Kullanım Koşulları", style: TextStyle(color: Colors.grey, decoration: TextDecoration.underline))),
                       InkWell(onTap: () => showSozlesmeDialog(context, "iptal_iade", "İptal ve İade"), child: const Text("İptal ve İade", style: TextStyle(color: Colors.grey, decoration: TextDecoration.underline))),
                     ]),
-
                     const SizedBox(height: 20),
                     const Divider(color: Color(0xFF444444)),
                     Text("© ${DateTime.now().year} $FIRMA_UNVANI. Tüm hakları saklıdır.", style: GoogleFonts.poppins(color: Colors.grey[600], fontSize: 12)),
@@ -269,12 +331,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(top: 5),
                     child: FloatingActionButton(
                         elevation: 0,
-                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerAuthPage(role: "customer"))),
-                        backgroundColor: Colors.red,
-                        child: const Icon(Icons.add, color: Colors.white, size: 30)
-                    ),
+                        onPressed: _handleMusteriAction,
+                        backgroundColor: _userRole == 'usta'? Colors.grey : Colors.red,
+                        child: const Icon(Icons.add, color: Colors.white, size: 30)),
                   ),
-                  const Text("İLAN VER", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                  Text("İLAN VER", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _userRole == 'usta'? Colors.grey : Colors.black)),
                 ],
               ),
               _buildNavItem(Icons.article_outlined, "İNŞAAT REHBERİ", () => Navigator.push(context, MaterialPageRoute(builder: (context) => const InsaatRehberiScreen()))),
@@ -313,6 +374,6 @@ class BizKimizPage extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Biz Kimiz", style: TextStyle(color: Colors.black)), backgroundColor: Colors.white, elevation: 0, iconTheme: const IconThemeData(color: Colors.black)), body: FutureBuilder<Map<String, dynamic>>(future: _loadData(), builder: (context, snapshot) { if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator()); if (!snapshot.hasData) return const Center(child: Text("İçerik bulunamadı.")); final data = snapshot.data!; final List icerikListesi = data['icerik'] ?? []; return SingleChildScrollView(padding: const EdgeInsets.all(20.0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(data['baslik'] ?? "Biz Kimiz?", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)), const Divider(height: 40), ...icerikListesi.map((item) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(item['baslik'] ?? "", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent)), const SizedBox(height: 5), Text(item['metin'] ?? "", style: const TextStyle(fontSize: 15, height: 1.4)), const SizedBox(height: 20)]))])); }));
+    return Scaffold(appBar: AppBar(title: const Text("Biz Kimiz", style: TextStyle(color: Colors.black)), backgroundColor: Colors.white, elevation: 0, iconTheme: const IconThemeData(color: Colors.black)), body: FutureBuilder<Map<String, dynamic>>(future: _loadData(), builder: (context, snapshot) { if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator()); if (!snapshot.hasData) return const Center(child: Text("İçerik bulunamadı.")); final data = snapshot.data!; final List icerikListesi = data['icerik']?? []; return SingleChildScrollView(padding: const EdgeInsets.all(20.0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(data['baslik']?? "Biz Kimiz?", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)), const Divider(height: 40),...icerikListesi.map((item) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(item['baslik']?? "", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent)), const SizedBox(height: 5), Text(item['metin']?? "", style: const TextStyle(fontSize: 15, height: 1.4)), const SizedBox(height: 20)]))])); }));
   }
 }

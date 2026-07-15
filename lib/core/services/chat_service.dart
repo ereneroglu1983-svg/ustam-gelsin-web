@@ -1,5 +1,6 @@
 // lib/core/services/chat_service.dart
 
+import 'package:rxdart/rxdart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ustam_gelsin/core/services/overlay_manager.dart';
@@ -30,26 +31,45 @@ class ChatService {
 
   // --- OPTİMİZE EDİLMİŞ CHAT YÖNETİMİ ---
 
-  /// Mesaj Gönderme ve Bildirim Tetikleme (katilimcilar eklendi)
+  /// Mesaj Gönderme ve Bildirim Tetikleme (Mevcut sohbeti kullanır veya yenisini oluşturur)
   Future<void> mesajGonder({
     required String ilanId,
     required String gonderenId,
     required String aliciId,
     required String mesajMetni,
   }) async {
-    final Map<String, dynamic> mesajVerisi = {
-      'ilanId': ilanId,
-      'gonderenId': gonderenId,
-      'aliciId': aliciId,
-      'katilimcilar': [gonderenId, aliciId], // İndeksleme için şart
-      'mesajMetni': mesajMetni,
-      'timestamp': FieldValue.serverTimestamp(),
-      'okundu': false,
-    };
-
     try {
-      await _firestore.collection('chats').add(mesajVerisi);
+      // 1. Aynı ilan ve katılımcılar için daha önce oluşturulmuş bir sohbet var mı kontrol et
+      var chatQuery = await _firestore
+          .collection('chats')
+          .where('ilanId', isEqualTo: ilanId)
+          .where('katilimcilar', arrayContains: gonderenId)
+          .limit(1)
+          .get();
 
+      DocumentReference chatRef;
+
+      if (chatQuery.docs.isNotEmpty) {
+        // Zaten bir sohbet varsa onun referansını al
+        chatRef = chatQuery.docs.first.reference;
+      } else {
+        // Yoksa yeni bir sohbet dokümanı oluştur
+        chatRef = await _firestore.collection('chats').add({
+          'ilanId': ilanId,
+          'katilimcilar': [gonderenId, aliciId],
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      }
+
+      // 2. Mesajı, o sohbetin altına "mesajlar" alt koleksiyonu olarak ekle
+      await chatRef.collection('mesajlar').add({
+        'gonderenId': gonderenId,
+        'mesajMetni': mesajMetni,
+        'timestamp': FieldValue.serverTimestamp(),
+        'okundu': false,
+      });
+
+      // 3. İlan bilgilerini güncelle
       await _firestore.collection('ilanlar').doc(ilanId).update({
         'sonMesaj': mesajMetni,
         'sonMesajTarihi': FieldValue.serverTimestamp(),
@@ -59,24 +79,28 @@ class ChatService {
     }
   }
 
-  /// Yeni mesajları dinle (limit eklendi)
+  /// Yeni mesajları dinle (Alt koleksiyon yapısına uygun güncellendi)
   void yeniMesajlariDinle() {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
     _firestore
         .collection('chats')
-        .where('aliciId', isEqualTo: uid)
-        .where('okundu', isEqualTo: false)
-        .limit(5) // Gereksiz veri akışını önlemek için limit
+        .where('katilimcilar', arrayContains: uid)
         .snapshots()
         .listen((snapshot) {
       for (var change in snapshot.docChanges) {
-        if (change.type == DocumentChangeType.added) {
+        if (change.type == DocumentChangeType.modified) {
+          // Sohbet dokümanı güncellendiğinde yeni mesaj gelmiş olabilir
           var data = change.doc.data() as Map<String, dynamic>;
+
+          // Alıcıyı belirle
+          List katilimcilar = data['katilimcilar'] ?? [];
+          String digerKullaniciId = katilimcilar.firstWhere((id) => id != uid, orElse: () => "");
+
           OverlayManager.showChatHead(
             data['ilanId'],
-            data['gonderenId'],
+            digerKullaniciId,
             "Yeni Mesaj",
           );
         }
@@ -89,36 +113,51 @@ class ChatService {
     return _firestore
         .collection('chats')
         .where('ilanId', isEqualTo: ilanId)
-        .orderBy('timestamp', descending: true)
-        .limit(30) // Sayfa başına sınırlı veri okuma
-        .snapshots();
+        .limit(1)
+        .snapshots()
+        .switchMap((chatSnapshot) {
+      if (chatSnapshot.docs.isEmpty) return const Stream<QuerySnapshot>.empty();
+      return chatSnapshot.docs.first.reference
+          .collection('mesajlar')
+          .orderBy('timestamp', descending: true)
+          .limit(30)
+          .snapshots();
+    });
   }
 
   /// Kullanıcının okunmamış mesaj bildirimlerini dinle (limit eklendi)
   Stream<QuerySnapshot> bildirimleriDinle(String userId) {
     return _firestore
         .collection('chats')
-        .where('aliciId', isEqualTo: userId)
-        .where('okundu', isEqualTo: false)
+        .where('katilimcilar', arrayContains: userId)
         .limit(10)
         .snapshots();
   }
 
-  /// Mesajı okundu olarak işaretle
+  /// Mesajı okundu olarak işaretle (Alt koleksiyona göre güncellendi)
   Future<void> mesajOkunduIsaretle(String ilanId, String mevcutKullaniciId) async {
     try {
-      var batch = _firestore.batch();
-      var okunmamislar = await _firestore
+      var chatQuery = await _firestore
           .collection('chats')
           .where('ilanId', isEqualTo: ilanId)
-          .where('aliciId', isEqualTo: mevcutKullaniciId)
-          .where('okundu', isEqualTo: false)
+          .limit(1)
           .get();
 
-      for (var doc in okunmamislar.docs) {
-        batch.update(doc.reference, {'okundu': true});
+      if (chatQuery.docs.isNotEmpty) {
+        var okunmamislar = await chatQuery.docs.first.reference
+            .collection('mesajlar')
+            .where('okundu', isEqualTo: false)
+            .get();
+
+        var batch = _firestore.batch();
+        for (var doc in okunmamislar.docs) {
+          // Sadece karşı tarafın gönderdiği mesajları okundu işaretle
+          if (doc.get('gonderenId') != mevcutKullaniciId) {
+            batch.update(doc.reference, {'okundu': true});
+          }
+        }
+        await batch.commit();
       }
-      await batch.commit();
 
       OverlayManager.hideChatHead();
     } catch (e) {

@@ -94,7 +94,9 @@ class _UstaCuzdanimState extends State<UstaCuzdanim> {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(25, 10, 25, 25),
                           child: ElevatedButton(
-                            onPressed: _loading? null : () {
+                            onPressed: _loading
+                                ? null
+                                : () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -149,6 +151,9 @@ class _UstaCuzdanimState extends State<UstaCuzdanim> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
+        if (snapshot.hasError) {
+          return Center(child: Text("Hata: ${snapshot.error}"));
+        }
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Center(
             child: Text(
@@ -169,8 +174,15 @@ class _UstaCuzdanimState extends State<UstaCuzdanim> {
           ),
           itemBuilder: (context, index) {
             var data = snapshot.data!.docs[index].data() as Map<String, dynamic>;
-            bool isPositive = data['type'] == 'deposit';
-            DateTime date = (data['date'] as Timestamp).toDate();
+
+            // DÜZELTİLDİ: Backend 'topup' yazıyor, 'deposit' değil
+            final String type = (data['type']?? '').toString();
+            bool isPositive = type == 'topup' || type == 'deposit';
+
+            // Senin tarih/saat sistemin - tek kaynak 'date'
+            final Timestamp? ts = data['date'] as Timestamp?;
+            if (ts == null) return const SizedBox.shrink();
+            DateTime date = ts.toDate();
 
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

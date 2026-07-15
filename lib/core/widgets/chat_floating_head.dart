@@ -35,10 +35,13 @@ class _ChatFloatingHeadState extends State<ChatFloatingHead> {
         },
         child: GestureDetector(
           onTap: () {
+            // Navigator'ı Overlay'in içindeki bağlamla güvenli kullanıyoruz
             Navigator.push(context, MaterialPageRoute(
               builder: (_) => ChatDetaySayfasi(
                 ilanId: widget.ilanId,
+                // ChatDetaySayfasi'ndaki 'ustaId' ile tam eşleşme
                 ustaId: widget.aliciId,
+                // ChatDetaySayfasi'ndaki 'ustaAd' ile tam eşleşme
                 ustaAd: widget.aliciAd,
               ),
             ));

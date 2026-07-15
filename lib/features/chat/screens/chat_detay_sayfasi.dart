@@ -26,8 +26,6 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  // Optimizasyon: Stream'ler build metodu dışına taşındı.
-  // Bu sayede setState veya build her tetiklendiğinde Firebase'e yeni istek atılmaz.
   late Stream<QuerySnapshot> _mesajStream;
   late Stream<DocumentSnapshot> _ilanStream;
 
@@ -36,10 +34,8 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
     super.initState();
     final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
-    // Okundu işaretleme işlemi sadece sayfa ilk açıldığında yapılır.
     _chatService.mesajOkunduIsaretle(widget.ilanId, currentUserId);
 
-    // Stream'ler initState içinde bir kez tanımlanır.
     _mesajStream = _chatService.mesajlariGetir(widget.ilanId);
     _ilanStream = FirebaseFirestore.instance.collection('ilanlar').doc(widget.ilanId).snapshots();
   }
@@ -66,9 +62,8 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
           children: [
             Text(widget.ustaAd, style: const TextStyle(color: Colors.white, fontSize: 16)),
             StreamBuilder<DocumentSnapshot>(
-              stream: _ilanStream, // Sabitlenmiş stream kullanıldı.
+              stream: _ilanStream,
               builder: (context, snapshot) {
-                // Veri yoksa veya yükleniyorsa basit bir boşluk dönerek faturayı koruyoruz.
                 if (!snapshot.hasData || !snapshot.data!.exists) {
                   return const Text("İlan Başlığı", style: TextStyle(fontSize: 12, color: Colors.white70));
                 }
@@ -86,7 +81,7 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
           children: [
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: _mesajStream, // Sabitlenmiş stream kullanıldı.
+                stream: _mesajStream,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return const Center(child: Text("Hata oluştu", style: TextStyle(color: Colors.white)));
@@ -150,12 +145,12 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
                   IconButton(
                     icon: const Icon(Icons.send, color: Colors.blue),
                     onPressed: () {
-                      if (_controller.text.isNotEmpty) {
+                      if (_controller.text.trim().isNotEmpty) { // .trim() eklendi
                         _chatService.mesajGonder(
                           ilanId: widget.ilanId,
                           gonderenId: currentUserId,
                           aliciId: widget.ustaId,
-                          mesajMetni: _controller.text,
+                          mesajMetni: _controller.text.trim(),
                         );
                         _controller.clear();
                       }
