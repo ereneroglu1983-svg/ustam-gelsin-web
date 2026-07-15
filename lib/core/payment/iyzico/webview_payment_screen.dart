@@ -2,17 +2,36 @@
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:ustam_gelsin/features/wallet/screens/odeme_sonuc_screen.dart';
 import 'iyzico_config.dart';
 
 class WebviewPaymentScreen extends StatefulWidget {
-  final String paymentUrl;
+  // 1. REVİZE: Artık URL değil form içeriği, geriye uyum için ikisi de opsiyonel
+  final String? paymentUrl;
+  final String? checkoutFormContent;
   final String orderId;
+  final String conversationId;
 
   const WebviewPaymentScreen({
     super.key,
-    required this.paymentUrl,
+    this.paymentUrl,
+    this.checkoutFormContent,
     required this.orderId,
+    this.conversationId = '',
   });
+
+  // Eski kullanım için factory
+  factory WebviewPaymentScreen.fromUrl({
+    Key? key,
+    required String paymentUrl,
+    required String orderId,
+  }) {
+    return WebviewPaymentScreen(
+      key: key,
+      paymentUrl: paymentUrl,
+      orderId: orderId,
+    );
+  }
 
   @override
   State<WebviewPaymentScreen> createState() => _WebviewPaymentScreenState();
@@ -42,6 +61,16 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
           },
           onNavigationRequest: (request) {
             final url = request.url;
+            // 2. REVİZE: Gerçek callback - hemenustam://
+            if (url.startsWith('hemenustam://payment-success')) {
+              _finishWithResult(true, "Ödeme başarılı! Bakiye güncelleniyor...");
+              return NavigationDecision.prevent;
+            }
+            if (url.startsWith('hemenustam://payment-fail')) {
+              _finishWithResult(false, "Ödeme başarısız veya iptal edildi.");
+              return NavigationDecision.prevent;
+            }
+            // Geriye uyum: Eski IyzicoConfig URL'leri hala çalışsın
             if (url.startsWith(IyzicoConfig.successUrl)) {
               _finishWithResult(true, "Ödeme başarılı! Bakiye güncelleniyor...");
               return NavigationDecision.prevent;
@@ -53,32 +82,52 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
             return NavigationDecision.navigate;
           },
         ),
-      )
-      ..loadRequest(Uri.parse(widget.paymentUrl));
+      );
+
+    // 1. REVİZE: Form içeriği varsa HTML bas, yoksa URL yükle
+    if (widget.checkoutFormContent != null && widget.checkoutFormContent!.isNotEmpty) {
+      final html = '''
+        <html>
+          <head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+          <body style="margin:0;padding:0;">
+            <div id="iyzipay-checkout-form" class="responsive"></div>
+            ${widget.checkoutFormContent}
+          </body>
+        </html>
+      ''';
+      _controller.loadHtmlString(html, baseUrl: "https://sandbox-api.iyzipay.com");
+    } else if (widget.paymentUrl != null && widget.paymentUrl!.isNotEmpty) {
+      _controller.loadRequest(Uri.parse(widget.paymentUrl!));
+    } else {
+      debugPrint('[WEBVIEW] Ne URL ne de checkoutFormContent var!');
+    }
   }
 
   void _finishWithResult(bool success, String message) {
     if (_hasFinished) return;
     _hasFinished = true;
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: success ? Colors.green : Colors.red,
+    if (!mounted) return;
+
+    // YENİ AKIŞ: SnackBar + pop yerine tam sayfa sonuç ekranı
+    // Bu ekran kendi içinde 3 sn sonra UstaProfilSayfasi'na atacak
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => OdemeSonucScreen(
+          isSuccess: success,
+          message: message,
         ),
-      );
-      Navigator.of(context).pop(success);
-    }
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // PopScope kullanımı
     return PopScope(
-      canPop: false, // Kullanıcının geri tuşuyla çat diye çıkmasını engelle
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+        // Çift pop engellendi, tek noktadan çıkış -> başarısız ekranına git
         _finishWithResult(false, "Ödeme iptal edildi.");
       },
       child: Scaffold(

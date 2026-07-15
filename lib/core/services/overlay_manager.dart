@@ -10,7 +10,14 @@ class OverlayManager {
   static void showChatHead(String ilanId, String aliciId, String aliciAd) {
     // Navigator'ın context'ine ulaş
     final context = NotificationService.navigatorKey.currentContext;
-    if (context == null || _overlayEntry != null) return;
+
+    // Eğer halihazırda bir balon varsa ve context geçerliyse,
+    // yeni bir balon açmadan önce eskisini temizle ki çakışma olmasın
+    if (_overlayEntry != null) {
+      hideChatHead();
+    }
+
+    if (context == null) return;
 
     _overlayEntry = OverlayEntry(
       builder: (context) => ChatFloatingHead(
@@ -20,11 +27,14 @@ class OverlayManager {
       ),
     );
 
+    // Overlay'i güvenli bir şekilde ekle
     Overlay.of(context).insert(_overlayEntry!);
   }
 
   static void hideChatHead() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+    if (_overlayEntry != null) {
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+    }
   }
 }

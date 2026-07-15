@@ -108,12 +108,13 @@ class NotificationService {
         MaterialPageRoute(builder: (context) => AcilIlanlarSayfasi()),
       );
     } else if (type == 'chat') {
+      // REVİZE: Bildirimden gelen verilerle ChatDetaySayfasi'na yönlendirme güncellendi.
       navigatorKey.currentState?.push(
         MaterialPageRoute(
           builder: (context) => ChatDetaySayfasi(
             ilanId: dataMap['ilanId']?.toString() ?? '',
-            ustaId: dataMap['ustaId']?.toString() ?? '',
-            ustaAd: "Sohbet",
+            ustaId: dataMap['ustaId']?.toString() ?? dataMap['gonderenId']?.toString() ?? '',
+            ustaAd: dataMap['aliciAd']?.toString() ?? "Sohbet",
           ),
         ),
       );

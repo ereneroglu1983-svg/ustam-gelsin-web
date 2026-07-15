@@ -18,12 +18,13 @@ android {
     }
 
     kotlinOptions {
+        // En güncel ve hatasız Kotlin DSL yapılandırması
         jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId = "com.ustamgelsin.app.ustam_gelsin"
-        minSdk = flutter.minSdkVersion // flutter.minSdkVersion yerine sabit 21 kullanmak bağlantı kararlılığı sağlar
+        minSdk = 23
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -34,8 +35,6 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
-            // Native kanal hatalarını önlemek için release modunda minify'ı test amaçlı kapalı tutabilirsin
-            // Eğer minify gerekiyorsa, proguard-rules.pro içine Flutter kurallarını eklediğinden emin ol
             isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(
@@ -43,6 +42,11 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
 }
 

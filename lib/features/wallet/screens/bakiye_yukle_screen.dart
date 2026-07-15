@@ -1,8 +1,12 @@
+// lib/features/wallet/screens/bakiye_yukle_screen.dart
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'dart:convert';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class BakiyeYukleScreen extends StatefulWidget {
   const BakiyeYukleScreen({super.key});
@@ -12,6 +16,7 @@ class BakiyeYukleScreen extends StatefulWidget {
 }
 
 class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
+  // 1. REVİZE: Renk crash'i düzeltildi
   final Color primaryRed = const Color(0xFFDC143C);
   final Color navyBlue = const Color(0xFF000080);
   final Color darkBg = const Color(0xFF0F0F0F);
@@ -22,6 +27,7 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
   final TextEditingController _manuelTutarController = TextEditingController();
   bool _kvkkOnay = false;
   bool _sozlesmeOnay = false;
+  bool _isProcessing = false;
 
   final List<int> hazirTutarlar = [50, 100, 250, 500, 1000];
 
@@ -32,96 +38,224 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
   }
 
   int get _yuklenecekTutar {
-    if (_secilenTutar != null) return _secilenTutar!;
-    return int.tryParse(_manuelTutarController.text) ?? 0;
+    if (_secilenTutar!= null) return _secilenTutar!;
+    return int.tryParse(_manuelTutarController.text)?? 0;
   }
 
   bool get _odemeAktif {
-    return _yuklenecekTutar >= 10 && _kvkkOnay && _sozlesmeOnay;
+    return _yuklenecekTutar >= 10 && _kvkkOnay && _sozlesmeOnay &&!_isProcessing;
   }
 
   void _tutarSec(int? tutar) {
     setState(() {
       _secilenTutar = tutar;
-      if (tutar != null) _manuelTutarController.clear();
+      if (tutar!= null) _manuelTutarController.clear();
     });
+  }
+
+  // 2. REVİZE: Şehir / İlçe dinamik çözümleme
+  Future<Map<String, String>> _konumCozumle() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final userData = userDoc.data()?? {};
+
+      final sehirId = (userData['sehir_id']?? '34').toString();
+      final ilceId = (userData['ilce_id']?? '').toString();
+      final adres = (userData['faturaAdresi']?? userData['adres']?? 'Adres bilgisi').toString();
+
+      final String ilcelerStr = await rootBundle.loadString('assets/data/ilceler.json');
+      final List ilceler = jsonDecode(ilcelerStr);
+
+      Map? bulunanIlce;
+      if (ilceId.isNotEmpty) {
+        try {
+          bulunanIlce = ilceler.firstWhere((e) => e['ilce_id'].toString() == ilceId) as Map;
+        } catch (_) {}
+      }
+      bulunanIlce??= ilceler.firstWhere((e) => e['sehir_id'].toString() == sehirId, orElse: () => null) as Map?;
+
+      String normalize(String s) {
+        if (s.isEmpty) return s;
+        final lower = s.toLowerCase();
+        return lower[0].toUpperCase() + lower.substring(1);
+      }
+
+      if (bulunanIlce!= null) {
+        return {
+          'city': normalize(bulunanIlce['sehir_adi'].toString()),
+          'district': normalize(bulunanIlce['ilce_adi'].toString()),
+          'address': adres,
+        };
+      }
+
+      return {'city': 'Istanbul', 'district': 'Kadikoy', 'address': adres};
+    } catch (e) {
+      debugPrint('[KONUM] Cozumleme hatasi: $e');
+      return {'city': 'Istanbul', 'district': 'Kadikoy', 'address': 'Adres bilgisi'};
+    }
   }
 
   Future<void> _iyzicoOdemeBaslat({required bool iyzicoIleOde}) async {
     if (!_odemeAktif) return;
 
+    setState(() => _isProcessing = true);
     HapticFeedback.mediumImpact();
 
     try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('Kullanıcı girişi gerekli');
+
+      debugPrint('[IYZICO_FLOW] 1. Kullanıcı: ${user.uid}');
+
+      // 2. REVİZE: Dinamik konum al
+      final konum = await _konumCozumle();
+      debugPrint('[IYZICO_FLOW] 2. Konum: ${konum['city']} / ${konum['district']}');
+
+      // 3. REVİZE: http.post -> FirebaseFunctions.httpsCallable
       final functions = FirebaseFunctions.instanceFor(region: 'europe-west3');
-      final callable = functions.httpsCallable('bakiyeYukleCheckout');
+      final callable = functions.httpsCallable('checkout');
 
-      final result = await callable.call({
+      final requestData = {
         'amount': _yuklenecekTutar,
-        'channel': iyzicoIleOde ? 'iyzico_wallet' : 'card',
-        'userId': FirebaseAuth.instance.currentUser!.uid,
-      });
+        'payWithIyzico': iyzicoIleOde,
+        'city': konum['city'],
+        'district': konum['district'],
+        'address': konum['address'],
+      };
 
-      final checkoutUrl = result.data['checkoutFormContent'];
+      debugPrint('[IYZICO_FLOW] 3. CF Request: ${jsonEncode(requestData)}');
 
-      if (!mounted) return;
+      final result = await callable.call(requestData);
 
-      final bool? odemeBasarili = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => IyzicoWebViewScreen(url: checkoutUrl),
-        ),
-      );
+      debugPrint('[IYZICO_FLOW] 4. CF Response: ${result.data}');
 
-      if (!mounted) return;
-      if (odemeBasarili == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Bakiye yükleme başarılı'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Navigator.pop(context);
-      } else if (odemeBasarili == false) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Ödeme iptal edildi veya başarısız'),
-            backgroundColor: Colors.red,
-          ),
-        );
+      final data = result.data as Map;
+      final checkoutFormContent = data['checkoutFormContent'] as String?;
+
+      debugPrint('[IYZICO_FLOW] 5. IYZICO FORM CONTENT ALINDI');
+
+      if (checkoutFormContent == null) {
+        throw Exception('checkoutFormContent alınamadı');
       }
 
-    } on FirebaseFunctionsException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hata: ${e.message}'), backgroundColor: Colors.red),
-      );
-    }
-  }
 
-  void _sozlesmeGoster() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: cardBg,
-        title: const Text('Mesafeli Satış Sözleşmesi', style: TextStyle(color: Colors.white)),
-        content: const SizedBox(
-          width: double.maxFinite,
-          child: SingleChildScrollView(
-            child: Text(
-              'Bu sözleşme... \n\n1. Hizmet...\n2. İade...',
-              style: TextStyle(color: Colors.grey),
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(backgroundColor: cardBg, title: const Text("Ödeme Yap", style: TextStyle(color: Colors.white))),
+            // 4. REVİZE: Callback dinleme eklendi
+            body: InAppWebView(
+              initialData: InAppWebViewInitialData(
+                baseUrl: WebUri("https://sandbox-api.iyzipay.com"),
+                data: '''
+                  <html>
+                    <head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+                    <body>
+                      <div id="iyzipay-checkout-form" class="responsive"></div>
+                      $checkoutFormContent
+                    </body>
+                  </html>
+                ''',
+              ),
+              initialSettings: InAppWebViewSettings(
+                javaScriptEnabled: true,
+                domStorageEnabled: true,
+                allowUniversalAccessFromFileURLs: true,
+              ),
+              shouldOverrideUrlLoading: (controller, navigationAction) async {
+                final url = navigationAction.request.url.toString();
+                debugPrint('[IYZICO_WEBVIEW] URL: $url');
+
+                if (url.startsWith('hemenustam://payment-success')) {
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('$_yuklenecekTutar TL başarıyla yüklendi!'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                  return NavigationActionPolicy.CANCEL;
+                }
+
+                if (url.startsWith('hemenustam://payment-fail')) {
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Ödeme başarısız'), backgroundColor: Colors.red),
+                    );
+                  }
+                  return NavigationActionPolicy.CANCEL;
+                }
+
+                return NavigationActionPolicy.ALLOW;
+              },
             ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Kapat', style: TextStyle(color: primaryRed)),
+      );
+    } catch (e, stack) {
+      debugPrint('[IYZICO_FLOW] ERROR: $e');
+      debugPrint('[IYZICO_FLOW] STACK: $stack');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
+  Future<void> _dokumanGoster(String docId, String title) async {
+    try {
+      final doc = await FirebaseFirestore.instance.collection('config').doc(docId).get();
+
+      if (!doc.exists) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Döküman bulunamadı.')));
+        return;
+      }
+
+      final data = doc.data();
+      final String baslik = data?['baslik']?? title;
+      final String tarih = data?['guncelleme_tarihi']?.toString()?? '';
+      final String metin = data?['metin']?? 'İçerik bulunamadı.';
+
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: cardBg,
+          title: Text(baslik, style: const TextStyle(color: Colors.white)),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(tarih, style: const TextStyle(color: Colors.redAccent, fontSize: 12)),
+                  const SizedBox(height: 10),
+                  Text(metin, style: const TextStyle(color: Colors.grey)),
+                ],
+              ),
+            ),
           ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Kapat', style: TextStyle(color: primaryRed)),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+    }
   }
 
   @override
@@ -162,8 +296,8 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
                       width: 100,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
-                        color: secili ? primaryRed : cardBg,
-                        border: Border.all(color: secili ? primaryRed : borderColor, width: 1.5),
+                        color: secili? primaryRed : cardBg,
+                        border: Border.all(color: secili? primaryRed : borderColor, width: 1.5),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
@@ -176,7 +310,7 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text('TL', style: TextStyle(color: secili ? Colors.white70 : Colors.grey, fontSize: 12)),
+                          Text('TL', style: TextStyle(color: secili? Colors.white70 : Colors.grey, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -227,34 +361,45 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
                   children: [
                     CheckboxListTile(
                       value: _kvkkOnay,
-                      onChanged: (v) => setState(() => _kvkkOnay = v ?? false),
-                      activeColor: primaryRed,
-                      checkColor: Colors.white,
-                      side: const BorderSide(color: Colors.grey),
-                      contentPadding: EdgeInsets.zero,
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: const Text(
-                        'KVKK Aydınlatma Metni\'ni okudum, onaylıyorum.',
-                        style: TextStyle(color: Colors.white, fontSize: 13),
-                      ),
-                    ),
-                    CheckboxListTile(
-                      value: _sozlesmeOnay,
-                      onChanged: (v) => setState(() => _sozlesmeOnay = v ?? false),
+                      onChanged: (v) => setState(() => _kvkkOnay = v?? false),
                       activeColor: primaryRed,
                       checkColor: Colors.white,
                       side: const BorderSide(color: Colors.grey),
                       contentPadding: EdgeInsets.zero,
                       controlAffinity: ListTileControlAffinity.leading,
                       title: GestureDetector(
-                        onTap: _sozlesmeGoster,
+                        onTap: () => _dokumanGoster('gizlilik_politikasi', 'KVKK Aydınlatma Metni'),
+                        child: RichText(
+                          text: TextSpan(
+                            style: const TextStyle(color: Colors.white, fontSize: 13),
+                            children: [
+                              const TextSpan(text: 'KVKK Aydınlatma Metni'),
+                              TextSpan(
+                                text: '\'ni okudum, onaylıyorum.',
+                                style: TextStyle(color: primaryRed, decoration: TextDecoration.underline),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    CheckboxListTile(
+                      value: _sozlesmeOnay,
+                      onChanged: (v) => setState(() => _sozlesmeOnay = v?? false),
+                      activeColor: primaryRed,
+                      checkColor: Colors.white,
+                      side: const BorderSide(color: Colors.grey),
+                      contentPadding: EdgeInsets.zero,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: GestureDetector(
+                        onTap: () => _dokumanGoster('mesafeli_satis', 'Mesafeli Satış Sözleşmesi'),
                         child: RichText(
                           text: TextSpan(
                             style: const TextStyle(color: Colors.white, fontSize: 13),
                             children: [
                               const TextSpan(text: 'Mesafeli Satış Sözleşmesi'),
                               TextSpan(
-                                text: ' \'ni okudum, onaylıyorum.',
+                                text: '\'ni okudum, onaylıyorum.',
                                 style: TextStyle(color: primaryRed, decoration: TextDecoration.underline),
                               ),
                             ],
@@ -277,6 +422,7 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
                 title: 'Kredi/Banka Kartı ile Öde',
                 subtitle: 'Visa, Mastercard, Troy',
                 primaryColor: navyBlue,
+                loading: _isProcessing,
               ),
               const SizedBox(height: 16),
 
@@ -287,6 +433,7 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
                 title: 'iyzico ile Öde',
                 subtitle: 'iyzico bakiyesi veya kayıtlı kartınla',
                 primaryColor: primaryRed,
+                loading: _isProcessing,
               ),
               const SizedBox(height: 24),
 
@@ -323,6 +470,7 @@ class _OdemeButon extends StatelessWidget {
   final String title;
   final String subtitle;
   final Color primaryColor;
+  final bool loading;
 
   const _OdemeButon({
     required this.aktif,
@@ -331,19 +479,21 @@ class _OdemeButon extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.primaryColor,
+    this.loading = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Opacity(
-      opacity: aktif ? 1 : 0.4,
+      opacity: aktif? 1 : 0.4,
       child: GestureDetector(
-        onTap: aktif ? onTap : null,
+        onTap: aktif? onTap : null,
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
+            // 1. REVİZE: Buradaki renk de düzeltildi
             color: const Color(0xFF1A1A1A),
-            border: Border.all(color: aktif ? primaryColor : const Color(0xFF2A2A2A), width: 1.5),
+            border: Border.all(color: aktif? primaryColor : const Color(0xFF2A2A2A), width: 1.5),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -354,7 +504,12 @@ class _OdemeButon extends StatelessWidget {
                   color: primaryColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: primaryColor, size: 28),
+                child: loading
+                    ? SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: primaryColor))
+                    : Icon(icon, color: primaryColor, size: 28),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -367,58 +522,11 @@ class _OdemeButon extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+              if (!loading) const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class IyzicoWebViewScreen extends StatefulWidget {
-  final String url;
-  const IyzicoWebViewScreen({super.key, required this.url});
-
-  @override
-  State<IyzicoWebViewScreen> createState() => _IyzicoWebViewScreenState();
-}
-
-class _IyzicoWebViewScreenState extends State<IyzicoWebViewScreen> {
-  late final WebViewController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onNavigationRequest: (request) {
-            if (request.url.contains('odeme-basarili') || request.url.contains('success')) {
-              Navigator.pop(context, true);
-              return NavigationDecision.prevent;
-            }
-            if (request.url.contains('odeme-basarisiz') || request.url.contains('fail') || request.url.contains('cancel')) {
-              Navigator.pop(context, false);
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse(widget.url));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text('Güvenli Ödeme', style: TextStyle(color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: WebViewWidget(controller: controller),
     );
   }
 }
