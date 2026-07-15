@@ -1,0 +1,202 @@
+[
+  {
+    "id": "anahtar_teslim_komple_tadilat",
+    "name": "Anahtar Teslim Komple Tadilat",
+    "main_category": "insaat_tadilat"
+  },
+  {
+    "id": "asansor_bakim_onarim",
+    "name": "Asansör Bakım ve Onarım",
+    "main_category": "mekanik_tesisat"
+  },
+  {
+    "id": "uydu_internet_kamera",
+    "name": "Uydu, İnternet ve Kamera Sistemleri",
+    "main_category": "guvenlik_teknoloji"
+  },
+  {
+    "id": "konteyner_bungalov_prefabrik",
+    "name": "Konteyner, Bungalov ve Prefabrik",
+    "main_category": "prefabrik_konteyner"
+  },
+  {
+    "id": "ferforje_korkuluk_bahce_kapisi",
+    "name": "Ferforje Korkuluk ve Bahçe Kapısı",
+    "main_category": "metal_demir"
+  },
+  {
+    "id": "havuz_yapimi_bakimi",
+    "name": "Havuz Yapımı ve Bakımı",
+    "main_category": "havuz_sulama"
+  },
+  {
+    "id": "otomatik_sulama_sistemleri",
+    "name": "Otomatik Sulama Sistemleri",
+    "main_category": "havuz_sulama"
+  },
+  {
+    "id": "bahce_peyzaj_cim_ekimi",
+    "name": "Bahçe Peyzaj ve Çim Ekimi",
+    "main_category": "bahce_peyzaj"
+  },
+  {
+    "id": "temel_bodrum_su_yalitimi",
+    "name": "Temel ve Bodrum Su Yalıtımı",
+    "main_category": "cati_izolasyon"
+  },
+  {
+    "id": "sandvic_panel_singil_kaplama",
+    "name": "Sandviç Panel ve Şingıl Kaplama",
+    "main_category": "cati_izolasyon"
+  },
+  {
+    "id": "cati_yapimi_aktarma_izolasyon",
+    "name": "Çatı Yapımı Aktarma ve İzolasyon",
+    "main_category": "cati_izolasyon"
+  },
+  {
+    "id": "marangozluk_mobilya_tamiri",
+    "name": "Marangozluk ve Mobilya Tamiri",
+    "main_category": "mobilya_ahsap"
+  },
+  {
+    "id": "gomme_dolap_ray_dolap",
+    "name": "Gömme Dolap ve Ray Dolap",
+    "main_category": "mobilya_ahsap"
+  },
+  {
+    "id": "banyo_dolabi_vestiyer",
+    "name": "Banyo Dolabı ve Vestiyer",
+    "main_category": "mobilya_ahsap"
+  },
+  {
+    "id": "mutfak_dolabi_tezgahi",
+    "name": "Mutfak Dolabı ve Tezgahı",
+    "main_category": "mobilya_ahsap"
+  },
+  {
+    "id": "sineklik_panjur_sistemleri",
+    "name": "Sineklik ve Panjur Sistemleri",
+    "main_category": "kapi_pencere"
+  },
+  {
+    "id": "oda_kapisi_celik_kapi",
+    "name": "Oda Kapısı ve Çelik Kapı",
+    "main_category": "kapi_pencere"
+  },
+  {
+    "id": "cam_balkon_giyotin_cam",
+    "name": "Cam Balkon ve Giyotin Cam",
+    "main_category": "cam_aluminyum"
+  },
+  {
+    "id": "aluminyum_dograma_cephe",
+    "name": "Alüminyum Doğrama ve Cephe",
+    "main_category": "cam_aluminyum"
+  },
+  {
+    "id": "pvc_dograma",
+    "name": "PVC Doğrama",
+    "main_category": "kapi_pencere"
+  },
+  {
+    "id": "klima_montaj_bakim_gaz_dolumu",
+    "name": "Klima Montaj, Bakım ve Gaz Dolumu",
+    "main_category": "iklimlendirme"
+  },
+  {
+    "id": "yerden_isitma_sistemleri",
+    "name": "Yerden Isıtma Sistemleri",
+    "main_category": "mekanik_tesisat"
+  },
+  {
+    "id": "gunes_enerjisi_termosifon",
+    "name": "Güneş Enerjisi ve Termosifon",
+    "main_category": "dogalgaz_gunes"
+  },
+  {
+    "id": "dogalgaz_tesisati_kombi",
+    "name": "Doğalgaz Tesisatı ve Kombi Montajı/Bakımı",
+    "main_category": "dogalgaz_gunes"
+  },
+  {
+    "id": "elektrik_tesisati",
+    "name": "Elektrik Tesisatı",
+    "main_category": "elektrik_enerji"
+  },
+  {
+    "id": "sihhi_tesisat_pis_su",
+    "name": "Sıhhi Tesisat ve Pis Su Tesisatı",
+    "main_category": "mekanik_tesisat"
+  },
+  {
+    "id": "sistre_cila",
+    "name": "Sistre Cila İşleri",
+    "main_category": "zemin_kaplama"
+  },
+  {
+    "id": "epoksi_zemin_kaplama",
+    "name": "Epoksi Zemin Kaplama",
+    "main_category": "zemin_kaplama"
+  },
+  {
+    "id": "mermer_granit_traverten",
+    "name": "Mermer, Granit ve Traverten",
+    "main_category": "zemin_kaplama"
+  },
+  {
+    "id": "laminat_lamine_masif_parke",
+    "name": "Laminat, Lamine ve Masif Parke",
+    "main_category": "zemin_kaplama"
+  },
+  {
+    "id": "fayans_seramik_kalebodur",
+    "name": "Fayans, Seramik ve Kalebodur",
+    "main_category": "insaat_tadilat"
+  },
+  {
+    "id": "bolme_duvar",
+    "name": "Bölme Duvar (Alçıpan/Betoban/Cam)",
+    "main_category": "insaat_tadilat"
+  },
+  {
+    "id": "alci_siva_saten_alci",
+    "name": "Alçı Sıva ve Saten Alçı",
+    "main_category": "boya_dekorasyon"
+  },
+  {
+    "id": "kartonpiyer_stropiyer_citalama",
+    "name": "Kartonpiyer, Stropiyer ve Çıtalama",
+    "main_category": "boya_dekorasyon"
+  },
+  {
+    "id": "gergi_tavan_sistemleri",
+    "name": "Gergi Tavan Sistemleri",
+    "main_category": "boya_dekorasyon"
+  },
+  {
+    "id": "asma_tavan",
+    "name": "Asma Tavan",
+    "main_category": "boya_dekorasyon"
+  },
+  {
+    "id": "italyan_boya_dekoratif_siva",
+    "name": "İtalyan Boya ve Dekoratif Sıva",
+    "main_category": "boya_dekorasyon"
+  },
+  {
+    "id": "duvar_kagidi_poster",
+    "name": "Duvar Kağıdı ve Poster Uygulaması",
+    "main_category": "boya_dekorasyon"
+  },
+  {
+    "id": "dis_cephe_boya_mantolama",
+    "name": "Dış Cephe Boya ve Mantolama",
+    "main_category": "boya_dekorasyon"
+  },
+  {
+    "id": "ic_cephe_boya_badana",
+    "name": "İç Cephe Boya ve Badana",
+    "main_category": "boya_dekorasyon"
+  }
+]
