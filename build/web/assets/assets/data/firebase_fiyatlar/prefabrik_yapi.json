@@ -1,0 +1,156 @@
+﻿{
+  "meslekId": "prefabrik_yapi",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 1800,
+    "asgariKucuk": 45000,
+    "asgariBuyuk": 120000
+  },
+  "malzeme": {
+    "m2": 9500,
+    "aciklama": "Anahtar teslim m2 13500 TL her sey dahil 1.2mm celik govde C30 hasirli su basmani mutfak banyo dolap dahil, 14k TL tek kat standart veranda dahil luks haric, dubleks celik orani farkli 16k TL/m2 standart - Subat 2026 Prefabrikhane"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.22,
+    "ankara_izmir_antalya_bursa": 1.1,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "tek_kat_mimari": 0,
+    "dubleks_celik_karkas_agir_sase": 28000,
+    "zor_arazi_cift_bomlu_vinc": 35000
+  },
+  "ekstralar": {
+    "sifirdan_imalat_anahtar_teslim_kurulum": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Sifirdan Imalat Anahtar Teslim Kurulum Hizmeti - 14k TL/m2 tek kat 16k TL/m2 dubleks standart"
+    },
+    "mevcut_yapi_onarim_tamir_tadilat": {
+      "tip": "m2",
+      "fiyat": -3200,
+      "etiket": "Mevcut Yapi Icin Onarim Tamir ve Tadilat - Onarim indirimli m2"
+    },
+    "lojistik_nakliye_baska_sahaya_yer_degisim": {
+      "tip": "m2",
+      "fiyat": 1200,
+      "etiket": "Lojistik Nakliye ve Baska Sahaya Yer Degistirme - Sokum + nakliye + yeniden kurulum"
+    },
+    "prefabrik_konut_galvaniz_hafif_celik_panel": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Prefabrik Konut Galvaniz Hafif Celik Profil ve Standart Panel Yapi Tabanli - 14k TL/m2 tek kat baz"
+    },
+    "ahsap_bungalov_ithal_cam_ucgen_karkas_lambri": {
+      "tip": "m2",
+      "fiyat": 1800,
+      "etiket": "Ahsap Bungalov Ithal Cam Malzeme Ucgen Karkas ve Yogun Lambri Iscilikli - Bungalov lambri yogun"
+    },
+    "celik_konstruksiyon_statik_deprem_agir_celik": {
+      "tip": "m2",
+      "fiyat": 2800,
+      "etiket": "Celik Konstruksiyon Statik Hesapli Resmi Deprem Yonetmeligine Uygun Agir Celik - Agir celik deprem"
+    },
+    "tek_katli_mimari_yapi_planyasi": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Tek Katli Mimari Yapi Planyasi - 14k TL/m2 veranda dahil"
+    },
+    "dubleks_iki_kat_celik_karkas_agir_sase_guclendirme": {
+      "tip": "m2",
+      "fiyat": 2000,
+      "etiket": "Dubleks Iki Katli Celik Karkas ve Agir Sase Guclendirmeli Yapi Mimarisi - 16k TL/m2 dubleks fark 2k TL/m2"
+    },
+    "cati_akmasi_membran_izolasyon_yenileme": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Cati Akmasi Onarimi ve Komple Membran Izolasyon Yenilemesi - Membran yenileme"
+    },
+    "taban_curumesi_celik_sase_alt_taban_saci_yenileme": {
+      "tip": "m2",
+      "fiyat": 420,
+      "etiket": "Taban Curumesi Tamiri ve Celik Sase Alt Taban Saci Yenileme - Taban curume"
+    },
+    "dis_cephe_boya_betopan_kompozit_revizyon": {
+      "tip": "m2",
+      "fiyat": 185,
+      "etiket": "Dis Cephe Boya Isciligi ve Betopan Kompozit Kaplama Revizyonu"
+    },
+    "sihhi_tesisat_elektrik_altyapi_yenileme_ariza": {
+      "tip": "m2",
+      "fiyat": 320,
+      "etiket": "Sihhi Tesisat / Elektrik Altyapi Hatlari Yenileme ve Ariza Tamiri"
+    },
+    "deforme_sandvic_panel_degisim_duvar_ici_yalitim": {
+      "tip": "m2",
+      "fiyat": 380,
+      "etiket": "Deforme Olmus Sandvic Panel Degisimi ve Duvar Ici Yalitim Destegi - Panel 500-1500 TL/m2"
+    },
+    "yakin_sevk_0_50_km": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Yakin Mesafe Sevk 0-50 KM Arasi - Baz nakliye"
+    },
+    "orta_sevk_50_150_km": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Orta Mesafe Sevk 50-150 KM Arasi"
+    },
+    "uzak_sevk_150_350_km": {
+      "tip": "sabit",
+      "fiyat": 18500,
+      "etiket": "Uzak Mesafe Sevk 150-350 KM Arasi"
+    },
+    "sehirler_arasi_350_uzeri": {
+      "tip": "sabit",
+      "fiyat": 32000,
+      "etiket": "Sehirler Arasi Uzun Hat 350 KM ve Uzeri - Uzun hat tir"
+    },
+    "yogun_tas_yunu_ekstra_yalitim_duvar_cati": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Yogun Tas Yunu / Ekstra Yalitim Duvar Ici ve Cati Ustu Yuksek Yogunluklu Izolasyon"
+    },
+    "yerden_isitma_celik_sase_strafor_oksijen_bariyerli": {
+      "tip": "m2",
+      "fiyat": 320,
+      "etiket": "Yerden Isitma Altyapisi Celik Sase Uzeri Strafor ve Oksijen Bariyerli Borulama Dosemesi"
+    },
+    "aluminyum_konfor_cam_sinerji_premium_dograma": {
+      "tip": "m2",
+      "fiyat": 280,
+      "etiket": "Aluminyum Konfor Cam Entegrasyonu Isi Yalitimli Premium Dogramalar ve Sinerji Cam Gecisi"
+    },
+    "subasman_beton_celik_hasirli_hazir_kalip": {
+      "tip": "m2",
+      "fiyat": 420,
+      "etiket": "Subasman / Beton Zemin Isciligi Celik Hasirli Hazir Beton Dokumu ve Kalip Kurulumu - C30 beton hasir celikli su basmani 13.5k TL icinde"
+    },
+    "veranda_sundurma_ana_govde_entegre_celik_karkas_kapali": {
+      "tip": "m2",
+      "fiyat": 2800,
+      "etiket": "Veranda / Sundurma Tasarimi Ana Govdeye Entegre Celik Karkasli Uzeri Kapali Dis Mekan - Veranda m2 hesaba dahil 14k TL icinde"
+    },
+    "zor_arazi_dik_egim_tir_yanasma_cift_bomlu_vinc_denge": {
+      "tip": "sabit",
+      "fiyat": 25000,
+      "etiket": "Zor Arazi / Dik Egim Saha Zorlugu Tir Yanasma Engeli Cift Bomlu Agir Vinc Kurulumu ve Denge Mesaisi"
+    }
+  },
+  "carpanlar": {
+    "prefabrik_konut": 1.0,
+    "ahsap_bungalov": 1.12,
+    "celik_konstruksiyon": 1.22,
+    "tek_kat": 1.0,
+    "dubleks": 1.15
+  },
+  "alanKatsayilari": {
+    "0_45_kucuk": 1.28,
+    "45_85_standart": 1.0,
+    "85_130_genis_aile": 0.92,
+    "130_uzeri_cok_genis_endustriyel": 0.82
+  },
+  "kaynak": "Temmuz 2026 - Prefabrik anahtar teslim 13500 TL/m2 her sey dahil 1.2mm celik C30 hasirli mutfak banyo dahil, 14k TL/m2 tek kat standart veranda dahil 16k TL/m2 dubleks celik orani farkli luks haric - Subat 2026 Prefabrikhane 360m2 celik ev turu, 200m2 efsane model, 1.62M TL ekonomik, 3.2M TL full donanimli 25 Mayis guncel"
+}

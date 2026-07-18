@@ -1,0 +1,158 @@
+﻿{
+  "meslekId": "cati_isleri",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 680,
+    "asgariKucuk": 18000,
+    "asgariBuyuk": 35000
+  },
+  "malzeme": {
+    "m2": 1850,
+    "aciklama": "Kiremit 2500-3000 TL/m2, shingle 2800-3500 TL/m2, sandvic panel 3000-4200 TL/m2, metal 3500-4800 TL/m2 - 120m2 ornek kiremit 220k TL metal 260k TL celik karkas 320-380k TL"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.32,
+    "ankara_izmir_antalya_bursa": 1.16,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 1200,
+    "3_ve_ustu_asansorsuz": 4500,
+    "moloz_tasima_var": 2800,
+    "vinc_lojistik_2026": 8500
+  },
+  "ekstralar": {
+    "sifirdan_cati_yapimi": {
+      "tip": "m2",
+      "fiyat": 2850,
+      "etiket": "Sifirdan Cati Yapimi Yeni Konstruksiyon ve Kaplama - 120m2 celik 320-380k TL ahsap emprenyeli benzer"
+    },
+    "cati_aktarma_onarim": {
+      "tip": "m2",
+      "fiyat": 650,
+      "etiket": "Cati Aktarma ve Onarim Kiremit Revizyonu - 50-80k TL Izmir ornek"
+    },
+    "sandvic_singil_yenileme": {
+      "tip": "m2",
+      "fiyat": 1250,
+      "etiket": "Sandvic Panel / Singil Kaplama Yenileme - Panel 40mm 510 TL/m + KDV den baslar"
+    },
+    "sadece_izolasyon_yalitim": {
+      "tip": "m2",
+      "fiyat": 520,
+      "etiket": "Sadece Izolasyon Isi ve Su Yalitim - Tasyunu+membran+buhar kesici 140k-190k TL/120m2"
+    },
+    "oluk_dere_yenileme": {
+      "tip": "mt",
+      "fiyat": 380,
+      "etiket": "Oluk ve Dere Yenileme Yagmur Suyu Drenaj - 24k TL yagmur oluk yenileme ornek"
+    },
+    "ahsap_karkas_1_sinif": {
+      "tip": "m2",
+      "fiyat": 950,
+      "etiket": "Ahsap Karkas 1. Sinif Kereste Iskelet - Emprenyeli kaliteli"
+    },
+    "celik_karkas_metal_profil": {
+      "tip": "m2",
+      "fiyat": 1450,
+      "etiket": "Celik Karkas Metal Profil Yuksek Mukavemet - 120m2 320-380k TL"
+    },
+    "kiremit_kaplama_geleneksel": {
+      "tip": "m2",
+      "fiyat": 380,
+      "etiket": "Kiremit Kaplama Geleneksel Kil - Beton kiremit 100-155 TL/m2 malzeme + iscilik 2500-3000 TL/m2 toplam"
+    },
+    "sandvic_panel_poliuretan": {
+      "tip": "m2",
+      "fiyat": 850,
+      "etiket": "Sandvic Panel Poliuretan Dolgulu Cift Kat Sac Isi Yalitimli - 3000-4200 TL/m2"
+    },
+    "shingle_osb_membran": {
+      "tip": "m2",
+      "fiyat": 720,
+      "etiket": "Shingle Kaplama OSB + Membran - 2800-3500 TL/m2, rulo 2.1k TL/10m2"
+    },
+    "eternit_sac_trapez": {
+      "tip": "m2",
+      "fiyat": 320,
+      "etiket": "Eternit / Sac / Trapez Tek Kat Galvaniz - 750-1100 TL kenet sac benzeri"
+    },
+    "yapi_mustakil_villa": {
+      "tip": "carpan",
+      "fiyat": 1.1,
+      "etiket": "Mustakil Ev / Villa / Bungalov - Kirma cati detayli"
+    },
+    "apartman_site_blogu": {
+      "tip": "carpan",
+      "fiyat": 1.15,
+      "etiket": "Apartman / Site Blogu - Iskele ve ortak karar sureci"
+    },
+    "fabrika_depo_endustriyel": {
+      "tip": "carpan",
+      "fiyat": 0.88,
+      "etiket": "Fabrika / Depo Endustriyel Tesis - Genis alan indirimi"
+    },
+    "prefabrik_hafif_celik": {
+      "tip": "carpan",
+      "fiyat": 0.95,
+      "etiket": "Prefabrik / Hafif Celik Yapi"
+    },
+    "malzeme_dahil_nakliye": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Malzeme Dahil Tum Sarf ve Nakliye Ustaya Ait"
+    },
+    "sadece_iscilik_musteri": {
+      "tip": "carpan",
+      "fiyat": 0.42,
+      "etiket": "Sadece Iscilik Ana Malzeme Musteriye Ait - Iscilik 680 TL/m2 baz"
+    },
+    "isi_yalitimi_tas_yunu_cam_yunu": {
+      "tip": "m2",
+      "fiyat": 285,
+      "etiket": "Isi Yalitimi Cati Arasi Tas Yunu / Cam Yunu Silte - 5cm 1600-1900 TL 8cm 1850-2200 TL 10cm 2000-2400 TL, Izocam 2030 TL"
+    },
+    "su_yalitimi_membran_salom": {
+      "tip": "m2",
+      "fiyat": 195,
+      "etiket": "Su Yalitimi Saloma Alevi Membran Yakma Bohcalama - Tek kat 200 TL cift kat 200-800 TL etki"
+    },
+    "gizli_dere_asma_oluk_yenileme": {
+      "tip": "mt",
+      "fiyat": 520,
+      "etiket": "Gizli Dere / Asma Oluk Komple Yenileme Montaj"
+    },
+    "baca_kenari_cinko_siva_tamir": {
+      "tip": "adet",
+      "fiyat": 1850,
+      "etiket": "Baca Kenari Cinko Izolasyonu ve Siva Tamirati - Adet basi baca"
+    },
+    "dik_egimli_halatli_emniyet": {
+      "tip": "carpan",
+      "fiyat": 1.35,
+      "etiket": "Dik Egimli Cati Halatli Emniyet Tedbirli Ekstra Zorlu Iscilik"
+    },
+    "yuksek_katli_vinc_iskele": {
+      "tip": "sabit",
+      "fiyat": 12500,
+      "etiket": "Yuksek Katli Bina Vinc / Iskele Kurulum - Lojistik ve vinc 8500 TL 2026 ort"
+    }
+  },
+  "carpanlar": {
+    "sifirdan_yapim": 1.45,
+    "aktarma_onarim": 0.55,
+    "sandvic_singil": 0.95,
+    "izolasyon_sadece": 0.42,
+    "oluk_dere": 0.35
+  },
+  "alanKatsayilari": {
+    "0_50_m2_kucuk_teras": 1.35,
+    "50_100_m2_standart_mustakil": 1.15,
+    "100_200_m2_genis_apartman": 1.0,
+    "200_400_m2_buyuk_site_depo": 0.88,
+    "400_m2_uzeri_endustriyel": 0.78
+  },
+  "kaynak": "Temmuz 2026 - 120m2 cati marsilya kiremit 2500-3000 TL/m2 shingle 2800-3500 TL sandvic 3000-4200 TL metal 3500-4800 TL, kiremit kaplama 220k TL metal 260k TL celik karkas 320-380k TL, yalim tasyunu+membran+buhar 140-190k TL iscilik 180-230k TL, beton kiremit malzeme 100-155 TL/m2, sandvic panel 40mm 510 TL/m + KDV, tasyunu mantolama 5cm 1600-1900 TL 8cm 1850-2200 TL Izocam 2030 TL"
+}

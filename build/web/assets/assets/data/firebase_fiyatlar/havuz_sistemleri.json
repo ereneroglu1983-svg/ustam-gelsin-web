@@ -1,0 +1,137 @@
+﻿{
+  "meslekId": "havuz_sistemleri",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 4200,
+    "asgariKucuk": 45000,
+    "asgariBuyuk": 95000
+  },
+  "malzeme": {
+    "m2": 18500,
+    "aciklama": "Betonarme skimmer 35k-60k TL/m2 govde+mekanik 1.75M-3M TL 5x10, overflow 45k-70k TL/m2 2.25M-3.5M TL, prefabrik/celik+liner 24k-40k TL/m2 1.2M-2M TL, 32m2 betonarme 10k-12.5k TL prefabrik 8k-9k TL liner 9k-10.5k TL - 2025-2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.15,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "normal_arazi_kolay_kazi": 0,
+    "kayalik_kirici_mesai": 18500,
+    "bataklik_drenaj_kazik_islah": 42000,
+    "nakliye_vinc_fiberglass": 12000
+  },
+  "ekstralar": {
+    "sifirdan_komple_anahtar_teslim": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Sifirdan Havuz Yapimi Komple Anahtar Teslim - Baz betonarme skimmer 35k-60k TL/m2"
+    },
+    "mevcut_tadilat_liner_degisim": {
+      "tip": "m2",
+      "fiyat": -8500,
+      "etiket": "Mevcut Havuz Tadilati Liner Degisimi Yenileme - Govde mevcut"
+    },
+    "periyodik_sezonluk_bakim_kimyasal": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Periyodik Sezonluk Bakim Kimyasal ve Filtrasyon Temizligi - Sezonluk"
+    },
+    "kapatma_isi_sistemi_sezon_uzatma": {
+      "tip": "sabit",
+      "fiyat": 28000,
+      "etiket": "Havuz Kapatma / Isi Sistemi Kurulumu Sezon Uzatma - Lamel + isi pompasi on hazirlik"
+    },
+    "betonarme_skimmer_standart": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Betonarme Govde Skimmerli Standart Filtrasyon - Klasik dayanikli 35k-60k TL/m2"
+    },
+    "ustten_tasmali_infinity_denge_tankli_luks": {
+      "tip": "m2",
+      "fiyat": 11000,
+      "etiket": "Ustten Tasmali Betonarme Infinity Denge Tankli Luks - 45k-70k TL/m2 2.25M-3.5M TL 5x10"
+    },
+    "prefabrik_panel_celik_hizli_kurulum": {
+      "tip": "m2",
+      "fiyat": -9500,
+      "etiket": "Prefabrik / Panel Celik Panel Altyapili Hizli Kurulum - 24k-40k TL/m2 1.2M-2M TL 5x10"
+    },
+    "fiberglass_monoblok_kabuk": {
+      "tip": "m2",
+      "fiyat": -7000,
+      "etiket": "Fiberglass Havuz Govdesi Hazir Monoblok Kabuk Kasa - 98k-750k TL Armut fiberglass yapim araligi"
+    },
+    "normal_toprak_duz_kolay_kazi": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Normal Toprak Duz Arazi Kolay Ekskavator Kazisi - Baz"
+    },
+    "kayalik_sert_kirici_mesai": {
+      "tip": "m3",
+      "fiyat": 850,
+      "etiket": "Kayalik / Sert Zemin Agir Is Makinesi Kirici Mesaisi - m3 basi"
+    },
+    "bataklik_yuksek_yeralti_balçik_islah_kazik_drenaj": {
+      "tip": "sabit",
+      "fiyat": 48000,
+      "etiket": "Bataklik Yuksek Yeralti Suyu Balcik Zemin Islahi Kazik ve Drenaj"
+    },
+    "porselen_mozaik_yuksek_dayanikli": {
+      "tip": "m2",
+      "fiyat": 1850,
+      "etiket": "Porselen Mozaik Kaplama Yuksek Dayanimli Havuz Seramigi - Klasik"
+    },
+    "cam_mozaik_dogal_tas_premium": {
+      "tip": "m2",
+      "fiyat": 3200,
+      "etiket": "Cam Mozaik veya Dogal Tas Kaplama Premium Derinlik Efektli Luks Seri"
+    },
+    "liner_pvc_membran_sizdirmaz": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Liner Kaplama Sizdirmaz PVC Membran Hazir Ic Hazne Ortusu - 9k-10.5k TL/m2 liner, prefabrik 8k-9k TL/m2"
+    },
+    "inverter_isi_pompasi_dort_mevsim": {
+      "tip": "sabit",
+      "fiyat": 85000,
+      "etiket": "Inverter Isi Pompasi Dort Mevsim Yuzme Akilli Havuz Isitma - 60k-120k TL cihaz"
+    },
+    "tuz_klorlama_jenerator_otomasyon_ph": {
+      "tip": "sabit",
+      "fiyat": 28000,
+      "etiket": "Tuz Klorlama Jeneratoru Otomasyonu Dogal Dezenfeksiyon Otomatik pH Dozajlama"
+    },
+    "paslanmaz_selale_jakuzi_spa_pompa_jet": {
+      "tip": "sabit",
+      "fiyat": 42000,
+      "etiket": "Paslanmaz Celik Selale veya Jakuzi SPA Kosesi Bagimsiz Pompa Masaj Jet"
+    },
+    "rgb_akilli_aydinlatma_led_trafo": {
+      "tip": "adet",
+      "fiyat": 4500,
+      "etiket": "RGB Akilli Aydinlatma Paketi Uzaktan Kumandali Trafolu LED Armatur Seti - Adet"
+    },
+    "otomatik_kapak_lamel_motorlu": {
+      "tip": "m2",
+      "fiyat": 3200,
+      "etiket": "Otomatik Kapak Sistemi Isi Buharlasma Kaybini Onleyen Motorlu Lamel Ortu - m2"
+    }
+  },
+  "carpanlar": {
+    "betonarme_skimmer": 1.0,
+    "overflow_infinity": 1.32,
+    "prefabrik_panel": 0.68,
+    "fiberglass": 0.78,
+    "liner_kaplama": 0.82
+  },
+  "alanKatsayilari": {
+    "0_25_m2_kucuk_villa": 1.35,
+    "25_50_m2_orta_bahce_aile": 1.12,
+    "50_100_m2_genis_ticari_sosyal": 1.0,
+    "100_m2_uzeri_yari_olimpik_otel": 0.88
+  },
+  "kaynak": "Temmuz 2026 - Arokadesign 5x10 havuz betonarme skimmer 35k-60k TL/m2 1.75M-3M TL overflow 45k-70k TL/m2 2.25M-3.5M TL prefabrik/celik+liner 24k-40k TL/m2 1.2M-2M TL, 32m2 betonarme 10k-12.5k TL prefabrik 8k-9k TL liner 9k-10.5k TL polipropilen 7.5k-9k TL, Sile 20-30m2 prefabrik 200k-300k TL, Armut fiberglass 98.770-750k TL"
+}

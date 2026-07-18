@@ -1,0 +1,131 @@
+﻿{
+  "meslekId": "mermer_granit",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 650,
+    "asgariKucuk": 3500,
+    "asgariBuyuk": 8500
+  },
+  "malzeme": {
+    "m2": 1450,
+    "aciklama": "2cm mermer plaka 1300 TL/m2 3cm 1700 TL, merdiven basamak 2cm 970 TL 3cm 1400 TL, denizlik 2cm 900 TL 3cm 1300 TL, fayans 30x60 775 TL 60x60 950 TL, granit mutfak tezgah 768 TL 70cmx2m, Ankara tezgah ort 2500-40k TL - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.15,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 280,
+    "3_ve_ustu_asansorsuz": 850,
+    "mezar_montaj_nakliye": 2500
+  },
+  "ekstralar": {
+    "mutfak_tezgahi_evye_ocak_sablon": {
+      "tip": "mt",
+      "fiyat": 3200,
+      "etiket": "Mutfak Tezgahi Evye/Ocak Deligi ve Sablon Iscilikli - Basaksehir granit 9k TL standart, Ankara 2.5k-40k TL"
+    },
+    "banyo_zemin_kaplama": {
+      "tip": "m2",
+      "fiyat": 1100,
+      "etiket": "Banyo / Zemin Kaplama - Mermer fayans 30x60 775 TL/m2 60x60 950 TL/m2"
+    },
+    "merdiven_basamagi_riht_kaymaz_kanal": {
+      "tip": "mt",
+      "fiyat": 1350,
+      "etiket": "Merdiven Basamagi Riht Kesimi ve Kaymazlik Kanalli - 2cm basamak 970 TL/m2 3cm 1400 TL/m2"
+    },
+    "balkon_denizligi": {
+      "tip": "mt",
+      "fiyat": 850,
+      "etiket": "Balkon Denizligi Uygulamasi - Denizlik 2cm 900 TL/m2 3cm 1300 TL/m2"
+    },
+    "asansor_sovesi_dis_mekan_kaplama": {
+      "tip": "m2",
+      "fiyat": 1450,
+      "etiket": "Asansor Sovesi / Dis Mekan Kaplama - Dis cephe kaplama"
+    },
+    "mezar_yapimi_restorasyon": {
+      "tip": "adet",
+      "fiyat": 28000,
+      "etiket": "Mezar Yapimi ve Restorasyonu - Tek kisilik 17k-20k Adana 18k-25k Antalya 30k-70k Mugla genis beyaz ust kapak siyah granit"
+    },
+    "tek_kisilik_standart_blok": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "Tek Kisilik Standart Blok Kaplama - 17k-20k Adana 18k-25k Antalya, ortalama 18k TL"
+    },
+    "cift_kisilik_aile_kabri": {
+      "tip": "adet",
+      "fiyat": 14500,
+      "etiket": "Cift Kisilik Aile Kabri - Cift mezar tek + %50-70"
+    },
+    "katli_mezar_gomme_sistemi": {
+      "tip": "adet",
+      "fiyat": 18500,
+      "etiket": "Katli Mezar Gomme Sistemi - Katli derin kazı"
+    },
+    "sadece_bas_tasi_degisim_onarim": {
+      "tip": "adet",
+      "fiyat": -15000,
+      "etiket": "Sadece Bas Tasi Degisimi / Onarim Hizmeti - Bas tasi kitap sekl beyaz mermer"
+    },
+    "yerli_mermer_mugla_beyazi_marmara_standart": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Yerli Mermer Mugla Beyazi / Marmara Serisi Standart - 2cm 1300 TL/m2 3cm 1700 TL/m2 baz"
+    },
+    "ithal_granit_yuksek_sertlik_sert_tas": {
+      "tip": "m2",
+      "fiyat": 650,
+      "etiket": "Ithal Granit Yuksek Sertlik Dereceli Sert Tas Serisi - Granit 70cmx2m 768 TL en ucuz, ust kapak siyah granit"
+    },
+    "kuvars_belenco_coante_kompoze_luks": {
+      "tip": "m2",
+      "fiyat": 1450,
+      "etiket": "Kuvars / Belenco / Coante Kompoze Tas Grubu Luks Plaka - Kuvars luks plaka"
+    },
+    "ultra_ince_porselen_ozel_kesim_yuksek_dayanim": {
+      "tip": "m2",
+      "fiyat": 2100,
+      "etiket": "Ultra Ince Porselen Plaka Ozel Kesim ve Yuksek Dayanimli Ust Segment - Mermerit 4900 TL/m2 ref"
+    },
+    "baliksirti_tam_pah_kenar_yuvarlatma_parlatma": {
+      "tip": "mt",
+      "fiyat": 180,
+      "etiket": "Baliksirti / Tam Pah Isciligi Kenarlarin Makine ile Yuvarlatilip Parlatilmasi - Kenar pah"
+    },
+    "alttan_montaj_evye_entegrasyon_rodaj": {
+      "tip": "adet",
+      "fiyat": 950,
+      "etiket": "Alttan Montaj Evye Entegrasyonu Ic Kismin Hassas Rodajlanmasi - Alttan evye Schock Grando M-100 granit evye ornek"
+    },
+    "l_cita_kalinlastirma_45_gonye": {
+      "tip": "mt",
+      "fiyat": 320,
+      "etiket": "L Cita / Kalinlastirma Uygulamasi On Kismin Kalin Gorunmesi Icin 45° Gonye Birlestirme - Kalin gosterim"
+    },
+    "supurgelik_dahil_koruma_seridi": {
+      "tip": "mt",
+      "fiyat": 95,
+      "etiket": "Supurgelik Dahil Hizmeti Duvar Dibine Cekilecek Koruma Seritleri - Supurgelik mt"
+    }
+  },
+  "carpanlar": {
+    "yerli_mermer": 1.0,
+    "ithal_granit": 1.35,
+    "kuvars_belenco": 1.75,
+    "ultra_porselen": 2.15,
+    "mutfak_tezgah": 1.28
+  },
+  "alanKatsayilari": {
+    "0_5_mt_m2": 1.38,
+    "5_10_mt_m2": 1.12,
+    "10_20_mt_m2": 1.0,
+    "20_mt_m2_uzeri": 0.88
+  },
+  "kaynak": "Temmuz 2026 - Mermer plaka 2cm 1300 TL/m2 3cm 1700 TL basamak 2cm 970 TL 3cm 1400 TL denizlik 2cm 900 TL 3cm 1300 TL fayans 775-950 TL/m2 fiyatdetay, granit 70cmx2m 768 TL, mezar tek 17k-20k Adana 18k-25k Antalya 30k-70k Mugla 35k-50k Datca tek genis beyaz ust siyah granit bas kitap sekl, Bursa 30k-40k, Ankara tezgah 2.5k-40k TL Basaksehir 9k TL granit standart"
+}

@@ -1,0 +1,164 @@
+﻿{
+  "meslekId": "panel_singil",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 180,
+    "asgariKucuk": 7500,
+    "asgariBuyuk": 18000
+  },
+  "malzeme": {
+    "m2": 620,
+    "aciklama": "Sandvic panel 500-1500 TL/m2 genel, 40mm 420-750 TL/mt +KDV 3mt 1260-2250 6mt 2520-4500 TL+KDV, trapez sac kg 48-55 TL+KDV 0.5mm 213 TL/mt+KDV 224.67 TL/m2 galvaniz 258.38 TL/m2 bordo, 3.93 kg/m2 antrasit gri 215 TL/m2+KDV, 6m panel ~6m2 48-90kg 8-15kg/m2 - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.26,
+    "ankara_izmir_antalya_bursa": 1.14,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_alcak_iskele_kolay": 0,
+    "3_5_kat_vinc_lojistik_primli": 1800,
+    "5_kat_uzeri_agir_makine_guvenlik": 4500
+  },
+  "ekstralar": {
+    "sandvic_panel_poliuretan_tas_yunu_endustriyel": {
+      "tip": "m2",
+      "fiyat": 420,
+      "etiket": "Sandvic Panel Poliuretan / Tas Yunu Dolgulu Endustriyel Metal Panel - 500-1500 TL/m2 genel aralik"
+    },
+    "singil_kaplama_osb_altyapili_dekoratif_esnek": {
+      "tip": "m2",
+      "fiyat": 380,
+      "etiket": "Singil Kaplama Shingle OSB Altyapili Dekoratif ve Esnek Seri - OSB + singil + membran"
+    },
+    "trapez_sac_yalitimsiz_ekonomik_tek_kat_boyali": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Trapez Sac Yalitimsiz Ekonomik Tek Kat Boyali Sac - 224-258 TL/m2 +KDV galvaniz/bordo 0.5mm"
+    },
+    "poliuretan_pur_yuksek_isi_yalitimli_standart": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Poliuretan Dolgu PUR Yuksek Isi Yalitimli Standart - Baz dolgu"
+    },
+    "tas_yunu_yangin_dayanimli_a_sinifi": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Tas Yunu Dolgu Yangin Dayanimli A Sinifi Guvenlikli - Yangin guvenlik farki"
+    },
+    "polistiren_eps_ekonomik_hafif": {
+      "tip": "m2",
+      "fiyat": -95,
+      "etiket": "Polistiren EPS Ekonomik Segment Hafif Dolgu - Hafif ekonomik -95 TL/m2"
+    },
+    "kalinlik_40mm_konut_sundurma": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "40 mm Standart Konut ve Sundurma Tipi - 40mm 420-750 TL/mt +KDV baz"
+    },
+    "kalinlik_50mm_orta_fabrika_depo": {
+      "tip": "m2",
+      "fiyat": 85,
+      "etiket": "50 mm Orta Olcekli Fabrika ve Depo Tipi - 50mm +85 TL/m2"
+    },
+    "kalinlik_60mm_genis_endustriyel": {
+      "tip": "m2",
+      "fiyat": 160,
+      "etiket": "60 mm Genis Endustriyel Yapi Tipi - 60mm kalin"
+    },
+    "kalinlik_80_100mm_soguk_depo_maks_izolasyon": {
+      "tip": "m2",
+      "fiyat": 320,
+      "etiket": "80-100 mm Soguk Hava Deposu Maksimum Izolasyon Serisi - 80-100mm soguk oda"
+    },
+    "petek_geleneksel_simetrik": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Petek Model Geleneksel Simetrik Hatlar - Baz singil"
+    },
+    "safir_yuvarlak_balik_sirti_klasik": {
+      "tip": "m2",
+      "fiyat": 35,
+      "etiket": "Safir / Yuvarlak Model Klasik Balik Sirti Formu"
+    },
+    "dikdortgen_ejderha_disi_modern_kirikli": {
+      "tip": "m2",
+      "fiyat": 55,
+      "etiket": "Dikdortgen / Ejderha Disi Tasarim Modern Kirikli Geometri"
+    },
+    "3d_golgeli_ozel_premium_derinlik": {
+      "tip": "m2",
+      "fiyat": 95,
+      "etiket": "3D Golgeli Ozel Seri Derinlik Efektli Premium Gorunum - Premium singil"
+    },
+    "normal_egim_standart_yurume": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Normal Egimli Cati Standart Yurume Alani - Baz egim"
+    },
+    "dik_egim_isg_kemer_halat_zorluk": {
+      "tip": "carpan",
+      "fiyat": 1.28,
+      "etiket": "Dik Egimli Cati Yuksek Egim ISG Emniyet Kemerli ve Halatli Calisma Zorlugu - %28 prim"
+    },
+    "endustriyel_fabrika_depo_antrepo": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Endustriyel Yapi Fabrika / Depo / Antrepo - Baz"
+    },
+    "mustakil_villa_prefabrik_konut": {
+      "tip": "carpan",
+      "fiyat": 1.12,
+      "etiket": "Mustakil Ev / Villa / Prefabrik Konut - Konut detay"
+    },
+    "sundurma_garaj_acik_kamelya": {
+      "tip": "carpan",
+      "fiyat": 0.92,
+      "etiket": "Sundurma / Garaj / Acik Kamelya Catisi - Kucuk alan kolay"
+    },
+    "eski_cati_sokum_moloz_nakliye": {
+      "tip": "m2",
+      "fiyat": 65,
+      "etiket": "Eski Cati Kaplamasinin Sokumu ve Moloz Nakliyesi Hizmeti - Sokum + nakliye, Antalya ornek mevcut cati sokulecek"
+    },
+    "ekstra_tas_yunu_katman_yuksek_yogunluk": {
+      "tip": "m2",
+      "fiyat": 120,
+      "etiket": "Ekstra Tas Yunu Katmani Ilavesi Cati Arasi Yuksek Yogunluklu Isi Yalitimi"
+    },
+    "cift_kat_membran_su_yalitim_singil_alti_arduvaz": {
+      "tip": "m2",
+      "fiyat": 85,
+      "etiket": "Cift Kat Membran / Su Yalitimi Destegi Singil Alti Arduvazli veya Keceli Rulo - Membran"
+    },
+    "eksiz_oluk_dere_cinko_galvaniz_yagmur_hat": {
+      "tip": "mt",
+      "fiyat": 180,
+      "etiket": "Eksiz Oluk / Dere Sistemleri Montaji Eksiz Cinko/Galvaniz Yaglanmis Yagmur Hatlari - Mt"
+    },
+    "mahya_kenar_saci_kapama_tepe_ruzgar_tahtasi": {
+      "tip": "mt",
+      "fiyat": 95,
+      "etiket": "Mahya ve Kenar Saci Kapama Isciligi Tepe Birlesim Saclari ve Ruzgar Tahtasi Montaji - Mt"
+    }
+  },
+  "carpanlar": {
+    "sandvic_panel": 1.18,
+    "singil": 1.08,
+    "trapez_sac": 1.0,
+    "40mm": 1.0,
+    "50mm": 1.12,
+    "60mm": 1.22,
+    "80_100mm": 1.45
+  },
+  "alanKatsayilari": {
+    "1_50_kucuk_kamelya_garaj_sundurma": 1.35,
+    "51_120_standart_mustakil_kucuk_depo": 1.12,
+    "121_250_genis_cati_orta_bina": 1.0,
+    "251_500_buyuk_bina_kucuk_fabrika": 0.88,
+    "500_uzeri_buyuk_endustriyel": 0.78
+  },
+  "kaynak": "Temmuz 2026 - Sandvic panel m2 500-1500 TL genel, 40mm 1mt 420-750 TL+KDV 3mt 1260-2250 TL 6mt 2520-4500 TL+KDV, trapez kg 48-55 TL+KDV 0.5mm 213 TL/mt+KDV m2 224.67 TL galvaniz 258.38 TL bordo 215 TL antrasit gri 3.93kg/m2, 6m panel 6m2 48-90kg 8-15kg/m2, Ankara teras kapatma 50k TL Etimesgut 150k TL Cankaya singil sokup sandvic+laminat, montaj 25k-300k TL Basaksehir"
+}

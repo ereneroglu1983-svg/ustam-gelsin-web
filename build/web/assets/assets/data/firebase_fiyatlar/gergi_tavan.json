@@ -1,0 +1,123 @@
+﻿{
+  "meslekId": "gergi_tavan",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 380,
+    "asgariKucuk": 8500,
+    "asgariBuyuk": 15000
+  },
+  "malzeme": {
+    "m2": 720,
+    "aciklama": "Transparan 15 $/m2, UV baskili 25 $/m2, lake 20-30 $/m2 27-35 $, 3D 15 $, gergi mat 900-1500 TL parlak/3D/baskili 1500-2800 TL - Dek-Mar 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.12,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 250,
+    "3_ve_ustu_asansorsuz": 900,
+    "yuksek_tavan_iskele": 2800
+  },
+  "ekstralar": {
+    "sifirdan_komple_karkas_led_membran": {
+      "tip": "m2",
+      "fiyat": 950,
+      "etiket": "Sifirdan Komple Gergi Tavan Karkas + LED + Membran - Baz 900-1300 TL PVC gergi sistem"
+    },
+    "mevcut_membran_degisim_led_haric": {
+      "tip": "m2",
+      "fiyat": -280,
+      "etiket": "Mevcut Sisteme Sadece Yeni Membran/Kumas Degisimi LED Haric - LED altyapi mevcut"
+    },
+    "sadece_aydinlatma_led_trafo_ariza": {
+      "tip": "sabit",
+      "fiyat": 3200,
+      "etiket": "Sadece Aydinlatma / LED ve Trafo Ariza Onarimi - 15k TL apartman girisi ornek"
+    },
+    "transparan_isik_gecirgen_beyaz": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Transparan Isik Gecirgen Standart Beyaz Doku - 15 $/m2 malzeme 900-1500 TL mat gergi"
+    },
+    "dijital_baskili_uv_murekkep": {
+      "tip": "m2",
+      "fiyat": 380,
+      "etiket": "Dijital Baskili / UV Murekkep Desenli Membran - 25 $/m2 30 $ dijital baski"
+    },
+    "lake_ayna_etkili_premium": {
+      "tip": "m2",
+      "fiyat": 420,
+      "etiket": "Lake / Ayna Etkili Yuksek Yansiticili Premium - 20-30 $ 27 $ ayna 35 $ lake"
+    },
+    "3d_formlu_ozel_bukumlu_karkas": {
+      "tip": "m2",
+      "fiyat": 680,
+      "etiket": "3D / Formlu Gergi Tavan Ozel Bukumlu Karkas Yapili - 1500-2800 TL parlak/3D/baskili"
+    },
+    "full_modul_led_paketi_altyapi_dahil": {
+      "tip": "m2",
+      "fiyat": 520,
+      "etiket": "Full Modul LED Paketi Aydinlatma Altyapisi Dahil - LED modul + trafo"
+    },
+    "sadece_kumas_led_haric": {
+      "tip": "m2",
+      "fiyat": -350,
+      "etiket": "Sadece Gergi Tavan Kumasi LED Aydinlatma Haric"
+    },
+    "standart_yukseklik_2_5_3m": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Standart 2.5-3m - Baz"
+    },
+    "yuksek_tavan_3_4_5m": {
+      "tip": "sabit",
+      "fiyat": 2800,
+      "etiket": "Yuksek Tavan 3-4.5m - Iskele gerekli"
+    },
+    "endustriyel_4_5m_plus": {
+      "tip": "sabit",
+      "fiyat": 5500,
+      "etiket": "Endustriyel 4.5m+ - Teleskopik iskele ve tasiyici"
+    },
+    "rgb_uzaktan_kumandali_renk": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "RGB / Uzaktan Kumandali Renk Degistiren Isik Sistemi - Kontrolcu + kumanda"
+    },
+    "daire_oval_kavisli_geometrik": {
+      "tip": "sabit",
+      "fiyat": 4200,
+      "etiket": "Daire / Oval / Kavisli Ozel Geometrik Tasarim Uygulamasi - Ozel karkas bukme"
+    },
+    "lake_fitil_kenar_bitis": {
+      "tip": "mt",
+      "fiyat": 45,
+      "etiket": "Lake Fitil Uygulamasi Kenar Bitisleri Icin Estetik Dekoratif Fitil - Mt basi"
+    },
+    "teleskopik_karkas_aski_kot_farki": {
+      "tip": "sabit",
+      "fiyat": 3800,
+      "etiket": "Teleskopik Karkas Aski Sistemi Yuksek Kot Farki ve Tasiyici Iskelet"
+    }
+  },
+  "carpanlar": {
+    "komple_sistem": 1.0,
+    "membran_degisim": 0.62,
+    "led_ariza_sadece": 0.35,
+    "transparan": 1.0,
+    "baskili": 1.28,
+    "lake_ayna": 1.32,
+    "3d_formlu": 1.65
+  },
+  "alanKatsayilari": {
+    "0_5_m2_kucuk_koridor_wc": 1.55,
+    "5_15_m2_standart_oda_salon": 1.15,
+    "15_30_m2_buyuk_salon_magaza": 1.0,
+    "30_m2_uzeri_genis_ofis_havuz": 0.82
+  },
+  "kaynak": "Temmuz 2026 - Belemir Yapi transparan 15 $ UV baskili 25 $ lake 20-30 $ 3D 15 $ ayna 27 $ dijital 30 $ lake 35 $, Dek-Mar gergi mat 900-1500 TL parlak/3D/baskili 1500-2800 TL, gergi sistemleri 900-1300 TL, apartman girisi 15k TL ornek"
+}
