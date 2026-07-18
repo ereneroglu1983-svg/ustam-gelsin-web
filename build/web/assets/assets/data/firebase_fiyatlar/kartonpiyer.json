@@ -1,0 +1,129 @@
+﻿{
+  "meslekId": "kartonpiyer",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 2000,
+    "asgariBuyuk": 5500
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "Stropiyer kopuk 199-352 TL/m, 2x25 50m LED model, poliuretan 24m 10lu paket 240cm, alci kartonpiyer alcisi 10kg 499 TL 25kg 589-620 TL - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.12,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 150,
+    "3_ve_ustu_asansorsuz": 550,
+    "iskele_yuksek_calisma": 1200
+  },
+  "ekstralar": {
+    "stropiyer_kopuk_ekonomik_hafif": {
+      "tip": "mt",
+      "fiyat": 85,
+      "etiket": "Stropiyer Kopuk Ekonomik Hafif Seri - 5cm genislik kopuk cita 1m, 12x12 basar 16cm genislik 1m, 8x8 basar 11cm"
+    },
+    "alci_klasik_agir_dokum_donati_fileli": {
+      "tip": "mt",
+      "fiyat": 165,
+      "etiket": "Alci Klasik Agir Dokum Donati Fileli - Alci 10kg 499 TL 25kg 589 TL, agir ve kirilgan montaj zor"
+    },
+    "poliuretan_polimer_luks_darbeye_dayanikli": {
+      "tip": "mt",
+      "fiyat": 245,
+      "etiket": "Poliuretan / Polimer Luks Darbeye Dayanikli Cita Profili - Home Ledli 10lu 24m polimer boyanabilir, dayanikli"
+    },
+    "duz_standart_hat": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Duz / Standart Hat - Baz"
+    },
+    "kareli_baklava_klasik_kusak": {
+      "tip": "carpan",
+      "fiyat": 1.35,
+      "etiket": "Kareli / Baklava / Klasik Kusak Tasarimi - Kesim ve birlestirme artar"
+    },
+    "oda_salon_tavani": {
+      "tip": "mt",
+      "fiyat": 0,
+      "etiket": "Oda / Salon Tavani - Cevre donme, standart"
+    },
+    "duvar_citalama_dekoratif": {
+      "tip": "m2",
+      "fiyat": 145,
+      "etiket": "Duvar Citalama Dekoratif - m2 uzerinden, 1-10 m2 10-25 m2 25-50 m2 50m2+"
+    },
+    "tavan_gobegi": {
+      "tip": "adet",
+      "fiyat": 850,
+      "etiket": "Tavan Gobegi - Bugday 48cm kartonpiyer stropiyer lamba gobegi ornek, adet"
+    },
+    "perdelik_bolumu": {
+      "tip": "mt",
+      "fiyat": 95,
+      "etiket": "Perdelik Bolumu - 20m perde onu boyanmasi 2500 TL ornek, 12cm cam pencere onu stropiyer perdelik 5 adet 10m"
+    },
+    "standart_yukseklik_2_5_3m": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Standart 2.5-3m - Baz"
+    },
+    "yuksek_3m_plus": {
+      "tip": "sabit",
+      "fiyat": 850,
+      "etiket": "Yuksek 3m+ - Merdiven ve iskele"
+    },
+    "cok_yuksek": {
+      "tip": "sabit",
+      "fiyat": 1800,
+      "etiket": "Cok Yuksek - Profesyonel iskele ve guvenlik"
+    },
+    "ince_kestirme_boya_astar_2kat": {
+      "tip": "mt",
+      "fiyat": 35,
+      "etiket": "Ince Kestirme Boya Akrilik Astar ve 2 Kat Cita Boyama Hizmeti - Mt basi"
+    },
+    "hazir_kose_motifi_orta_gobek_montaji": {
+      "tip": "adet",
+      "fiyat": 450,
+      "etiket": "Hazir Kose Motifi veya Orta Gobek Montaji - Adet"
+    },
+    "led_kanalli_profil_gizli_isik_ozel": {
+      "tip": "mt",
+      "fiyat": 120,
+      "etiket": "LED Kanalli Profil Gecisi Gizli Isik Gecen Ozel Kanalli - 2x25 50m LED 1 Model stropiyer, LED kanal farki"
+    },
+    "yuksek_duvar_tavan_3m_asan": {
+      "tip": "sabit",
+      "fiyat": 1100,
+      "etiket": "Yuksek Duvar / Tavan Calisma Kosulu 3 Metreyi Asan Alanlar Icin - Iskele kurulum"
+    }
+  },
+  "carpanlar": {
+    "stropiyer_kopuk": 1.0,
+    "alci_klasik": 1.45,
+    "poliuretan_luks": 1.85,
+    "duz_hat": 1.0,
+    "kareli_baklava_klasik": 1.32
+  },
+  "alanKatsayilari": {
+    "0_10_metretul": 1.45,
+    "10_30_metretul": 1.18,
+    "30_70_metretul": 1.0,
+    "70_metretul_uzeri": 0.85,
+    "1_10_m2_citalama": 1.35,
+    "10_25_m2_citalama": 1.12,
+    "25_50_m2_citalama": 1.0,
+    "50_m2_plus_citalama": 0.88,
+    "1_15_metre": 1.3,
+    "15_30_metre": 1.1,
+    "30_60_metre": 1.0,
+    "60_metre_plus": 0.85
+  },
+  "kaynak": "Temmuz 2026 - Stropiyer kopuk cita 199-352 TL, 2x25 50m LED model, Home 10lu 24m polimer 240cm ledli, alci 10kg 499 TL 25kg 589-620 TL, kartonpiyer tamiri 2k-10k TL ort 20m perde onu boyanmasi 2.5k TL, 80m2 2+1 ev tum tavan koseleri stropiyer 4k-22k TL, Ozyurt alci siva 600-700 TL/m2 malzeme+iscilik karisik alci 333 TL saten sonlama 162 TL alci pan derz+2kat saten 401 TL"
+}

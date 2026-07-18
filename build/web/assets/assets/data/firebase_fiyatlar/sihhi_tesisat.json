@@ -1,0 +1,192 @@
+﻿{
+  "meslekId": "sihhi_tesisat",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 1500,
+    "asgariBuyuk": 4500
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "Su tesisatcisi 1.5k-5k TL Istanbul Esenler kacak sizdirma 1.3k-2.5k TL, tesisat yenileme 1k-45k TL Erzincan Antalya, tamir 1k-4.25k TL Catalca, akustik dinleme termal kamera noktasal tespit kirmadan, robotla tikaniklik acma - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.14,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 180,
+    "3_ve_ustu_asansorsuz": 450,
+    "duvar_kirim_moloz": 650
+  },
+  "ekstralar": {
+    "genel_tesisat_yenileme_sifirdan_komple_altyapi": {
+      "tip": "sabit",
+      "fiyat": 18500,
+      "etiket": "Genel Tesisat Yenileme Sifirdan Komple Altyapi Kurulumu - 1k-45k TL yenileme araligi"
+    },
+    "kacak_tespit_tikaniklik_acma_kucuk_onarim": {
+      "tip": "sabit",
+      "fiyat": 1800,
+      "etiket": "Su Kacagi Tespiti / Tikaniklik Acma / Kucuk Onarim - 1.5k-5k TL kacak sizdirma"
+    },
+    "pprc_standart_plastik_boru": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "PPRC Standart Plastik Tesisat Borusu - Baz PPRC"
+    },
+    "cam_elyaf_takviyeli_kompozit_sicak_su_uzama_onleyen": {
+      "tip": "sabit",
+      "fiyat": 2200,
+      "etiket": "Cam Elyaf Takviyeli Kompozit Boru Sicak Su Hatlarinda Uzamayi Onleyen Ic Govde - Kompozit farki"
+    },
+    "sessiz_boru_akustik_gider_kalin_cidar": {
+      "tip": "sabit",
+      "fiyat": 3200,
+      "etiket": "Sessiz Boru / Akustik Gider Hatti Pis Su Saft Seslerini Keserek Sessizlik Saglayan Kalin Cidarli"
+    },
+    "1_islak_hacim_tek_banyo_mutfak": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "1 Islak Hacim Sadece Tek Banyo veya Sadece Mutfak - Baz"
+    },
+    "2_islak_hacim_banyo_mutfak_banyo_wc": {
+      "tip": "sabit",
+      "fiyat": 5800,
+      "etiket": "2 Islak Hacim Banyo + Mutfak / Banyo + WC - 2 hacim"
+    },
+    "3_islak_hacim_ebeveyn_ana_banyo_mutfak": {
+      "tip": "sabit",
+      "fiyat": 11200,
+      "etiket": "3 Islak Hacim Ebeveyn Banyosu + Ana Banyo + Mutfak - 3 hacim"
+    },
+    "4_plus_coklu_komple_altyapi_revizyon": {
+      "tip": "sabit",
+      "fiyat": 18500,
+      "etiket": "4+ Islak Hacim Coklu Islak Hacim Komple Altyapi Revizyonu - 4+ hacim 1k-45k ust"
+    },
+    "su_kacagi_yeri_bilinmiyor_akustik_termal_noktasal": {
+      "tip": "sabit",
+      "fiyat": 1200,
+      "etiket": "Su Kacagi Var Yeri Bilinmiyor Akustik Cihaz ve Termal Kamerayla Noktasal Tespit - Akustik dinleme termal kamera kirmadan"
+    },
+    "gider_tikanikligi_robot_kamerali_acilmasi": {
+      "tip": "sabit",
+      "fiyat": 850,
+      "etiket": "Gider Tikanikligi Mevcut Robot Kamerali Cihazla Acilmasi Gerekiyor - Robotla tikaniklik acma kamera"
+    },
+    "onarim_tamirat_musluk_batarya_montaj": {
+      "tip": "sabit",
+      "fiyat": 450,
+      "etiket": "Onarim / Tamirat / Musluk-Batarya Montaji Istiyorum - Musluk batarya tamiri montaj"
+    },
+    "lokal_mudahale_1_5_m": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Lokal Mudahale 1-5 Metre Arasi - Lokal"
+    },
+    "bolgesel_mudahale_5_15_m": {
+      "tip": "sabit",
+      "fiyat": 650,
+      "etiket": "Bolgesel Mudahale 5-15 Metre Arasi - Bolgesel"
+    },
+    "kismi_hat_yenileme_15_30_m": {
+      "tip": "sabit",
+      "fiyat": 1450,
+      "etiket": "Kismi Hat Yenileme 15-30 Metre Arasi - Kismi hat"
+    },
+    "armatur_istenmiyor": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Armatur/Musluk Montaji Istenmiyor - Baz"
+    },
+    "1_3_adet_batarya_musluk_degisim": {
+      "tip": "adet",
+      "fiyat": 320,
+      "etiket": "1-3 Adet Arasi Batarya/Musluk Degisimi - Adet 320 TL"
+    },
+    "4_6_adet_batarya_musluk": {
+      "tip": "adet",
+      "fiyat": 280,
+      "etiket": "4-6 Adet Arasi Batarya/Musluk Degisimi - Indirimli adet"
+    },
+    "7_10_adet_yogun": {
+      "tip": "adet",
+      "fiyat": 240,
+      "etiket": "7-10 Adet Arasi Batarya/Musluk Degisimi - Yogun"
+    },
+    "10_plus_yogun_armatur": {
+      "tip": "adet",
+      "fiyat": 210,
+      "etiket": "10+ Adet Uzeri Yogun Armatur Montaji - Toplu"
+    },
+    "daire": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Daire - Standart"
+    },
+    "villa_mustakil": {
+      "tip": "carpan",
+      "fiyat": 1.15,
+      "etiket": "Villa / Mustakil Ev - Villa tesisat uzun hat"
+    },
+    "isyeri_ofis_ticari": {
+      "tip": "carpan",
+      "fiyat": 1.18,
+      "etiket": "Isyeri / Ofis / Ticari Alan - Ticari mesai disi"
+    },
+    "duvar_ici_gizli": {
+      "tip": "sabit",
+      "fiyat": 650,
+      "etiket": "Duvar Ici Gizli Tesisat - Kirim gerektirir"
+    },
+    "zemin_alti": {
+      "tip": "sabit",
+      "fiyat": 850,
+      "etiket": "Zemin Alti Tesisat - Zemin kirim"
+    },
+    "acikta_siva_ustu": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Acikta Gecen Siva Ustu Tesisat - En kolay"
+    },
+    "eski_tesisat_sokum_duvar_kirim_moloz": {
+      "tip": "sabit",
+      "fiyat": 1200,
+      "etiket": "Eski Tesisat Sokumu / Duvar Kirimi ve Moloz Isciligi - Sokum + moloz"
+    },
+    "gomme_rezervuar_gizli_sarnic_kurulum": {
+      "tip": "adet",
+      "fiyat": 1850,
+      "etiket": "Gomme Rezervuar Altyapi Montaji Duvar Ici Gizli Sarnic Kurulumu - Gomme rezervuar"
+    },
+    "kollektorlu_mobil_kutu_merkezi_dagitim_panel": {
+      "tip": "sabit",
+      "fiyat": 2200,
+      "etiket": "Kollektorlu Mobil Sistem Kutusu Kurulumu Merkezi Kombi/Su Dagitim Paneli - Kollektor"
+    },
+    "basincli_kacak_sizdirmazlik_kompresor_pompa_kontrol": {
+      "tip": "sabit",
+      "fiyat": 650,
+      "etiket": "Basincli Kacak and Sizdirmazlik Testi Kompresor Pompasi Ile Boru Basinc Kontrolu - Basinc testi"
+    }
+  },
+  "carpanlar": {
+    "pprc_standart": 1.0,
+    "cam_elyaf_kompozit": 1.15,
+    "sessiz_boru_akustik": 1.22,
+    "1_islak": 1.0,
+    "2_islak": 1.45,
+    "3_islak": 1.85,
+    "4_plus_islak": 2.35
+  },
+  "alanKatsayilari": {
+    "lokal_1_5m": 1.0,
+    "bolgesel_5_15m": 1.35,
+    "kismi_15_30m": 1.75
+  },
+  "kaynak": "Temmuz 2026 - Su tesisatcisi 1.5k-5k TL Esenler kacak 1.3k-2.5k TL, yenileme 1k-45k TL Erzincan Antalya, tamir 1k-4.25k TL Catalca, akustik dinleme termal kamera noktasal kirmadan, robotla tikaniklik acma kamera boru goruntuleme lavabo gider tuvalet kanal yikama, Batikent Ozdemir 0 530 520 44 30 2016 Ankara kirmadan su kacagi cihazla"
+}

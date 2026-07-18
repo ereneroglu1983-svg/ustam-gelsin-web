@@ -1,0 +1,154 @@
+﻿{
+  "meslekId": "gunes_enerjisi",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 3500,
+    "asgariBuyuk": 8500
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "Sicak su vakum tuplu 18-30x sistem 15k-35k TL, basincili 304 krom 20k-45k TL, GES ev tipi 70k-125k TL, 25k-300k TL aralik, panel 2000 TL'den baslar - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.18,
+    "ankara_izmir_antalya_bursa": 1.12,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "duz_cati_kolay": 0,
+    "egimli_kiremit_iskele": 2800,
+    "sandvic_panel_guclendirme": 1800
+  },
+  "ekstralar": {
+    "gunes_sifirdan_kurulum": {
+      "tip": "sabit",
+      "fiyat": 18500,
+      "etiket": "Gunes Enerjisi Sistemi Sifirdan Kurulum - Baz iscilik + iskele"
+    },
+    "tamir_bakim_ariza": {
+      "tip": "sabit",
+      "fiyat": 2200,
+      "etiket": "Gunes Enerjisi Tamir Bakim Ariza Onarimi - Servis"
+    },
+    "termosifon_satis_montaj": {
+      "tip": "sabit",
+      "fiyat": 3500,
+      "etiket": "Termosifon Satis ve Montaj Hizmeti - 80-100 LT"
+    },
+    "vakum_tuplu_acik_devre_standart": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Vakum Tuplu Acik Devre Standart Sistem - Disi galvaniz ici 304 krom, dogal akisli, -43C donmaz"
+    },
+    "basincli_kapali_devre_antifrizli_esanjorlu": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Basincili Kapali Devre Sebeke Basinca Dayanikli Antifrizli Esanjorlu - 24x krom basincili 4-6 kisi kis 6-8 kisi yaz, 30x 6-8 kis kis 8-12 kis yaz"
+    },
+    "304_kalite_krom_paslanmaz_uzun_omurlu": {
+      "tip": "sabit",
+      "fiyat": 4200,
+      "etiket": "304 Kalite Krom Paslanmaz Depo Uzun Omurlu High-End - Ici 304 krom disi 430 krom, poliuretan 45mm izolasyon"
+    },
+    "galvaniz_sac_ekonomik": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Galvaniz Sac Depo Ekonomik Seri - Disi statik boyali galvaniz ici 304 krom"
+    },
+    "duz_beton_teras": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Duz Beton Teras Zemini - En kolay montaj"
+    },
+    "egimli_kiremit_cati_saplama_iskele": {
+      "tip": "sabit",
+      "fiyat": 3200,
+      "etiket": "Egimli Kiremit Cati Kiremit Alti Saplama ve Iskele Iscilikli - Iskele + kiremit kancasi"
+    },
+    "sandvic_panel_sac_cati": {
+      "tip": "sabit",
+      "fiyat": 2100,
+      "etiket": "Sandvic Panel / Sac Cati Zemini - Guclendirme profili gerekli"
+    },
+    "kapasite_1_2_daire_kucuk_aile": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "1-2 Dairelik Kucuk Aile Tipi Standart Tank - 18x-24x 50LT samandira + 220LT basincli kutulu tank ornek"
+    },
+    "kapasite_3_5_daire_orta_ortak": {
+      "tip": "sabit",
+      "fiyat": 14500,
+      "etiket": "3-5 Dairelik Orta Olcek Ortak Kullanim Sistemi - 30x ve uzeri, baglanti aparati artar"
+    },
+    "merkezi_apartman_otel_ticari": {
+      "tip": "sabit",
+      "fiyat": 42000,
+      "etiket": "Merkezi Sistem Apartman Tipi Otel Genis Ticari Olcu - Kollektor sayisi cok"
+    },
+    "rezistans_elektrikli_isitici_kis": {
+      "tip": "sabit",
+      "fiyat": 1800,
+      "etiket": "Rezidans / Elektrikli Isitici Takviyesi Kis Aylari Termostatli Rezistans"
+    },
+    "pompa_hidrofor_sessiz_basinc": {
+      "tip": "sabit",
+      "fiyat": 3500,
+      "etiket": "Pompa / Hidrofor Entegrasyonu Sicak Suyu Asagi Basan Sessiz Basinc Pompasi"
+    },
+    "yalitim_izolasyon_folyolu_kaucuk": {
+      "tip": "sabit",
+      "fiyat": 950,
+      "etiket": "Yalitim / Izolasyon Paketi Borularin UV Dayanimli Folyolu Kaucuk Kaplanmasi"
+    },
+    "vakum_tup_cam_kirilmasi_degisim": {
+      "tip": "adet",
+      "fiyat": 650,
+      "etiket": "Vakum Tup / Cam Kirilmasi Cam Degisim Hizmeti - 47mm 58mm/1800mm tup, conta dahil adet"
+    },
+    "depo_sizintisi_kazan_degisim_kaynak": {
+      "tip": "sabit",
+      "fiyat": 5800,
+      "etiket": "Sicak/Soguk Su Depo Sizintisi Kazan Degisimi veya Kaynak Isciligi - 304 krom kaynak veya yeni depo"
+    },
+    "samandira_vana_tesisat_kacak": {
+      "tip": "sabit",
+      "fiyat": 1200,
+      "etiket": "Samandira Vana veya Tesisat Borusu Kacak Onarimi - 20\" vana 9x dirsek 7x manson ornek set"
+    },
+    "kislik_bakim_antifriz_temizligi": {
+      "tip": "sabit",
+      "fiyat": 1800,
+      "etiket": "Kislik Bakim Antifriz Kimyasal Dolumu ve Panel Genel Temizligi - Kapali devre"
+    },
+    "termosifon_sadece_montaj_musteri_cihaz": {
+      "tip": "sabit",
+      "fiyat": 1500,
+      "etiket": "Termosifon Sadece Montaj Isciligi Cihaz Musteriye Ait"
+    },
+    "termosifon_cihaz_dahil_anahtar_teslim": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Termosifon Cihaz Dahil Anahtar Teslim Satis + Montaj - 65-80 LT elektrikli"
+    },
+    "termosifon_sokum_yeni_degisim": {
+      "tip": "sabit",
+      "fiyat": 2200,
+      "etiket": "Eski Termosifon Sokumu ve Yeni Cihaz Degisim Montaji - Sokum + tahliye + montaj"
+    }
+  },
+  "carpanlar": {
+    "vakum_tuplu_acik": 1.0,
+    "basincli_kapali": 1.42,
+    "304_krom": 1.22,
+    "galvaniz": 1.0
+  },
+  "alanKatsayilari": {
+    "1_2_daire_kucuk": 1.0,
+    "3_5_daire_orta": 1.65,
+    "merkezi_apartman_otel": 2.85
+  },
+  "kaynak": "Temmuz 2026 - Sonmez Solar 24x krom basincili kapali devre 4-6 kisi kis 6-8 yaz, 30x 6-8 kis 8-12 yaz, ici 304 krom disi 430 krom/galvaniz, 50LT samandira + 220LT basincli tank, vakum tup 58mm/1800mm 47mm conta, GES ev 85k-125k TL 25k-300k TL araligi, panel 2000 TL'den baslar, kurulum 70k-100k TL yillik 5000 kWh, kiremit cati saplama iskele ek maliyet"
+}
