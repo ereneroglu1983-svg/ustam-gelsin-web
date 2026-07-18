@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:ustam_gelsin/core/config/firebase_options.dart';
+import 'package:ustam_gelsin/firebase_options.dart';
 import 'package:ustam_gelsin/core/services/notification_service.dart';
 import 'package:ustam_gelsin/core/services/chat_service.dart';
 import 'package:ustam_gelsin/features/home/screens/web_home_screen.dart';
