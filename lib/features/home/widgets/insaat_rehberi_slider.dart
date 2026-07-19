@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ustam_gelsin/features/home/screens/insaat_rehberi.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:async';
 
 class InsaatRehberiSlider extends StatefulWidget {
@@ -20,13 +20,22 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
   String? _hata;
 
   String _fixR2Url(String url) {
-    if (url.contains('pub-27a42c3abc764860b54d06b5cf79567f.r2.dev')) {
-      return url.replaceAll(
-        'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev',
-        'https://cdn.hemenustamgelsin.com/ustam-gelsin-medya',
-      );
+    url = url.trim();
+    if (url.isEmpty) return url;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      if (url.contains('pub-27a42c3abc764860b54d06b5cf79567f.r2.dev')) {
+        return url.replaceAll(
+          'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev',
+          'https://cdn.hemenustamgelsin.com/ustam-gelsin-medya',
+        );
+      }
+      return url;
     }
-    return url.trim();
+    const String cdnBase = 'https://cdn.hemenustamgelsin.com/ustam-gelsin-medya';
+    if (url.startsWith('images/')) return '$cdnBase/$url';
+    if (url.startsWith('/images/')) return '$cdnBase$url';
+    if (!url.contains('/')) return '$cdnBase/images/$url';
+    return url;
   }
 
   @override
@@ -77,7 +86,6 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
 
   @override
   Widget build(BuildContext context) {
-    // RESPONSIVE ÖLÇÜ
     final double screenWidth = MediaQuery.of(context).size.width;
     final bool isMobile = screenWidth < 600;
     final bool isTablet = screenWidth >= 600 && screenWidth < 1100;
@@ -86,39 +94,57 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
       width: double.infinity,
       margin: EdgeInsets.only(top: isMobile? 16 : 24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        // [DÜZELTİLDİ - RESPONSIVE BAŞLIK]
-        // Web: Yan yana, Tablet: Yan yana ellipsis, Mobil: Alt alta
         isMobile
             ? Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("İNŞAAT REHBERİ",
-                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFFDC143C), letterSpacing: 0.5)),
+                style: GoogleFonts.poppins(
+                    fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFFDC143C), letterSpacing: 0.5)),
             const SizedBox(height: 4),
             Text("İnşaat, Tadilat, Dekorasyon ve Yenilenebilir Enerji Rehberleri",
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black87, height: 1.2)),
+                style: GoogleFonts.poppins(
+                    fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black87, height: 1.2)),
           ],
         )
             : Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text("İNŞAAT REHBERİ",
-                style: GoogleFonts.poppins(fontSize: isTablet? 15 : 16, fontWeight: FontWeight.w700, color: const Color(0xFFDC143C), letterSpacing: 0.5)),
+                style: GoogleFonts.poppins(
+                    fontSize: isTablet? 15 : 16,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFFDC143C),
+                    letterSpacing: 0.5)),
             const SizedBox(width: 8),
-            // İŞTE TAŞMAYI BİTİREN KISIM
             Expanded(
               child: Text("İnşaat, Tadilat, Dekorasyon ve Yenilenebilir Enerji Rehberleri",
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.poppins(fontSize: isTablet? 12 : 14, fontWeight: FontWeight.w500, color: Colors.black87)),
+                  style: GoogleFonts.poppins(
+                      fontSize: isTablet? 12 : 14, fontWeight: FontWeight.w500, color: Colors.black87)),
             ),
           ],
         ),
         const SizedBox(height: 12),
+        // --- SEO FIX BURADA ---
         InkWell(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const InsaatRehberiScreen())),
+          onTap: () {
+            if (_sliderRehberler.isNotEmpty) {
+              try {
+                final doc = _sliderRehberler[_currentIndex];
+                final data = doc.data() as Map<String, dynamic>;
+                final slug = data.containsKey('slug')? data['slug'] as String : doc.id;
+                context.go('/rehber/$slug');
+              } catch (_) {
+                context.go('/rehber/${_sliderRehberler[_currentIndex].id}');
+              }
+            } else {
+              context.go('/rehber');
+            }
+          },
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 800),
             transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
@@ -135,7 +161,8 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
         key: const ValueKey('loading'),
         width: double.infinity,
         height: isMobile? 260 : 380,
-        decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(
+            color: Colors.grey.shade100, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           const CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC143C)),
           const SizedBox(height: 12),
@@ -149,7 +176,8 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
         key: const ValueKey('error'),
         width: double.infinity,
         height: isMobile? 260 : 380,
-        decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
+        decoration: BoxDecoration(
+            color: Colors.grey.shade100, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade200)),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Icon(Icons.error_outline, size: 48, color: Colors.grey),
           const SizedBox(height: 8),
@@ -172,25 +200,31 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(
-              _fixR2Url(_sliderRehberler[_currentIndex].get('imagePath').toString()),
-              fit: isMobile? BoxFit.cover : BoxFit.contain,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Container(color: Colors.grey.shade100, child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC143C))));
-              },
-              errorBuilder: (context, error, stackTrace) {
-                final url = _sliderRehberler[_currentIndex].get('imagePath');
-                print("GÖRSEL YÜKLEME HATASI: $error URL: $url");
-                return Container(
-                  color: Colors.grey[200],
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    const Icon(Icons.broken_image_outlined, size: 48, color: Colors.grey),
-                    const SizedBox(height: 8),
-                    Text("Görsel yüklenemedi", style: GoogleFonts.poppins(color: Colors.grey.shade600)),
-                  ]),
-                );
-              },
+            Container(
+              color: Colors.white,
+              child: Image.network(
+                _fixR2Url(_sliderRehberler[_currentIndex].get('imagePath').toString()),
+                fit: BoxFit.contain,
+                alignment: Alignment.center,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                      color: Colors.grey.shade100,
+                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC143C))));
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  final url = _sliderRehberler[_currentIndex].get('imagePath');
+                  print("GÖRSEL YÜKLEME HATASI: $error URL: $url -> DÜZELTİLMİŞ: ${_fixR2Url(url.toString())}");
+                  return Container(
+                    color: Colors.grey[200],
+                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      const Icon(Icons.broken_image_outlined, size: 48, color: Colors.grey),
+                      const SizedBox(height: 8),
+                      Text("Görsel yüklenemedi", style: GoogleFonts.poppins(color: Colors.grey.shade600)),
+                    ]),
+                  );
+                },
+              ),
             ),
             Positioned(
               left: 0,
@@ -199,24 +233,36 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
               child: Container(
                 padding: EdgeInsets.fromLTRB(isMobile? 14 : 20, 60, isMobile? 14 : 20, isMobile? 14 : 20),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [Colors.black.withOpacity(0.85), Colors.black.withOpacity(0.3), Colors.transparent], stops: const [0.0, 0.6, 1.0]),
+                  gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [Colors.black.withOpacity(0.85), Colors.black.withOpacity(0.3), Colors.transparent],
+                      stops: const [0.0, 0.6, 1.0]),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(6)),
-                    child: Text("YENİ", style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                    child: Text("YENİ",
+                        style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
                   ),
                   const SizedBox(height: 10),
                   Text(_sliderRehberler[_currentIndex].get('baslik')?? "",
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w700, color: Colors.white, fontSize: isMobile? 16 : 22, height: 1.3, shadows: [Shadow(color: Colors.black.withOpacity(0.6), blurRadius: 10)])),
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          fontSize: isMobile? 16 : 22,
+                          height: 1.3,
+                          shadows: [Shadow(color: Colors.black.withOpacity(0.6), blurRadius: 10)])),
                   const SizedBox(height: 10),
                   Row(children: [
                     const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
                     const SizedBox(width: 6),
-                    Text("Tüm rehberleri gör", style: GoogleFonts.poppins(color: Colors.white.withOpacity(0.95), fontSize: 13, fontWeight: FontWeight.w500)),
+                    Text("Tüm rehberleri gör",
+                        style: GoogleFonts.poppins(
+                            color: Colors.white.withOpacity(0.95), fontSize: 13, fontWeight: FontWeight.w500)),
                   ]),
                 ]),
               ),

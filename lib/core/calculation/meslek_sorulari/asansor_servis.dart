@@ -1,7 +1,9 @@
-// lib/core/calculation/meslek_sorulari/asansor_servis.dart
+// lib/core/calculation/meslek_sorulari/asansor_servis.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class AsansorSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
       "id": "hizmet_turu",
       "label": "İhtiyacınız Olan Hizmet",
@@ -14,6 +16,8 @@ class AsansorSorulari {
         "Komple Modernizasyon (Yenileme)"
       ]
     },
+
+    // ADIM 2: TEKNİK YAPI - hizmet seçilince gelsin
     {
       "id": "asansor_tipi",
       "label": "Asansör Teknik Yapısı",
@@ -34,17 +38,20 @@ class AsansorSorulari {
         "Panoramik Asansör"
       ]
     },
+
+    // ADIM 3: DURAK SAYISI - tip seçilince gelsin
     {
       "id": "durak_sayisi",
       "label": "Toplam Durak (Kat) Sayısı",
       "type": "single",
       "required": true,
-      "dependsOnId": "hizmet_turu",
+      "dependsOnId": "asansor_tipi",
       "dependsOnValue": [
-        "Periyodik Aylık Bakım",
-        "Acil Arıza Müdahale",
-        "Yıllık Revizyon (Mavi/Yeşil Etiket Hazırlık)",
-        "Komple Modernizasyon (Yenileme)"
+        "Halatlı (Makine Daireli)",
+        "MRL (Makine Dairesiz/Dairesiz)",
+        "Hidrolik Asansör Sistemleri",
+        "Yük / Araç Asansörü",
+        "Panoramik Asansör"
       ],
       "options": [
         "2-4 Durak",
@@ -53,17 +60,19 @@ class AsansorSorulari {
         "16 Kat ve Üzeri"
       ]
     },
+
+    // ADIM 4: KAT ARALIĞI - durak seçilince gelsin
     {
-      "id": "kat", // 🛠️ REVIZE: Text sekmesi kaldırıldı, mimariyi bozmayan net seçimli single sekme getirildi.
+      "id": "kat",
       "label": "Tam Kat Aralığı Belirleme",
       "type": "single",
       "required": true,
-      "dependsOnId": "hizmet_turu",
+      "dependsOnId": "durak_sayisi",
       "dependsOnValue": [
-        "Periyodik Aylık Bakım",
-        "Acil Arıza Müdahale",
-        "Yıllık Revizyon (Mavi/Yeşil Etiket Hazırlık)",
-        "Komple Modernizasyon (Yenileme)"
+        "2-4 Durak",
+        "5-8 Durak",
+        "9-15 Durak",
+        "16 Kat ve Üzeri"
       ],
       "options": [
         "Zemin / Alçak Kat Yapısı (2 - 4 Kat)",
@@ -72,17 +81,19 @@ class AsansorSorulari {
         "Çok Yüksek Rezidans / Kule (16 Kat ve Üzeri)"
       ]
     },
+
+    // ADIM 5: BİNA TİPİ - kat seçilince gelsin
     {
       "id": "bina_tipi",
       "label": "Bina Kullanım Türü",
       "type": "single",
       "required": true,
-      "dependsOnId": "hizmet_turu",
+      "dependsOnId": "kat",
       "dependsOnValue": [
-        "Periyodik Aylık Bakım",
-        "Acil Arıza Müdahale",
-        "Yıllık Revizyon (Mavi/Yeşil Etiket Hazırlık)",
-        "Komple Modernizasyon (Yenileme)"
+        "Zemin / Alçak Kat Yapısı (2 - 4 Kat)",
+        "Standart Apartman Segmenti (5 - 8 Kat)",
+        "Yüksek Katlı Bina Yapısı (9 - 15 Kat)",
+        "Çok Yüksek Rezidans / Kule (16 Kat ve Üzeri)"
       ],
       "options": [
         "Konut / Apartman",
@@ -91,6 +102,8 @@ class AsansorSorulari {
         "Kamu Binası"
       ]
     },
+
+    // ==================== DALLANAN ÖZEL SORULAR - ZATEN DOĞRUYDU, KORUNDU ====================
     {
       "id": "etiket_durumu",
       "label": "Mevcut Etiket Rengi",
@@ -139,17 +152,19 @@ class AsansorSorulari {
         "Fotosel ve Güvenlik Sensörleri"
       ]
     },
+
+    // ADIM 6: FİNAL - bina tipi seçilince gelsin
     {
       "id": "parca_garanti",
       "label": "Yedek Parça ve Güvenlik Sınıfı",
       "type": "single",
       "required": true,
-      "dependsOnId": "hizmet_turu",
+      "dependsOnId": "bina_tipi",
       "dependsOnValue": [
-        "Periyodik Aylık Bakım",
-        "Acil Arıza Müdahale",
-        "Yıllık Revizyon (Mavi/Yeşil Etiket Hazırlık)",
-        "Komple Modernizasyon (Yenileme)"
+        "Konut / Apartman",
+        "Ticari Plaza / Otel",
+        "Hastane / Sağlık Merkezi (Kamu)",
+        "Kamu Binası"
       ],
       "options": [
         "CE Belgeli / Yerli Üretim",

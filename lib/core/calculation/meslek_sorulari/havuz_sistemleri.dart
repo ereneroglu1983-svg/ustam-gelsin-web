@@ -1,9 +1,11 @@
-// lib/core/calculation/meslek_sorulari/havuz_sistemleri.dart
+// lib/core/calculation/meslek_sorulari/havuz_sistemleri.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class HavuzSistemleriSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
-      "id": "is_kapsami", // 🛠️ ANA TETİKLEYİCİ: Komple yapım, tadilat, bakım veya kapatma akışlarını birbirinden ayıran anahtar
+      "id": "is_kapsami",
       "label": "İhtiyacınız Olan Hizmet Kapsamı",
       "type": "single",
       "required": true,
@@ -15,11 +17,9 @@ class HavuzSistemleriSorulari {
       ]
     },
 
-    // ==========================================
-    // 🏗️ GRUP 1: KABA İNŞAAT VE YAPI DETAYLARI
-    // ==========================================
+    // ADIM 2: HAVUZ TİPİ - sadece Sıfırdan'da gelsin
     {
-      "id": "havuz_tipi", // 🛠️ PROJE STANDARDI: dependsOnId ve dependsOnValue mimarisine geçirildi, string uyuşmazlığı giderildi
+      "id": "havuz_tipi",
       "label": "Havuz Yapım Teknolojisi ve İşletim Modeli",
       "type": "single",
       "required": true,
@@ -32,13 +32,20 @@ class HavuzSistemleriSorulari {
         "Fiberglass Havuz Gövdesi (Hazır Monoblok Kabuk Kasa Montajı)"
       ]
     },
+
+    // ADIM 3: ARAZİ ŞARTI - havuz tipi sonrası gelsin
     {
-      "id": "arazi_sarti", // 🛠️ PROJE STANDARDI: dependsOnId ve dependsOnValue mimarisine geçirildi
+      "id": "arazi_sarti",
       "label": "Zemin Yapısı ve Hafriyat Koşulları",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
-      "dependsOnValue": ["Sıfırdan Havuz Yapımı (Komple Anahtar Teslim İnşaat ve Mekanik)"],
+      "dependsOnId": "havuz_tipi",
+      "dependsOnValue": [
+        "Betonarme Gövde (Skimmerlı Standart Filtrasyon Sistemi)",
+        "Üstten Taşmalı Betonarme / Infinity (Denge Tanklı Lüks Sistem)",
+        "Prefabrik / Panel Havuz Sistemi (Hızlı Kurulum Çelik Panel Altyapılı)",
+        "Fiberglass Havuz Gövdesi (Hazır Monoblok Kabuk Kasa Montajı)"
+      ],
       "options": [
         "Normal Toprak Yapısı (Düz Arazi / Kolay Ekskavatör Kazısı)",
         "Kayalık / Sert Zemin Yapısı (Ağır İş Makinesi ve Kırıcı Mesaisi Gereken)",
@@ -46,17 +53,17 @@ class HavuzSistemleriSorulari {
       ]
     },
 
-    // ==========================================
-    // 🧱 GRUP 2: İÇ KAPLAMA VE YÜZEY MİMARİSİ
-    // ==========================================
+    // ADIM 4: KAPLAMA - Sıfırdan için arazi sonrası, Tadilat için direkt kökten gelsin
     {
-      "id": "kaplama_tipi", // 🛠️ PROJE STANDARDI: Yapım ve tadilat durumlarında tetiklenecek şekilde optimize edildi
+      "id": "kaplama_tipi",
       "label": "Havuz İç Yüzey Kaplama Malzemesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": ["arazi_sarti", "is_kapsami"],
       "dependsOnValue": [
-        "Sıfırdan Havuz Yapımı (Komple Anahtar Teslim İnşaat ve Mekanik)",
+        "Normal Toprak Yapısı (Düz Arazi / Kolay Ekskavatör Kazısı)",
+        "Kayalık / Sert Zemin Yapısı (Ağır İş Makinesi ve Kırıcı Mesaisi Gereken)",
+        "Bataklık / Yüksek Yeraltı Suyu Olan Balçık Zemin (Zemin Islahı, Kazık ve Drenaj Gereken)",
         "Mevcut Havuz Tadilatı / Liner Değişimi (Yenileme ve Onarım)"
       ],
       "options": [
@@ -66,18 +73,17 @@ class HavuzSistemleriSorulari {
       ]
     },
 
-    // ==========================================
-    // 📐 ÖLÇÜ, METRAJ VE SU HACMİ PARAMETRELERİ
-    // ==========================================
+    // ADIM 5: ALAN - kaplama sonrası veya Bakım/Kapatma'da direkt kökten gelsin
     {
-      "id": "alan_segmenti", // 🛠️ TEK ÖLÇÜ KAYNAĞI: Bağımlılık eklendi, ana seçim yapılmadan görünmez
+      "id": "alan_segmenti",
       "label": "Havuz Yüzey Alanı Ölçü Segmenti",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": ["kaplama_tipi", "is_kapsami"],
       "dependsOnValue": [
-        "Sıfırdan Havuz Yapımı (Komple Anahtar Teslim İnşaat ve Mekanik)",
-        "Mevcut Havuz Tadilatı / Liner Değişimi (Yenileme ve Onarım)",
+        "Porselen Mozaik Kaplama (Yüksek Dayanımlı Havuz Seramiği)",
+        "Cam Mozaik veya Doğal Taş Kaplama (Premium Derinlik Efektli Lüks Seri)",
+        "Liner Kaplama Uygulaması (Sızdırmaz PVC Membran Hazır İç Hazne Örtüsü)",
         "Periyodik Sezonluk Bakım Servisi (Kimyasal ve Filtrasyon Temizliği)",
         "Havuz Kapatma / Isı Sistemi Kurulumu (Sezon Uzatma Çözümleri)"
       ],
@@ -89,20 +95,18 @@ class HavuzSistemleriSorulari {
       ]
     },
 
-    // ==========================================
-    // ⚙️ ELEKTROMEKANİK DONANIMLAR VE KONFOR EKSTRALARI
-    // ==========================================
+    // ADIM 6: FİNAL EKSTRA - alan sonrası yeşil kutuda
     {
-      "id": "ekstra_ozellikler", // 🛠️ DÜZELTİLDİ: Bağımlılık eklendi, ana seçim yapılmadan görünmez
+      "id": "ekstra_ozellikler",
       "label": "Elektromekanik Donanımlar ve Konfor Ekstraları",
       "type": "multi",
       "required": false,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": "alan_segmenti",
       "dependsOnValue": [
-        "Sıfırdan Havuz Yapımı (Komple Anahtar Teslim İnşaat ve Mekanik)",
-        "Mevcut Havuz Tadilatı / Liner Değişimi (Yenileme ve Onarım)",
-        "Periyodik Sezonluk Bakım Servisi (Kimyasal ve Filtrasyon Temizliği)",
-        "Havuz Kapatma / Isı Sistemi Kurulumu (Sezon Uzatma Çözümleri)"
+        "0-25 m² Arası (Küçük Ölçekli / Müstakil Villa Tipi Havuz)",
+        "25-50 m² Arası (Orta Boy Standart Bahçe Tipi Aile Havuzu)",
+        "50-100 m² Arası (Geniş / Ticari / Sosyal Tesis Havuzu)",
+        "100 m² ve Üzeri (Yarı Olimpik / Büyük Otel Tesis Tipi)"
       ],
       "options": [
         "Inverter Isı Pompası Entegrasyonu (Dört Mevsim Yüzme İçin Akıllı Havuz Isıtma Sistemi)",

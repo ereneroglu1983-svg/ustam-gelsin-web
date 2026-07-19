@@ -3,6 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiService {
   final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(region: 'europe-west3');
@@ -14,13 +15,12 @@ class GeminiService {
     required String kategoriId,
     Map<String, dynamic>? detaylar,
   }) async {
-    try {
-      // 1. Prompt hazırla - MASTER PROMPT v2.0 - DEĞİŞMEDİ
-      String teknikDetaylar = detaylar?.entries
-          .map((e) => "${e.key.toUpperCase()}: ${e.value}")
-          .join(", ") ?? "Belirtilmedi";
+    // MASTER PROMPT v2.0 - YEDEKTE DURUYOR, SİLİNMEDİ
+    String teknikDetaylar = detaylar?.entries
+        .map((e) => "${e.key.toUpperCase()}: ${e.value}")
+        .join(", ") ?? "Belirtilmedi";
 
-      final String userPrompt = """
+    final String masterPrompt = """
 Sen artık Hemen Ustam Gelsin Yapay Zekâ Maliyet Motoru olarak görev yapıyorsun.
 
 Amacın, Türkiye'de hizmet almak isteyen müşterilere gerçek piyasa koşullarına uygun tek bir yaklaşık toplam maliyet üretmektir.
@@ -176,46 +176,55 @@ Kategori: $kategoriAdi
 Teknik Detaylar: $teknikDetaylar
 """;
 
-      // 2. Cloud Function çağır - HttpsCallableOptions ile timeout eklendi
+    try {
+      // 1. ÖNCE CLOUD FUNCTION - Frankfurt
       final callable = _functions.httpsCallable(
         'hesaplaFiyat',
-        options: HttpsCallableOptions(
-          timeout: const Duration(seconds: 60),
-        ),
+        options: HttpsCallableOptions(timeout: const Duration(seconds: 60)),
       );
 
       final result = await callable.call(<String, dynamic>{
-        'prompt': userPrompt,
+        'isAdi': isAdi,
+        'kategoriAdi': kategoriAdi,
+        'kategori': kategoriId,
+        'teknikDetaylar': teknikDetaylar,
+        'ilanMetni': isAdi,
       });
 
-      // 3. Cevabı parse et
       String rawText = result.data['fiyat']?.toString().trim() ?? "";
-
-      final String? formatliFiyat = _formatSafePrice(rawText);
-
-      if (formatliFiyat == null) {
-        throw Exception("AI geçersiz veya yasaklı format üretti: $rawText");
-      }
-
-      return formatliFiyat;
+      final formatli = _formatSafePrice(rawText);
+      if (formatli == null) throw Exception("Cloud geçersiz: $rawText");
+      return formatli;
 
     } on FirebaseFunctionsException catch (e) {
-      debugPrint("❌ CLOUD FUNCTION HATASI: ${e.code} - ${e.message}");
-      throw Exception("AI başarısız: ${e.message}");
-    } catch (e) {
-      debugPrint("❌ AI SERVİS HATASI: $e");
-      throw Exception("AI başarısız");
+      // 2. CLOUD ÇÖKERSE - google_generative_ai İLE TELEFONDAN ÇALIŞ
+      debugPrint("❌ CLOUD HATASI ${e.code} - YEDEK AI DEVREDE...");
+
+      List<String> modeller = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.5-flash-002'];
+      String? sonHata;
+
+      for (String modelIsmi in modeller) {
+        try {
+          final model = GenerativeModel(model: modelIsmi, apiKey: const String.fromEnvironment('GEMINI_API_KEY'));
+          final response = await model.generateContent([Content.text(masterPrompt)]);
+          String rawText = response.text?.trim() ?? "";
+          final formatli = _formatSafePrice(rawText);
+          if (formatli != null) return formatli;
+        } catch (e2) {
+          debugPrint("❌ MODEL $modelIsmi HATASI: $e2");
+          sonHata = e2.toString();
+        }
+      }
+
+      debugPrint("❌ FALLBACK HATASI: $sonHata");
+      throw Exception("AI başarısız: $sonHata");
     }
   }
 
-  // DEĞİŞMEDİ
   String? _formatSafePrice(String text) {
-    int? price = int.tryParse(text);
-
-    if (price == null || price < 1000 || price > 100000000) {
-      return null;
-    }
-
+    String cleaned = text.replaceAll(RegExp(r'[^0-9]'), '');
+    int? price = int.tryParse(cleaned);
+    if (price == null || price < 1000 || price > 100000000) return null;
     final formatter = NumberFormat("#,###", "tr_TR");
     return "${formatter.format(price).replaceAll(',', '.')} ₺";
   }

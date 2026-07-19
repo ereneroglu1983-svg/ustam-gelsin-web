@@ -8,7 +8,11 @@ class IlanModel {
   final String durum;
   final String tarih;
   final String userId;
-  final String fiyatBilgisi; // ESKİ SİSTEM: Sadece String
+  final String fiyatBilgisi; // Artik aralikli de olabilir: "35.000 - 45.000 ₺"
+  final double minimumButce;
+  final double muhtemelButce;
+  final double maksimumButce;
+  final String fiyatAraligi;
   final String detaylar;
   final String musteriAd;
   final String maskeliAd;
@@ -20,6 +24,7 @@ class IlanModel {
   final String ilanCode;
   final String isTanimi;
   final double komisyonTutari;
+  final double komisyonTabani;
   final bool komisyonOdendiMi;
   final bool isAcil;
   final String? metreKare;
@@ -42,6 +47,10 @@ class IlanModel {
     required this.tarih,
     required this.userId,
     required this.fiyatBilgisi,
+    this.minimumButce = 0,
+    this.muhtemelButce = 0,
+    this.maksimumButce = 0,
+    this.fiyatAraligi = '',
     required this.detaylar,
     this.musteriAd = '',
     this.maskeliAd = '',
@@ -53,6 +62,7 @@ class IlanModel {
     this.ilanCode = '',
     this.isTanimi = '',
     this.komisyonTutari = 0.0,
+    this.komisyonTabani = 0.0,
     this.komisyonOdendiMi = false,
     this.isAcil = false,
     this.metreKare,
@@ -75,7 +85,11 @@ class IlanModel {
     String? durum,
     String? tarih,
     String? userId,
-    String? fiyatBilgisi, // ESKİ SİSTEM: String
+    String? fiyatBilgisi,
+    double? minimumButce,
+    double? muhtemelButce,
+    double? maksimumButce,
+    String? fiyatAraligi,
     String? detaylar,
     String? musteriAd,
     String? maskeliAd,
@@ -87,6 +101,7 @@ class IlanModel {
     String? ilanCode,
     String? isTanimi,
     double? komisyonTutari,
+    double? komisyonTabani,
     bool? komisyonOdendiMi,
     bool? isAcil,
     String? metreKare,
@@ -109,6 +124,10 @@ class IlanModel {
       tarih: tarih?? this.tarih,
       userId: userId?? this.userId,
       fiyatBilgisi: fiyatBilgisi?? this.fiyatBilgisi,
+      minimumButce: minimumButce?? this.minimumButce,
+      muhtemelButce: muhtemelButce?? this.muhtemelButce,
+      maksimumButce: maksimumButce?? this.maksimumButce,
+      fiyatAraligi: fiyatAraligi?? this.fiyatAraligi,
       detaylar: detaylar?? this.detaylar,
       musteriAd: musteriAd?? this.musteriAd,
       maskeliAd: maskeliAd?? this.maskeliAd,
@@ -120,6 +139,7 @@ class IlanModel {
       ilanCode: ilanCode?? this.ilanCode,
       isTanimi: isTanimi?? this.isTanimi,
       komisyonTutari: komisyonTutari?? this.komisyonTutari,
+      komisyonTabani: komisyonTabani?? this.komisyonTabani,
       komisyonOdendiMi: komisyonOdendiMi?? this.komisyonOdendiMi,
       isAcil: isAcil?? this.isAcil,
       metreKare: metreKare?? this.metreKare,
@@ -146,34 +166,55 @@ class IlanModel {
     return adSoyad.toUpperCase();
   }
 
-  // ESKİ SİSTEM: Sadece String fiyat destekli komisyon hesaplama
-  static double _komisyonHesapla(String fiyat) {
+  // REVIZE EDILDI - Artik araligi dogru okuyor: (min+max)/2 * %1
+  static double _komisyonHesapla(Map<String, dynamic> map) {
+    // 1. Yeni sistem: minimum ve maksimum varsa
+    if (map['minimumButce']!= null && map['maksimumButce']!= null) {
+      double min = (map['minimumButce'] as num).toDouble();
+      double max = (map['maksimumButce'] as num).toDouble();
+      double taban = (min + max) / 2;
+      return taban * 0.01;
+    }
+    // 2. Eski sistemde komisyonTutari direkt yaziliysa onu kullan
+    if (map['komisyonTutari']!= null && (map['komisyonTutari'] as num).toDouble() > 0) {
+      return (map['komisyonTutari'] as num).toDouble();
+    }
+    // 3. Fallback: fiyatBilgisi stringini parse et (geriye uyum)
+    String fiyat = map['fiyatBilgisi']?.toString()?? '0';
+    if (fiyat.contains('-')) {
+      var parts = fiyat.split('-');
+      double min = double.tryParse(parts[0].replaceAll(RegExp(r'[^0-9]'), ''))?? 0;
+      double max = double.tryParse(parts[1].replaceAll(RegExp(r'[^0-9]'), ''))?? 0;
+      if (min > 0 && max > 0) return ((min + max) / 2) * 0.01;
+    }
     String temizFiyat = fiyat.replaceAll(RegExp(r'[^0-9]'), '');
     double tutar = double.tryParse(temizFiyat)?? 0.0;
-
-    // Kural: 15k altı sabit 150 TL, üstü %1
-    if (tutar >= 15000) {
-      return tutar * 0.01;
-    } else {
-      return 150.0;
-    }
+    if (tutar >= 15000) return tutar * 0.01;
+    return 150.0;
   }
 
   static Map<String, dynamic> _teknikDetaylariNormalizeEt(Map<String, dynamic> hamDetaylar) {
-    final Map<String, dynamic> normalizeHarita = Map<String, dynamic>.from(hamDetaylar);
-    return normalizeHarita;
+    return Map<String, dynamic>.from(hamDetaylar);
   }
 
   factory IlanModel.fromMap(Map<String, dynamic> map, [String? docId]) {
     String ad = map['musteriAd']?.toString()?? map['name']?.toString()?? '';
-    // ESKİ SİSTEM: Fiyat bilgisi String gelir
-    String fiyat = map['fiyatBilgisi']?.toString()?? '0 ₺';
+    String fiyat = map['fiyatBilgisi']?.toString()?? map['fiyatAraligi']?.toString()?? '0 ₺';
+
+    double min = (map['minimumButce'] as num?)?.toDouble()?? 0;
+    double muhtemel = (map['muhtemelButce'] as num?)?.toDouble()?? 0;
+    double max = (map['maksimumButce'] as num?)?.toDouble()?? 0;
+    String aralik = map['fiyatAraligi']?.toString()?? map['aralikliFiyatBilgisi']?.toString()?? '';
+
+    // Eger aralik yoksa ama min/max varsa olustur
+    if (aralik.isEmpty && min > 0 && max > 0) {
+      aralik = "${min.toInt()} - ${max.toInt()} ₺";
+    }
+    if (aralik.isNotEmpty) fiyat = aralik;
 
     Map<String, dynamic> hamTeknikDetaylar = map['teknikDetaylar'] is Map
         ? Map<String, dynamic>.from(map['teknikDetaylar'])
         : {};
-
-    Map<String, dynamic> temizTeknikDetaylar = _teknikDetaylariNormalizeEt(hamTeknikDetaylar);
 
     return IlanModel(
       id: docId?? map['id']?.toString()?? '',
@@ -184,6 +225,10 @@ class IlanModel {
       tarih: map['tarih']?.toString()?? DateTime.now().toIso8601String(),
       userId: map['userId']?.toString()?? map['uid']?.toString()?? '',
       fiyatBilgisi: fiyat,
+      minimumButce: min,
+      muhtemelButce: muhtemel,
+      maksimumButce: max,
+      fiyatAraligi: aralik,
       detaylar: map['detaylar']?.toString()?? '',
       musteriAd: ad,
       maskeliAd: _maskele(ad),
@@ -194,13 +239,14 @@ class IlanModel {
       ilceId: map['ilceId']?.toString()?? map['ilce_id']?.toString()?? '',
       ilanCode: map['ilanCode']?.toString()?? '',
       isTanimi: map['isTanimi']?.toString()?? '',
-      komisyonTutari: _komisyonHesapla(fiyat),
+      komisyonTutari: _komisyonHesapla(map),
+      komisyonTabani: (map['komisyonTabani'] as num?)?.toDouble()?? ((min + max) / 2),
       komisyonOdendiMi: map['komisyonOdendiMi']?? false,
       isAcil: map['isAcil']?? (hamTeknikDetaylar['isAcil'] == true),
       metreKare: map['metreKare']?.toString(),
       odaSayisi: map['odaSayisi']?.toString(),
       hizmetTipi: map['hizmetTipi']?.toString(),
-      teknikDetaylar: temizTeknikDetaylar,
+      teknikDetaylar: _teknikDetaylariNormalizeEt(hamTeknikDetaylar),
       latitude: (map['latitude'] as num?)?.toDouble()?? 0.0,
       longitude: (map['longitude'] as num?)?.toDouble()?? 0.0,
       musteriAdSoyad: map['musteriAdSoyad']?.toString(),
@@ -220,6 +266,11 @@ class IlanModel {
       'tarih': tarih,
       'userId': userId,
       'fiyatBilgisi': fiyatBilgisi,
+      'minimumButce': minimumButce,
+      'muhtemelButce': muhtemelButce,
+      'maksimumButce': maksimumButce,
+      'fiyatAraligi': fiyatAraligi,
+      'aralikliFiyatBilgisi': fiyatAraligi,
       'detaylar': detaylar,
       'musteriAd': musteriAd,
       'maskeliAd': maskeliAd,
@@ -231,6 +282,7 @@ class IlanModel {
       'ilanCode': ilanCode,
       'isTanimi': isTanimi,
       'komisyonTutari': komisyonTutari,
+      'komisyonTabani': komisyonTabani,
       'komisyonOdendiMi': komisyonOdendiMi,
       'isAcil': isAcil,
       'metreKare': metreKare,

@@ -37,13 +37,10 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
     _konumVerileriniHazirla();
   }
 
-  // --- YENİ DOĞRULAMA MANTIĞI ---
   bool _tumAlanlarDoluMu() {
     if (_secilenIl == null || _secilenIlce == null) return false;
-
     final List<Map<String, dynamic>> hamSorular = IsSorulariData.getSorularByKategori(widget.ilan.kategori);
     for (var x in hamSorular) {
-      // Sadece o an görünür olması gereken alanları kontrol et
       if (_alanGorunurMu(x)) {
         String id = x['id'].toString();
         if (_secilenDetaylar[id] == null || _secilenDetaylar[id].toString().isEmpty) {
@@ -55,7 +52,6 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
   }
 
   Future<void> _fiyatHesapla() async {
-    // Sadece tüm alanlar doluysa hesapla
     if (!_tumAlanlarDoluMu()) {
       setState(() => _guncelFiyat = "LÜTFEN TÜM ALANLARI DOLDURUNUZ");
       return;
@@ -65,13 +61,30 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
       if (!mounted) return;
       setState(() => _isCalculating = true);
-      final String sonuc = await _priceManager.orkestraFiyatHesapla(
-          userId: widget.ilan.userId, baslik: widget.ilan.baslik, kategori: widget.ilan.kategori,
-          kategoriId: widget.ilan.kategoriId, detaylar: _secilenDetaylar);
-      if (mounted) setState(() { _guncelFiyat = sonuc; _isCalculating = false; });
+
+      try {
+        // SENİN MANAGER'INA GÖRE DÜZELTİLDİ - EKSİKSİZ
+        final Map<String, dynamic> sonucMap = await _priceManager.orkestraFiyatHesapla(
+          userId: widget.ilan.userId,
+          talepId: widget.ilan.id?? widget.ilan.userId, // talepId sende IlanModel.id, yoksa userId
+          baslik: widget.ilan.baslik,
+          kategori: widget.ilan.kategori,
+          kategoriId: widget.ilan.kategoriId,
+          detaylar: _secilenDetaylar,
+          bolgeKodu: _secilenIlId?? 'diger', // <-- SENİN SEHIR ID'N BURASI İŞTE
+        );
+
+        if (mounted) {
+          setState(() {
+            _guncelFiyat = sonucMap['aralikliFiyatBilgisi']?? sonucMap['fiyatBilgisi']?? "Fiyat alınamadı";
+            _isCalculating = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) setState(() { _guncelFiyat = "Hesaplama hatası"; _isCalculating = false; });
+      }
     });
   }
-  // ------------------------------
 
   Future<void> _konumVerileriniHazirla() async {
     try {
@@ -83,11 +96,11 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
 
   Future<void> _otomatikKonumAl() async {
     final sonuc = await LocationService.otomatikKonumTespitEt();
-    if (sonuc != null && mounted) {
+    if (sonuc!= null && mounted) {
       setState(() {
         _secilenIl = sonuc['sehir_adi']; _secilenIlId = sonuc['sehir_id'];
         _secilenIlce = sonuc['ilce_adi'];
-        if (_secilenIl != null) _ilceFiltrele(_secilenIl!);
+        if (_secilenIl!= null) _ilceFiltrele(_secilenIl!);
       });
     }
   }
@@ -100,14 +113,14 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
     }
   }
 
-  String _metniYalinHaleGetir(dynamic input) => input?.toString().toLowerCase().trim() ?? "";
+  String _metniYalinHaleGetir(dynamic input) => input?.toString().toLowerCase().trim()?? "";
 
   bool _alanGorunurMu(Map<String, dynamic> alanHamVerisi) {
     final dynamic dependsOnId = alanHamVerisi['dependsOnId'];
     if (dependsOnId == null) return true;
     final ustAlanDegeri = _secilenDetaylar[dependsOnId.toString()];
     if (ustAlanDegeri == null) return false;
-    final List<dynamic> dependsOnValueList = alanHamVerisi['dependsOnValue'] is List ? alanHamVerisi['dependsOnValue'] : [alanHamVerisi['dependsOnValue']];
+    final List<dynamic> dependsOnValueList = alanHamVerisi['dependsOnValue'] is List? alanHamVerisi['dependsOnValue'] : [alanHamVerisi['dependsOnValue']];
     return dependsOnValueList.map((v) => _metniYalinHaleGetir(v)).contains(_metniYalinHaleGetir(ustAlanDegeri));
   }
 
@@ -138,7 +151,7 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
           child: _buildActionButtons(),
         ),
       ),
-      body: _konumYukleniyor ? const Center(child: CircularProgressIndicator(color: Colors.red)) : SingleChildScrollView(
+      body: _konumYukleniyor? const Center(child: CircularProgressIndicator(color: Colors.red)) : SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(children: [
           _buildKonumSeciciCard(),
@@ -155,12 +168,12 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.red, width: 2)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(title, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16)),
-      const SizedBox(height: 10), ...children
+      const SizedBox(height: 10),...children
     ]),
   );
 
   Widget _buildDropdown(String? value, String hint, List<String> items, Function(String?) onChanged) => DropdownButtonFormField<String>(
-    value: items.contains(value) ? value : null,
+    value: items.contains(value)? value : null,
     isExpanded: true,
     hint: Text(hint, style: const TextStyle(color: Colors.black)),
     style: const TextStyle(color: Colors.black),
@@ -178,8 +191,9 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
 
   Widget _buildKonumSeciciCard() => _buildGlassCard("HİZMET YERİ", [
     _buildDropdown(_secilenIl, "İl Seçiniz", _sehirListesi.map((s) => s['sehir_adi'].toString()).toList(), (val) {
-      setState(() { _secilenIl = val; _secilenIlce = null; });
-      _ilceFiltrele(val!);
+      final secilen = _sehirListesi.firstWhere((e) => e['sehir_adi'] == val, orElse: () => {});
+      setState(() { _secilenIl = val; _secilenIlce = null; _secilenIlId = secilen['sehir_id']?.toString(); });
+      if (val!= null) _ilceFiltrele(val);
       _fiyatHesapla();
     }),
     const SizedBox(height: 12),
@@ -202,7 +216,7 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
             Text(alan.label, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
             const SizedBox(height: 5),
             DropdownButtonFormField<String>(
-              value: alan.options.contains(_secilenDetaylar[alan.id]) ? _secilenDetaylar[alan.id] : null,
+              value: alan.options.contains(_secilenDetaylar[alan.id])? _secilenDetaylar[alan.id] : null,
               isExpanded: true,
               style: const TextStyle(color: Colors.black),
               dropdownColor: Colors.white,
@@ -237,7 +251,9 @@ class _MusteriIlanDetaySayfasiState extends State<AiIlanDetaySayfasi> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(border: Border.all(color: Colors.red, width: 2), borderRadius: BorderRadius.circular(15)),
-      child: Text(_guncelFiyat, style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+      child: _isCalculating
+          ? const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
+          : Text(_guncelFiyat, style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
     )
   ]);
 

@@ -1,7 +1,9 @@
-// lib/core/calculation/meslek_sorulari/aluminyum_cephe.dart
+// lib/core/calculation/meslek_sorulari/aluminyum_cephe.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi, sadece zincir eklendi.
 
 class AluminyumCepheSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
       "id": "uygulama_tipi",
       "label": "Yapılacak İşlem Kapsamı",
@@ -14,6 +16,8 @@ class AluminyumCepheSorulari {
         "Ofis Bölme Sistemleri (İç Mekan Alüminyum Modüler Bölme)"
       ]
     },
+
+    // ADIM 2: DAL SEÇİMLERİ - sadece ilgili kök seçilince gelir
     {
       "id": "cephe_sistem_detayi",
       "label": "Giydirme Cephe Mimari Teknolojisi",
@@ -45,6 +49,8 @@ class AluminyumCepheSorulari {
         "Usta Sahada İnceleyip Mimari Seriyi Önersin"
       ]
     },
+
+    // ADIM 3: METRAJ - kök seçilince gelir, dal varsa daldan hemen sonra listede durduğu için profesyonel görünür
     {
       "id": "alan_segmenti",
       "label": "Tahmini Toplam Uygulama / Metraj Alanı",
@@ -71,25 +77,29 @@ class AluminyumCepheSorulari {
       "type": "text",
       "keyboardType": "number",
       "hint": "Örn: 45",
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "alan_segmenti", // DEĞİŞTİ: Direkt köke değil, alan_segmenti'ne bağlı - zincir
       "dependsOnValue": [
-        "Giydirme Cephe Sistemleri (Silikon / Kapaklı Dış Cephe)",
-        "Alüminyum Doğrama Kapı/Pencere (Korkuluk / Küpeşte ve Sürme Sistemler)",
-        "Kompozit Panel Kaplama (Dış Cephe Levha Giydirme)",
-        "Ofis Bölme Sistemleri (İç Mekan Alüminyum Modüler Bölme)"
+        "0-10 m² / mt Arası Küçük Ölçek",
+        "10-30 m² / mt Arası Orta Ölçek",
+        "30-100 m² / mt Arası Geniş Cephe",
+        "100-300 m² / mt Arası Büyük Proje",
+        "300 m² ve Üzeri Endüstriyel / Kurumsal Proje"
       ]
     },
+
+    // ADIM 4: TEKNİK DETAYLAR - metraj netleşince gelsin
     {
       "id": "profil_renk",
       "label": "Profil Renk ve Yüzey Bitiş Teknolojisi",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "alan_segmenti", // DEĞİŞTİ: metre_kare text olduğu için boş kalırsa kilitlenmesin diye alan_segmenti'ne bağlandı
       "dependsOnValue": [
-        "Giydirme Cephe Sistemleri (Silikon / Kapaklı Dış Cephe)",
-        "Alüminyum Doğrama Kapı/Pencere (Korkuluk / Küpeşte ve Sürme Sistemler)",
-        "Kompozit Panel Kaplama (Dış Cephe Levha Giydirme)",
-        "Ofis Bölme Sistemleri (İç Mekan Alüminyum Modüler Bölme)"
+        "0-10 m² / mt Arası Küçük Ölçek",
+        "10-30 m² / mt Arası Orta Ölçek",
+        "30-100 m² / mt Arası Geniş Cephe",
+        "100-300 m² / mt Arası Büyük Proje",
+        "300 m² ve Üzeri Endüstriyel / Kurumsal Proje"
       ],
       "options": [
         "Eloksal Kaplama (Gümüş / Parlak Standart Korozyon Dirençli)",
@@ -103,12 +113,12 @@ class AluminyumCepheSorulari {
       "label": "Montaj Zemini ve Cephe Yükseklik Durumu",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "profil_renk", // DEĞİŞTİ: Renk seçilince zemin gelsin
       "dependsOnValue": [
-        "Giydirme Cephe Sistemleri (Silikon / Kapaklı Dış Cephe)",
-        "Alüminyum Doğrama Kapı/Pencere (Korkuluk / Küpeşte ve Sürme Sistemler)",
-        "Kompozit Panel Kaplama (Dış Cephe Levha Giydirme)",
-        "Ofis Bölme Sistemleri (İç Mekan Alüminyum Modüler Bölme)"
+        "Eloksal Kaplama (Gümüş / Parlak Standart Korozyon Dirençli)",
+        "Elektrostatik Toz Boya (Antrasit Gri / Siyah Mat Ral Kodu)",
+        "Premium Eloksal (Bronz veya Altın Sarısı Özel Kimyasal İşlemli)",
+        "Ahşap Desenli Özel Transfer Kaplama"
       ],
       "options": [
         "Beton Zemin (Standart Ankrajlı Kolay Montaj)",
@@ -120,12 +130,12 @@ class AluminyumCepheSorulari {
       "id": "ekstra_ozellikler",
       "label": "Ekstra Teknik Donanım ve Cam Katmanları",
       "type": "multi",
-      "dependsOnId": "uygulama_tipi",
+      "required": false,
+      "dependsOnId": "zemin_montaj", // DEĞİŞTİ: En son final sorusu
       "dependsOnValue": [
-        "Giydirme Cephe Sistemleri (Silikon / Kapaklı Dış Cephe)",
-        "Alüminyum Doğrama Kapı/Pencere (Korkuluk / Küpeşte ve Sürme Sistemler)",
-        "Kompozit Panel Kaplama (Dış Cephe Levha Giydirme)",
-        "Ofis Bölme Sistemleri (İç Mekan Alüminyum Modüler Bölme)"
+        "Beton Zemin (Standart Ankrajlı Kolay Montaj)",
+        "Mermer / Granit Basamak Üzeri (Sulu Karot Delimli Hassas İşçilik)",
+        "Yüksek Kat Dış Cephe (Güvenlikli İskele Kurulumu veya Vinç / Sepet Gerektiren)"
       ],
       "options": [
         "Isı Yalıtım Bariyeri ve Konfor EPDM Fitil Farkı",

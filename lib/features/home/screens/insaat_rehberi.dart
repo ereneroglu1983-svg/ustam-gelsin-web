@@ -10,10 +10,31 @@ import 'dart:convert';
 class InsaatRehberiScreen extends StatelessWidget {
   const InsaatRehberiScreen({super.key});
 
+  // [REVIZE] Merkezi CDN URL düzeltici - hem pub- hem relative path'i kapsar
+  String _fixUrl(String path) {
+    const String r2PublicUrl = "https://cdn.hemenustamgelsin.com/ustam-gelsin-medya";
+    path = path.trim();
+    if (path.isEmpty) return path;
+
+    // Tam URL ise
+    if (path.startsWith('http')) {
+      // Eski R2 public URL'i yeni CDN'e çevir
+      if (path.contains('pub-27a42c3abc764860b54d06b5cf79567f.r2.dev')) {
+        return path.replaceAll(
+          'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev',
+          r2PublicUrl,
+        );
+      }
+      return path;
+    }
+
+    // Relative ise (images/xxx.webp veya /images/xxx.webp)
+    final cleanPath = path.startsWith('/')? path.substring(1) : path;
+    return "$r2PublicUrl/$cleanPath";
+  }
+
   @override
   Widget build(BuildContext context) {
-    const String r2PublicUrl = "https://cdn.hemenustamgelsin.com/ustam-gelsin-medya";
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -35,7 +56,7 @@ class InsaatRehberiScreen extends StatelessWidget {
         stream: FirebaseFirestore.instance.collection('icerikler').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+            return const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC143C)));
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(child: Text("Henüz içerik eklenmemiş.", style: GoogleFonts.poppins()));
@@ -48,15 +69,18 @@ class InsaatRehberiScreen extends StatelessWidget {
               var doc = snapshot.data!.docs[index];
               final data = doc.data() as Map<String, dynamic>;
 
-              String baslik = data['baslik'] ?? 'Başlıksız';
-              String imagePath = data['imagePath'] ?? '';
-              String contentPath = data['contentPath'] ?? '';
-              String youtubeId = data['youtubeId'] ?? '';
-              String resimUrl = imagePath.startsWith('http') ? imagePath : "$r2PublicUrl/$imagePath";
+              String baslik = data['baslik']?? 'Başlıksız';
+              String imagePath = data['imagePath']?? '';
+              String contentPath = data['contentPath']?? '';
+              String youtubeId = data['youtubeId']?? '';
+
+              // [REVIZE EDİLDİ] Tek yerden fix
+              String resimUrl = _fixUrl(imagePath);
+              String icerikUrl = _fixUrl(contentPath);
 
               return RehberPostCard(
                 baslik: baslik,
-                contentUrl: contentPath.startsWith('http') ? contentPath : "$r2PublicUrl/$contentPath",
+                contentUrl: icerikUrl,
                 resimUrl: resimUrl,
                 youtubeId: youtubeId,
               );
@@ -120,15 +144,28 @@ class _RehberPostCardState extends State<RehberPostCard> {
     try {
       final response = await http.get(Uri.parse(widget.contentUrl));
       if (response.statusCode == 200) {
-        if (mounted) setState(() {
-          _icerikMetni = utf8.decode(response.bodyBytes);
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _icerikMetni = utf8.decode(response.bodyBytes);
+            _isLoading = false;
+          });
+        }
       } else {
-        if (mounted) setState(() { _icerikMetni = "İçerik yüklenemedi."; _isLoading = false; });
+        if (mounted) {
+          setState(() {
+            _icerikMetni = "İçerik yüklenemedi.";
+            _isLoading = false;
+          });
+        }
       }
     } catch (e) {
-      if (mounted) setState(() { _icerikMetni = "Hata oluştu."; _isLoading = false; });
+      if (mounted) {
+        setState(() {
+          _icerikMetni = "Hata oluştu.";
+          _isLoading = false;
+        });
+      }
+      print("İÇERİK YÜKLEME HATASI: $e URL: ${widget.contentUrl}");
     }
   }
 
@@ -214,11 +251,22 @@ class _RehberPostCardState extends State<RehberPostCard> {
                 child: Image.network(
                   widget.resimUrl,
                   fit: BoxFit.contain,
-                  errorBuilder: (c, e, s) => Container(
-                    height: 300,
-                    color: Colors.grey[100],
-                    child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                  ),
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 300,
+                      color: Colors.grey.shade100,
+                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC143C))),
+                    );
+                  },
+                  errorBuilder: (c, e, s) {
+                    print("GÖRSEL YÜKLEME HATASI: $e URL: ${widget.resimUrl}");
+                    return Container(
+                      height: 300,
+                      color: Colors.grey[100],
+                      child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                    );
+                  },
                 ),
               ),
 
@@ -228,10 +276,10 @@ class _RehberPostCardState extends State<RehberPostCard> {
                 child: _isLoading
                     ? const Text("Yükleniyor...", style: TextStyle(color: Colors.grey, fontSize: 14))
                     : InkWell(
-                  onTap: () => setState(() => _isExpanded = !_isExpanded),
+                  onTap: () => setState(() => _isExpanded =!_isExpanded),
                   child: RichText(
-                    maxLines: _isExpanded ? null : 4,
-                    overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                    maxLines: _isExpanded? null : 4,
+                    overflow: _isExpanded? TextOverflow.visible : TextOverflow.ellipsis,
                     text: TextSpan(
                       style: GoogleFonts.poppins(color: Colors.black87, fontSize: 14.5, height: 1.45),
                       children: [
@@ -256,7 +304,7 @@ class _RehberPostCardState extends State<RehberPostCard> {
                 ),
 
               // YOUTUBE VİDEO
-              if (_isExpanded && widget.youtubeId.isNotEmpty && _ytController != null)
+              if (_isExpanded && widget.youtubeId.isNotEmpty && _ytController!= null)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                   child: ClipRRect(

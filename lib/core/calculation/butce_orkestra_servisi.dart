@@ -2,199 +2,245 @@
 
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart'; // debugPrint için gerekli
+import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import '../constants/is_sorulari_data.dart';
-import 'meslekler/alci_siva.dart';
-import 'meslekler/aluminyum_cephe.dart';
-import 'meslekler/asansor_servis.dart';
-import 'meslekler/asma_tavan.dart';
-import 'meslekler/bahce_peyzaj.dart';
-import 'meslekler/banyo_vestiyer.dart';
-import 'meslekler/temizlik_hizmetleri.dart';
-import 'meslekler/bolme_duvar.dart';
-import 'meslekler/cam_balkon.dart';
-import 'meslekler/cati_isleri.dart';
-import 'meslekler/dis_cephe.dart';
-import 'meslekler/dogalgaz_kombi.dart';
-import 'meslekler/duvar_kagidi.dart';
-import 'meslekler/elektrik_tesisat.dart';
-import 'meslekler/epoksi_zemin.dart';
-import 'meslekler/fayans_seramik.dart';
-import 'meslekler/ferforje_metal.dart';
-import 'meslekler/gergi_tavan.dart';
-import 'meslekler/gomme_dolap.dart';
-import 'meslekler/gunes_enerjisi.dart';
-import 'meslekler/havuz_sistemleri.dart';
-import 'meslekler/ic_boya.dart';
-import 'meslekler/italyan_boya.dart';
-import 'meslekler/kapi_sistemleri.dart';
-import 'meslekler/kartonpiyer.dart';
-import 'meslekler/klima_servis.dart';
-import 'meslekler/komple_tadilat.dart';
-import 'meslekler/marangozluk.dart';
-import 'meslekler/mermer_granit.dart';
-import 'meslekler/mutfak_dolabi.dart';
-import 'meslekler/otomatik_sulama.dart';
-import 'meslekler/panel_singil.dart';
-import 'meslekler/parke_doseme.dart';
-import 'meslekler/prefabrik_yapi.dart';
-import 'meslekler/pvc_dograma.dart';
-import 'meslekler/sihhi_tesisat.dart';
-import 'meslekler/sineklik_panjur.dart';
-import 'meslekler/sistre_cila.dart';
-import 'meslekler/su_yalitimi.dart';
-import 'meslekler/uydu_kamera.dart';
-import 'meslekler/cilingir.dart';
-import 'meslekler/hesap_yenilenebilir_enerji/hesap_elektrikli_arac.dart';
-import 'meslekler/hesap_yenilenebilir_enerji/hesap_enerji_depolama.dart';
-import 'meslekler/hesap_yenilenebilir_enerji/hesap_ges.dart';
-import 'meslekler/hesap_yenilenebilir_enerji/hesap_off_grid_mobil_enerji.dart';
-import 'meslekler/hesap_yenilenebilir_enerji/hesap_res.dart';
+import '../services/ai_price_provider.dart';
+import '../services/groq_provider.dart';
 
 class ButceOrkestraServisi {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final AiPriceProvider _aiProvider = GroqProvider();
 
-  static Map<String, dynamic> yerelRobotHesapla({
-    required String kategori,
-    required List<dynamic> gelenCevaplar,
-  }) {
-    final String aranan = kategori.trim().toUpperCase();
+  static const Set<String> _gecerliMeslekIdler = {
+    'alci_siva','aluminyum_cephe','asansor_servis','asma_tavan','bahce_peyzaj',
+    'banyo_vestiyer','bina_temizlik_hesaplayici','bolme_duvar','cam_balkon','cati_isleri',
+    'dis_cephe','dogalgaz_kombi','duvar_kagidi','elektrik_tesisat','elektrikli_arac',
+    'enerji_depolama','epoksi_zemin','fayans_seramik','ferforje_metal','gergi_tavan',
+    'ges','gomme_dolap','gunes_enerjisi','havuz_sistemleri','ic_boya','italyan_boya',
+    'kapi_sistemleri','kartonpiyer','klima_servis','komple_tadilat','marangozluk',
+    'mermer_granit','mutfak_dolabi','off_grid_mobil_enerji','otomatik_sulama','panel_singil',
+    'parke_doseme','prefabrik_yapi','pvc_dograma','res','sihhi_tesisat','sineklik_panjur',
+    'sistre_cila','su_yalitimi','temizlik_hizmetleri','uydu_kamera'
+  };
 
-    if (aranan.contains("LAMİNAT") || aranan.contains("PARKE")) return ParkeDosemeHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("İÇ CEPHE") || aranan.contains("BOYA")) return IcBoyaHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("FAYANS") || aranan.contains("SERAMİK")) return FayansSeramikHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("MERMER") || aranan.contains("GRANİT")) return MermerGranitHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("ALÇI") || aranan.contains("SIVA")) return AlciSivaHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("ASMA TAVAN")) return AsmaTavanHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("GERGİ TAVAN")) return GergiTavanHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("KARTONPİYER")) return KartonpiyerHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("BÖLME DUVAR")) return BolmeDuvarHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("EPOKSİ")) return EpoksiZeminHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("SİSTRE")) return SistreCilaHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("SIHHİ") || aranan.contains("TESİSAT")) return SihhiTesisatHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("ELEKTRİK")) return ElektrikTesisatHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("DOĞALGAZ") || aranan.contains("KOMBİ")) return DogalgazKombiHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("GÜNEŞ") || aranan.contains("ENERJİ")) return GunesEnerjisiHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("KLİMA")) return KlimaServisHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("PVC")) return PvcDogramaHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("ALÜMİNYUM")) return AluminyumCepheHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("CAM BALKON")) return CamBalkonHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("KAPI")) return KapiSistemleriHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("SİNEKLİK") || aranan.contains("PANJUR")) return SineklikPanjurHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("MUTFAK")) return MutfakDolabiHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("BANYO")) return BanyoVestiyerHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("GÖMME") || aranan.contains("RAY DOLAP")) return RayDolapHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("MARANGOZ")) return MarangozlukHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("ÇATI")) return CatiIsleriHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("SANDVİÇ") || aranan.contains("ŞİNGIL")) return PanelSingilHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("YALITIM") || aranan.contains("SU YALITIMI")) return SuYalitimiHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("BAHÇE") || aranan.contains("PEYZAJ")) return BahcePeyzajHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("SULAMA")) return OtomatikSulamaHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("HAVUZ")) return HavuzSistemleriHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("FERFORJE")) return FerforjeMetalHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("PREFABRİK") || aranan.contains("BUNGALOV")) return PrefabrikYapiHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("UYDU") || aranan.contains("KAMERA")) return UyduKameraHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("ASANSÖR")) return AsansorHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("TADİLAT")) return KompleTadilatHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("TEMİZLİK")) return TemizlikHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("ÇİLİNGİR")) return CilingirHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("ELEKTRİKLİ ARAÇ")) return ElektrikliAracHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("ENERJİ DEPOLAMA")) return EnerjiDepolamaHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("GES")) return GESHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("OFF-GRID")) return OffGridMobilEnerjiHesaplayici.hesapla(gelenCevaplar);
-    if (aranan.contains("RÜZGAR")) return RESHesaplayici.hesapla(gelenCevaplar);
+  static String _stabilHashOlustur(String kategoriId, List<dynamic> cevaplar) {
+    final String ham = "$kategoriId-${jsonEncode(cevaplar)}";
+    return sha256.convert(utf8.encode(ham)).toString().substring(0, 32);
+  }
 
-    debugPrint("!!! KRİTİK: Kategori eşleşmedi, Fallback devrede. Aranan: $aranan");
-    return {
-      "hata": "Eşleşen yerel robot hesaplayıcı bulunamadı.",
-      "kategori": aranan,
-      "minimumButce": 1000.0,
-      "muhtemelButce": 3000.0,
-      "maksimumButce": 5000.0,
-      "durum": "HATA"
-    };
+  static Map<String, dynamic> _zenginDetayOlustur(String kategoriAdi, List<dynamic> kullaniciCevaplari) {
+    final sorular = IsSorulariData.getSorularByKategori(kategoriAdi);
+    final Map<String, dynamic> cevapMap = {};
+    for (var item in kullaniciCevaplari) {
+      if (item is Map && item.containsKey('id')) {
+        cevapMap[item['id'].toString()] = item['cevap'];
+      }
+    }
+    List<Map<String, String>> zenginListe = [];
+    for (var s in sorular) {
+      final String id = s['id'].toString();
+      if (cevapMap.containsKey(id)) {
+        zenginListe.add({
+          "soru": s['label']?.toString()?? id,
+          "cevap": cevapMap[id].toString(),
+        });
+      }
+    }
+    return {"ham_cevaplar": cevapMap, "zengin_aciklama": zenginListe};
+  }
+
+  static Future<Map<String, dynamic>> _firebaseTabanliJenerikHesapla({
+    required String meslekId,
+    required List<dynamic> kullaniciCevaplari,
+    required String bolgeKodu,
+  }) async {
+    try {
+      if (!_gecerliMeslekIdler.contains(meslekId)) {
+        throw Exception("Geçersiz meslekId, tarifede yok: $meslekId");
+      }
+
+      final doc = await _firestore.collection('meslek_fiyat_tarifeleri').doc(meslekId).get();
+      if (!doc.exists) throw Exception("Tarife dokümanı yok: $meslekId");
+
+      final data = doc.data()!;
+      final Map<String, dynamic> iscilik = Map<String, dynamic>.from(data['iscilik']?? {});
+      final Map<String, dynamic> ekstralar = Map<String, dynamic>.from(data['ekstralar']?? {});
+      final Map<String, dynamic> alanKatsayilari = Map<String, dynamic>.from(data['alanKatsayilari']?? {});
+      final Map<String, dynamic> carpanlar = Map<String, dynamic>.from(data['carpanlar']?? {});
+      final Map<String, dynamic> sehirCarpani = Map<String, dynamic>.from(data['sehirCarpani']?? {});
+      final Map<String, dynamic> katFarki = Map<String, dynamic>.from(data['katFarki']?? {});
+
+      Map<String, String> cevapStrMap = {};
+      for (var c in kullaniciCevaplari) {
+        if (c is Map && c['id']!= null) {
+          cevapStrMap[c['id'].toString().toLowerCase()] = c['cevap'].toString().toLowerCase();
+        }
+      }
+      final String tumCevaplar = cevapStrMap.values.join(' ').toLowerCase();
+
+      final num tabanNum = (iscilik['asgariKucuk'] as num?)?? (iscilik['asgariBuyuk'] as num?)?? 3000;
+      double taban = tabanNum.toDouble();
+
+      double alanKatsayi = 1.0;
+      alanKatsayilari.forEach((k, v) {
+        if (tumCevaplar.contains(k.split('_').first)) {
+          alanKatsayi = (v as num).toDouble();
+        }
+      });
+
+      double ekstraToplam = 0;
+      List<String> kullanilanEkstralar = [];
+      ekstralar.forEach((k, v) {
+        if (v is Map && tumCevaplar.contains(k.split('_').first)) {
+          final num fiyatNum = (v['fiyat'] as num?)?? 0;
+          ekstraToplam += fiyatNum.toDouble();
+          kullanilanEkstralar.add(v['etiket']?.toString()?? k);
+        }
+      });
+
+      double sehirCarpan = 1.0;
+      String bolge = bolgeKodu.toLowerCase();
+      if (bolge.contains('istanbul') || bolge == '34') {
+        final num sc = (sehirCarpani['istanbul'] as num?)?? 1.28;
+        sehirCarpan = sc.toDouble();
+      } else if (bolge.contains('ankara') || bolge.contains('izmir') || bolge.contains('antalya') || bolge.contains('bursa')) {
+        final num sc = (sehirCarpani['ankara_izmir_antalya_bursa'] as num?)?? 1.14;
+        sehirCarpan = sc.toDouble();
+      } else {
+        final num sc = (sehirCarpani['diger_iller'] as num?)?? 1.0;
+        sehirCarpan = sc.toDouble();
+      }
+
+      double katEk = 0;
+      katFarki.forEach((k, v) {
+        if (tumCevaplar.contains(k.split('_').first)) katEk += (v as num).toDouble();
+      });
+
+      double carpanToplam = 1.0;
+      carpanlar.forEach((k, v) {
+        if (tumCevaplar.contains(k.split('_').first)) carpanToplam *= (v as num).toDouble();
+      });
+
+      double muhtemel = (taban * alanKatsayi + ekstraToplam + katEk) * sehirCarpan * carpanToplam;
+
+      return {
+        "kaynak": "FIREBASE_JENERIK_ROBOT",
+        "meslekId": meslekId,
+        "minimumButce": muhtemel * 0.85,
+        "muhtemelButce": muhtemel,
+        "maksimumButce": muhtemel * 1.25,
+        "fiyatBilgisi": "${muhtemel.toInt()} ₺",
+        "komisyonTutari": muhtemel * 0.01,
+        "detay": {"taban": taban, "alanKatsayi": alanKatsayi, "sehirCarpan": sehirCarpan, "ekstraToplam": ekstraToplam, "kullanilanEkstralar": kullanilanEkstralar},
+        "durum": "BASARILI"
+      };
+    } catch (e) {
+      debugPrint("FIREBASE JENERIK HATA: $e");
+      return {
+        "kaynak": "FIREBASE_HATA",
+        "minimumButce": 3000.0,
+        "muhtemelButce": 5000.0,
+        "maksimumButce": 8000.0,
+        "fiyatBilgisi": "5000 ₺",
+        "komisyonTutari": 50.0,
+        "hata": e.toString(),
+        "durum": "HATA"
+      };
+    }
   }
 
   static Future<Map<String, dynamic>> silsileYurut({
     required String talepId,
     required String kategoriAdi,
+    required String kategoriId,
     required List<dynamic> kullaniciCevaplari,
     required Map<String, dynamic> yerelHafizaVerisi,
     required String anlikBolgeKodu,
     required String anlikKullaniciSegmenti,
   }) async {
-    print("--- SİLSİLE MOTORU BAŞLATILDI (Talep ID: $talepId) ---");
+    final String normalizeKategori = kategoriAdi.trim().toUpperCase();
+    final String meslekId = kategoriId.trim().toLowerCase();
+    final String stabilKey = _stabilHashOlustur(meslekId, kullaniciCevaplari);
 
     if (yerelHafizaVerisi.containsKey(talepId) && yerelHafizaVerisi[talepId]!= null) {
-      print("[SİLSİLE 1] Veri RAM üzerinde bulundu. Doğrudan ekrana basılıyor.");
       return yerelHafizaVerisi[talepId];
     }
-    print("[SİLSİLE 1] RAM boş, Firebase Ortak Koleksiyon kontrolüne geçiliyor.");
-
-    String cevapMatrisiKey = jsonEncode(kullaniciCevaplari);
-    String normalizeKategori = kategoriAdi.trim().toUpperCase();
 
     try {
-      print("[SİLSİLE 2] Firebase ortak havuzunda aynı arama sorgulanıyor...");
-      var havuzSorgusu = await _firestore
-          .collection('hazir_teklif_havuzu')
-          .where('kategori', isEqualTo: normalizeKategori)
-          .where('analizMatrisi', isEqualTo: cevapMatrisiKey)
-          .limit(1)
-          .get();
-
-      if (havuzSorgusu.docs.isNotEmpty) {
-        print("[SİLSİLE 2] AYNEN BULDUM! Daha önce bu arama yapılmış.");
-        Map<String, dynamic> hazirRapor = havuzSorgusu.docs.first.data();
-
-        yerelHafizaVerisi[talepId] = hazirRapor;
-        return hazirRapor;
+      var havuz = await _firestore.collection('hazir_teklif_havuzu').where('stabilKey', isEqualTo: stabilKey).limit(1).get();
+      if (havuz.docs.isNotEmpty) {
+        final data = havuz.docs.first.data();
+        yerelHafizaVerisi[talepId] = data;
+        return data;
       }
-      print("[SİLSİLE 2] Ortak havuzda eşleşme yok. Yeni arama olarak işleniyor.");
     } catch (e) {
-      print("[SİLSİLE HATA] Firebase sorgulanırken hata oluştu: $e");
+      debugPrint("[SİLSİLE 2 HATA] $e");
     }
 
-    print("[SİLSİLE 4] Veriler yerel hesaplama robotuna gönderiliyor...");
-    Map<String, dynamic> robotHesapSonucu = yerelRobotHesapla(
-      kategori: normalizeKategori,
-      gelenCevaplar: kullaniciCevaplari,
+    try {
+      final zengin = _zenginDetayOlustur(kategoriAdi, kullaniciCevaplari);
+      String aiRaw = await _aiProvider.getFiyatTahmini(
+        musteriId: talepId,
+        isAdi: kategoriAdi,
+        kategoriAdi: kategoriAdi,
+        kategoriId: meslekId,
+        detaylar: {"bolge": anlikBolgeKodu,...zengin},
+      ).timeout(const Duration(seconds: 12));
+
+      // DÜZELTİLDİ - TEK SATIR, HATASIZ
+      double aiFiyat = double.tryParse(aiRaw.replaceAll(RegExp(r'[^0-9.]'), ''))?? 0;
+
+      if (aiFiyat > 500) {
+        final rapor = {
+          "talepId": talepId,
+          "kategori": normalizeKategori,
+          "meslekId": meslekId,
+          "stabilKey": stabilKey,
+          "hesaplamaTarihi": FieldValue.serverTimestamp(),
+          "kaynak": "AI_${_aiProvider.providerName}",
+          "robotSonucu": {
+            "kaynak": "AI",
+            "minimumButce": aiFiyat * 0.85,
+            "muhtemelButce": aiFiyat,
+            "maksimumButce": aiFiyat * 1.25,
+            "fiyatBilgisi": "${aiFiyat.toInt()} ₺",
+            "komisyonTutari": aiFiyat * 0.01,
+            "durum": "BASARILI"
+          },
+          "durum": "BASARILI"
+        };
+        yerelHafizaVerisi[talepId] = rapor;
+        _firestore.collection('hazir_teklif_havuzu').add(rapor);
+        return rapor;
+      }
+      throw Exception("AI anlamsız: $aiRaw");
+    } catch (e) {
+      debugPrint("[SİLSİLE 3] AI FAIL -> Firebase: $e");
+    }
+
+    final robotSonuc = await _firebaseTabanliJenerikHesapla(
+      meslekId: meslekId,
+      kullaniciCevaplari: kullaniciCevaplari,
+      bolgeKodu: anlikBolgeKodu,
     );
 
-    Map<String, dynamic> nihaiButceRaporu = {
+    final nihaiRapor = {
       "talepId": talepId,
       "kategori": normalizeKategori,
+      "meslekId": meslekId,
+      "stabilKey": stabilKey,
       "hesaplamaTarihi": FieldValue.serverTimestamp(),
-      "analizMatrisi": cevapMatrisiKey,
-      "robotSonucu": robotHesapSonucu,
-      "durum": "BAŞARILI"
+      "analizMatrisi": jsonEncode(kullaniciCevaplari),
+      "robotSonucu": robotSonuc,
+      "durum": "BASARILI"
     };
 
     try {
-      print("[SİLSİLE 5] Rapor Firebase ortak koleksiyonuna yazılıyor...");
-      await _firestore.collection('hazir_teklif_havuzu').add(nihaiButceRaporu);
+      await _firestore.collection('hazir_teklif_havuzu').add(nihaiRapor);
+      yerelHafizaVerisi[talepId] = nihaiRapor;
+    } catch (_) {}
 
-      print("[SİLSİLE 6] AI Uzmanı için gerçek zamanlı veriler app_ai_data koleksiyonuna işleniyor...");
-      await _firestore.collection('app_ai_data').add({
-        "talepId": talepId,
-        "kategori": normalizeKategori,
-        "kullaniciCevaplari": kullaniciCevaplari,
-        "robotSonucu": robotHesapSonucu,
-        "metaVeri": {
-          "islemZamani": FieldValue.serverTimestamp(),
-          "bolgeKodlari": [anlikBolgeKodu],
-          "kullaniciSegmenti": anlikKullaniciSegmenti,
-        },
-        "aiEtiketleri": ["INS_HESAPLAMA", "SEKTOR_UZMANI_DYNAMIC"],
-        "selfCorrectionStatus": "READY"
-      });
-
-      yerelHafizaVerisi[talepId] = nihaiButceRaporu;
-      print("[SİLSİLE 5 & 6] İşlem tamamlandı ve AI veri seti oluşturuldu.");
-    } catch (e) {
-      print("[SİLSİLE HATA] Firebase kaydı başarısız: $e");
-    }
-
-    return nihaiButceRaporu;
+    return nihaiRapor;
   }
 }

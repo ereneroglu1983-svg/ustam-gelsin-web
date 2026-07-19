@@ -1,7 +1,9 @@
-// lib/core/calculation/meslek_sorulari/bolme_duvar.dart
+// lib/core/calculation/meslek_sorulari/bolme_duvar.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class BolmeDuvarSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
       "id": "uygulama_tipi",
       "label": "Duvar Tipi ve Malzemesi",
@@ -14,6 +16,8 @@ class BolmeDuvarSorulari {
         "Akustik Panel Bölme Duvar"
       ]
     },
+
+    // ADIM 2: METRAJ - kök seçilince gelsin
     {
       "id": "alan_segmenti",
       "label": "Toplam Uygulama Alanı (m²) Aralığı",
@@ -40,14 +44,17 @@ class BolmeDuvarSorulari {
       "type": "text",
       "keyboardType": "number",
       "hint": "Örn: 42",
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "alan_segmenti",
       "dependsOnValue": [
-        "Alçıpan Bölme Duvar Sistemleri",
-        "Cam Bölme / Ofis Bölme Sistemleri (Temperli)",
-        "Betoban Bölme Duvar (Darbe Dayanımlı)",
-        "Akustik Panel Bölme Duvar"
+        "0-20 m² Arası",
+        "20-50 m² Arası",
+        "50-100 m² Arası",
+        "100-300 m² Arası",
+        "300 m² ve Üzeri"
       ]
     },
+
+    // ADIM 3: MALZEME DALLARI - sadece 3 tipte gelir, Cam'da gelmez (zaten doğruydu)
     {
       "id": "malzeme_detayi",
       "label": "Alçıpan / Panel Detay Özelliği",
@@ -70,11 +77,11 @@ class BolmeDuvarSorulari {
       "label": "Duvar Kalınlığı / Profil Genişliği",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "malzeme_detayi",
       "dependsOnValue": [
-        "Alçıpan Bölme Duvar Sistemleri",
-        "Betoban Bölme Duvar (Darbe Dayanımlı)",
-        "Akustik Panel Bölme Duvar"
+        "Standart Beyaz Alçıpan / Panel",
+        "Yeşil Alçıpan (Suya Dayanıklı / Islak Hacim)",
+        "Kırmızı Alçıpan (Yangın Dayanımlı)"
       ],
       "options": [
         "7.5 cm (Dar Alanlar)",
@@ -83,17 +90,20 @@ class BolmeDuvarSorulari {
         "15 cm+ (Özel Tesisat/Akustik)"
       ]
     },
+
+    // ADIM 4: YÜKSEKLİK - metraj seçilince gelsin (Cam'da da gelsin diye alan_segmenti'ne bağlı)
     {
       "id": "duvar_yukseklik",
       "label": "Duvar Yüksekliği",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "alan_segmenti",
       "dependsOnValue": [
-        "Alçıpan Bölme Duvar Sistemleri",
-        "Cam Bölme / Ofis Bölme Sistemleri (Temperli)",
-        "Betoban Bölme Duvar (Darbe Dayanımlı)",
-        "Akustik Panel Bölme Duvar"
+        "0-20 m² Arası",
+        "20-50 m² Arası",
+        "50-100 m² Arası",
+        "100-300 m² Arası",
+        "300 m² ve Üzeri"
       ],
       "options": [
         "Standart (2.50m - 3.00m)",
@@ -101,17 +111,18 @@ class BolmeDuvarSorulari {
         "Endüstriyel (4.50m+)"
       ]
     },
+
+    // ADIM 5: KAPI - yükseklik seçilince gelsin
     {
       "id": "kapi_durum",
       "label": "Talep Edilen Kapı Durumu",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "duvar_yukseklik",
       "dependsOnValue": [
-        "Alçıpan Bölme Duvar Sistemleri",
-        "Cam Bölme / Ofis Bölme Sistemleri (Temperli)",
-        "Betoban Bölme Duvar (Darbe Dayanımlı)",
-        "Akustik Panel Bölme Duvar"
+        "Standart (2.50m - 3.00m)",
+        "Yüksek Duvar (3.00m - 4.50m)",
+        "Endüstriyel (4.50m+)"
       ],
       "options": [
         "Menteşeli Kapı Eklenecek",
@@ -119,17 +130,18 @@ class BolmeDuvarSorulari {
         "Kapı İstemiyorum"
       ]
     },
+
+    // ADIM 6: ALAN TÜRÜ - kapı seçilince gelsin
     {
       "id": "alan_tip",
       "label": "Uygulama Alanı Türü",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "kapi_durum",
       "dependsOnValue": [
-        "Alçıpan Bölme Duvar Sistemleri",
-        "Cam Bölme / Ofis Bölme Sistemleri (Temperli)",
-        "Betoban Bölme Duvar (Darbe Dayanımlı)",
-        "Akustik Panel Bölme Duvar"
+        "Menteşeli Kapı Eklenecek",
+        "Sürgülü Kapı Eklenecek",
+        "Kapı İstemiyorum"
       ],
       "options": [
         "Ev / Oda Bölme",
@@ -137,16 +149,18 @@ class BolmeDuvarSorulari {
         "Mağaza / Depo"
       ]
     },
+
+    // ADIM 7: FİNAL - alan türü seçilince yeşil kutuda açılsın
     {
       "id": "ekstra_ozellikler",
       "label": "Teknik Özellikler ve Ekstralar",
       "type": "multi",
-      "dependsOnId": "uygulama_tipi",
+      "required": false,
+      "dependsOnId": "alan_tip",
       "dependsOnValue": [
-        "Alçıpan Bölme Duvar Sistemleri",
-        "Cam Bölme / Ofis Bölme Sistemleri (Temperli)",
-        "Betoban Bölme Duvar (Darbe Dayanımlı)",
-        "Akustik Panel Bölme Duvar"
+        "Ev / Oda Bölme",
+        "Ofis / Çalışma Alanı",
+        "Mağaza / Depo"
       ],
       "options": [
         "Taş Yünü ile Ses Yalıtımı Uygulaması",

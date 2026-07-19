@@ -1,9 +1,11 @@
-// lib/core/calculation/meslek_sorulari/prefabrik_yapi.dart
+// lib/core/calculation/meslek_sorulari/prefabrik_yapi.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class PrefabrikYapiSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
-      "id": "is_kapsami", // 🛠️ KİLİT TETİKLEYİCİ: Proje standardına eşitlendi (hizmet_turu -> is_kapsami)
+      "id": "is_kapsami",
       "label": "Talep Edilen Hizmet Kapsamı",
       "type": "single",
       "required": true,
@@ -14,11 +16,9 @@ class PrefabrikYapiSorulari {
       ]
     },
 
-    // ==========================================
-    // 🏗️ GRUP 1: FABRİKA İMALAT VE TEKNOLOJİ DETAYLARI (Sadece Sıfırdan İmalat Seçilirse Açılır)
-    // ==========================================
+    // ========== SIFIRDAN İMALAT YOLU ==========
     {
-      "id": "yapi_tipi", // 🛠️ PROJE STANDARDI: dependsOnId ve dependsOnValue mimarisine geçirildi
+      "id": "yapi_tipi",
       "label": "İmalatı Yapılacak Ana Yapı Teknolojisi",
       "type": "single",
       "required": true,
@@ -31,23 +31,25 @@ class PrefabrikYapiSorulari {
       ]
     },
     {
-      "id": "kat_sayisi", // 🛠️ PROJE STANDARDI: dependsOnId ve dependsOnValue mimarisine geçirildi
+      "id": "kat_sayisi",
       "label": "Yapının Kat Mimarisi ve Yük Endeksi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
-      "dependsOnValue": ["Sıfırdan İmalat / Anahtar Teslim Kurulum Hizmeti"],
+      "dependsOnId": "yapi_tipi",
+      "dependsOnValue": [
+        "Prefabrik Konut (Galvaniz Hafif Çelik Profil ve Standart Panel Yapı Tabanlı)",
+        "Ahşap Bungalov (İthal Çam Malzeme, Üçgen Karkas ve Yoğun Lambri İşçilikli)",
+        "Çelik Konstrüksiyon (Statik Hesaplı Resmi Deprem Yönetmeliğine Uygun Ağır Çelik)"
+      ],
       "options": [
         "Tek Katlı Mimari Yapı Planyası",
         "Dubleks (İki Katlı Çelik Karkas ve Ağır Şase Güçlendirmeli Yapı Mimarisi)"
       ]
     },
 
-    // ==========================================
-    // 🛠️ GRUP 2: LOKAL ONARIM VE SERVİS DETAYLARI (Sadece Tamir / Tadilat Seçilirse Açılır)
-    // ==========================================
+    // ========== ONARIM YOLU ==========
     {
-      "id": "tamir_detay", // 🛠️ PROJE STANDARDI: dependsOnId ve dependsOnValue mimarisine geçirildi
+      "id": "tamir_detay",
       "label": "Onarılacak ve Revize Edilecek Yapı Bölümleri",
       "type": "multi",
       "required": true,
@@ -62,18 +64,21 @@ class PrefabrikYapiSorulari {
       ]
     },
 
-    // ==========================================
-    // 📐 ÖLÇÜ, LOJİSTİK VE TONAJ PARAMETRELERİ (Seçmeli Sekmelere Dönüştürüldü)
-    // ==========================================
+    // ADIM: ALAN - Sıfırdan'da kat sonrası, Onarım'da detay sonrası, Lojistik'te direkt kökten gelsin
     {
-      "id": "alan_m2", // 🛠️ REVIZE EDİLDİ: Text tipinden single seçmeli tipe dönüştürüldü ve kilitleme eklendi
+      "id": "alan_m2",
       "label": "Yapının Yaklaşık Net Toplam Alanı (m²)",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": ["kat_sayisi", "tamir_detay", "is_kapsami"],
       "dependsOnValue": [
-        "Sıfırdan İmalat / Anahtar Teslim Kurulum Hizmeti",
-        "Mevcut Yapı İçin Onarım, Tamir ve Tadilat",
+        "Tek Katlı Mimari Yapı Planyası",
+        "Dubleks (İki Katlı Çelik Karkas ve Ağır Şase Güçlendirmeli Yapı Mimarisi)",
+        "Çatı Akması Onarımı ve Komple Membran İzolasyon Yenilemesi",
+        "Taban Çürümesi Tamiri ve Çelik Şase Alt Taban Sacı Yenileme",
+        "Dış Cephe Boya İşçiliği ve Betopan Kompozit Kaplama Revizyonu",
+        "Sıhhi Tesisat / Elektrik Altyapı Hatları Yenileme ve Arıza Tamiri",
+        "Deforme Olmuş Sandviç Panel Değişimi ve Duvar İçi Yalıtım Desteği",
         "Lojistik, Nakliye ve Başka Sahaya Yer Değiştirme"
       ],
       "options": [
@@ -83,15 +88,25 @@ class PrefabrikYapiSorulari {
         "Çok Geniş / Endüstriyel Alan (130 m² ve Üzeri)"
       ]
     },
+
+    // ADIM: NAKLİYE - alan sonrası, sadece Sıfırdan ve Lojistik'te gelsin
     {
-      "id": "nakliye_mesafesi_km", // 🛠️ REVIZE EDİLDİ: Text tipinden single seçmeli tipe dönüştürüldü ve kilitleme eklendi
+      "id": "nakliye_mesafesi_km",
       "label": "Kurulum Sahası Sevk Mesafesi Lojistik Kademesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": "alan_m2",
+      "visibleIf": {
+        "is_kapsami": [
+          "Sıfırdan İmalat / Anahtar Teslim Kurulum Hizmeti",
+          "Lojistik, Nakliye ve Başka Sahaya Yer Değiştirme"
+        ]
+      },
       "dependsOnValue": [
-        "Sıfırdan İmalat / Anahtar Teslim Kurulum Hizmeti",
-        "Lojistik, Nakliye ve Başka Sahaya Yer Değiştirme"
+        "Küçük Ölçekli Yapı (0 - 45 m² Arası)",
+        "Standart Konut Alanı (45 - 85 m² Arası)",
+        "Geniş Aile Konutu (85 - 130 m² Arası)",
+        "Çok Geniş / Endüstriyel Alan (130 m² ve Üzeri)"
       ],
       "options": [
         "Yakın Mesafe Sevk (0 - 50 KM Arası)",
@@ -101,18 +116,22 @@ class PrefabrikYapiSorulari {
       ]
     },
 
-    // ==========================================
-    // ⚙️ ALTYAPI, YALITIM VE YAPISAL KONFOR EKSTRALARI
-    // ==========================================
+    // ADIM FİNAL: EKSTRA - Onarım'da alan sonrası, Sıfırdan'da nakliye sonrası yeşil kutuda
     {
-      "id": "ekstra_ozellikler", // 🛠️ DÜZELTİLDİ: Form ilk açıldığında havada kalmaması için bağımlılık eklendi
+      "id": "ekstra_ozellikler",
       "label": "Altyapı Çözümleri, Yalıtım ve Yapısal Konfor Ekstraları",
       "type": "multi",
       "required": false,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": ["alan_m2", "nakliye_mesafesi_km"],
       "dependsOnValue": [
-        "Sıfırdan İmalat / Anahtar Teslim Kurulum Hizmeti",
-        "Mevcut Yapı İçin Onarım, Tamir ve Tadilat"
+        "Küçük Ölçekli Yapı (0 - 45 m² Arası)",
+        "Standart Konut Alanı (45 - 85 m² Arası)",
+        "Geniş Aile Konutu (85 - 130 m² Arası)",
+        "Çok Geniş / Endüstriyel Alan (130 m² ve Üzeri)",
+        "Yakın Mesafe Sevk (0 - 50 KM Arası)",
+        "Orta Mesafe Sevk (50 - 150 KM Arası)",
+        "Uzak Mesafe Sevk (150 - 350 KM Arası)",
+        "Şehirler Arası Uzun Hat (350 KM ve Üzeri)"
       ],
       "options": [
         "Yoğun Taş Yünü / Ekstra Yalıtım Desteği (Duvar İçi ve Çatı Üstü Yüksek Yoğunluklu İzolasyon)",
