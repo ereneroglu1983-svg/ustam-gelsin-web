@@ -1,9 +1,11 @@
-// lib/core/calculation/meslek_sorulari/mutfak_dolabi.dart
+// lib/core/calculation/meslek_sorulari/mutfak_dolabi.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class MutfakDolabiSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
-      "id": "is_kapsami", // 🛠️ EN ANA TETİKLEYİCİ (İlk açılışta SADECE bu soru görünür)
+      "id": "is_kapsami",
       "label": "Yapılacak Mutfak Projesinin Kapsamı",
       "type": "single",
       "required": true,
@@ -15,9 +17,7 @@ class MutfakDolabiSorulari {
       ]
     },
 
-    // ==========================================
-    // 🚪 DOLAP KAPAK SEÇİMİ (Sadece Dolap veya Kapak Yenileme Varsa Açılır)
-    // ==========================================
+    // ADIM 2: KAPAK - Komple, Sadece Dolap ve Kapak Yenileme'de gelsin
     {
       "id": "kapak_tipi",
       "label": "Mutfak Dolabı Kapak Malzemesi ve Teknolojisi",
@@ -37,41 +37,44 @@ class MutfakDolabiSorulari {
       ]
     },
 
-    // ==========================================
-    // 🪨 TEZGAH MALZEME SEÇİMİ (Bedava Marka İsimleri Temizlendi 💰)
-    // ==========================================
+    // ADIM 3: TEZGAH - Komple için kapak sonrası, Sadece Tezgah için direkt kökten gelsin
     {
       "id": "tezgah_tipi",
       "label": "Mutfak Tezgahı Malzeme Tercihi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": ["kapak_tipi", "is_kapsami"],
       "dependsOnValue": [
-        "Komple Mutfak Yenileme (Hem Dolap Hem Tezgah İmalat ve Montajı)",
+        "Akrilik Kapak (Parlak / Mat Çizilmeye Dayanıklı Pürüzsüz Yüzey)",
+        "Lake Kapak (7 Kat Boyalı İpek Mat / Parlak Lüks El İşçiliği)",
+        "Membran / MDFlam Kapak (Ekonomik ve Standart Dayanımlı Segment)",
+        "Masif Ahşap Kapak (Fırınlanmış Doğal Ağaç / Rustik Klasik Seri)",
         "Sadece Mutfak Tezgahı Değişimi (Dolaplar Sabit)"
       ],
       "options": [
-        "Kuvars Kompoze Tezgah (Yüksek Mukavemetli Yeni Nesil Doğal Taş Teknolojisi)", // 🛠️ Reklam bitti, parayı veren marka buraya gelecek
+        "Kuvars Kompoze Tezgah (Yüksek Mukavemetli Yeni Nesil Doğal Taş Teknolojisi)",
         "Porselen Tezgah (Lüks / Isıya Dayanıklı CNC Kesim İnce Panel)",
         "Granit Tezgah (Doğal Taş Yerli / İthal Ağır Sanayi Serisi)",
         "Ahşap / Masif Panel Tezgah (İroko / Meşe Suya Dayanıklı Yağlanmış Seri)"
       ]
     },
 
-    // ==========================================
-    // 📐 GLOBAL DETAYLAR (İş Kapsamı Seçilmeden Asla Ekrana Gelmezler)
-    // ==========================================
+    // ADIM 4: FORM - kapak sonrası veya tezgah sonrası gelsin (hangi yol gelirse)
     {
       "id": "mutfak_formu",
       "label": "Mutfak Mimari Yerleşim Formu",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": ["kapak_tipi", "tezgah_tipi"],
       "dependsOnValue": [
-        "Komple Mutfak Yenileme (Hem Dolap Hem Tezgah İmalat ve Montajı)",
-        "Sadece Mutfak Dolabı İmalatı (Tezgah Hariç)",
-        "Sadece Mutfak Tezgahı Değişimi (Dolaplar Sabit)",
-        "Mutfak Kapak Yenileme / Boyama Hizmeti"
+        "Akrilik Kapak (Parlak / Mat Çizilmeye Dayanıklı Pürüzsüz Yüzey)",
+        "Lake Kapak (7 Kat Boyalı İpek Mat / Parlak Lüks El İşçiliği)",
+        "Membran / MDFlam Kapak (Ekonomik ve Standart Dayanımlı Segment)",
+        "Masif Ahşap Kapak (Fırınlanmış Doğal Ağaç / Rustik Klasik Seri)",
+        "Kuvars Kompoze Tezgah (Yüksek Mukavemetli Yeni Nesil Doğal Taş Teknolojisi)",
+        "Porselen Tezgah (Lüks / Isıya Dayanıklı CNC Kesim İnce Panel)",
+        "Granit Tezgah (Doğal Taş Yerli / İthal Ağır Sanayi Serisi)",
+        "Ahşap / Masif Panel Tezgah (İroko / Meşe Suya Dayanıklı Yağlanmış Seri)"
       ],
       "options": [
         "Düz Mutfak (Tek Hat Duvar Boyu Yerleşim)",
@@ -79,17 +82,18 @@ class MutfakDolabiSorulari {
         "U Mutfak / Ada Mutfak Entegrasyonu (Çift Köşe Dönüşlü ve Ağır Lojistik Yükü)"
       ]
     },
+
+    // ADIM 5: METRAJ - form sonrası gelsin
     {
       "id": "metraj_segmenti",
       "label": "Tahmini Mutfak Toplam Ölçüsü / Uzunluk Kademesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": "mutfak_formu",
       "dependsOnValue": [
-        "Komple Mutfak Yenileme (Hem Dolap Hem Tezgah İmalat ve Montajı)",
-        "Sadece Mutfak Dolabı İmalatı (Tezgah Hariç)",
-        "Sadece Mutfak Tezgahı Değişimi (Dolaplar Sabit)",
-        "Mutfak Kapak Yenileme / Boyama Hizmeti"
+        "Düz Mutfak (Tek Hat Duvar Boyu Yerleşim)",
+        "L Mutfak (Köşe Birleşim ve Tezgah Köşe Kesim Fire Paylı)",
+        "U Mutfak / Ada Mutfak Entegrasyonu (Çift Köşe Dönüşlü ve Ağır Lojistik Yükü)"
       ],
       "options": [
         "0 - 3 Metretül Arası Standart Küçük Mutfak",
@@ -98,17 +102,19 @@ class MutfakDolabiSorulari {
         "8 Metretül ve Üzeri Büyük Villa / Ticari Mutfak"
       ]
     },
+
+    // ADIM 6: YAPI TİP - metraj sonrası gelsin
     {
       "id": "yapi_tip",
       "label": "Uygulama Yapılacak Alanın Mimarisi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": "metraj_segmenti",
       "dependsOnValue": [
-        "Komple Mutfak Yenileme (Hem Dolap Hem Tezgah İmalat ve Montajı)",
-        "Sadece Mutfak Dolabı İmalatı (Tezgah Hariç)",
-        "Sadece Mutfak Tezgahı Değişimi (Dolaplar Sabit)",
-        "Mutfak Kapak Yenileme / Boyama Hizmeti"
+        "0 - 3 Metretül Arası Standart Küçük Mutfak",
+        "3 - 5 Metretül Arası Orta Ölçek Daire Mutfağı",
+        "5 - 8 Metretül Arası Geniş Mutfak",
+        "8 Metretül ve Üzeri Büyük Villa / Ticari Mutfak"
       ],
       "options": [
         "Apartman Dairesi",
@@ -117,17 +123,19 @@ class MutfakDolabiSorulari {
         "Cafe / Restoran Ticari Mutfağı"
       ]
     },
+
+    // ADIM 7: FİNAL - yapı tipi sonrası yeşil kutuda
     {
-      "id": "ekstra_ozellikler", // 🛠️ Aksesuar markaları da (Blum/Hettich) süpürüldü! Parayı veren düdüğü çalacak.
+      "id": "ekstra_ozellikler",
       "label": "Mekanizma, Ray Sistemleri ve Donanım Ekstraları",
       "type": "multi",
       "required": false,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": "yapi_tip",
       "dependsOnValue": [
-        "Komple Mutfak Yenileme (Hem Dolap Hem Tezgah İmalat ve Montajı)",
-        "Sadece Mutfak Dolabı İmalatı (Tezgah Hariç)",
-        "Sadece Mutfak Tezgahı Değişimi (Dolaplar Sabit)",
-        "Mutfak Kapak Yenileme / Boyama Hizmeti"
+        "Apartman Dairesi",
+        "Müstakil Ev / Villa",
+        "Ofis / İş Yeri Personel Mutfağı",
+        "Cafe / Restoran Ticari Mutfağı"
       ],
       "options": [
         "Premium Frenli Ray Çekmece Setleri (Yüksek Taşıma Kapasiteli Tandem Sistemler)",

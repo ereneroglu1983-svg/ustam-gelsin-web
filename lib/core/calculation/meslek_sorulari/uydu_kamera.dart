@@ -1,9 +1,11 @@
-// lib/core/calculation/meslek_sorulari/uydu_kamera.dart
+// lib/core/calculation/meslek_sorulari/uydu_kamera.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class UyduKameraSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
-      "id": "is_turu", // 🛠️ KİLİT TETİKLEYİCİ: IP Güvenlik kamerası, merkezi/bireysel uydu ve yapısal network kablolama akışlarını ve taban altyapı işçilik maliyetlerini jilet gibi ayıran ana id
+      "id": "is_turu",
       "label": "Yapılacak Ana İş Türü / Altyapı Kapsamı",
       "type": "single",
       "required": true,
@@ -14,11 +16,9 @@ class UyduKameraSorulari {
       ]
     },
 
-    // ==========================================
-    // 📹 GRUP 1: GÜVENLİK KAMERASI TEKNOLOJİSİ (Sadece Güvenlik Kamerası Seçilirse Açılır)
-    // ==========================================
+    // ADIM 2: TEKNOLOJİ DETAYI - kök sonrası, 3 yol
     {
-      "id": "kamera_detay", // 🛠️ DÜZELTİLDİ: dependsOnId ve dependsOnValue yapısına geçirildi.
+      "id": "kamera_detay",
       "label": "Kamera Mercek ve Çözünürlük Teknolojisi",
       "type": "single",
       "required": true,
@@ -31,12 +31,8 @@ class UyduKameraSorulari {
         "Full Color Renkli Gece Görüşlü (Ses Kayıt ve Çift Yönlü Konuşma Özellikli)"
       ]
     },
-
-    // ==========================================
-    // 📡 GRUP 2: UYDU VE TELEVİZYON ALTYAPISI (Sadece Uydu TV Sistemleri Seçilirse Açılır)
-    // ==========================================
     {
-      "id": "uydu_altyapi_tipi", // 🛠️ DÜZELTİLDİ: dependsOnId ve dependsOnValue yapısına geçirildi.
+      "id": "uydu_altyapi_tipi",
       "label": "Uydu Altyapı ve Dağıtım Sistemi Türü",
       "type": "single",
       "required": true,
@@ -49,12 +45,8 @@ class UyduKameraSorulari {
         "Komple Dağıtıcı Splitter, LNB ve Eskimiş Koaksiyel Kablo Değişimi"
       ]
     },
-
-    // ==========================================
-    // 💻 GRUP 3: YAPISAL NETWORK VE İNTERNET OMURGASI (Sadece İnternet / Network Seçilirse Açılır)
-    // ==========================================
     {
-      "id": "network_ekipman_detay", // 🛠️ DÜZELTİLDİ: dependsOnId ve dependsOnValue yapısına geçirildi.
+      "id": "network_ekipman_detay",
       "label": "Talep Edilen Network Donanım ve Dağıtım Altyapısı",
       "type": "multi",
       "required": true,
@@ -67,19 +59,25 @@ class UyduKameraSorulari {
       ]
     },
 
-    // ==========================================
-    // 📐 ÖLÇÜ, MEKAN VE KABLOLAMA KOŞULLARI
-    // ==========================================
+    // ADIM 3: MEKAN TİPİ - teknoloji detayı sonrası gelsin (3 yolun birleşimi)
     {
-      "id": "mekan_tipi", // Daire, villa veya endüstriyel tava montajı gerektiren fabrika zorluk çarpanlarını tetikler
+      "id": "mekan_tipi",
       "label": "Uygulama Yapılacak Mekan Yapısı ve Mimari Sınıfı",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
+      "dependsOnId": ["kamera_detay", "uydu_altyapi_tipi", "network_ekipman_detay"],
       "dependsOnValue": [
-        "Güvenlik Kamerası Sistemi (IP Tabanlı NVR Altyapısı)",
-        "Merkezi / Bireysel Uydu TV Sistemleri Kurulumu",
-        "İnternet / Network Kablolu Hat Çekimi ve Rack Kabin Düzenleme"
+        "Standart Full HD Çözünürlük (Kızılötesi Gece Görüşlü Sabit Lens)",
+        "4K Ultra HD Yüksek Çözünürlük (Geniş Açı ve Dijital Zoom Destekli Premium Lens)",
+        "AI Yapay Zeka Destekli Akıllı Akış (Yüz Tanıma ve Plaka Okuma Analitik Yazılımlı)",
+        "Full Color Renkli Gece Görüşlü (Ses Kayıt ve Çift Yönlü Konuşma Özellikli)",
+        "Merkezi Santral Sistemi Kurulumu (Apartman Tipi Çoklu Dağıtım ve Multiswitch)",
+        "Bireysel Çanak Anten Kurulumu (Balkon / Çatı Montajı ve Tekli LNB)",
+        "Mevcut Uydu Hattı Sinyal Ayarı (Frekans Güncelleme ve İnce Sinyal Optimizasyonu)",
+        "Komple Dağıtıcı Splitter, LNB ve Eskimiş Koaksiyel Kablo Değişimi",
+        "Kablosuz Kapsama Alanı Genişletme (Access Point ve Kesintisiz Mesh Sistem Kurulumu)",
+        "Sıfırdan Sistem Odası Kurulumu (Rack Kabin Montajı, Patch Panel ve Switch Sonlandırma)",
+        "Kurumsal Ağ Yönetimi (Router Konfigürasyonu, VLAN Bölümlendirme ve Firewall Kurulumu)"
       ],
       "options": [
         "Daire Standart İç Mekan (Asma Tavan / Süpürgelik Üstü Kolay Hat Çekimi)",
@@ -87,16 +85,18 @@ class UyduKameraSorulari {
         "Fabrika / Site / Depo (Galvaniz Sac Tava Montajı ve Yüksek İrtifa Geniş Omurga Mimari)"
       ]
     },
+
+    // ADIM 4: CİHAZ ADEDİ - mekan sonrası gelsin
     {
-      "id": "cihaz_adedi", // 🛠️ REVIZE EDİLDİ: Text tipinden bağımlı ve single seçmeli tipe dönüştürüldü
+      "id": "cihaz_adedi",
       "label": "Sisteme Dahil Edilecek Toplam Nokta Sayısı (Kamera / Uydu Uç / Data Hattı)",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
+      "dependsOnId": "mekan_tipi",
       "dependsOnValue": [
-        "Güvenlik Kamerası Sistemi (IP Tabanlı NVR Altyapısı)",
-        "Merkezi / Bireysel Uydu TV Sistemleri Kurulumu",
-        "İnternet / Network Kablolu Hat Çekimi ve Rack Kabin Düzenleme"
+        "Daire Standart İç Mekan (Asma Tavan / Süpürgelik Üstü Kolay Hat Çekimi)",
+        "Villa / Müstakil Ev (Geniş Bahçe ve Çevre Duvarı Toprak Altı Borulama Zorluğu)",
+        "Fabrika / Site / Depo (Galvaniz Sac Tava Montajı ve Yüksek İrtifa Geniş Omurga Mimari)"
       ],
       "options": [
         "1 - 4 Arası Nokta / Hat Dağıtımı (Küçük Ölçekli)",
@@ -106,16 +106,20 @@ class UyduKameraSorulari {
         "32 Nokta ve Üzeri / Komple Ağ Altyapısı (Endüstriyel Proje)"
       ]
     },
+
+    // ADIM 5: KABLOLAMA TİPİ - cihaz adedi sonrası gelsin
     {
-      "id": "kablolama_tipi", // Füzyon ek işçiliği, fiber pigtail veya duvar kırma, spiral boru gömme maliyet modelini kilitler
+      "id": "kablolama_tipi",
       "label": "Kablolama Teknolojisi ve Hat Kanal Estetiği",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
+      "dependsOnId": "cihaz_adedi",
       "dependsOnValue": [
-        "Güvenlik Kamerası Sistemi (IP Tabanlı NVR Altyapısı)",
-        "Merkezi / Bireysel Uydu TV Sistemleri Kurulumu",
-        "İnternet / Network Kablolu Hat Çekimi ve Rack Kabin Düzenleme"
+        "1 - 4 Arası Nokta / Hat Dağıtımı (Küçük Ölçekli)",
+        "4 - 8 Arası Nokta / Hat Dağıtımı (Standart Konut / Ofis)",
+        "8 - 16 Arası Nokta / Hat Dağıtımı (Geniş Yapı / Villa)",
+        "16 - 32 Arası Nokta / Hat Dağıtımı (Büyük İşletme / Site / Fabrika)",
+        "32 Nokta ve Üzeri / Komple Ağ Altyapısı (Endüstriyel Proje)"
       ],
       "options": [
         "UTP Kablolama (Cat6 / PoE Standart Bakır Network Kablo Döşeme ve Kanal İşçiliği)",
@@ -124,19 +128,17 @@ class UyduKameraSorulari {
       ]
     },
 
-    // ==========================================
-    // ⚙️ TEKNİK DONANIM, LENS VE ERİŞİM EKSTRALARI
-    // ==========================================
+    // ADIM 6: FİNAL - kablolama sonrası yeşil kutuda
     {
       "id": "ekstra_ozellikler",
       "label": "Lens Teknolojisi, Yapay Zeka ve Erişim Ekstraları",
       "type": "multi",
       "required": false,
-      "dependsOnId": "is_turu",
+      "dependsOnId": "kablolama_tipi",
       "dependsOnValue": [
-        "Güvenlik Kamerası Sistemi (IP Tabanlı NVR Altyapısı)",
-        "Merkezi / Bireysel Uydu TV Sistemleri Kurulumu",
-        "İnternet / Network Kablolu Hat Çekimi ve Rack Kabin Düzenleme"
+        "UTP Kablolama (Cat6 / PoE Standart Bakır Network Kablo Döşeme ve Kanal İşçiliği)",
+        "Fiber Optik Kablolama (Pigtail Sonlandırma ve Hassas Füzyon Ek Cihazı Mesaisi)",
+        "Sıva Altı Kablolama / Kanal İçi Kırım (Duvar Kırma, Spiral Boru Geçişi ve Alçı Rütuş Payı)"
       ],
       "options": [
         "4K Ultra HD Ultra Yüksek Çözünürlüklü Kamera Farkı Entegrasyonu",

@@ -1,9 +1,11 @@
-// lib/core/calculation/meslek_sorulari/banyo_vestiyer.dart
+// lib/core/calculation/meslek_sorulari/banyo_vestiyer.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class BanyoVestiyerSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
-      "id": "uygulama_tipi", // 🛠️ EN ANA TETİKLEYİCİ
+      "id": "uygulama_tipi",
       "label": "İhtiyacınız Olan Mobilya Grubu",
       "type": "single",
       "required": true,
@@ -14,6 +16,8 @@ class BanyoVestiyerSorulari {
         "Gömme Dolap / Yüklük (Yatak Odası / Koridor Grubu)"
       ]
     },
+
+    // ADIM 2: MALZEME DALLARI - sadece ilgili köklerde gelir
     {
       "id": "banyo_malzeme_tipi",
       "label": "Banyo Grubu Gövde ve Kapak Malzemesi Tercihi",
@@ -47,12 +51,20 @@ class BanyoVestiyerSorulari {
         "Doğal Masif Ahşap Kaplama Plaka"
       ]
     },
+
+    // ADIM 3: ÖLÇÜ - malzeme seçilince gelsin (dal sonrası tek soru)
+    // NOT: 2 farklı dal olduğu için tek dependsOnId yetmez, o yüzden
+    // banyo_malzeme_tipi ve kuru_alan_malzemesi'nin TÜM opsiyonlarını
+    // kapsayacak şekilde alan_segmenti'ni malzeme sonrası zincire bağlıyoruz.
+    // Çözüm: dolap_olcusu'nu banyo dalına bağlıyoruz, kuru dal için de
+    // aynı mantık _alanGorunurMu'da OR olarak çalışacak şekilde
+    // dependsOnId'yi liste olarak destekliyoruz.
     {
-      "id": "dolap_olcusu", // 🛠️ TEK ÖLÇÜ KAYNAĞI: Tamamen sekmeli hale getirildi, text kaldırıldı!
+      "id": "dolap_olcusu",
       "label": "Tahmini Mobilya Genişliği / Ölçü Kademesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "uygulama_tipi", // Eski halinde doğruydu, koruyoruz ki 2 dalda da çalışsın
       "dependsOnValue": [
         "Banyo Dolabı (Lavabolu / Lavabosuz Modeller)",
         "Vestiyer / Portmanto İmalatı (Antre Grubu)",
@@ -66,51 +78,53 @@ class BanyoVestiyerSorulari {
         "Tam Boy / Duvar Blok (3 Metre ve Üzeri Komple Kurulum)"
       ]
     },
+
+    // ADIM 4: KAPAK MODELİ - ölçü seçilince gelsin
     {
       "id": "kapak_modeli",
       "label": "Kapak Tasarım ve Yüzey Modeli",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "dolap_olcusu",
       "dependsOnValue": [
-        "Banyo Dolabı (Lavabolu / Lavabosuz Modeller)",
-        "Vestiyer / Portmanto İmalatı (Antre Grubu)",
-        "Çamaşır Makinesi Dolabı (Banyo / Çamaşır Odası Grubu)",
-        "Gömme Dolap / Yüklük (Yatak Odası / Koridor Grubu)"
+        "Küçük Ölçekli Alan (0 - 1 Metre Arası Dar Alan Çözümleri)",
+        "Orta Ölçekli Alan (1 - 2 Metre Arası Standart Ölçü)",
+        "Geniş Ölçekli Alan (2 - 3 Metre Arası Geniş Yerleşim)",
+        "Tam Boy / Duvar Blok (3 Metre ve Üzeri Komple Kurulum)"
       ],
       "options": [
         "Düz / Standart Modern Kapak Tasarımı",
         "Çıtalı Kapak / Country Model Tasarımı (Özel CNC Kesim İşçiliği)"
       ]
     },
+
+    // ADIM 5: MONTAJ DURUMU - kapak seçilince gelsin
     {
       "id": "montaj_durum",
       "label": "Mevcut Alandaki Demontaj Durumu",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "kapak_modeli",
       "dependsOnValue": [
-        "Banyo Dolabı (Lavabolu / Lavabosuz Modeller)",
-        "Vestiyer / Portmanto İmalatı (Antre Grubu)",
-        "Çamaşır Makinesi Dolabı (Banyo / Çamaşır Odası Grubu)",
-        "Gömme Dolap / Yüklük (Yatak Odası / Koridor Grubu)"
+        "Düz / Standart Modern Kapak Tasarımı",
+        "Çıtalı Kapak / Country Model Tasarımı (Özel CNC Kesim İşçiliği)"
       ],
       "options": [
         "Eski Dolap Sökülecek (Demontaj ve Moloz Temizliği İşçiliği Dahil)",
         "Boş Alan / Sıfır Duvar Yuvası (Doğrudan Yeni Montaj)"
       ]
     },
+
+    // ADIM 6: YAPI TİPİ - montaj seçilince gelsin
     {
       "id": "yapi_tip",
       "label": "Uygulama Yapılacak Alanın Mimarisi",
       "type": "single",
       "required": true,
-      "dependsOnId": "uygulama_tipi",
+      "dependsOnId": "montaj_durum",
       "dependsOnValue": [
-        "Banyo Dolabı (Lavabolu / Lavabosuz Modeller)",
-        "Vestiyer / Portmanto İmalatı (Antre Grubu)",
-        "Çamaşır Makinesi Dolabı (Banyo / Çamaşır Odası Grubu)",
-        "Gömme Dolap / Yüklük (Yatak Odası / Koridor Grubu)"
+        "Eski Dolap Sökülecek (Demontaj ve Moloz Temizliği İşçiliği Dahil)",
+        "Boş Alan / Sıfır Duvar Yuvası (Doğrudan Yeni Montaj)"
       ],
       "options": [
         "Apartman Dairesi",
@@ -119,16 +133,19 @@ class BanyoVestiyerSorulari {
         "Otel / Pansiyon Projesi"
       ]
     },
+
+    // ADIM 7: FİNAL - yapı tipi seçilince yeşil kutuda açılsın
     {
-      "id": "ekstra_donanimlar", // 🛠️ Tamamen reklamsız, jenerik premium donanım tanımları
+      "id": "ekstra_donanimlar",
       "label": "Mekanizma, Aydınlatma ve Donanım Ekstraları",
       "type": "multi",
-      "dependsOnId": "uygulama_tipi",
+      "required": false,
+      "dependsOnId": "yapi_tip",
       "dependsOnValue": [
-        "Banyo Dolabı (Lavabolu / Lavabosuz Modeller)",
-        "Vestiyer / Portmanto İmalatı (Antre Grubu)",
-        "Çamaşır Makinesi Dolabı (Banyo / Çamaşır Odası Grubu)",
-        "Gömme Dolap / Yüklük (Yatak Odası / Koridor Grubu)"
+        "Apartman Dairesi",
+        "Müstakil Ev / Villa",
+        "Ofis / İş Yeri Ticari Alanı",
+        "Otel / Pansiyon Projesi"
       ],
       "options": [
         "LED Şerit / Sensörlü Dolap İçi Aydınlatma Sistemi",

@@ -2,38 +2,23 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../env.dart';
 
 class SosyalMedyaMotoru {
-  // RAM CACHE: Ayarları her seferinde okumaması için
-  static Map<String, dynamic>? _cachedConfig;
 
-  static Future<Map<String, dynamic>> _getSosyalMedyaConfig() async {
-    // Eğer cache doluysa Firebase'e hiç gitme
-    if (_cachedConfig != null) return _cachedConfig!;
+  // DEFAULT GÖRSEL - MÜŞTERİ RESİM EKLEMEZSE BU GİDER
+  static const String _defaultIlanGorseli = "https://pub-63efa1c2a7de49f4a20c67bfcefeb342.r2.dev/default.jpg";
 
-    DocumentSnapshot doc = await FirebaseFirestore.instance
-        .collection('settings')
-        .doc('sosyal_medya_config')
-        .get();
-
-    _cachedConfig = doc.data() as Map<String, dynamic>;
-    return _cachedConfig!;
-  }
-
-  // ROBOT GÜNLÜĞÜNE HATA KAYDETME METODU
   static Future<void> _logRobot(String message) async {
     try {
-      // Sadece kritik hataları logla
       await FirebaseFirestore.instance.collection('robot_logs').add({
         'message': "🚨 KRİTİK HATA: $message",
         'timestamp': FieldValue.serverTimestamp(),
         'type': 'error'
       });
-    } catch (e) {
-      // Firebase'e log atılamazsa sessiz kal (Sistemi kilitleme)
-    }
+    } catch (e) {}
   }
 
   static Future<String> _getPublicUrl(String gorselUrl) async {
@@ -41,7 +26,7 @@ class SosyalMedyaMotoru {
       if (gorselUrl.startsWith('http')) return gorselUrl;
       return await FirebaseStorage.instance.ref(gorselUrl).getDownloadURL();
     } catch (e) {
-      return "https://hemenustamgelsin.com/default-image.jpg";
+      return _defaultIlanGorseli;
     }
   }
 
@@ -52,25 +37,28 @@ class SosyalMedyaMotoru {
     }).join("\n");
   }
 
+  // FACEBOOK
   static Future<void> facebookPaylas(String baslik, String sehir, String kategori, Map<String, dynamic> detaylar, String gorselUrl) async {
     try {
-      // CACHE'LENMİŞ AYARLARI KULLAN
-      final config = await _getSosyalMedyaConfig();
-      final String pageId = config['fb_page_id'] ?? '';
-      final String accessToken = config['fb_access_token'] ?? '';
+      final String pageId = Env.facebookPageId;
+      final String accessToken = Env.facebookPageToken;
 
       if (pageId.isEmpty || accessToken.isEmpty) {
-        await _logRobot("Facebook yapılandırma değerleri boş!");
+        await _logRobot("Facebook yapılandırma değerleri boş! .env kontrol et");
         return;
       }
 
       String detayMetni = _detaylariDuzgunMetneCevir(detaylar);
       String message = "UstamGelsin'de Yeni İş Fırsatı!\n\nİş Tanımı: $baslik\nKategori: $kategori\nBölge: $sehir\n\nDetaylar:\n$detayMetni\n\nDetaylar için uygulamayı indir!";
 
-      var response = await http.post(
-        Uri.parse('https://graph.facebook.com/v20.0/$pageId/feed'),
+      final String kullanilacakGorsel = gorselUrl.isNotEmpty ? gorselUrl : _defaultIlanGorseli;
+      String publicUrl = await _getPublicUrl(kullanilacakGorsel);
+
+      final response = await http.post(
+        Uri.parse('https://graph.facebook.com/v20.0/$pageId/photos'),
         body: {
-          'message': message,
+          'url': publicUrl,
+          'caption': message,
           'access_token': accessToken,
         },
       );
@@ -80,6 +68,57 @@ class SosyalMedyaMotoru {
       }
     } catch (e) {
       await _logRobot("Facebook Paylaşım Hatası: $e");
+    }
+  }
+
+  // INSTAGRAM - REVİZE EDİLDİ
+  static Future<void> instagramPaylas(String baslik, String sehir, String kategori, Map<String, dynamic> detaylar, String gorselUrl) async {
+    try {
+      final String igBusinessId = Env.instagramBusinessId;
+      final String accessToken = Env.instagramToken;
+
+      if (igBusinessId.isEmpty || accessToken.isEmpty) {
+        await _logRobot("Instagram yapılandırma değerleri boş! .env kontrol et");
+        return;
+      }
+
+      String detayMetni = _detaylariDuzgunMetneCevir(detaylar);
+      String caption = "$baslik\n\n📍 $sehir\n\nKategori: $kategori\n\nDetaylar:\n$detayMetni\n\n#${kategori.replaceAll(' ', '')} #hemenustamgelsin";
+
+      final String kullanilacakGorsel = gorselUrl.isNotEmpty ? gorselUrl : _defaultIlanGorseli;
+      String publicUrl = await _getPublicUrl(kullanilacakGorsel);
+
+      // 1. Container oluştur - POST body ile
+      final uploadRes = await http.post(
+        Uri.parse('https://graph.facebook.com/v20.0/$igBusinessId/media'),
+        body: {
+          'image_url': publicUrl,
+          'caption': caption,
+          'access_token': accessToken,
+        },
+      );
+
+      if (uploadRes.statusCode != 200) {
+        await _logRobot("Instagram Upload Hatası (${uploadRes.statusCode}): ${uploadRes.body}");
+        return;
+      }
+
+      final String creationId = jsonDecode(uploadRes.body)['id'];
+
+      // 2. Yayınla - POST body ile
+      final publishRes = await http.post(
+        Uri.parse('https://graph.facebook.com/v20.0/$igBusinessId/media_publish'),
+        body: {
+          'creation_id': creationId,
+          'access_token': accessToken,
+        },
+      );
+
+      if (publishRes.statusCode != 200) {
+        await _logRobot("Instagram Publish Hatası (${publishRes.statusCode}): ${publishRes.body}");
+      }
+    } catch (e) {
+      await _logRobot("Instagram Paylaşım Hatası: $e");
     }
   }
 }

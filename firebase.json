@@ -63,18 +63,6 @@
       "source": "ustam-gelsin-backend"
     },
     {
-      "codebase": "fiyat-motoru",
-      "disallowLegacyRuntimeConfig": true,
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ],
-      "source": "fiyat-motoru"
-    },
-    {
       "source": "iyzico",
       "codebase": "iyzico",
       "disallowLegacyRuntimeConfig": true,
@@ -106,6 +94,10 @@
         "**/node_modules/**"
       ],
       "rewrites": [
+        {
+          "source": "/rehber/**",
+          "destination": "/index.html"
+        },
         {
           "source": "**",
           "destination": "/index.html"

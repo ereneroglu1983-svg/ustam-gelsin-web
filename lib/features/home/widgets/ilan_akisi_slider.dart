@@ -1,43 +1,29 @@
 // lib/features/home/widgets/ilan_akisi_slider.dart
 
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ustam_gelsin/core/models/ilan_model.dart';
 import 'package:ustam_gelsin/core/services/ad_service.dart';
-import 'package:ustam_gelsin/core/services/location_service.dart';
+import 'package:ustam_gelsin/core/constants/meslekler_data.dart'; // MesleklerData'yı import ettik
 import 'package:ustam_gelsin/features/usta/screens/usta_auth_page.dart';
 
-class IlanAkisiSlider extends StatefulWidget {
+class IlanAkisiSlider extends StatelessWidget {
   final double ustaLat;
   final double ustaLng;
 
   const IlanAkisiSlider({super.key, required this.ustaLat, required this.ustaLng});
 
-  @override
-  State<IlanAkisiSlider> createState() => _IlanAkisiSliderState();
-}
-
-class _IlanAkisiSliderState extends State<IlanAkisiSlider> {
-  late ScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  double _mesafeHesapla(double lat1, double lon1, double lat2, double lon2) {
-    var p = 0.017453292519943295;
-    var c = cos;
-    var a = 0.5 - c((lat2 - lat1) * p) / 2 + c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-    return 12742 * asin(sqrt(a));
+  // Artık manuel Map yok, MesleklerData'dan yardım alıyoruz
+  String? _getKategoriResmi(String kategori) {
+    try {
+      final meslek = MesleklerData.hizmetlerDetayli.firstWhere(
+            (m) => m.isim.toUpperCase() == kategori.toUpperCase(),
+      );
+      return meslek.resimYolu;
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<String> _getMaskeliIsim(String userId) async {
@@ -54,108 +40,119 @@ class _IlanAkisiSliderState extends State<IlanAkisiSlider> {
     return "MÜŞTERİ";
   }
 
-  Future<String> _formatKonumMetni(String raw) async {
-    final parts = raw.split('/').map((e) => e.trim()).toList();
-    if (parts.length >= 2 && (RegExp(r'^\d+$').hasMatch(parts[0]))) {
-      final ilIsim = await LocationService.getSehirIsim(parts[0]);
-      final ilceIsim = await LocationService.getIlceIsim(parts[1]);
-      return "$ilIsim / $ilceIsim";
-    }
-    return raw;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 240,
-      child: StreamBuilder<List<IlanModel>>(
-        stream: AdService().getAktifIlanlar(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) return const Center(child: Text("Veriler yüklenemedi."));
-          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-          if (!snapshot.hasData || snapshot.data!.isEmpty) return const Center(child: Text("Henüz ilan bulunmuyor."));
+    return StreamBuilder<List<IlanModel>>(
+      stream: AdService().getAktifIlanlar(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) return const Center(child: Text("Hata oluştu."));
+        if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+        if (!snapshot.hasData || snapshot.data!.isEmpty) return const Center(child: Text("İlan bulunmuyor."));
 
-          List<IlanModel> ilanlar = snapshot.data!.where((i) =>
-          i.isAcil != true && (i.teknikDetaylar['isAcil'] != true)
-          ).toList();
+        List<IlanModel> ilanlar = snapshot.data!.where((i) {
+          bool modelAcilMi = i.isAcil == true;
+          bool detayAcilMi = i.teknikDetaylar['isAcil'] == true;
+          return !modelAcilMi && !detayAcilMi;
+        }).toList()
+          ..sort((a, b) => b.tarih.compareTo(a.tarih));
 
-          ilanlar.sort((a, b) => _mesafeHesapla(widget.ustaLat, widget.ustaLng, a.latitude, a.longitude)
-              .compareTo(_mesafeHesapla(widget.ustaLat, widget.ustaLng, b.latitude, b.longitude)));
+        ilanlar = ilanlar.take(3).toList();
 
-          return ListView.builder(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: ilanlar.length,
-            itemBuilder: (context, index) => _ilanKarti(context, ilanlar[index]),
-          );
-        },
-      ),
+        if (ilanlar.isEmpty) return const SizedBox.shrink();
+
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: ilanlar.length,
+          itemBuilder: (context, index) => _ilanKarti(context, ilanlar[index]),
+        );
+      },
     );
   }
 
   Widget _ilanKarti(BuildContext context, IlanModel ilan) {
+    // MesleklerData'dan resim yolunu çek
+    final String? kategoriResimYolu = _getKategoriResmi(ilan.kategori);
+
     return GestureDetector(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta")));
-      },
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta"))),
       child: Container(
-        width: 220,
-        margin: const EdgeInsets.only(right: 12),
+        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4))]),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        ),
+        child: Row(
           children: [
-            SizedBox(
-              height: 20,
-              child: Row(
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 80,
+                height: 80,
+                child: (ilan.resimler.isNotEmpty && ilan.resimler.first.isNotEmpty)
+                    ? CachedNetworkImage(
+                  imageUrl: ilan.resimler.first,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, url, error) => kategoriResimYolu != null
+                      ? Image.asset(kategoriResimYolu, fit: BoxFit.cover)
+                      : Container(color: Colors.grey[200], child: const Icon(Icons.build)),
+                )
+                    : (kategoriResimYolu != null
+                    ? Image.asset(kategoriResimYolu, fit: BoxFit.cover)
+                    : Container(color: Colors.grey[200], child: const Icon(Icons.build))),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: FutureBuilder<String>(
-                      future: _getMaskeliIsim(ilan.userId),
-                      builder: (ctx, snap) => Text(
-                        snap.data ?? "...",
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueAccent),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
                   FutureBuilder<String>(
-                    future: _formatKonumMetni(ilan.konumMetin),
-                    builder: (ctx, snap) => Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.location_on, size: 12, color: Colors.red),
-                        const SizedBox(width: 2),
-                        Text(
-                          snap.data ?? "...",
-                          style: const TextStyle(fontSize: 10, color: Colors.black54),
-                        ),
-                      ],
+                    future: _getMaskeliIsim(ilan.userId),
+                    builder: (context, s) => Text(
+                      s.data ?? "MÜŞTERİ",
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Row(children: [
+                    const Icon(Icons.location_on, size: 12, color: Colors.red),
+                    const SizedBox(width: 6),
+                    Text(ilan.sehirIlceMetni ?? "Konum yok", style: const TextStyle(fontSize: 11, color: Colors.grey))
+                  ]),
+                  const SizedBox(height: 6),
+                  Text(ilan.kategori, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  const SizedBox(height: 4),
+                  if (ilan.teknikDetaylar.isNotEmpty)
+                    Wrap(
+                      spacing: 4,
+                      children: ilan.teknikDetaylar.values
+                          .where((e) => e != null && e.toString().isNotEmpty && e.toString() != "false")
+                          .take(3)
+                          .map((e) => Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                        child: Text(e.toString(), style: const TextStyle(fontSize: 10, color: Colors.black54)),
+                      ))
+                          .toList(),
+                    ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
-              child: Text(ilan.kategori, style: const TextStyle(color: Colors.blue, fontSize: 13, fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Wrap(
-                spacing: 4, runSpacing: 4,
-                children: ilan.teknikDetaylar.entries.take(4).map((e) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                  decoration: BoxDecoration(color: Colors.grey.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-                  child: Text("${e.key.replaceAll('_', ' ')}: ${e.value}", style: const TextStyle(fontSize: 10, color: Colors.black54)),
-                )).toList(),
-              ),
-            ),
+            Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta"))),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, padding: const EdgeInsets.symmetric(horizontal: 12)),
+                  child: const Text("Teklif Ver", style: TextStyle(fontSize: 11, color: Colors.white)),
+                ),
+                const SizedBox(height: 4),
+                Text("${ilan.teklifSayisi} Teklif", style: const TextStyle(fontSize: 10, color: Colors.grey)),
+              ],
+            )
           ],
         ),
       ),

@@ -1,9 +1,11 @@
-// lib/core/calculation/meslek_sorulari/cati_isleri.dart
+// lib/core/calculation/meslek_sorulari/cati_isleri.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class CatiIsleriSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
-      "id": "hizmet_turu", // 🛠️ ANA TETİKLEYİCİ: Formun kapısını açan ana kilit id
+      "id": "hizmet_turu",
       "label": "İhtiyacınız Olan Ana Hizmet Kapsamı",
       "type": "single",
       "required": true,
@@ -15,6 +17,8 @@ class CatiIsleriSorulari {
         "Oluk ve Dere Yenileme (Yağmur Suyu Drenaj Sistemleri)"
       ]
     },
+
+    // ADIM 2: KARKAS - sadece Sıfırdan'da gelir
     {
       "id": "karkas_tipi",
       "label": "Çatı Taşıyıcı Karkas Tipi",
@@ -29,6 +33,9 @@ class CatiIsleriSorulari {
         "Çelik Karkas veya Metal Profil Konstrüksiyon (Yüksek Mukavemetli)"
       ]
     },
+
+    // ADIM 3: KAPLAMA - Sıfırdan, Aktarma, Sandviç Panel'de gelir
+    // NOT: Sıfırdan seçildiyse karkas'tan sonra gelsin diye karkas'a bağlıyoruz
     {
       "id": "kaplama_tipi",
       "label": "Talep Edilen Üst Çatı Kaplama Malzemesi",
@@ -47,8 +54,14 @@ class CatiIsleriSorulari {
         "Eternit / Sac / Trapez Kaplama Tek Kat Galvaniz"
       ]
     },
+
+    // ADIM 4: ALAN KADEMESİ - kaplama veya karkas sonrası gelsin
+    // Eski halinde köke bağlıydı, şimdi zincir için alan_segmenti'ni
+    // kaplama_tipi'ne bağlamıyoruz çünkü İzolasyon ve Oluk'ta kaplama yok.
+    // O yüzden köke bağlı bırakıyoruz ama listede 3. sırada durduğu için
+    // profesyonel görünüyor: Karkas/Kaplama seçilince hemen altında alan açılıyor.
     {
-      "id": "alan_segmenti", // 🛠️ DÜZELTİLDİ: Ana seçime bağlandı, klavyesiz tek ölçü kaynağı
+      "id": "alan_segmenti",
       "label": "Çatı Yaklaşık Alan Kademesi (m²)",
       "type": "single",
       "required": true,
@@ -68,18 +81,20 @@ class CatiIsleriSorulari {
         "400 m² ve Üzeri Endüstriyel Fabrika Çatısı"
       ]
     },
+
+    // ADIM 5: YAPI TİPİ - alan seçilince gelsin
     {
-      "id": "yapi_tip", // 🛠️ DÜZELTİLDİ: Ana seçime bağlandı, seçim yapılmadan ekranda görünmez
+      "id": "yapi_tip",
       "label": "Uygulama Yapılacak Yapının Mimarisi",
       "type": "single",
       "required": true,
-      "dependsOnId": "hizmet_turu",
+      "dependsOnId": "alan_segmenti",
       "dependsOnValue": [
-        "Sıfırdan Çatı Yapımı (Yeni Çatı Konstrüksiyonu ve Kaplama)",
-        "Çatı Aktarma ve Onarım (Geleneksel Kiremit Revizyonu ve Tamirat)",
-        "Sandviç Panel / Şıngıl Kaplama Yenileme (Üst Örtü Değişimi)",
-        "Sadece İzolasyon / Yalıtım Uygulaması (Isı ve Su Yalıtım Çözümleri)",
-        "Oluk ve Dere Yenileme (Yağmur Suyu Drenaj Sistemleri)"
+        "0-50 m² Arası Küçük Çatı / Teras Kapatma",
+        "50-100 m² Arası Standart Müstakil Ev",
+        "100-200 m² Arası Geniş Bina / Apartman Bloğu",
+        "200-400 m² Arası Büyük Site / Depo / Ticari Alan",
+        "400 m² ve Üzeri Endüstriyel Fabrika Çatısı"
       ],
       "options": [
         "Müstakil Ev / Villa / Bungalov",
@@ -88,36 +103,36 @@ class CatiIsleriSorulari {
         "Prefabrik / Hafif Çelik Yapı"
       ]
     },
+
+    // ADIM 6: MALZEME TEDARİK - yapı seçilince gelsin
     {
-      "id": "malzeme_tedarik", // 🛠️ DÜZELTİLDİ: Ana seçime bağlandı, lojistik kırılımı kilitler
+      "id": "malzeme_tedarik",
       "label": "Malzeme Tedarik dev Lojistik Durumu",
       "type": "single",
       "required": true,
-      "dependsOnId": "hizmet_turu",
+      "dependsOnId": "yapi_tip",
       "dependsOnValue": [
-        "Sıfırdan Çatı Yapımı (Yeni Çatı Konstrüksiyonu ve Kaplama)",
-        "Çatı Aktarma ve Onarım (Geleneksel Kiremit Revizyonu ve Tamirat)",
-        "Sandviç Panel / Şıngıl Kaplama Yenileme (Üst Örtü Değişimi)",
-        "Sadece İzolasyon / Yalıtım Uygulaması (Isı ve Su Yalıtım Çözümleri)",
-        "Oluk ve Dere Yenileme (Yağmur Suyu Drenaj Sistemleri)"
+        "Müstakil Ev / Villa / Bungalov",
+        "Apartman / Site Bloğu",
+        "Fabrika / Depo / Endüstriyel Tesis",
+        "Prefabrik / Hafif Çelik Yapı"
       ],
       "options": [
         "Malzeme Dahil (Tüm Sarf Malzemeleri ve Nakliye Ustaya Ait)",
         "Sadece İşçilik (Ana ve Yardımcı Malzemeler Müşteriye Ait)"
       ]
     },
+
+    // ADIM 7: FİNAL - malzeme seçilince yeşil kutuda açılsın
     {
-      "id": "ekstra_detaylar", // 🛠️ DÜZELTİLDİ: Ana seçime bağlandı, çoklu seçmeli ekstralar
+      "id": "ekstra_detaylar",
       "type": "multi",
       "label": "Teknik Detaylar, Yalıtım ve Mimari Zorluklar",
       "required": false,
-      "dependsOnId": "hizmet_turu",
+      "dependsOnId": "malzeme_tedarik",
       "dependsOnValue": [
-        "Sıfırdan Çatı Yapımı (Yeni Çatı Konstrüksiyonu ve Kaplama)",
-        "Çatı Aktarma ve Onarım (Geleneksel Kiremit Revizyonu ve Tamirat)",
-        "Sandviç Panel / Şıngıl Kaplama Yenileme (Üst Örtü Değişimi)",
-        "Sadece İzolasyon / Yalıtım Uygulaması (Isı ve Su Yalıtım Çözümleri)",
-        "Oluk ve Dere Yenileme (Yağmur Suyu Drenaj Sistemleri)"
+        "Malzeme Dahil (Tüm Sarf Malzemeleri ve Nakliye Ustaya Ait)",
+        "Sadece İşçilik (Ana ve Yardımcı Malzemeler Müşteriye Ait)"
       ],
       "options": [
         "Isı Yalıtımı İlavesi (Çatı Arası Taş Yünü veya Cam Yünü Şilte Serimi)",

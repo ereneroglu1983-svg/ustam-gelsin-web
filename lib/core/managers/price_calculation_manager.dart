@@ -1,106 +1,118 @@
+// lib/core/managers/price_calculation_manager.dart
+
 import 'dart:async';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ustam_gelsin/core/services/gemini_service.dart';
-import 'package:ustam_gelsin/core/calculation/butce_orkestra_servisi.dart';
+import '../calculation/butce_orkestra_servisi.dart';
 
 class PriceCalculationManager {
-  final GeminiService _geminiService = GeminiService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  static const int _cacheTazelikSuresiGun = 20;
-
+  // Sadece gösterim için - Orkestra zaten 35.000 - 45.000 aralığını veriyor
   static double fiyatTemizle(String fiyat) => double.tryParse(fiyat.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0.0;
 
-  Future<String> orkestraFiyatHesapla({
+  /// TEK GİRİŞ NOKTASI - Tüm hesaplama buradan yürüyecek
+  /// Eski tek String yerine artık aralıklı String döndürür: "35.000 - 45.000 ₺"
+  Future<Map<String, dynamic>> orkestraFiyatHesapla({
+    required String userId,
+    required String talepId,
+    required String baslik,
+    required String kategori,
+    required String kategoriId,
+    required Map<String, dynamic> detaylar,
+    required String bolgeKodu,
+  }) async {
+    // Detayları orkestranın beklediği formata çevir
+    // detaylar: { "soru_id": "cevap" } -> [ {id, cevap}, ... ]
+    List<Map<String, dynamic>> cevapListesi = detaylar.entries.map((e) => {
+      "id": e.key,
+      "cevap": e.value
+    }).toList();
+
+    // Yerel hafıza için geçici map - Silsile 1 için
+    Map<String, dynamic> yerelHafiza = {};
+
+    try {
+      // TEK SİLSİLE - Orkestraya devret
+      final Map<String, dynamic> orkestraRapor = await ButceOrkestraServisi.silsileYurut(
+        talepId: talepId,
+        kategoriAdi: kategori,
+        kategoriId: kategoriId,
+        kullaniciCevaplari: cevapListesi,
+        yerelHafizaVerisi: yerelHafiza,
+        anlikBolgeKodu: bolgeKodu,
+        anlikKullaniciSegmenti: "standart",
+      );
+
+      final Map<String, dynamic> robotSonuc = Map<String, dynamic>.from(orkestraRapor['robotSonucu'] ?? {});
+
+      double min = (robotSonuc['minimumButce'] as num?)?.toDouble() ?? 3000;
+      double ort = (robotSonuc['muhtemelButce'] as num?)?.toDouble() ?? 5000;
+      double max = (robotSonuc['maksimumButce'] as num?)?.toDouble() ?? 8000;
+
+      // SENİN İSTEDİĞİN MANTIK: Komisyon = (min+max)/2 * %1
+      double komisyonTabani = (min + max) / 2;
+      double komisyon = komisyonTabani * 0.01;
+
+      // Müşteriye gösterilecek metin
+      String aralikliFiyat = "${min.toInt()} - ${max.toInt()} ₺";
+      String tekilFiyat = "${ort.toInt()} ₺"; // Eski kodlar için geriye uyumlu
+
+      debugPrint("✅ [ORKESTRA BAŞARILI] $kategoriId | $aralikliFiyat | Komisyon: $komisyon");
+
+      return {
+        "basarili": true,
+        "kaynak": robotSonuc['kaynak'] ?? 'ORKESTRA',
+        "minimumButce": min,
+        "muhtemelButce": ort,
+        "maksimumButce": max,
+        "fiyatBilgisi": tekilFiyat, // Eski IlanModel için
+        "aralikliFiyatBilgisi": aralikliFiyat, // Yeni gösterim için - FIX: ı -> i
+        "komisyonTutari": komisyon,
+        "komisyonTabani": komisyonTabani,
+        "tamRapor": orkestraRapor,
+      };
+    } catch (e, stack) {
+      debugPrint("❌ [ORKESTRA HATA] $e\n$stack");
+      // En kötü senaryoda bile sistem çökmesin, sabit bir aralık ver
+      return {
+        "basarili": false,
+        "minimumButce": 3500.0,
+        "muhtemelButce": 5000.0,
+        "maksimumButce": 7500.0,
+        "fiyatBilgisi": "5000 ₺",
+        "aralikliFiyatBilgisi": "3500 - 7500 ₺", // FIX: ı -> i
+        "komisyonTutari": 55.0, // (3500+7500)/2 * 0.01
+        "komisyonTabani": 5500.0,
+        "hata": e.toString(),
+      };
+    }
+  }
+
+  /// ESKİ KODLARIN ÇAĞIRDIĞI String döndüren fonksiyon - Geriye uyum için duruyor
+  /// Yeni kodlar Map döndüren üstteki fonksiyonu kullanmalı
+  @Deprecated("Yerine orkestraFiyatHesapla(Map döndüren) kullan")
+  Future<String> eski_orkestraFiyatHesapla_String({
     required String userId,
     required String baslik,
     required String kategori,
     required String kategoriId,
     required Map<String, dynamic> detaylar,
   }) async {
-    final String cacheKey = _generateSecureCacheKey(kategori, detaylar);
-
-    try {
-      var cacheDoc = await _firestore.collection('fiyat_arsivi').doc(cacheKey).get();
-      if (cacheDoc.exists) {
-        Timestamp tarih = cacheDoc['hesaplamaTarihi'] as Timestamp;
-        if (DateTime.now().difference(tarih.toDate()).inDays < _cacheTazelikSuresiGun) {
-          debugPrint("⚡ [CACHE HIT] $cacheKey");
-          return cacheDoc['fiyat'].toString();
-        }
-      }
-    } catch (e) {
-      debugPrint("❌ [CACHE READ ERROR] $e");
-    }
-
-    String sonuc;
-    try {
-      String aiRaw = await _geminiService.getFiyatTahmini(
-        musteriId: userId,
-        isAdi: baslik,
-        kategoriAdi: kategori,
-        kategoriId: kategoriId,
-        detaylar: detaylar,
-      ).timeout(const Duration(seconds: 60));
-
-      if (aiRaw.isEmpty || aiRaw == "0" || aiRaw.length > 10) throw Exception("Geçersiz AI");
-      sonuc = aiRaw;
-
-      // TAKİP MEKANİZMASI:
-      debugPrint("✅ [HESAPLAMA] Kaynak: GEMİNİ AI | Sonuç: $sonuc");
-
-    } catch (e) {
-      // TAKİP MEKANİZMASI:
-      debugPrint("⚠️ [HESAPLAMA] Kaynak: YEREL ROBOT (Fallback) | Hata: $e");
-      sonuc = _yerelHesapla(kategori, detaylar);
-    }
-
-    await _saveToCache(cacheKey, sonuc, kategori);
-    return sonuc;
-  }
-
-  String _yerelHesapla(String kategori, Map<String, dynamic> detaylar) {
-    List<dynamic> cevaplarListesi = detaylar.entries.map((e) => {"id": e.key, "cevap": e.value}).toList();
-    final Map<String, dynamic> rapor = ButceOrkestraServisi.yerelRobotHesapla(
+    final sonuc = await orkestraFiyatHesapla(
+      userId: userId,
+      talepId: userId,
+      baslik: baslik,
       kategori: kategori,
-      gelenCevaplar: cevaplarListesi,
+      kategoriId: kategoriId,
+      detaylar: detaylar,
+      bolgeKodu: "diger",
     );
-
-    double maliyet = (rapor['tahminiButce'] as num? ?? 0.0).toDouble();
-    double taban = _getAgirlikliTabanFiyat(kategori);
-    double agirlikKatsayisi = 1.0 + (detaylar.length * 0.1);
-    double finalMaliyet = (maliyet < taban ? taban : maliyet) * agirlikKatsayisi;
-
-    return "${finalMaliyet.round()} ₺";
+    return sonuc['aralikliFiyatBilgisi'] as String;
   }
 
-  double _getAgirlikliTabanFiyat(String kategori) {
-    if (RegExp(r'(KOMPLE|PREFABRİK|HAVUZ)').hasMatch(kategori)) return 100000.0;
-    if (RegExp(r'(ÇATI|ALÜMİNYUM|CEPHE|TADİLAT)').hasMatch(kategori)) return 30000.0;
-    if (RegExp(r'(DOLAP|KAPI|PARKE|BOYA|ALÇI|FAYANS)').hasMatch(kategori)) return 8000.0;
-    if (RegExp(r'(ELEKTRİK|SIHHI|KLİMA|ASANSÖR|KOMBİ|UYDU)').hasMatch(kategori)) return 3500.0;
-    return 3000.0;
+  String formatFiyatGosterim(String text) {
+    if (text.contains('₺')) return "Tahmini: $text";
+    return "Tahmini: $text ₺";
   }
-
-  String _generateSecureCacheKey(String kategori, Map<String, dynamic> detaylar) {
-    final sortedMap = Map.fromEntries(detaylar.entries.toList()..sort((a, b) => a.key.compareTo(b.key)));
-    return sha256.convert(utf8.encode("${kategori}_${jsonEncode(sortedMap)}")).toString().substring(0, 40);
-  }
-
-  Future<void> _saveToCache(String key, String fiyat, String kategori) async {
-    try {
-      await _firestore.collection('fiyat_arsivi').doc(key).set({
-        'fiyat': fiyat,
-        'kategori': kategori,
-        'hesaplamaTarihi': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    } catch (e) {
-      debugPrint("❌ [CRITICAL] Cache Yazılamadı: $e");
-    }
-  }
-
-  String formatFiyatGosterim(String text) => text.contains('₺') ? "Tahmini: $text" : "Tahmini: $text ₺";
 }

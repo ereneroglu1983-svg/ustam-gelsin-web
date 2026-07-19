@@ -1,9 +1,11 @@
-// lib/core/calculation/meslek_sorulari/marangozluk.dart
+// lib/core/calculation/meslek_sorulari/marangozluk.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class MarangozlukSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
-      "id": "is_kapsami", // 🛠️ EN ANA TETİKLEYİCİ: Yerinde servis ile atölye imalat akışlarını ayıran ana kilit
+      "id": "is_kapsami",
       "label": "Yapılacak İşlemin Ana Niteliği",
       "type": "single",
       "required": true,
@@ -13,9 +15,7 @@ class MarangozlukSorulari {
       ]
     },
 
-    // ==========================================
-    // 🪚 GRUP 1: SIFIR ÖZEL İMALAT ÖZEL SORULARI (Sadece İmalat Seçilirse Açılır)
-    // ==========================================
+    // ========== SIFIR İMALAT YOLU ==========
     {
       "id": "malzeme_tipi",
       "label": "Kullanılacak Ana Malzeme Tipi",
@@ -30,12 +30,16 @@ class MarangozlukSorulari {
       ]
     },
     {
-      "id": "olcu_segmenti", // 🛠️ TEK ÖLÇÜ KAYNAĞI: Klavye girdisi yerine motorla tam uyumlu temiz sekmeler
+      "id": "olcu_segmenti",
       "label": "Üretilecek Ürünün Tahmini Ölçü Kademesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami",
-      "dependsOnValue": ["Sıfır Özel İmalat (Atölyede Plaka Kesim, Bantlama ve Üretim Projesi)"],
+      "dependsOnId": "malzeme_tipi",
+      "dependsOnValue": [
+        "Suntalam (Ekonomik / Hazır Panel Serisi)",
+        "MDF Lam (Yüksek Yoğunluklu Dayanıklı Gövde Paneli)",
+        "Masif Ahşap / Doğal Ahşap Kereste (Fırınlanmış Planya İşçilikli Lüks Seri)"
+      ],
       "options": [
         "Küçük Ölçekli Alanlar (0 - 2 m² Arası Komodin, Sehpa, Küçük Raf Sistemi vb.)",
         "Orta Ölçekli Alanlar (2 - 5 m² Arası TV Ünitesi, Şifonyer, Kitaplık Blokları vb.)",
@@ -44,9 +48,7 @@ class MarangozlukSorulari {
       ]
     },
 
-    // ==========================================
-    // 🔧 GRUP 2: TAMİRAT VE MONTAJ ÖZEL SORULARI (Sadece Tamirat Seçilirse Açılır)
-    // ==========================================
+    // ========== TAMİRAT YOLU ==========
     {
       "id": "mobilya_kategorisi",
       "label": "Uygulama Yapılacak Mobilya Grubu / Ölçeği",
@@ -60,12 +62,15 @@ class MarangozlukSorulari {
       ]
     },
     {
-      "id": "tamir_montaj_detayi", // 🛠️ Bedava marka reklam çağrışımları jenerik terimlerle temizlendi
+      "id": "tamir_montaj_detayi",
       "label": "Yapılacak Tamirat ve Montaj Hizmetinin Detayı",
       "type": "multi",
       "required": true,
-      "dependsOnId": "is_kapsami",
-      "dependsOnValue": ["Tamirat / Montaj / Kurulum ve Yerinde Servis Hizmeti"],
+      "dependsOnId": "mobilya_kategorisi",
+      "dependsOnValue": [
+        "Küçük Hacimli Onarım (Kapak, Raf, Çekmece, Kulp veya Menteşe Tamiri)",
+        "Büyük Gövdeli Ünite Onarımı (Gardırop Söküm, Mutfak Dolabı Kasa Kasılması, Büyük Modül Revizyonu)"
+      ],
       "options": [
         "Menteşe / Ray / Kulp Değişimi ve Donanım Yenileme",
         "Kırık Ayak / Gövde Onarımı ve Ahşap Tutkallama İşlemi",
@@ -76,18 +81,25 @@ class MarangozlukSorulari {
       ]
     },
 
-    // ==========================================
-    // 📐 ORTAK YAPISAL FİLTRELER VE EKSTRALAR
-    // ==========================================
+    // ========== ORTAK ZİNCİR ==========
+    // ADIM: YAPI TİP - Sıfır'da ölçü sonrası, Tamirat'ta detay sonrası gelsin
     {
       "id": "yapi_tip",
       "label": "Uygulama Yapılacak Alanın Mimarisi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_kapsami", // 🛠️ İş kapsamı seçilmeden bu ortak sorular da ekrana gelmez
+      "dependsOnId": ["olcu_segmenti", "tamir_montaj_detayi"],
       "dependsOnValue": [
-        "Tamirat / Montaj / Kurulum ve Yerinde Servis Hizmeti",
-        "Sıfır Özel İmalat (Atölyede Plaka Kesim, Bantlama ve Üretim Projesi)"
+        "Küçük Ölçekli Alanlar (0 - 2 m² Arası Komodin, Sehpa, Küçük Raf Sistemi vb.)",
+        "Orta Ölçekli Alanlar (2 - 5 m² Arası TV Ünitesi, Şifonyer, Kitaplık Blokları vb.)",
+        "Büyük Ölçekli Alanlar (5 - 10 m² Arası Gardırop, Geniş Portmanto Üniteleri vb.)",
+        "Özel Geniş Mimari Projeler (10 m² ve Üzeri Komple Kurulumlar)",
+        "Menteşe / Ray / Kulp Değişimi ve Donanım Yenileme",
+        "Kırık Ayak / Gövde Onarımı ve Ahşap Tutkallama İşlemi",
+        "Şişmiş / Nem Almış Kapak Revizyonu veya Yeniden Kesim",
+        "Sürgü Kapak Ayarı ve Ray Temizliği",
+        "Hazır Paket Mobilya Montajı (İnternet veya Mağaza Demonte Ürünleri)",
+        "Taşınma Sebebiyle Mobilya Sök-Tak (Demontaj + Montaj)"
       ],
       "options": [
         "Ev İçi Yaşam Alanları",
@@ -96,15 +108,19 @@ class MarangozlukSorulari {
         "Tekne / Karavan Marangozluğu (Özel Yatçılık İşçiliği)"
       ]
     },
+
+    // ADIM FİNAL: EKSTRA - yapı tipi sonrası yeşil kutuda
     {
-      "id": "ekstra_ozellikler", // 🛠️ Sponsor dostu jenerik donanım isimleriyle yenilendi
+      "id": "ekstra_ozellikler",
       "label": "Donanım, Yüzey İşlemi ve Aksesuar Ekstraları",
       "type": "multi",
       "required": false,
-      "dependsOnId": "is_kapsami",
+      "dependsOnId": "yapi_tip",
       "dependsOnValue": [
-        "Tamirat / Montaj / Kurulum ve Yerinde Servis Hizmeti",
-        "Sıfır Özel İmalat (Atölyede Plaka Kesim, Bantlama ve Üretim Projesi)"
+        "Ev İçi Yaşam Alanları",
+        "Ofis / Mağaza / Ticari İş Yeri",
+        "Bahçe / Dış Mekan Ahşap Yapıları",
+        "Tekne / Karavan Marangozluğu (Özel Yatçılık İşçiliği)"
       ],
       "options": [
         "Cila / Vernik Uygulaması (İpek Mat Vernik, Lake Boya Boyama veya Gomalak El İşçiliği)",

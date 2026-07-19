@@ -1,21 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
-import 'package:ustam_gelsin/services/r2_service.dart'; // SENİN PATH'İN BU
-import 'package:permission_handler/permission_handler.dart';
+import 'package:ustam_gelsin/services/r2_service.dart';
 
 class IsResimleri extends StatefulWidget {
-  final String? ilanId;
   final Function(List<String>) onResimYuklendi;
-  final int maxResimSayisi;
-
-  const IsResimleri({
-    super.key,
-    this.ilanId,
-    required this.onResimYuklendi,
-    this.maxResimSayisi = 5,
-  });
+  const IsResimleri({super.key, required this.onResimYuklendi});
 
   @override
   State<IsResimleri> createState() => _IsResimleriState();
@@ -23,130 +13,68 @@ class IsResimleri extends StatefulWidget {
 
 class _IsResimleriState extends State<IsResimleri> {
   final R2Service _r2Service = R2Service();
-  final String _tempId = const Uuid().v4();
   final ImagePicker _picker = ImagePicker();
+  final List<String> _yuklenenUrlList = [];
+  final List<File> _localFiles = []; // Önizleme için lokal
+  bool _yukleniyor = false;
 
-  bool _isLoading = false;
-  List<String> _uploadedImageUrls = [];
+  Future<void> _resimSecVeYukle() async {
+    final XFile? picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    if (picked == null) return;
 
-  Future<void> _checkPermissionsAndPick(ImageSource source) async {
-    if (_uploadedImageUrls.length >= widget.maxResimSayisi) {
+    setState(() => _yukleniyor = true);
+    final file = File(picked.path);
+    final fileName = "ilanlar/${DateTime.now().millisecondsSinceEpoch}_${picked.name}";
+
+    try {
+      final url = await _r2Service.uploadFile(file, fileName);
+      setState(() {
+        _yuklenenUrlList.add(url);
+        _localFiles.add(file);
+      });
+      widget.onResimYuklendi(_yuklenenUrlList);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("En fazla ${widget.maxResimSayisi} resim ekleyebilirsin")),
+          SnackBar(content: Text("Resminiz yüklendi (${_yuklenenUrlList.length})"), backgroundColor: const Color(0xFF2DB34A)),
         );
       }
-      return;
-    }
-
-    Permission permission = (source == ImageSource.camera) ? Permission.camera : Permission.photos;
-    var status = await permission.request();
-
-    if (status.isGranted) {
-      _pickAndUploadImage(source);
-    } else {
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Kamera veya galeri izni reddedildi")),
+          SnackBar(content: Text("Yükleme hatası: $e"), backgroundColor: Colors.redAccent),
         );
       }
+    } finally {
+      if (mounted) setState(() => _yukleniyor = false);
     }
   }
 
-  void _showImageSourceDialog() {
-    showModalBottomSheet(
+  Future<void> _resimSil(int index) async {
+    final url = _yuklenenUrlList[index];
+    try {
+      await _r2Service.deleteFile(url);
+    } catch (_) {}
+    setState(() {
+      _yuklenenUrlList.removeAt(index);
+      _localFiles.removeAt(index);
+    });
+    widget.onResimYuklendi(_yuklenenUrlList);
+  }
+
+  void _resmiBuyut(File file) {
+    showDialog(
       context: context,
-      backgroundColor: const Color(0xFF203A43),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
-        child: Wrap(
+      builder: (_) => Dialog(
+        backgroundColor: Colors.black,
+        insetPadding: const EdgeInsets.all(10),
+        child: Stack(
           children: [
-            ListTile(
-              leading: const Icon(Icons.photo_library, color: Colors.white70),
-              title: const Text("Galeriden Seç", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                _checkPermissionsAndPick(ImageSource.gallery);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt, color: Colors.white70),
-              title: const Text("Kamera ile Çek", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                _checkPermissionsAndPick(ImageSource.camera);
-              },
-            ),
+            InteractiveViewer(child: Image.file(file, fit: BoxFit.contain)),
+            Positioned(top: 10, right: 10, child: IconButton(icon: const Icon(Icons.close, color: Colors.white, size: 30), onPressed: () => Navigator.pop(context))),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _pickAndUploadImage(ImageSource source) async {
-    final XFile? pickedFile = await _picker.pickImage(
-      source: source,
-      maxWidth: 1080,
-      imageQuality: 85,
-    );
-    if (pickedFile == null) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      // SENİN R2Service 2 parametre alıyor: File ve fileName
-      // folder yapısını fileName içine gömüyoruz
-      final String folder = widget.ilanId != null ? "ilanlar/${widget.ilanId}" : "temp/$_tempId";
-      final String fileName = "$folder/img_${DateTime.now().millisecondsSinceEpoch}.jpg";
-
-      String url = await _r2Service.uploadFile(File(pickedFile.path), fileName);
-
-      if (!mounted) return;
-      setState(() {
-        _uploadedImageUrls.add(url);
-      });
-
-      widget.onResimYuklendi(_uploadedImageUrls);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Resim başarıyla yüklendi"),
-            backgroundColor: Color(0xFF2DB34A),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Hata: $e")),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _handleDelete(String url) async {
-    setState(() => _isLoading = true);
-    try {
-      await _r2Service.deleteFile(url);
-      if (!mounted) return;
-      setState(() {
-        _uploadedImageUrls.remove(url);
-      });
-      widget.onResimYuklendi(_uploadedImageUrls);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Silme hatası: $e")),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
   }
 
   @override
@@ -154,94 +82,38 @@ class _IsResimleriState extends State<IsResimleri> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_uploadedImageUrls.isNotEmpty) ...[
-          SizedBox(
-            height: 90,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _uploadedImageUrls.length,
-              itemBuilder: (context, index) {
-                final imageUrl = _uploadedImageUrls[index];
-                return Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          imageUrl,
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, progress) {
-                            if (progress == null) return child;
-                            return Container(
-                              width: 90,
-                              height: 90,
-                              color: Colors.white10,
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Color(0xFF2DB34A),
-                                ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stack) => Container(
-                            width: 90,
-                            height: 90,
-                            color: Colors.white10,
-                            child: const Icon(Icons.error, color: Colors.redAccent),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () => _handleDelete(imageUrl),
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.close, color: Colors.white, size: 16),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 12),
-        ],
         SizedBox(
           width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: _isLoading || _uploadedImageUrls.length >= widget.maxResimSayisi
-                ? null
-                : _showImageSourceDialog,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white70,
-              side: const BorderSide(color: Colors.white24),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            ),
-            icon: _isLoading
-                ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
-            )
-                : const Icon(Icons.add_photo_alternate_outlined),
-            label: Text(_uploadedImageUrls.isEmpty
-                ? "Resim Ekle"
-                : "${_uploadedImageUrls.length}/${widget.maxResimSayisi} Resim Eklendi"),
+          child: ElevatedButton.icon(
+            onPressed: _yukleniyor? null : _resimSecVeYukle,
+            icon: _yukleniyor? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.add_a_photo_rounded),
+            label: Text(_yukleniyor? "YÜKLENİYOR..." : "RESİM EKLE"),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2DB34A), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
           ),
         ),
+        if (_localFiles.isNotEmpty)...[
+          const SizedBox(height: 14),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _localFiles.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8),
+            itemBuilder: (context, i) {
+              return Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () => _resmiBuyut(_localFiles[i]),
+                    child: ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.file(_localFiles[i], width: double.infinity, height: double.infinity, fit: BoxFit.cover)),
+                  ),
+                  Positioned(top: 4, right: 4, child: InkWell(onTap: () => _resimSil(i), child: Container(decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle), padding: const EdgeInsets.all(4), child: const Icon(Icons.close, size: 14, color: Colors.white)))),
+                  Positioned(bottom: 4, left: 4, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), borderRadius: BorderRadius.circular(6)), child: const Icon(Icons.zoom_in, size: 14, color: Colors.white))),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 6),
+          Text("${_localFiles.length} resim yüklendi - Silmek için X'e, büyütmek için resme dokunun", style: const TextStyle(color: Colors.white38, fontSize: 11)),
+        ],
       ],
     );
   }

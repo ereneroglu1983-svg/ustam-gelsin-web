@@ -1,7 +1,9 @@
-// lib/core/calculation/meslek_sorulari/dis_cephe.dart
+// lib/core/calculation/meslek_sorulari/dis_cephe.dart - PROFESYONEL AKIŞLI VERSİYON
+// id ve options ASLA değiştirilmedi.
 
 class DisCepheSorulari {
   static final List<Map<String, dynamic>> sorular = [
+    // ADIM 1: KÖK
     {
       "id": "islem_turu",
       "label": "Talep Edilen Cephe İşlem Türü",
@@ -12,7 +14,8 @@ class DisCepheSorulari {
         "Sadece Dış Cephe Boya (Mantolama İstemiyorum)"
       ]
     },
-    // 🎯 1. ADIM: Uygulama Durumu
+
+    // ADIM 2: MANTOLAMA DURUMU - sadece Paket'te gelsin
     {
       "id": "mantolama_durum",
       "label": "Mantolama Uygulama Durumu",
@@ -25,7 +28,8 @@ class DisCepheSorulari {
         "Mevcut Mantolama Yenileme / Revizyon (Tadilat)"
       ]
     },
-    // 🎯 2. ADIM: Sadece Tadilat seçenler için dinamik ara yönlendirme sorusu açılır
+
+    // ADIM 3: TADİLAT ARA SORU - sadece Tadilat seçilince gelsin
     {
       "id": "malzeme_tadilati_gerekli_mi",
       "label": "Mantolama Malzemesi Değişimi / Tadilatı Gerekiyor mu?",
@@ -38,19 +42,19 @@ class DisCepheSorulari {
         "HAYIR (Sadece sıva/file tamiri ve boya yapılsın)"
       ]
     },
-    // 🎯 3. ADIM: Malzeme Tipi Yönlendirmesi
-    // ARTIK KİLİTLİ! Sadece Sıfır Mantolama yapacaklara VEYA tadilatta kesinlikle EVET diyenlere açılır.
-    // HAYIR diyen adamın arayüzünde bu soru ASLA görünmez.
+
+    // ADIM 4: MALZEME TİPİ - Sıfır Mantolama VEYA EVET diyenlerde gelsin
+    // OR mantığı için dependsOnId2 kullanıyoruz, yeni _alanGorunurMu bunu okuyor
     {
       "id": "malzeme_tipi",
       "label": "Yalıtım Malzemesi Tercihi",
       "type": "single",
       "required": true,
-      "dependsOnId": "malzeme_tadilati_gerekli_mi", // 👈 Tetikleyiciyi ara soruya bağladık
-      "dependsOnId2": "mantolama_durum", // 👈 Eğer UI çift bağımlılık desteklemiyorsa alt satırdaki listeyle çözüyoruz
+      "dependsOnId": "malzeme_tadilati_gerekli_mi",
+      "dependsOnId2": "mantolama_durum",
       "dependsOnValue": [
         "EVET (Hasarlı levhalar değiştirilsin)",
-        "Sıfır Mantolama (Yeni Uygulama)" // 👈 UI motorunun süzebilmesi için iki tetikleyici değeri de diziye ekledik
+        "Sıfır Mantolama (Yeni Uygulama)"
       ],
       "options": [
         "EPS - Standart",
@@ -59,17 +63,19 @@ class DisCepheSorulari {
         "XPS Yalıtım Levhası"
       ]
     },
-    // 🎯 4. ADIM: Malzeme Kalınlığı Yallatımı
-    // HAYIR diyen adam buradan da muaf, zorla mal satmak yok!
+
+    // ADIM 5: KALINLIK - malzeme seçilince gelsin (OR mantığı aynı)
     {
       "id": "kalinlik_boya",
       "label": "Yalıtım Malzeme Kalınlığı",
       "type": "single",
       "required": true,
-      "dependsOnId": "malzeme_tadilati_gerekli_mi",
+      "dependsOnId": "malzeme_tipi",
       "dependsOnValue": [
-        "EVET (Hasarlı levhalar değiştirilsin)",
-        "Sıfır Mantolama (Yeni Uygulama)"
+        "EPS - Standart",
+        "Karbonlu EPS - Yüksek Yoğunluklu",
+        "Taş Yünü - A1 Sınıfı Yanmaz / Isı-Ses Yalıtımlı",
+        "XPS Yalıtım Levhası"
       ],
       "options": [
         "3 cm Kalınlık",
@@ -78,7 +84,8 @@ class DisCepheSorulari {
         "8 cm+ Kalınlık"
       ]
     },
-    // --- GENEL CEPHE SORULARI (HER İKİ SEÇENEKTE DE AÇILANLAR) ---
+
+    // ADIM 6: ALAN - kök seçilince gelsin ama zincirde buraya oturttuk
     {
       "id": "alan_segmenti",
       "label": "Toplam Dış Cephe Alanı (m²)",
@@ -104,21 +111,29 @@ class DisCepheSorulari {
       "required": false,
       "keyboardType": "number",
       "hint": "Örn: 185",
-      "dependsOnId": "islem_turu",
+      "dependsOnId": "alan_segmenti",
       "dependsOnValue": [
-        "Mantolama ve Boya Paket Uygulaması",
-        "Sadece Dış Cephe Boya (Mantolama İstemiyorum)"
+        "0-100 m² Arası",
+        "100-250 m² Arası",
+        "250-500 m² Arası",
+        "500-1000 m² Arası",
+        "1000 m² ve Üzeri"
       ]
     },
+
+    // ADIM 7: BİNA TİPİ - alan seçilince gelsin
     {
       "id": "bina_tip",
       "label": "Bina Yapı Türü",
       "type": "single",
       "required": true,
-      "dependsOnId": "islem_turu",
+      "dependsOnId": "alan_segmenti",
       "dependsOnValue": [
-        "Mantolama ve Boya Paket Uygulaması",
-        "Sadece Dış Cephe Boya (Mantolama İstemiyorum)"
+        "0-100 m² Arası",
+        "100-250 m² Arası",
+        "250-500 m² Arası",
+        "500-1000 m² Arası",
+        "1000 m² ve Üzeri"
       ],
       "options": [
         "Apartman Bloğu",
@@ -126,15 +141,18 @@ class DisCepheSorulari {
         "Ticari Bina / İşyeri"
       ]
     },
+
+    // ADIM 8: YÜKSEKLİK - bina tipi seçilince gelsin
     {
       "id": "bina_yuksekligi",
       "label": "Bina Kat Sayısı (Yükseklik Derecesi)",
       "type": "single",
       "required": true,
-      "dependsOnId": "islem_turu",
+      "dependsOnId": "bina_tip",
       "dependsOnValue": [
-        "Mantolama ve Boya Paket Uygulaması",
-        "Sadece Dış Cephe Boya (Mantolama İstemiyorum)"
+        "Apartman Bloğu",
+        "Villa / Müstakil Ev",
+        "Ticari Bina / İşyeri"
       ],
       "options": [
         "1-2 Katlı Müstakil Ev / Villa",
@@ -143,16 +161,19 @@ class DisCepheSorulari {
         "Yüksek Kule / Gökdelen (Hareketli Platform Sepetli)"
       ]
     },
-    // --- DEKORATİF EKSTRALAR KATMANI ---
+
+    // ADIM 9: EKSTRA SORUSU - yükseklik seçilince gelsin
     {
       "id": "ekstra_secimi",
       "label": "Boyama Detayları ve Dekoratif Ekstralar İstiyor musunuz?",
       "type": "single",
       "required": true,
-      "dependsOnId": "islem_turu",
+      "dependsOnId": "bina_yuksekligi",
       "dependsOnValue": [
-        "Mantolama ve Boya Paket Uygulaması",
-        "Sadece Dış Cephe Boya (Mantolama İstemiyorum)"
+        "1-2 Katlı Müstakil Ev / Villa",
+        "3-5 Katlı Bina (Çelik İskele Kurulumlu)",
+        "6 Kat ve Üzeri Standart Apartman Blokları",
+        "Yüksek Kule / Gökdelen (Hareketli Platform Sepetli)"
       ],
       "options": [
         "EKSTRALAR İSTİYORUM",

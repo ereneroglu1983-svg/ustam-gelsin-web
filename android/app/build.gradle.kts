@@ -1,3 +1,5 @@
+// android/app/build.gradle.kts
+
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
@@ -18,7 +20,6 @@ android {
     }
 
     kotlinOptions {
-        // En güncel ve hatasız Kotlin DSL yapılandırması
         jvmTarget = "17"
     }
 
@@ -53,6 +54,7 @@ android {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.0")
     implementation("androidx.multidex:multidex:2.0.1")
+    debugImplementation("com.google.firebase:firebase-appcheck-debug:17.1.0")
 }
 
 flutter {
