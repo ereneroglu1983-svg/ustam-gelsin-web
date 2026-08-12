@@ -1,0 +1,146 @@
+﻿{
+  "meslekId": "parke_doseme",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 95,
+    "asgariKucuk": 3500,
+    "asgariBuyuk": 8500
+  },
+  "malzeme": {
+    "m2": 320,
+    "aciklama": "Laminat 8mm AGT Natura 1.8336m2 derzsiz Ac4, 10mm Concept Neo 1.477m2 derzli Ac4, 12mm Effect Premium Alp Ac5 1.3551m2, Floorpan Ulus 8mm derzli 32 1.755m2 Belek 10mm 33 2.424m2, Prime Harbour 1 paket 1150 TL 1.86m2 ~618 TL/m2, Lapseki 50m2 8mm+8lik supurgelik 10k-12k TL, 45-50m2 tahta uzeri 6cm pvc supurgelik 6k-10k TL iscilik haric, mutfak 12m2 16k TL - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.14,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 120,
+    "3_ve_ustu_asansorsuz": 420,
+    "esya_tasima_koruma": 650
+  },
+  "ekstralar": {
+    "laminat_8_10mm_kilitli_standart": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Laminat Parke 8mm-10mm Kilitli Sistem Standart - AGT Natura Select 8mm derzsiz Ac4 1.8336m2, Floorpan Ulus 8mm derzli 32"
+    },
+    "lamine_dogal_ust_katman_hassas_klik": {
+      "tip": "m2",
+      "fiyat": 380,
+      "etiket": "Lamine Parke Dogal Ust Katmanli ve Hassas Klik Iscilikli - Dogal ust lamine"
+    },
+    "masif_tutkalli_sistre_cila_agir_zanaat": {
+      "tip": "m2",
+      "fiyat": 520,
+      "etiket": "Masif Ahsap Parke Tutkalli Doseme Sistre ve Cila Gerektiren Agir Zanaat - Masif + sistre + cila"
+    },
+    "lvp_vinil_suya_dayanikli_luks_pvc_klik": {
+      "tip": "m2",
+      "fiyat": 280,
+      "etiket": "LVP / Vinil Parke Suya Dayanikli Luks PVC Klik Sistemler - LVT 9.2-13 USD/m2 vinil 25 TL/m2 baslangic"
+    },
+    "kalinlik_8mm_derzsiz": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "8 mm Standart Derzsiz - AGT 8mm derzsiz Ac4 1.8336m2, Stepclick Elegance 8mm sinif 31 2.374m2"
+    },
+    "kalinlik_10mm_standart": {
+      "tip": "m2",
+      "fiyat": 65,
+      "etiket": "10 mm Standart - Floorpan Belek 10mm derzli sinif 33 2.424m2, AGT Concept Neo 10mm derzli Ac4 1.477m2"
+    },
+    "kalinlik_12mm_derzli_premium": {
+      "tip": "m2",
+      "fiyat": 125,
+      "etiket": "12 mm Derzli Premium Seri - Effect Premium Alp 12mm derzli Ac5 1.3551m2, Floorpan Tarabya 12mm derzli 32 1.755m2"
+    },
+    "mdf_standart_supurgelik_pvc_ince": {
+      "tip": "mt",
+      "fiyat": 18,
+      "etiket": "MDF Standart Supurgelik PVC veya Ince MDF Serisi - 6cm pvc supurgelik Duzce ornek"
+    },
+    "lake_yuksek_8_10cm_cnc_gonye_agir": {
+      "tip": "mt",
+      "fiyat": 65,
+      "etiket": "Lake Yuksek Supurgelik 8-10 cm CNC Kesimli Agir Gonye Iscilikli - 8lik supurgelik Lapseki 10k-12k dahil"
+    },
+    "aluminyum_metal_modern_minimal_klipsli": {
+      "tip": "mt",
+      "fiyat": 85,
+      "etiket": "Aluminyum Metal Supurgelik Modern Minimalist Klipsli Sistem - Metal klips"
+    },
+    "standart_silte_2mm_beyaz_kopuk": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Standart Silte 2mm Beyaz Kopuk Silte - Baz silte"
+    },
+    "kapron_xps_yerden_isitma_yuksek_isi_iletken": {
+      "tip": "m2",
+      "fiyat": 28,
+      "etiket": "Kapron Levha Yerden Isitma Uyumlu Yuksek Isi Iletkenlikli XPS - Yerden isitma uyumlu"
+    },
+    "mantar_ust_duzey_ses_yalitim_dogal_akustik": {
+      "tip": "m2",
+      "fiyat": 45,
+      "etiket": "Mantar Silte Ust Duzey Ses Yalitimli Dogal Akustik Mantar Rulo - Akustik mantar"
+    },
+    "poliuretan_cila_yuksek_parlak_asinma": {
+      "tip": "m2",
+      "fiyat": 85,
+      "etiket": "Cift Bilesenli Poliuretan Cila Yuksek Parlaklik ve Asinma Dayanimi - Masif cila"
+    },
+    "su_bazli_ekolojik_kokusuz_mat_ipek": {
+      "tip": "m2",
+      "fiyat": 95,
+      "etiket": "Su Bazli Ekolojik Cila Kokusuz Mat / Ipek Mat Gorunum - Ekolojik"
+    },
+    "dogal_parke_yagi_mat_dokulu": {
+      "tip": "m2",
+      "fiyat": 75,
+      "etiket": "Dogal Parke Yagi Uygulamasi Mat ve Dokulu Bitis - Yag bitis"
+    },
+    "kapi_alti_kesim_tiraslama": {
+      "tip": "adet",
+      "fiyat": 180,
+      "etiket": "Kapi Alti Kesimi ve Tiraslanmasi - Adet kapi"
+    },
+    "esik_kot_fark_profili_montaj": {
+      "tip": "adet",
+      "fiyat": 95,
+      "etiket": "Esik / Kot Farki Profilomi Montaji - Profil adet"
+    },
+    "eski_parke_hali_sokum_temizleme": {
+      "tip": "m2",
+      "fiyat": 35,
+      "etiket": "Eski Parke / Hali Sokumu ve Temizlenmesi - Sokum 6m2 bozulan laminat sok+yeni 65k-75k Golbasi ornek dahil, mevcut zemin sokme Duzce 6k-10k"
+    },
+    "zemin_sap_duzeltme_tesviye": {
+      "tip": "m2",
+      "fiyat": 85,
+      "etiket": "Zemin Sap Duzeltme / Tesviye - Bozuk zemin tesviye gerektirir"
+    }
+  },
+  "carpanlar": {
+    "laminat_8_10": 1.0,
+    "lamine_dogal": 1.45,
+    "masif_tutkalli": 1.85,
+    "lvp_vinil": 1.32,
+    "ev_oda_salon": 1.0,
+    "ofis_ticari": 1.12,
+    "spor_salonu": 1.35
+  },
+  "alanKatsayilari": {
+    "0_40_m2": 1.28,
+    "40_60_m2": 1.12,
+    "60_80_m2": 1.05,
+    "80_100_m2": 1.0,
+    "100_120_m2": 0.95,
+    "120_150_m2": 0.9,
+    "150_plus_m2": 0.82
+  },
+  "kaynak": "Temmuz 2026 - Laminat 8mm AGT 1.8336m2 derzsiz Ac4, 10mm 1.477m2 Ac4, 12mm 1.3551m2 Ac5, Floorpan 1.755m2 8mm 2.424m2 10mm 1.755m2 12mm, Prime Harbour 1150 TL 1.86m2 ~618 TL/m2, Lapseki 50m2 AGT 8mm+supurgelik 10k-12k TL, Duzce 45-50m2 tahta uzeri 6cm pvc 6k-10k TL iscilik haric, 12m2 mutfak 16k TL, Golbasi 6m2 bozulan sok+yeni 65k-75k TL, Armut 2k-480k TL aralik, vinil 25 TL/m2 LTV 9.2-13 USD/m2"
+}

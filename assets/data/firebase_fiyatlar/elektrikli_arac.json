@@ -1,0 +1,199 @@
+﻿{
+  "meslekId": "elektrikli_arac",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 5000,
+    "asgariBuyuk": 20000
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "Ev tipi AC 7-22kW kurulum dahil 25k-80k TL 2026 Azimut, ticari AC 60k-150k TL, DC hizli 50-150kW 500k+ TL, VW basit ev tipi 10k-20k TL dusuk guc hizli gelismis artiyor, ev/site AC 7-11kW 50k-150k TL, AC dusuk ilk yatirim uzun park uygun DC 50-350kW 180k-500k+ TL, ev tipi AC cihaz 25k-50k TL DC 250k-1M TL kurulum iscilik 5k-20k TL, Zes tesisat cekme 2k-2.5k TL mustakil bahce garaj 5kW ve alti, Gebze 11kW 3k-5k TL"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.22,
+    "ankara_izmir_antalya_bursa": 1.1,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "kablo_0_10m": 0,
+    "kablo_10_30m": 1800,
+    "kablo_30_100m": 4500,
+    "kablo_100_plus": 8500
+  },
+  "ekstralar": {
+    "ev_tipi_kurulum": {
+      "tip": "sabit",
+      "fiyat": 35000,
+      "etiket": "Ev Tipi Sarj Istasyonu Kurulumu - 25k-80k TL 7-22kW AC kurulum dahil"
+    },
+    "site_apartman_kurulum": {
+      "tip": "sabit",
+      "fiyat": 85000,
+      "etiket": "Site ve Apartman Sarj Istasyonu Kurulumu - Ortak/bireysel nokta load balancing kisisel sayac RFID"
+    },
+    "ticari_kurulum": {
+      "tip": "sabit",
+      "fiyat": 120000,
+      "etiket": "Ticari Sarj Istasyonu Kurulumu - 60k-150k TL AC ticari AVM akaryakit otel restoran"
+    },
+    "otopark_altyapi": {
+      "tip": "sabit",
+      "fiyat": 95000,
+      "etiket": "Otopark Sarj Altyapisi Kurulumu - Acik kapali AVM site yer alti kanal ustu karisik olceklenebilir"
+    },
+    "ac_unite": {
+      "tip": "sabit",
+      "fiyat": 32000,
+      "etiket": "AC Sarj Unitesi Kurulumu - 3.7 7.4 11 22kW Type2 Type1 zamanlama app enerji takibi"
+    },
+    "dc_hizli": {
+      "tip": "sabit",
+      "fiyat": 480000,
+      "etiket": "DC Hizli Sarj Unitesi Kurulumu - 30 60 120 150kW+ 300kW+ 20-30dk 500k+ TL 50-150kW 180k-500k+ 250k-1M cihaz"
+    },
+    "ariza_servis": {
+      "tip": "sabit",
+      "fiyat": 2500,
+      "etiket": "Sarj Istasyonu Ariza ve Servisi - Sarj baslamiyor baglanti guc kart uygulama fiziksel acil"
+    },
+    "bakim": {
+      "tip": "sabit",
+      "fiyat": 1800,
+      "etiket": "Sarj Istasyonu Bakimi - Periyodik ariza sonrasi kurulum sonrasi kablo yazilim guc baglanti guvenlik az orta yogun"
+    },
+    "projelendirme": {
+      "tip": "sabit",
+      "fiyat": 12000,
+      "etiket": "Sarj Altyapisi Projelendirme - Bireysel site ticari endustriyel guc dagilim kablo guzergah yerlesim yuk hesabi resmi surec genisletilebilir"
+    },
+    "elektrik_tesisati": {
+      "tip": "sabit",
+      "fiyat": 6500,
+      "etiket": "Sarj Istasyonu Elektrik Tesisati - Elektrik hazir kismen komple yeni tek faz trifaze 0-10 10-30 30-100 100+ m kablo dusuk orta yuksek guc 2k-5k TL ornek Zes 2k-2.5k"
+    },
+    "mustakil_villa": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Mustakil Ev Villa - Kolay"
+    },
+    "apartman_otopark_kapali_acik": {
+      "tip": "carpan",
+      "fiyat": 1.18,
+      "etiket": "Apartman Otoparki Kapali Garaj Acik Otopark - Kablo cekme zorluk"
+    },
+    "1_arac": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "1 arac - Baz"
+    },
+    "2_arac": {
+      "tip": "sabit",
+      "fiyat": 18000,
+      "etiket": "2 arac - 2. nokta"
+    },
+    "3_plus_arac": {
+      "tip": "sabit",
+      "fiyat": 35000,
+      "etiket": "3+ arac - 3+ nokta 3 arac duvar tipi+tasinabilir 3k-5k Gebze ornek"
+    },
+    "guc_3_7kw_standart": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "3.7 kW Standart - Dusuk guc 10k-20k TL"
+    },
+    "guc_7_4kw_hizli_ev": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "7.4 kW Hizli ev tipi - 25k-50k TL AC ev tipi"
+    },
+    "guc_11kw": {
+      "tip": "sabit",
+      "fiyat": 12000,
+      "etiket": "11 kW - 50k-150k TL 7-11kW ev/site"
+    },
+    "guc_22kw": {
+      "tip": "sabit",
+      "fiyat": 18000,
+      "etiket": "22 kW - Legrand Greenup 3 faz 22kW IP44 %25 indirim kurulum, 25k-80k TL 7-22kW"
+    },
+    "guc_30kw_dc": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "30 kW DC - Baz DC"
+    },
+    "guc_60kw_dc": {
+      "tip": "sabit",
+      "fiyat": 85000,
+      "etiket": "60 kW DC - Orta DC"
+    },
+    "guc_120kw_dc": {
+      "tip": "sabit",
+      "fiyat": 180000,
+      "etiket": "120 kW DC - Yuksek"
+    },
+    "guc_150kw_plus": {
+      "tip": "sabit",
+      "fiyat": 280000,
+      "etiket": "150 kW+ DC - 500k+ TL 50-150kW, 180k-500k+ 50-350kW"
+    },
+    "guc_300kw_plus": {
+      "tip": "sabit",
+      "fiyat": 520000,
+      "etiket": "300 kW+ DC - 98k-103k USD ~3.5M TL ultra hizli 600A CCS2 720kW split"
+    },
+    "elektrik_hazir": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Elektrik Altyapisi Hazir - Hazir"
+    },
+    "kismen_hazir": {
+      "tip": "sabit",
+      "fiyat": 3200,
+      "etiket": "Kismen hazir - Kismi tesisat"
+    },
+    "yeni_tesisat_gerekli": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Yeni tesisat gerekli - Komple yeni 5k-20k TL iscilik"
+    },
+    "akilli_app_kontrollu": {
+      "tip": "sabit",
+      "fiyat": 2800,
+      "etiket": "Evet App kontrollu akilli sarj - WiFi akilli orta seviye 1000-2500 TL butce dostu 500-1000 TL"
+    },
+    "load_balancing_evet": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Guc Yonetimi Load Balancing Evet - Site apartman guc yonetimi"
+    },
+    "kisisel_sayac_rfid_kart": {
+      "tip": "sabit",
+      "fiyat": 3200,
+      "etiket": "Kisisel sayacli Kart RFID olcum yetkilendirme mobil kart sifreli serbest - Olcum sistemi"
+    }
+  },
+  "carpanlar": {
+    "ev_tipi": 1.0,
+    "site_apartman": 1.35,
+    "ticari": 1.65,
+    "otopark_altyapi": 1.28,
+    "ac_3_7kw": 1.0,
+    "ac_22kw": 1.45,
+    "dc_30kw": 1.0,
+    "dc_150kw": 2.2
+  },
+  "alanKatsayilari": {
+    "1_5_arac_site": 1.0,
+    "5_10_arac": 1.45,
+    "10_20_arac": 1.95,
+    "20_plus_arac": 2.6,
+    "kablo_0_10m": 1.0,
+    "kablo_10_30m": 1.18,
+    "kablo_30_100m": 1.42,
+    "kablo_100_plus": 1.75
+  },
+  "kaynak": "Temmuz 2026 - EV sarj ev tipi AC 7-22kW 25k-80k TL kurulum dahil ticari AC 60k-150k TL DC 50-150kW 500k+ TL Azimut 2026, basit ev tipi 10k-20k TL VW dusuk guc hizli gelismis artar, ev/site AC 7-11kW 50k-150k TL, AC dusuk ilk yatirim uzun park DC 50-350kW 180k-500k+ TL, ev AC 25k-50k DC 250k-1M kurulum 5k-20k TL Milenerji, Zes tesisat 2k-2.5k TL 5kW alti mustakil, Gebze 11kW 3k-5k TL 3 arac duvar tipi"
+}

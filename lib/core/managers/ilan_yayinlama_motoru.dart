@@ -1,31 +1,21 @@
-// lib/core/managers/ilan_yayinlama_motoru.dart
-
+// lib/core/managers/ilan_yayinlama_motoru.dart - REVIZE FINAL V9
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ustam_gelsin/core/models/ilan_model.dart';
 import 'package:ustam_gelsin/core/services/ad_service.dart';
 import 'package:ustam_gelsin/core/services/sosyal_medya.dart';
-import 'package:ustam_gelsin/core/managers/price_calculation_manager.dart';
 
 class IlanYayinlamaMotoru {
   static const String _defaultGorselUrl = 'https://pub-63efa1c2a7de49f4a20c67bfcefeb342.r2.dev/default.jpg';
 
-  // REVIZE EDILDI - Senin istedigin mantik: (min+max)/2 * %1
-  static double _komisyonHesapla(String fiyatBilgisi) {
+  // SİSTEM KURALI: 15.000 TL altı sabit 150 TL, 15.000 TL ve üzeri net %1 (Orkestradan gelen net ortalama bütçeye göre)
+  static double _komisyonHesapla(double muhtemelButce) {
     try {
-      // fiyatBilgisi artik "35.000 - 45.000 ₺" formatinda geliyor
-      if (fiyatBilgisi.contains('-')) {
-        final parts = fiyatBilgisi.split('-');
-        double min = PriceCalculationManager.fiyatTemizle(parts[0]);
-        double max = PriceCalculationManager.fiyatTemizle(parts[1]);
-        double taban = (min + max) / 2;
-        return taban * 0.01;
-      } else {
-        // Eski tekil fiyat geriye uyumluluk icin
-        double muhtemelTutar = PriceCalculationManager.fiyatTemizle(fiyatBilgisi);
-        if (muhtemelTutar >= 15000) return muhtemelTutar * 0.01;
+      if (muhtemelButce < 15000) {
         return 150.0;
+      } else {
+        return muhtemelButce * 0.01;
       }
     } catch (e) {
       return 150.0;
@@ -39,6 +29,9 @@ class IlanYayinlamaMotoru {
     required List<String> resimler,
     required String notlar,
     required String fiyatBilgisi,
+    required double minimumButce,
+    required double maksimumButce,
+    required double muhtemelButce,
     required String secilenIl,
     required String secilenIlce,
     required String secilenIlId,
@@ -60,16 +53,18 @@ class IlanYayinlamaMotoru {
     try {
       var modDoc = await FirebaseFirestore.instance.collection('settings').doc('moderasyon_ayarlari').get();
       if (modDoc.exists) {
-        List<dynamic> seciliBolgeler = modDoc.data()?['secili_bolgeler']?? [];
+        List<dynamic> seciliBolgeler = modDoc.data()?['secili_bolgeler'] ?? [];
         ilanOnayBekliyorMu = seciliBolgeler.any((b) => b['sehir_id'].toString() == secilenIlId && (b['ilceler'] as List).any((i) => i['id'].toString() == secilenIlceId));
       }
     } catch (e) {
       debugPrint("Moderasyon kontrol hatası: $e");
     }
 
-    final double muhtemelTutar = PriceCalculationManager.fiyatTemizle(fiyatBilgisi);
-    final bool isAcilMi = detaylar['isAcil'] == true;
+    final double komisyon = _komisyonHesapla(muhtemelButce);
 
+    debugPrint("💰 ILAN MOTORU: fiyat=$fiyatBilgisi min=$minimumButce max=$maksimumButce ort=$muhtemelButce komisyon -> $komisyon");
+
+    final bool isAcilMi = detaylar['isAcil'] == true;
     Map<String, dynamic> guncelTeknikDetaylar = Map<String, dynamic>.from(detaylar);
 
     final yeniIlan = ilan.copyWith(
@@ -77,14 +72,19 @@ class IlanYayinlamaMotoru {
       resimler: resimler,
       detaylar: notlar,
       fiyatBilgisi: fiyatBilgisi,
-      durum: ilanOnayBekliyorMu? 'onay_bekliyor' : 'aktif',
-      musteriAd: user.displayName?? "Müşteri",
+      minimumButce: minimumButce,
+      maksimumButce: maksimumButce,
+      muhtemelButce: muhtemelButce,
+      fiyatAraligi: fiyatBilgisi,
+      durum: ilanOnayBekliyorMu ? 'onay_bekliyor' : 'aktif',
+      musteriAd: user.displayName ?? "Müşteri",
       konumMetin: "$secilenIl / $secilenIlce",
       ilId: secilenIlId,
       ilceId: secilenIlceId,
       latitude: lat,
       longitude: lng,
-      komisyonTutari: _komisyonHesapla(fiyatBilgisi), // REVIZE - artik aralikli stringi dogru okuyor
+      komisyonTutari: komisyon,
+      komisyonTabani: muhtemelButce,
       isAcil: isAcilMi,
     );
 
@@ -92,7 +92,7 @@ class IlanYayinlamaMotoru {
       await AdService().ilanOlustur(yeniIlan);
 
       if (!ilanOnayBekliyorMu) {
-        final String gorsel = resimler.isNotEmpty? resimler.first : _defaultGorselUrl;
+        final String gorsel = resimler.isNotEmpty ? resimler.first : _defaultGorselUrl;
         try {
           await SosyalMedyaMotoru.facebookPaylas(yeniIlan.baslik, yeniIlan.konumMetin, yeniIlan.kategori, detaylar, gorsel);
         } catch (e) {
@@ -110,9 +110,12 @@ class IlanYayinlamaMotoru {
         'userId': user.uid,
         'kategori': ilan.kategori,
         'fiyatBilgisi': fiyatBilgisi,
-        'sistemFiyat': muhtemelTutar,
-        'muhtemelTutar': muhtemelTutar,
-        'musteriDegerlendirmesi': secilenGeriBildirim?? "Belirtilmedi",
+        'minimumButce': minimumButce,
+        'maksimumButce': maksimumButce,
+        'muhtemelButce': muhtemelButce,
+        'sistemFiyat': muhtemelButce,
+        'komisyonTutari': komisyon,
+        'musteriDegerlendirmesi': secilenGeriBildirim ?? "Belirtilmedi",
         'musterininIstedigiFiyat': anketFiyat,
         'detaylar': detaylar,
         'resimler': resimler,
@@ -123,7 +126,7 @@ class IlanYayinlamaMotoru {
         'longitude': lng,
       });
 
-      onResult(ilanOnayBekliyorMu? "İlanınız İncelemede!" : "İlanınız Yayınlandı!", ilanOnayBekliyorMu? "İlanınız moderasyon sürecine alındı." : "İlanınız başarıyla yayına girdi.");
+      onResult(ilanOnayBekliyorMu ? "İlanınız İncelemede!" : "İlanınız Yayınlandı!", ilanOnayBekliyorMu ? "İlanınız moderasyon sürecine alındı." : "İlanınız başarıyla yayına girdi.");
     } catch (e) {
       debugPrint("IlanYayinlamaMotoru hata: $e");
       onResult("Hata Oluştu", "İlan yayınlanırken bir sorun oluştu.");

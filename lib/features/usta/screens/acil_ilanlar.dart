@@ -35,12 +35,13 @@ class AcilIlanlarSayfasi extends StatelessWidget {
           builder: (context, snapshot) {
             double bakiye = 0.0;
             if (snapshot.hasData && snapshot.data!.exists) {
-              bakiye = (snapshot.data!.data() as Map<String, dynamic>)['balance']?.toDouble() ?? 0.0;
+              bakiye = (snapshot.data!.data() as Map<String, dynamic>)['balance']?.toDouble()?? 0.0;
             }
             return Container(
-              height: MediaQuery.of(context).size.height * 0.9,
+              height: MediaQuery.of(context).size.height * 0.75,
               decoration: const BoxDecoration(color: Color(0xFFF8F9FA), borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 15),
                   Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10))),
@@ -49,15 +50,32 @@ class AcilIlanlarSayfasi extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Cüzdanım", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                        IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
+                        const Text("Cüzdanım", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black)),
+                        IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close, color: Colors.black)),
                       ],
                     ),
                   ),
-                  const Spacer(),
+                  const Divider(),
                   Padding(
                     padding: const EdgeInsets.all(25),
-                    child: Text("Mevcut Bakiye: ${bakiye.toStringAsFixed(2)} TL\n\nBakiye yüklemek için profil sayfanızdaki cüzdan panelini kullanabilirsiniz."),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.account_balance_wallet, size: 60, color: Colors.green),
+                        const SizedBox(height: 20),
+                        Text("Mevcut Bakiye: ${bakiye.toStringAsFixed(2)} TL", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
+                        const SizedBox(height: 15),
+                        const Text("Bakiye yüklemek için profil sayfanızdaki cüzdan panelini kullanabilirsiniz.", style: TextStyle(color: Colors.black54), textAlign: TextAlign.center),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white),
+                            child: const Text("KAPAT"),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -94,16 +112,14 @@ class AcilIlanlarSayfasi extends StatelessWidget {
               ),
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(
-                  // REVİZE ALANI: Hem string hem de liste kontrolü sağlayan sorgu mantığı
                   stream: FirebaseFirestore.instance
                       .collection('acil_cagri')
                       .where('durum', isEqualTo: 'bekliyor')
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+                    if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator(color: Colors.white));
                     if (!snapshot.hasData || snapshot.data!.docs.isEmpty) return _bosDurumWidget();
 
-                    // İlanları filtrele (Hem kategoriId bazlı hem teknikDetaylar.acilDurumTipi listesi bazlı)
                     List<IlanModel> acilIlanlar = snapshot.data!.docs.map((doc) {
                       var data = doc.data() as Map<String, dynamic>;
                       return IlanModel.fromMap(data, doc.id);
@@ -125,8 +141,6 @@ class AcilIlanlarSayfasi extends StatelessWidget {
   }
 
   Widget _firsatKarti(BuildContext context, IlanModel ilan) {
-    final String rawKonum = "${ilan.ilId} / ${ilan.ilceId}";
-
     return Card(
       color: Colors.red.shade900,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -138,20 +152,17 @@ class AcilIlanlarSayfasi extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FutureBuilder<String>(
-                  future: _formatKonumMetni(rawKonum),
-                  builder: (context, snapshot) {
-                    return Row(
-                      children: [
-                        const Icon(Icons.location_on, color: Colors.white54, size: 16),
-                        const SizedBox(width: 5),
-                        Text(
-                          snapshot.data ?? "Yükleniyor...",
-                          style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    );
-                  },
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, color: Colors.white54, size: 16),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(
+                        ilan.konumMetin.isNotEmpty? ilan.konumMetin : "Konum Belirtilmedi",
+                        style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10),
                 const Icon(Icons.flash_on, color: Colors.white),
@@ -176,11 +187,11 @@ class AcilIlanlarSayfasi extends StatelessWidget {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Bu ilan başkası tarafından alındı veya bakiye yetersiz!")));
                     final user = FirebaseAuth.instance.currentUser;
-                    if (user != null) _cuzdanSayfasiniAc(context, user.uid);
+                    if (user!= null) _cuzdanSayfasiniAc(context, user.uid);
                   }
                 } catch (e) {
                   if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("İşlem sırasında hata oluştu.")));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("İşlem sırasında hata: $e")));
                 }
               },
               child: const Text("HEMEN İŞİ AL (250.00 TL)", style: TextStyle(fontWeight: FontWeight.bold)),

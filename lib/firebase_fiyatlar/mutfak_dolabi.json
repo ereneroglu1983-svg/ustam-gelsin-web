@@ -1,0 +1,163 @@
+﻿{
+  "meslekId": "mutfak_dolabi",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 9000,
+    "asgariBuyuk": 25000
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "Mutfak alt+ust+tezgah 7.5k-70k Kocaeli, 6.5k-75k 2.5m+2m Balikesir, 65k-112k L akrilik Istanbul Atasehir mermer haric, 40k-70k Tekirdag 4.kat asansorsuz, 10mt country 5k-80k Yenimahalle, Adana alt+tezgah+ust 7.5k-90k - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.32,
+    "ankara_izmir_antalya_bursa": 1.15,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 650,
+    "3_ve_ustu_asansorsuz": 1850,
+    "l_lojistik_kose_fire": 1200
+  },
+  "ekstralar": {
+    "komple_yenileme_dolap_tezgah_imalat_montaj": {
+      "tip": "mt",
+      "fiyat": 14500,
+      "etiket": "Komple Mutfak Yenileme Hem Dolap Hem Tezgah Imalat ve Montaji - 7.5k-70k alt+tezgah+ust, L akrilik mermer haric 65k-112k"
+    },
+    "sadece_dolap_imalat_tezgah_haric": {
+      "tip": "mt",
+      "fiyat": 9500,
+      "etiket": "Sadece Mutfak Dolabi Imalati Tezgah Haric - Alt+ust 8m 7.5k-11k Antalya, L alt ust 6m Mersin 5.7k-222k"
+    },
+    "sadece_tezgah_degisim_dolap_sabit": {
+      "tip": "mt",
+      "fiyat": 5200,
+      "etiket": "Sadece Mutfak Tezgahi Degisimi Dolaplar Sabit - Granit 768 TL 70cmx2m, kuvars kompoze mermerit 4900 TL/m2"
+    },
+    "kapak_yenileme_boyama": {
+      "tip": "mt",
+      "fiyat": 3800,
+      "etiket": "Mutfak Kapak Yenileme / Boyama Hizmeti - Tamir 1k-4.5k gozden gecirme 2k-3k"
+    },
+    "akrilik_parlak_mat_cizilmez_puruzsuz": {
+      "tip": "mt",
+      "fiyat": 2800,
+      "etiket": "Akrilik Kapak Parlak / Mat Cizilmeye Dayanikli Puruzsuz Yuzey - Akrilik tercih Yenimahalle, L akrilik 65k-112k"
+    },
+    "lake_7_kat_ipek_mat_parlak_luks_el": {
+      "tip": "mt",
+      "fiyat": 4200,
+      "etiket": "Lake Kapak 7 Kat Boyali Ipek Mat / Parlak Luks El Isciligi - Lake en pahali"
+    },
+    "membran_mdflam_ekonomik_standart": {
+      "tip": "mt",
+      "fiyat": 0,
+      "etiket": "Membran / MDFlam Ekonomik ve Standart Dayanimli Segment - Beyaz membran alt 2 kapak 1 raf 90cm 28990 TL Minar"
+    },
+    "masif_ahsap_firinlanmis_dogal_rustik_klasik": {
+      "tip": "mt",
+      "fiyat": 5800,
+      "etiket": "Masif Ahsap Kapak Firinlanmis Dogal Agac Rustik Klasik Seri - Masif luks"
+    },
+    "kuvars_kompoze_yuksek_mukavemet_yeni_nesil": {
+      "tip": "mt",
+      "fiyat": 4800,
+      "etiket": "Kuvars Kompoze Tezgah Yuksek Mukavemetli Yeni Nesil Dogal Tas - Kuvars / Belenco / Coante luks plaka 1450 TL/m2 fark"
+    },
+    "porselen_luks_isiya_dayanikli_cnc_ince_panel": {
+      "tip": "mt",
+      "fiyat": 6200,
+      "etiket": "Porselen Tezgah Luks Isiya Dayanikli CNC Kesim Ince Panel - Ultra ince porselen 2100 TL/m2 fark"
+    },
+    "granit_dogal_yerli_ithal_agir_sanayi": {
+      "tip": "mt",
+      "fiyat": 3200,
+      "etiket": "Granit Tezgah Dogal Tas Yerli / Ithal Agir Sanayi Serisi - Granit 768 TL 70cmx2m en ucuz"
+    },
+    "ahsap_masif_panel_iroko_mese_yaglanmis": {
+      "tip": "mt",
+      "fiyat": 3800,
+      "etiket": "Ahsap / Masif Panel Tezgah Iroko / Mese Suya Dayanikli Yaglanmis Seri - Dis mekan yag"
+    },
+    "duz_tek_hat_duvar_boyu": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Duz Mutfak Tek Hat Duvar Boyu Yerlesim - Baz"
+    },
+    "l_kose_birlesim_fire_payli": {
+      "tip": "carpan",
+      "fiyat": 1.12,
+      "etiket": "L Mutfak Kose Birlesim ve Tezgah Kose Kesim Fire Payli - L seklinde akrilik ornek"
+    },
+    "u_ada_cift_kose_agir_lojistik": {
+      "tip": "carpan",
+      "fiyat": 1.28,
+      "etiket": "U Mutfak / Ada Entegrasyonu Cift Kose Donuslu ve Agir Lojistik Yuku - 7mt ust+alt tezgah Kadikoy"
+    },
+    "apartman_dairesi": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Apartman Dairesi - Standart"
+    },
+    "mustakil_villa": {
+      "tip": "carpan",
+      "fiyat": 1.12,
+      "etiket": "Mustakil Ev / Villa - Genis alan"
+    },
+    "ofis_is_yeri_personel_mutfagi": {
+      "tip": "carpan",
+      "fiyat": 0.95,
+      "etiket": "Ofis / Is Yeri Personel Mutfagi - Basit"
+    },
+    "cafe_restoran_ticari_mutfak": {
+      "tip": "carpan",
+      "fiyat": 1.35,
+      "etiket": "Cafe / Restoran Ticari Mutfagi - Paslanmaz + agir kullanim"
+    },
+    "premium_frenli_ray_tandem_yuksek_tasima": {
+      "tip": "adet",
+      "fiyat": 420,
+      "etiket": "Premium Frenli Ray Cekmece Setleri Yuksek Tasima Kapasiteli Tandem Sistemler - Adet"
+    },
+    "kor_kose_kiler_fasulye_doner_cekmece": {
+      "tip": "adet",
+      "fiyat": 3800,
+      "etiket": "Kor Kose Kiler Sistemi Entegrasyonu Fasulye Tipi Doner Cekmece Mekanizmasi"
+    },
+    "kulpsuz_gola_gizli_aluminyum_profil": {
+      "tip": "mt",
+      "fiyat": 850,
+      "etiket": "Kulpsuz Gola Sistem Gecisi Gizli Aluminyum Profil Kanali ve Ozel Kapak Kesimi - Mt"
+    },
+    "tezgah_arasi_cam_seramik_temperli_buyuk_panel": {
+      "tip": "m2",
+      "fiyat": 1450,
+      "etiket": "Tezgah Arasi Cam / Seramik Kaplama Temperli Cam veya Buyuk Ebat Panel - Cam mozaik 31.5x31.5 10 file=1m2"
+    },
+    "led_aydinlatma_el_sensorlu_profil_gizli": {
+      "tip": "mt",
+      "fiyat": 480,
+      "etiket": "LED Aydinlatma Entegrasyonu El Sensorlu Profil Ici Gizli Isik Bandi - Mt"
+    }
+  },
+  "carpanlar": {
+    "akrilik_kapak": 1.18,
+    "lake_kapak": 1.35,
+    "membran_mdflam": 1.0,
+    "masif_ahsap": 1.55,
+    "kuvars_kompoze": 1.32,
+    "porselen_luks": 1.55,
+    "granit": 1.12
+  },
+  "alanKatsayilari": {
+    "0_3_mt_kucuk": 1.28,
+    "3_5_mt_orta": 1.0,
+    "5_8_mt_genis": 0.92,
+    "8_mt_uzeri_villa_ticari": 0.85
+  },
+  "kaynak": "Temmuz 2026 - Mutfak alt+tezgah+ust 7.5k-70k Kocaeli 6.5k-75k 2.5m+2m Balikesir 65k-112k L akrilik Istanbul 40k-70k Tekirdag 4.kat asansorsuz 10mt country 5k-80k Yenimahalle 7.5k-90k Adana alt+tezgah+ust 8m alt ust 7.5k-11k Antalya L 6m Mersin 5.7k-222k, 7mt ust+alt Kadikoy pesin, hazir mutfak 220cm beyaz antrasit, beyaz membran alt 90cm 28990 TL Minar, granit 70cmx2m 768 TL mermerit 4900 TL/m2"
+}

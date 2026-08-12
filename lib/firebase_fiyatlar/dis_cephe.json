@@ -1,0 +1,173 @@
+﻿{
+  "meslekId": "dis_cephe",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 285,
+    "asgariKucuk": 18000,
+    "asgariBuyuk": 35000
+  },
+  "malzeme": {
+    "m2": 650,
+    "aciklama": "EPS 5cm 450-600 TL 8cm 550-700 TL, XPS 5cm 500-700 TL 1100-1400 TL liste, Tasyunu 5cm 1600-1900 TL 8cm 650-850 TL 1850-2200 TL, Izocam 5cm 2030 TL 8cm 2440 TL - 2026 Ankara/Ozyurt/Dek-Mar ort"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.32,
+    "ankara_izmir_antalya_bursa": 1.15,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 1500,
+    "3_5_kat_celik_iskele": 8500,
+    "6_ve_uzeri_iskele": 18500,
+    "kule_gokdelen_platform_sepet": 42000,
+    "vinc_lojistik": 9500
+  },
+  "ekstralar": {
+    "mantolama_boya_paket": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Mantolama ve Boya Paket Uygulamasi - Baz"
+    },
+    "sadece_dis_cephe_boya": {
+      "tip": "m2",
+      "fiyat": -420,
+      "etiket": "Sadece Dis Cephe Boya Mantolama Istemiyorum - Dis boya 150-260 TL/m2 iskele dahil, iscilik 80-150 TL"
+    },
+    "sifir_mantolama_yeni": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Sifir Mantolama Yeni Uygulama - Baz"
+    },
+    "mevcut_mantolama_yenileme_tadilat": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Mevcut Mantolama Yenileme / Revizyon - Sokum ve duzeltme"
+    },
+    "evet_hasarli_levha_degisimi": {
+      "tip": "m2",
+      "fiyat": 245,
+      "etiket": "EVET Hasarli Levhalar Degistirilsin - Levha + dubel + file"
+    },
+    "hayir_sadece_siva_file_boya": {
+      "tip": "m2",
+      "fiyat": -320,
+      "etiket": "HAYIR Sadece siva/file tamiri ve boya - Levha maliyeti dus"
+    },
+    "eps_standart": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "EPS Standart - 5cm 450-600 TL en ekonomik"
+    },
+    "karbonlu_eps_yuksek_yogunluk": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Karbonlu EPS Yuksek Yogunluklu - Filli Capatect Ideal Carbon 5cm 1600 TL, Double Carbon 1680 TL"
+    },
+    "tas_yunu_a1_yanmaz_isi_ses": {
+      "tip": "m2",
+      "fiyat": 850,
+      "etiket": "Tas Yunu A1 Yanmaz Isi-Ses Yalitimli - 5cm 1600-1900 TL, Izocam 2030 TL, 8cm 1850-2200 TL / 2440 TL"
+    },
+    "xps_yalitim_levhasi": {
+      "tip": "m2",
+      "fiyat": 320,
+      "etiket": "XPS Yalitim Levhasi - 5cm 500-700 TL liste 1100-1400 TL, nemli bolge"
+    },
+    "kalinlik_3_cm": {
+      "tip": "m2",
+      "fiyat": -150,
+      "etiket": "3 cm Kalinlik - Ince uygulama"
+    },
+    "kalinlik_4_cm": {
+      "tip": "m2",
+      "fiyat": -60,
+      "etiket": "4 cm Kalinlik"
+    },
+    "kalinlik_5_cm": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "5 cm Kalinlik - Standart"
+    },
+    "kalinlik_8_cm_plus": {
+      "tip": "m2",
+      "fiyat": 280,
+      "etiket": "8 cm+ Kalinlik - EPS 550-700 TL, Tasyunu 8cm 650-850 TL, yuksek yaltim"
+    },
+    "bina_apartman_blogu": {
+      "tip": "carpan",
+      "fiyat": 1.1,
+      "etiket": "Apartman Blogu - Ortak karar ve iskele uzun sureli"
+    },
+    "villa_mustakil": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Villa / Mustakil Ev - Standart"
+    },
+    "ticari_bina_isyeri": {
+      "tip": "carpan",
+      "fiyat": 1.18,
+      "etiket": "Ticari Bina / Isyeri - Mesai disi calisma"
+    },
+    "yukseklik_1_2_kat": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "1-2 Katli Mustakil Ev / Villa - Iskele dusuk"
+    },
+    "yukseklik_3_5_kat_celik_iskele": {
+      "tip": "sabit",
+      "fiyat": 9500,
+      "etiket": "3-5 Katli Bina Celik Iskele Kurulumlu - 25k-50k TL iskele ornek"
+    },
+    "yukseklik_6_uzeri_standart": {
+      "tip": "sabit",
+      "fiyat": 18500,
+      "etiket": "6 Kat ve Uzeri Standart Apartman - Yuksek iskele ve guvenlik"
+    },
+    "yuksek_kule_gokdelen_platform": {
+      "tip": "sabit",
+      "fiyat": 42000,
+      "etiket": "Yuksek Kule / Gokdelen Hareketli Platform Sepetli - Vincli"
+    },
+    "ekstra_istemiyorum": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "EKSTRALAR ISTEMIYORUM"
+    },
+    "sove_pencere_kenari_dekoratif": {
+      "tip": "mt",
+      "fiyat": 380,
+      "etiket": "Sove / Pencere Kenari Dekoratif Susleme Uygulamasi"
+    },
+    "silikonlu_boya_kendi_temizleyen": {
+      "tip": "m2",
+      "fiyat": 45,
+      "etiket": "Silikonlu Boya Kendi Kendini Temizleyen - Premium 120-200 TL/m2, elastomerik 240-320 TL"
+    },
+    "grenli_dekoratif_siva_mozaik": {
+      "tip": "m2",
+      "fiyat": 120,
+      "etiket": "Grenli Dis Cephe Boyasi / Dekoratif Siva Mozaik - Tas desenli 1800 TL/m2 anahtar teslim ornek"
+    },
+    "cephe_catlak_tamiri_file_kimyasal": {
+      "tip": "m2",
+      "fiyat": 95,
+      "etiket": "Cephe Catlak Tamiri ve Fileli Kimyasal Dolgu - Alci + file + kimyasal"
+    }
+  },
+  "carpanlar": {
+    "mantolama_paket": 1.0,
+    "sadece_boya": 0.38,
+    "sifir_uygulama": 1.0,
+    "revizyon_tadilat": 0.72
+  },
+  "alanKatsayilari": {
+    "0_100_m2": 1.35,
+    "100_250_m2": 1.15,
+    "250_500_m2": 1.0,
+    "500_1000_m2": 0.88,
+    "1000_m2_uzeri": 0.78
+  },
+  "kaynak": "Temmuz 2026 - Eleman.net EPS 5cm 450-600 TL 8cm 550-700 TL XPS 5cm 500-700 TL Tasyunu 8cm 650-850 TL, Ozyurt Filli Carbon 5cm 1600 TL Double 1680 TL Expert 1450 TL Fawori 1380 TL Izocam Tasyunu 5cm 2030 TL 8cm 2440 TL, Dek-Mar dis boya 150-280 TL iskele dahil iscilik 80-150 TL, villa dis 200-400 TL, tas desenli kaplama 1800 TL/m2"
+}

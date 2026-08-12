@@ -71,15 +71,9 @@ class _UstaIlanDetaySayfasiState extends State<UstaIlanDetaySayfasi> with Single
     return raw;
   }
 
-  double _fiyatSayiyaCevir(String? fiyat) {
-    if (fiyat == null) return 0.0;
-    String temizFiyat = fiyat.replaceAll(RegExp(r'[^0-9]'), '');
-    return double.tryParse(temizFiyat) ?? 0.0;
-  }
-
   Future<void> _teklifVer() async {
     final ustaId = FirebaseAuth.instance.currentUser!.uid;
-    final komisyon = _fiyatSayiyaCevir(widget.ilan.fiyatBilgisi) * 0.01;
+    final double komisyon = widget.ilan.komisyonTutari;
     final teklifFiyat = double.tryParse(_fiyatController.text.replaceAll('.', '')) ?? 0.0;
 
     if (teklifFiyat <= 0) {
@@ -171,7 +165,7 @@ class _UstaIlanDetaySayfasiState extends State<UstaIlanDetaySayfasi> with Single
   }
 
   Widget _buildBottomBar() {
-    double komisyon = _fiyatSayiyaCevir(widget.ilan.fiyatBilgisi) * 0.01;
+    double komisyon = widget.ilan.komisyonTutari;
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.all(20),

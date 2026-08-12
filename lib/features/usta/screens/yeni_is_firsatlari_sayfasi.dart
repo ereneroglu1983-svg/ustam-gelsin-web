@@ -1,4 +1,4 @@
-// lib/features/usta/screens/yeni_is_firsatlari_sayfasi.dart
+// lib/features/usta/screens/yeni_is_firsatlari_sayfasi.dart - REVİZE: YENİDEN ESKİYE
 
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -44,13 +44,13 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
 
   Future<void> _kullaniciKonumuYukle() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
+    if (user!= null) {
       final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      if (doc.exists && doc.data() != null) {
+      if (doc.exists && doc.data()!= null) {
         final data = doc.data()!;
         setState(() {
-          _ustaLat = (data['latitude'] ?? 0.0).toDouble();
-          _ustaLng = (data['longitude'] ?? 0.0).toDouble();
+          _ustaLat = (data['latitude']?? 0.0).toDouble();
+          _ustaLng = (data['longitude']?? 0.0).toDouble();
         });
       }
     }
@@ -79,10 +79,10 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
     try {
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
       if (userDoc.exists) {
-        String ad = userDoc.get('firstName') ?? "";
-        String soyad = userDoc.get('lastName') ?? "";
+        String ad = userDoc.get('firstName')?? "";
+        String soyad = userDoc.get('lastName')?? "";
         if (ad.isEmpty) return "MÜŞTERİ";
-        String soyadHarf = soyad.isNotEmpty ? soyad[0].toUpperCase() : "";
+        String soyadHarf = soyad.isNotEmpty? soyad[0].toUpperCase() : "";
         return "${ad[0].toUpperCase()}${ad.substring(1).toLowerCase()} $soyadHarf.";
       }
     } catch (e) { return "MÜŞTERİ"; }
@@ -116,11 +116,11 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
 
-                    List<IlanModel> ilanlar = (snapshot.data ?? [])
-                        .where((i) => !_isAcil(i) && !_teklifVerilenIlanlar.contains(i.id))
+                    List<IlanModel> ilanlar = (snapshot.data?? [])
+                        .where((i) =>!_isAcil(i) &&!_teklifVerilenIlanlar.contains(i.id))
                         .toList();
 
-                    if (_seciliKategori != "Hepsi") {
+                    if (_seciliKategori!= "Hepsi") {
                       ilanlar = ilanlar.where((i) => i.kategori.toLowerCase().contains(_seciliKategori.toLowerCase())).toList();
                     }
 
@@ -128,7 +128,8 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
                       double mesafeA = _mesafeHesapla(_ustaLat, _ustaLng, a.latitude, a.longitude);
                       double mesafeB = _mesafeHesapla(_ustaLat, _ustaLng, b.latitude, b.longitude);
                       if ((mesafeA - mesafeB).abs() < 0.1) {
-                        return a.tarih.compareTo(b.tarih);
+                        // REVİZE: YENİDEN > ESKİYE
+                        return b.tarih.compareTo(a.tarih);
                       }
                       return mesafeA.compareTo(mesafeB);
                     });
@@ -175,23 +176,22 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
                     builder: (context, s) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(color: const Color(0xFFFFA500).withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                      child: Text(s.data ?? "MÜŞTERİ", style: const TextStyle(color: Color(0xFFFFA500), fontSize: 11, fontWeight: FontWeight.bold)),
+                      child: Text(s.data?? "MÜŞTERİ", style: const TextStyle(color: Color(0xFFFFA500), fontSize: 11, fontWeight: FontWeight.bold)),
                     ),
                   ),
-                  Text(ilan.tarih.contains('T') ? ilan.tarih.split('T')[0] : ilan.tarih, style: const TextStyle(color: Colors.white60)),
+                  Text(ilan.tarih.contains('T')? ilan.tarih.split('T')[0] : ilan.tarih, style: const TextStyle(color: Colors.white60)),
                 ],
               ),
               const SizedBox(height: 16),
               Text(ilan.baslik.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
 
-              // TEKNİK DETAY KUTUCUKLARI BURAYA EKLENDİ
-              if (ilan.teknikDetaylar.isNotEmpty) ...[
+              if (ilan.teknikDetaylar.isNotEmpty)...[
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: ilan.teknikDetaylar.entries
-                      .where((e) => e.value != null && e.value.toString().isNotEmpty && e.key != 'isAcil')
+                      .where((e) => e.value!= null && e.value.toString().isNotEmpty && e.key!= 'isAcil')
                       .map((e) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
@@ -213,7 +213,7 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
                   Expanded(
                     child: FutureBuilder<String>(
                       future: _formatKonumMetni(ilan.konumMetin),
-                      builder: (context, s) => Text(s.data ?? "...", style: const TextStyle(color: Colors.white)),
+                      builder: (context, s) => Text(s.data?? "...", style: const TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],

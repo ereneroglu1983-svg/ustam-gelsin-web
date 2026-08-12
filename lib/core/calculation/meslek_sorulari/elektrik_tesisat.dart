@@ -1,6 +1,4 @@
-// lib/core/calculation/meslek_sorulari/elektrik_tesisat.dart - PROFESYONEL AKIŞLI VERSİYON
-// id ve options ASLA değiştirilmedi.
-
+// lib/core/calculation/meslek_sorulari/elektrik_tesisat.dart - FINAL
 class ElektrikTesisatiSorulari {
   static final List<Map<String, dynamic>> sorular = [
     {
@@ -8,178 +6,128 @@ class ElektrikTesisatiSorulari {
       "label": "Elektrik İşlem Kapsamı",
       "type": "single",
       "required": true,
-      "options": [
-        "Komple Tesisat Yenileme / Revizyon (Sıfırdan Kanal ve Kablo Çekimi)",
-        "Lokal Kısmi Tadilat / Arıza Onarımı (Kısa Devre / Buat Yenileme)",
-        "Sadece Montaj İşçiliği (Kabloları Hazır Yerlere Priz/Anahtar Takma)"
-      ]
+      "options": ["Komple Tesisat Yenileme Revizyon", "Lokal Kısmi Tadilat Arıza Onarım", "Sadece Montaj Priz Anahtar"]
     },
     {
       "id": "yapi_tipi",
-      "label": "Uygulama Yapılacak Yapı Tipi",
+      "label": "Yapı Tipi",
       "type": "single",
       "required": true,
       "dependsOnId": "uygulama_kapsami",
-      "dependsOnValue": [
-        "Komple Tesisat Yenileme / Revizyon (Sıfırdan Kanal ve Kablo Çekimi)",
-        "Lokal Kısmi Tadilat / Arıza Onarımı (Kısa Devre / Buat Yenileme)",
-        "Sadece Montaj İşçiliği (Kabloları Hazır Yerlere Priz/Anahtar Takma)"
-      ],
-      "options": [
-        "Daire",
-        "Villa / Müstakil Ev",
-        "Ticari Alan / İşyeri",
-        "Fabrika / Atölye"
-      ]
+      "options": ["Daire", "Villa Müstakil Ev", "Ticari Alan İşyeri", "Fabrika Atölye"]
     },
-
-    // ADIM 3: KONUT / TİCARİ AYRIMI - yapi_tipi'ne göre sadece biri gelir
+    // KONUT DALI
     {
       "id": "konut_tipi",
-      "label": "Konut Ölçüsü ve Oda Planı",
+      "label": "Konut Oda Planı",
       "type": "single",
       "required": true,
       "dependsOnId": "yapi_tipi",
-      "dependsOnValue": ["Daire", "Villa / Müstakil Ev"],
-      "options": [
-        "1+1 Konut Düzeni",
-        "2+1 Konut Düzeni",
-        "3+1 Konut Düzeni",
-        "4+1 ve Üzeri / Geniş Müstakil Ev"
-      ]
+      "dependsOnValue": ["Daire", "Villa Müstakil Ev"],
+      "options": ["1+1 Konut", "2+1 Konut", "3+1 Konut", "4+1 ve Üzeri Geniş"]
     },
+    // TİCARİ DALI
     {
       "id": "ticari_m2_alan",
-      "label": "Toplam Ticari Uygulama Alanı (m²)",
+      "label": "Ticari Alan Büyüklüğü",
       "type": "single",
       "required": true,
       "dependsOnId": "yapi_tipi",
-      "dependsOnValue": ["Ticari Alan / İşyeri", "Fabrika / Atölye"],
-      "options": [
-        "1-100 m² Arası Küçük İşletme",
-        "100-250 m² Arası Orta Ölçekli Ticari Alan",
-        "250-500 m² Arası Geniş Mağaza / Atölye",
-        "500 m² ve Üzeri Büyük Fabrika / Depo alanı"
-      ]
+      "dependsOnValue": ["Ticari Alan İşyeri", "Fabrika Atölye"],
+      "options": ["1-100 m² Küçük", "100-250 m² Orta", "250-500 m² Geniş", "500 m² Üzeri Büyük"]
     },
-
-    // ADIM 4: TESİSAT ŞEKLİ - sadece Komple ve Lokal'de gelir, Sadece Montaj'da gelmez
-    // Konut veya Ticari seçildikten sonra gelir
+    // ORTAK ZİNCİR - Konut sonrası
     {
-      "id": "tesisat_sekli",
+      "id": "tesisat_sekli_konut",
       "label": "Tesisat Uygulama Şekli",
       "type": "single",
       "required": true,
-      "dependsOnId": ["konut_tipi", "ticari_m2_alan"],
-      "visibleIf": {
-        "uygulama_kapsami": [
-          "Komple Tesisat Yenileme / Revizyon (Sıfırdan Kanal ve Kablo Çekimi)",
-          "Lokal Kısmi Tadilat / Arıza Onarımı (Kısa Devre / Buat Yenileme)"
-        ]
-      },
-      "dependsOnValue": [
-        "1+1 Konut Düzeni",
-        "2+1 Konut Düzeni",
-        "3+1 Konut Düzeni",
-        "4+1 ve Üzeri / Geniş Müstakil Ev",
-        "1-100 m² Arası Küçük İşletme",
-        "100-250 m² Arası Orta Ölçekli Ticari Alan",
-        "250-500 m² Arası Geniş Mağaza / Atölye",
-        "500 m² ve Üzeri Büyük Fabrika / Depo alanı"
-      ],
-      "options": [
-        "Duvar İçi / Sıva Altı Tesisat",
-        "Sıva Üstü Tesisat (Kanal/Boru)",
-        "Karar Vermedim (Usta Sahada İnceleyip Önersin)"
-      ]
+      "dependsOnId": "konut_tipi",
+      "options": ["Duvar İçi Sıva Altı", "Sıva Üstü Kanal Boru"]
     },
-
-    // ADIM 5: ADET - tesisat şekli varsa ondan sonra, yoksa (Sadece Montaj) konut/ticari sonrası
     {
-      "id": "adet",
-      "label": "Net Priz / Anahtar Montaj Adeti",
+      "id": "tesisat_sekli_ticari",
+      "label": "Tesisat Uygulama Şekli",
       "type": "single",
       "required": true,
-      "dependsOnId": ["tesisat_sekli", "konut_tipi", "ticari_m2_alan"],
-      "dependsOnValue": [
-        "Duvar İçi / Sıva Altı Tesisat",
-        "Sıva Üstü Tesisat (Kanal/Boru)",
-        "Karar Vermedim (Usta Sahada İnceleyip Önersin)",
-        "1+1 Konut Düzeni",
-        "2+1 Konut Düzeni",
-        "3+1 Konut Düzeni",
-        "4+1 ve Üzeri / Geniş Müstakil Ev",
-        "1-100 m² Arası Küçük İşletme",
-        "100-250 m² Arası Orta Ölçekli Ticari Alan",
-        "250-500 m² Arası Geniş Mağaza / Atölye",
-        "500 m² ve Üzeri Büyük Fabrika / Depo alanı"
-      ],
-      "options": [
-        "Priz/Anahtar Montajı İstenmiyor (Sadece Hat Çekimi)",
-        "1-15 Adet Arası Priz/Anahtar",
-        "15-30 Adet Arası Priz/Anahtar",
-        "30-50 Adet Arası Priz/Anahtar",
-        "50+ Adet Üzeri Priz/Anahtar"
-      ]
+      "dependsOnId": "ticari_m2_alan",
+      "options": ["Duvar İçi Sıva Altı", "Sıva Üstü Kanal Boru", "Kablo Kanalı Busbar"]
     },
-
-    // ADIM 6: AYDINLATMA - adet seçilince gelsin
     {
-      "id": "aydinlatma_sayi",
-      "label": "Montajı Yapılacak Toplam Aydınlatma Noktası (Duy/Armatür/Sorti)",
+      "id": "adet_konut",
+      "label": "Priz Anahtar Montaj Adeti",
       "type": "single",
       "required": true,
-      "dependsOnId": "adet",
-      "dependsOnValue": [
-        "Priz/Anahtar Montajı İstenmiyor (Sadece Hat Çekimi)",
-        "1-15 Adet Arası Priz/Anahtar",
-        "15-30 Adet Arası Priz/Anahtar",
-        "30-50 Adet Arası Priz/Anahtar",
-        "50+ Adet Üzeri Priz/Anahtar"
-      ],
-      "options": [
-        "1-10 Nokta Arası",
-        "10-25 Nokta Arası",
-        "25-50 Nokta Arası",
-        "Aydınlatma Montaj İşlemi Yok"
-      ]
+      "dependsOnId": "tesisat_sekli_konut",
+      "options": ["Sadece Hat Çekimi", "1-15 Adet", "15-30 Adet", "30-50 Adet", "50 Adet Üzeri"]
     },
-
-    // ADIM 7: MALZEME - aydınlatma seçilince gelsin
     {
-      "id": "malzeme_segmenti",
-      "label": "Kullanılacak Malzeme Standart Segmenti",
+      "id": "adet_ticari",
+      "label": "Priz Anahtar Montaj Adeti",
       "type": "single",
       "required": true,
-      "dependsOnId": "aydinlatma_sayi",
-      "dependsOnValue": [
-        "1-10 Nokta Arası",
-        "10-25 Nokta Arası",
-        "25-50 Nokta Arası",
-        "Aydınlatma Montaj İşlemi Yok"
-      ],
-      "options": [
-        "Standart Yerli (NYM / Tam Bakır Kablo ve Standart Şalt Grubu)",
-        "Premium Kalite (Halogen Free Yangın Yürütmez Kablo + Birinci Sınıf İthal Şalt Grubu)"
-      ]
+      "dependsOnId": "tesisat_sekli_ticari",
+      "options": ["Sadece Hat Çekimi", "1-15 Adet", "15-30 Adet", "30-50 Adet", "50 Adet Üzeri"]
     },
-
-    // ADIM 8: FİNAL - malzeme seçilince yeşil kutuda açılsın
     {
-      "id": "ekstra_ozellikler",
-      "label": "Özel Linye Hatları ve Ekstra Donanım Talepleri",
+      "id": "aydinlatma_konut",
+      "label": "Aydınlatma Noktası Sayısı",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "adet_konut",
+      "options": ["1-10 Nokta", "10-25 Nokta", "25-50 Nokta", "Aydınlatma Yok"]
+    },
+    {
+      "id": "aydinlatma_ticari",
+      "label": "Aydınlatma Noktası Sayısı",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "adet_ticari",
+      "options": ["1-10 Nokta", "10-25 Nokta", "25-50 Nokta", "50 Üzeri Nokta", "Aydınlatma Yok"]
+    },
+    {
+      "id": "malzeme_segmenti_konut",
+      "label": "Malzeme Kalite Segmenti",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "aydinlatma_konut",
+      "options": ["Standart Yerli NYM Tam Bakır", "Premium Halogen Free Yangın Yürütmez"]
+    },
+    {
+      "id": "malzeme_segmenti_ticari",
+      "label": "Malzeme Kalite Segmenti",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "aydinlatma_ticari",
+      "options": ["Standart Yerli", "Premium Halogen Free"]
+    },
+    {
+      "id": "ekstra_konut",
+      "label": "Özel Linye ve Ekstra Talepler",
       "type": "multi",
-      "required": false,
-      "dependsOnId": "malzeme_segmenti",
-      "dependsOnValue": [
-        "Standart Yerli (NYM / Tam Bakır Kablo ve Standart Şalt Grubu)",
-        "Premium Kalite (Halogen Free Yangın Yürütmez Kablo + Birinci Sınıf İthal Şalt Grubu)"
-      ],
+      "required": true,
+      "dependsOnId": "malzeme_segmenti_konut",
       "options": [
-        "Klima / Hat Çekimi (Panodan Doğrudan Bağımsız Yüksek Amperajlı Hat)",
-        "Pano Yenileme / Sigorta Kutusu Değişimi (Kaçak Akım Rölesi Dahil)",
-        "Topraklama Hattı Çekimi (Levha Çakımı ve Megger Testi Ölçümü Dahil)",
-        "İnternet / Data Hattı Çekimi (Cat6 Kablo ve Data Prizi Sonlandırma)"
+        "Klima Hattı Bağımsız Linye",
+        "Pano Yenileme Kaçak Akım Rölesi",
+        "Topraklama Hattı Megger Testli",
+        "İnternet Data Cat6 Hattı",
+        "Ekstra İstemiyorum"
+      ]
+    },
+    {
+      "id": "ekstra_ticari",
+      "label": "Özel Linye ve Ekstra Talepler",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "malzeme_segmenti_ticari",
+      "options": [
+        "Trifaze Hat Çekimi",
+        "Pano Yenileme Kompanzasyon",
+        "Topraklama Paratoner",
+        "Data Kamera Hattı",
+        "Jeneratör Transfer Panosu",
+        "Ekstra İstemiyorum"
       ]
     }
   ];

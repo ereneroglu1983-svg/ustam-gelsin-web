@@ -1,246 +1,288 @@
-// lib/core/calculation/butce_orkestra_servisi.dart
-
+// lib/core/calculation/butce_orkestra_servisi.dart - FINAL V11 - ICON LOG + KATEGORI BAGIMSIZ - DOTENV TEMIZLENDI - FIXED
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
-import '../constants/is_sorulari_data.dart';
-import '../services/ai_price_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart'; // ✅ BU EKSİKTİ, GERİ EKLENDİ
+import '../services/grok_provider.dart';
 import '../services/groq_provider.dart';
+import '../services/fiyat_hesaplama_robotu.dart';
 
 class ButceOrkestraServisi {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static final AiPriceProvider _aiProvider = GroqProvider();
+  static final GrokProvider _grok = GrokProvider();
+  static final GroqProvider _groq = GroqProvider();
 
-  static const Set<String> _gecerliMeslekIdler = {
-    'alci_siva','aluminyum_cephe','asansor_servis','asma_tavan','bahce_peyzaj',
-    'banyo_vestiyer','bina_temizlik_hesaplayici','bolme_duvar','cam_balkon','cati_isleri',
-    'dis_cephe','dogalgaz_kombi','duvar_kagidi','elektrik_tesisat','elektrikli_arac',
-    'enerji_depolama','epoksi_zemin','fayans_seramik','ferforje_metal','gergi_tavan',
-    'ges','gomme_dolap','gunes_enerjisi','havuz_sistemleri','ic_boya','italyan_boya',
-    'kapi_sistemleri','kartonpiyer','klima_servis','komple_tadilat','marangozluk',
-    'mermer_granit','mutfak_dolabi','off_grid_mobil_enerji','otomatik_sulama','panel_singil',
-    'parke_doseme','prefabrik_yapi','pvc_dograma','res','sihhi_tesisat','sineklik_panjur',
-    'sistre_cila','su_yalitimi','temizlik_hizmetleri','uydu_kamera'
-  };
-
-  static String _stabilHashOlustur(String kategoriId, List<dynamic> cevaplar) {
-    final String ham = "$kategoriId-${jsonEncode(cevaplar)}";
-    return sha256.convert(utf8.encode(ham)).toString().substring(0, 32);
+  static String _hashUret({
+    required String kategoriId,
+    required String ilId,
+    required Map<String, dynamic> teknikDetaylar,
+  }) {
+    final normalized = teknikDetaylar.entries
+        .map((e) => "${e.key.trim().toLowerCase()}:${e.value.toString().trim().toLowerCase()}")
+        .toList()
+      ..sort();
+    final raw = "$kategoriId|$ilId|${normalized.join('|')}";
+    return raw.hashCode.toUnsigned(32).toString();
   }
 
-  static Map<String, dynamic> _zenginDetayOlustur(String kategoriAdi, List<dynamic> kullaniciCevaplari) {
-    final sorular = IsSorulariData.getSorularByKategori(kategoriAdi);
-    final Map<String, dynamic> cevapMap = {};
-    for (var item in kullaniciCevaplari) {
-      if (item is Map && item.containsKey('id')) {
-        cevapMap[item['id'].toString()] = item['cevap'];
-      }
-    }
-    List<Map<String, String>> zenginListe = [];
-    for (var s in sorular) {
-      final String id = s['id'].toString();
-      if (cevapMap.containsKey(id)) {
-        zenginListe.add({
-          "soru": s['label']?.toString()?? id,
-          "cevap": cevapMap[id].toString(),
-        });
-      }
-    }
-    return {"ham_cevaplar": cevapMap, "zengin_aciklama": zenginListe};
-  }
-
-  static Future<Map<String, dynamic>> _firebaseTabanliJenerikHesapla({
-    required String meslekId,
-    required List<dynamic> kullaniciCevaplari,
-    required String bolgeKodu,
+  static Future<String> _llamaYedekFiyatTahmini({
+    required String ilanBasligi,
+    required String kategoriAdi,
+    required Map<String, dynamic> detaylar,
   }) async {
-    try {
-      if (!_gecerliMeslekIdler.contains(meslekId)) {
-        throw Exception("Geçersiz meslekId, tarifede yok: $meslekId");
-      }
-
-      final doc = await _firestore.collection('meslek_fiyat_tarifeleri').doc(meslekId).get();
-      if (!doc.exists) throw Exception("Tarife dokümanı yok: $meslekId");
-
-      final data = doc.data()!;
-      final Map<String, dynamic> iscilik = Map<String, dynamic>.from(data['iscilik']?? {});
-      final Map<String, dynamic> ekstralar = Map<String, dynamic>.from(data['ekstralar']?? {});
-      final Map<String, dynamic> alanKatsayilari = Map<String, dynamic>.from(data['alanKatsayilari']?? {});
-      final Map<String, dynamic> carpanlar = Map<String, dynamic>.from(data['carpanlar']?? {});
-      final Map<String, dynamic> sehirCarpani = Map<String, dynamic>.from(data['sehirCarpani']?? {});
-      final Map<String, dynamic> katFarki = Map<String, dynamic>.from(data['katFarki']?? {});
-
-      Map<String, String> cevapStrMap = {};
-      for (var c in kullaniciCevaplari) {
-        if (c is Map && c['id']!= null) {
-          cevapStrMap[c['id'].toString().toLowerCase()] = c['cevap'].toString().toLowerCase();
-        }
-      }
-      final String tumCevaplar = cevapStrMap.values.join(' ').toLowerCase();
-
-      final num tabanNum = (iscilik['asgariKucuk'] as num?)?? (iscilik['asgariBuyuk'] as num?)?? 3000;
-      double taban = tabanNum.toDouble();
-
-      double alanKatsayi = 1.0;
-      alanKatsayilari.forEach((k, v) {
-        if (tumCevaplar.contains(k.split('_').first)) {
-          alanKatsayi = (v as num).toDouble();
-        }
-      });
-
-      double ekstraToplam = 0;
-      List<String> kullanilanEkstralar = [];
-      ekstralar.forEach((k, v) {
-        if (v is Map && tumCevaplar.contains(k.split('_').first)) {
-          final num fiyatNum = (v['fiyat'] as num?)?? 0;
-          ekstraToplam += fiyatNum.toDouble();
-          kullanilanEkstralar.add(v['etiket']?.toString()?? k);
-        }
-      });
-
-      double sehirCarpan = 1.0;
-      String bolge = bolgeKodu.toLowerCase();
-      if (bolge.contains('istanbul') || bolge == '34') {
-        final num sc = (sehirCarpani['istanbul'] as num?)?? 1.28;
-        sehirCarpan = sc.toDouble();
-      } else if (bolge.contains('ankara') || bolge.contains('izmir') || bolge.contains('antalya') || bolge.contains('bursa')) {
-        final num sc = (sehirCarpani['ankara_izmir_antalya_bursa'] as num?)?? 1.14;
-        sehirCarpan = sc.toDouble();
-      } else {
-        final num sc = (sehirCarpani['diger_iller'] as num?)?? 1.0;
-        sehirCarpan = sc.toDouble();
-      }
-
-      double katEk = 0;
-      katFarki.forEach((k, v) {
-        if (tumCevaplar.contains(k.split('_').first)) katEk += (v as num).toDouble();
-      });
-
-      double carpanToplam = 1.0;
-      carpanlar.forEach((k, v) {
-        if (tumCevaplar.contains(k.split('_').first)) carpanToplam *= (v as num).toDouble();
-      });
-
-      double muhtemel = (taban * alanKatsayi + ekstraToplam + katEk) * sehirCarpan * carpanToplam;
-
-      return {
-        "kaynak": "FIREBASE_JENERIK_ROBOT",
-        "meslekId": meslekId,
-        "minimumButce": muhtemel * 0.85,
-        "muhtemelButce": muhtemel,
-        "maksimumButce": muhtemel * 1.25,
-        "fiyatBilgisi": "${muhtemel.toInt()} ₺",
-        "komisyonTutari": muhtemel * 0.01,
-        "detay": {"taban": taban, "alanKatsayi": alanKatsayi, "sehirCarpan": sehirCarpan, "ekstraToplam": ekstraToplam, "kullanilanEkstralar": kullanilanEkstralar},
-        "durum": "BASARILI"
-      };
-    } catch (e) {
-      debugPrint("FIREBASE JENERIK HATA: $e");
-      return {
-        "kaynak": "FIREBASE_HATA",
-        "minimumButce": 3000.0,
-        "muhtemelButce": 5000.0,
-        "maksimumButce": 8000.0,
-        "fiyatBilgisi": "5000 ₺",
-        "komisyonTutari": 50.0,
-        "hata": e.toString(),
-        "durum": "HATA"
-      };
-    }
+    const apiKey = String.fromEnvironment('OPENROUTER_API_KEY');
+    if (apiKey.isEmpty) throw Exception("OPENROUTER_API_KEY_YOK - --dart-define ile verilmedi");
+    String detayStr = detaylar.entries.map((e) => "${e.key}:${e.value}").join(", ");
+    final prompt = "TR 2026 guncel fiyat. Sadece rakam ver. Is:$ilanBasligi, Kategori:$kategoriAdi, Detay:$detayStr, Bolge:${detaylar['BOLGE']}. Ornek: 6500";
+    final res = await http.post(
+      Uri.parse("https://openrouter.ai/api/v1/chat/completions"),
+      headers: {
+        "Authorization": "Bearer $apiKey",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://hemenustamgelsin.com",
+        "X-Title": "HemenUstamGelsin",
+      },
+      body: jsonEncode({
+        "model": "meta-llama/llama-3.3-70b:free",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.1,
+        "max_tokens": 30
+      }),
+    );
+    if (res.statusCode!= 200) throw Exception("LLAMA_HATA ${res.statusCode}");
+    final raw = jsonDecode(res.body)['choices'][0]['message']['content'].toString();
+    debugPrint("🦙 [LLAMA RAW] $raw");
+    final m = RegExp(r'\d{3,9}').allMatches(raw.replaceAll(RegExp(r'[.,\s₺]'), ''));
+    if (m.isEmpty) throw Exception("Llama fiyat yok: $raw");
+    int price = int.parse(m.last.group(0)!);
+    if (price < 500) price *= 1000;
+    return "${NumberFormat("#,###", "tr_TR").format(price).replaceAll(',', '.')} ₺";
   }
 
   static Future<Map<String, dynamic>> silsileYurut({
     required String talepId,
     required String kategoriAdi,
     required String kategoriId,
-    required List<dynamic> kullaniciCevaplari,
+    String? ilanBasligi,
+    required List<Map<String, dynamic>> kullaniciCevaplari,
     required Map<String, dynamic> yerelHafizaVerisi,
     required String anlikBolgeKodu,
     required String anlikKullaniciSegmenti,
   }) async {
-    final String normalizeKategori = kategoriAdi.trim().toUpperCase();
-    final String meslekId = kategoriId.trim().toLowerCase();
-    final String stabilKey = _stabilHashOlustur(meslekId, kullaniciCevaplari);
+    String gercekIsAdi = (ilanBasligi!= null && ilanBasligi.trim().isNotEmpty)? ilanBasligi.trim() : kategoriAdi;
+    debugPrint("🎼 ========== [ORKESTRA BAŞLADI] ==========");
+    debugPrint("📋 [GİREN] BAŞLIK: $gercekIsAdi | KATEGORİ: $kategoriAdi ($kategoriId) | BÖLGE: $anlikBolgeKodu | TALEP: $talepId");
 
-    if (yerelHafizaVerisi.containsKey(talepId) && yerelHafizaVerisi[talepId]!= null) {
-      return yerelHafizaVerisi[talepId];
-    }
-
-    try {
-      var havuz = await _firestore.collection('hazir_teklif_havuzu').where('stabilKey', isEqualTo: stabilKey).limit(1).get();
-      if (havuz.docs.isNotEmpty) {
-        final data = havuz.docs.first.data();
-        yerelHafizaVerisi[talepId] = data;
-        return data;
-      }
-    } catch (e) {
-      debugPrint("[SİLSİLE 2 HATA] $e");
-    }
-
-    try {
-      final zengin = _zenginDetayOlustur(kategoriAdi, kullaniciCevaplari);
-      String aiRaw = await _aiProvider.getFiyatTahmini(
-        musteriId: talepId,
-        isAdi: kategoriAdi,
-        kategoriAdi: kategoriAdi,
-        kategoriId: meslekId,
-        detaylar: {"bolge": anlikBolgeKodu,...zengin},
-      ).timeout(const Duration(seconds: 12));
-
-      // DÜZELTİLDİ - TEK SATIR, HATASIZ
-      double aiFiyat = double.tryParse(aiRaw.replaceAll(RegExp(r'[^0-9.]'), ''))?? 0;
-
-      if (aiFiyat > 500) {
-        final rapor = {
-          "talepId": talepId,
-          "kategori": normalizeKategori,
-          "meslekId": meslekId,
-          "stabilKey": stabilKey,
-          "hesaplamaTarihi": FieldValue.serverTimestamp(),
-          "kaynak": "AI_${_aiProvider.providerName}",
-          "robotSonucu": {
-            "kaynak": "AI",
-            "minimumButce": aiFiyat * 0.85,
-            "muhtemelButce": aiFiyat,
-            "maksimumButce": aiFiyat * 1.25,
-            "fiyatBilgisi": "${aiFiyat.toInt()} ₺",
-            "komisyonTutari": aiFiyat * 0.01,
-            "durum": "BASARILI"
-          },
-          "durum": "BASARILI"
-        };
-        yerelHafizaVerisi[talepId] = rapor;
-        _firestore.collection('hazir_teklif_havuzu').add(rapor);
-        return rapor;
-      }
-      throw Exception("AI anlamsız: $aiRaw");
-    } catch (e) {
-      debugPrint("[SİLSİLE 3] AI FAIL -> Firebase: $e");
-    }
-
-    final robotSonuc = await _firebaseTabanliJenerikHesapla(
-      meslekId: meslekId,
-      kullaniciCevaplari: kullaniciCevaplari,
-      bolgeKodu: anlikBolgeKodu,
-    );
-
-    final nihaiRapor = {
-      "talepId": talepId,
-      "kategori": normalizeKategori,
-      "meslekId": meslekId,
-      "stabilKey": stabilKey,
-      "hesaplamaTarihi": FieldValue.serverTimestamp(),
-      "analizMatrisi": jsonEncode(kullaniciCevaplari),
-      "robotSonucu": robotSonuc,
-      "durum": "BASARILI"
+    final Map<String, dynamic> detayMap = {
+      for (var item in kullaniciCevaplari) item['id'].toString(): item['cevap']
     };
+    detayMap['bolgeKodu'] = anlikBolgeKodu;
+    detayMap['BOLGE'] = anlikBolgeKodu;
+    detayMap['kategoriId'] = kategoriId;
+    detayMap['kategoriAdi'] = kategoriAdi;
+
+    String ilId = yerelHafizaVerisi['ilId']?.toString()?? "";
+    if (ilId.isEmpty && int.tryParse(anlikBolgeKodu)!= null) ilId = anlikBolgeKodu;
+
+    final Map<String, dynamic> teknikDetaylarMap = Map<String, dynamic>.from(detayMap)
+      ..removeWhere((k, v) => ['bolgeKodu', 'BOLGE', 'kategoriId', 'kategoriAdi'].contains(k));
+
+    final String analizHash = _hashUret(kategoriId: kategoriId, ilId: ilId, teknikDetaylar: teknikDetaylarMap);
+    debugPrint("🔑 [HASH] $analizHash | ilId:$ilId | detayCount:${teknikDetaylarMap.length}");
 
     try {
-      await _firestore.collection('hazir_teklif_havuzu').add(nihaiRapor);
-      yerelHafizaVerisi[talepId] = nihaiRapor;
-    } catch (_) {}
+      debugPrint("💾 [1.FIREBASE CACHE KONTROL] ilanlar koleksiyonu taranıyor...");
+      final cache = await _firebaseIlanCacheKontrol(kategoriId: kategoriId, ilId: ilId, teknikDetaylar: teknikDetaylarMap, hash: analizHash);
+      if (cache!= null) {
+        debugPrint("💾✅ [1.FIREBASE BULDU!] FİYAT: ${cache['fiyatBilgisi']} | KAYNAK: FIREBASE_ILANLAR_CACHE | HASH: $analizHash");
+        debugPrint("🎼 ========== [ORKESTRA BİTTİ - CACHE] ==========");
+        return {"robotSonucu": cache, "kaynak": "FIREBASE_ILANLAR_CACHE", "talepId": talepId};
+      }
+      debugPrint("💾❌ [1.FIREBASE BOŞ] Benzer ilan yok, 👑 GROK'a geçiliyor");
+    } catch (e, s) {
+      debugPrint("💾⚠ [1.FIREBASE HATA] $e | Stack: $s");
+      debugPrint("💾➡ [1.FIREBASE] Hata, 👑 GROK'a düşüyor");
+    }
 
-    return nihaiRapor;
+    try {
+      debugPrint("👑 [2.GROK DENENİYOR] isAdi: $gercekIsAdi | detay: ${detayMap.length} alan");
+      String fiyatStr = await _grok.getFiyatTahmini(
+        isAdi: gercekIsAdi,
+        kategoriAdi: kategoriAdi,
+        kategoriId: kategoriId,
+        detaylar: detayMap,
+      );
+      int ort = int.tryParse(fiyatStr.replaceAll(RegExp(r'[^0-9]'), ''))?? 0;
+      if (ort <= 0) throw Exception("GROK geçersiz fiyat: $fiyatStr");
+      double min = ort * 0.95;
+      double max = ort * 1.05;
+      final sonuc = {
+        "minimumButce": min,
+        "muhtemelButce": ort.toDouble(),
+        "maksimumButce": max,
+        "fiyatBilgisi": fiyatStr,
+        "aralikliFiyatBilgisi": "${NumberFormat("#,###", "tr_TR").format(min.toInt()).replaceAll(',', '.')} - ${NumberFormat("#,###", "tr_TR").format(max.toInt()).replaceAll(',', '.')} ₺",
+        "kaynak": "AI_GROK_4_3",
+        "durum": "BASARILI",
+        "analizHash": analizHash,
+      };
+      debugPrint("👑✅ [2.GROK BAŞARILI!] FİYAT: $fiyatStr | KAYNAK: AI_GROK_4_3");
+      debugPrint("🎼 ========== [ORKESTRA BİTTİ - GROK] ==========");
+      return {"robotSonucu": sonuc, "kaynak": "AI_GROK_4_3", "talepId": talepId};
+    } catch (e, stack) {
+      debugPrint("👑❌ [2.GROK HATA] $e | Stack: ${stack.toString().substring(0, 300)}");
+      debugPrint("👑➡ [2.GROK] Hata, ⚡ GROQ'a geçiliyor");
+    }
+
+    try {
+      debugPrint("⚡ [3.GROQ YEDEK 1 DENENİYOR] $gercekIsAdi | Bölge: $anlikBolgeKodu");
+      String fiyatStr = await _groq.getFiyatTahmini(
+        musteriId: talepId,
+        isAdi: gercekIsAdi,
+        kategoriAdi: kategoriAdi,
+        kategoriId: kategoriId,
+        detaylar: detayMap,
+      );
+      int ort = int.tryParse(fiyatStr.replaceAll(RegExp(r'[^0-9]'), ''))?? 0;
+      if (ort <= 0) throw Exception("GROQ geçersiz: $fiyatStr");
+      double min = ort * 0.9;
+      double max = ort * 1.1;
+      final sonuc = {
+        "minimumButce": min,
+        "muhtemelButce": ort.toDouble(),
+        "maksimumButce": max,
+        "fiyatBilgisi": fiyatStr,
+        "aralikliFiyatBilgisi": "${min.toInt()} - ${max.toInt()} ₺",
+        "kaynak": "AI_GROQ",
+        "durum": "BASARILI",
+        "analizHash": analizHash,
+      };
+      debugPrint("⚡✅ [3.GROQ BAŞARILI!] FİYAT: $fiyatStr | KAYNAK: AI_GROQ");
+      debugPrint("🎼 ========== [ORKESTRA BİTTİ - GROQ] ==========");
+      return {"robotSonucu": sonuc, "kaynak": "AI_GROQ", "talepId": talepId};
+    } catch (e, stack) {
+      debugPrint("⚡❌ [3.GROQ HATA] $e | Stack: ${stack.toString().substring(0, 300)}");
+      debugPrint("⚡➡ [3.GROQ] Hata, 🦙 LLAMA'ya geçiliyor");
+    }
+
+    try {
+      debugPrint("🦙 [4.LLAMA YEDEK 2 DENENİYOR] $gercekIsAdi");
+      String fiyatStr = await _llamaYedekFiyatTahmini(ilanBasligi: gercekIsAdi, kategoriAdi: kategoriAdi, detaylar: detayMap);
+      int ort = int.tryParse(fiyatStr.replaceAll(RegExp(r'[^0-9]'), ''))?? 0;
+      if (ort <= 0) throw Exception("LLAMA geçersiz: $fiyatStr");
+      double min = ort * 0.9;
+      double max = ort * 1.1;
+      final sonuc = {
+        "minimumButce": min,
+        "muhtemelButce": ort.toDouble(),
+        "maksimumButce": max,
+        "fiyatBilgisi": fiyatStr,
+        "aralikliFiyatBilgisi": "${min.toInt()} - ${max.toInt()} ₺",
+        "kaynak": "AI_LLAMA_3_3_FREE",
+        "durum": "BASARILI",
+        "analizHash": analizHash,
+      };
+      debugPrint("🦙✅ [4.LLAMA BAŞARILI!] FİYAT: $fiyatStr | KAYNAK: AI_LLAMA_3_3_FREE");
+      debugPrint("🎼 ========== [ORKESTRA BİTTİ - LLAMA] ==========");
+      return {"robotSonucu": sonuc, "kaynak": "AI_LLAMA_3_3_FREE", "talepId": talepId};
+    } catch (e, stack) {
+      debugPrint("🦙❌ [4.LLAMA HATA] $e | Stack: ${stack.toString().substring(0, 300)}");
+      debugPrint("🦙➡ [4.LLAMA] Hata, 🦾 YEREL ROBOT'a geçiliyor");
+    }
+
+    try {
+      debugPrint("🦾 [5.YEREL ROBOT SON KALE DENENİYOR] kategoriId:$kategoriId | Bölge: $anlikBolgeKodu");
+      var doc = await _firestore.collection('kategoriler').doc(kategoriId).get();
+      if (!doc.exists) doc = await _firestore.collection('form_schemas').doc(kategoriId).get();
+      if (!doc.exists) throw Exception("Kategori verisi yok: $kategoriId");
+      double yerelOrt = FiyatHesaplamaRobotu.hesapla(kategoriVerisi: doc.data()!, secilenler: detayMap, sehir: anlikBolgeKodu);
+      if (yerelOrt <= 0) throw Exception("Yerel robot 0 döndü");
+      double min = yerelOrt * 0.9;
+      double max = yerelOrt * 1.1;
+      final sonuc = {
+        "minimumButce": min,
+        "muhtemelButce": yerelOrt,
+        "maksimumButce": max,
+        "fiyatBilgisi": "${yerelOrt.toInt()} ₺",
+        "aralikliFiyatBilgisi": "${min.toInt()} - ${max.toInt()} ₺",
+        "kaynak": "YEREL_ROBOT",
+        "durum": "BASARILI",
+        "analizHash": analizHash,
+      };
+      debugPrint("🦾✅ [5.YEREL ROBOT BAŞARILI!] FİYAT: ${sonuc['aralikliFiyatBilgisi']} | KAYNAK: YEREL_ROBOT");
+      debugPrint("🎼 ========== [ORKESTRA BİTTİ - YEREL] ==========");
+      return {"robotSonucu": sonuc, "kaynak": "YEREL_ROBOT", "talepId": talepId};
+    } catch (yerelHata, yerelStack) {
+      debugPrint("🦾❌ [5.YEREL ROBOT ÇÖKTÜ!] HATA: $yerelHata");
+      debugPrint("🦾💥 [SİSTEM TAMAMEN ÇÖKTÜ!] Stack: $yerelStack");
+      debugPrint("🎼 ========== [ORKESTRA BİTTİ - ÇÖKÜŞ] ==========");
+      rethrow;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> _firebaseIlanCacheKontrol({
+    required String kategoriId,
+    required String ilId,
+    required Map<String, dynamic> teknikDetaylar,
+    required String hash,
+  }) async {
+    try {
+      debugPrint("💾 [CACHE DETAY] kategoriId:$kategoriId | ilId:$ilId | hash:$hash");
+      var snap = await _firestore.collection('ilanlar').where('kategoriId', isEqualTo: kategoriId).where('analizHash', isEqualTo: hash).where('durum', isEqualTo: 'aktif').limit(1).get();
+      if (snap.docs.isNotEmpty) {
+        String fiyat = snap.docs.first.data()['fiyatBilgisi']?.toString()?? "";
+        int ort = int.tryParse(fiyat.replaceAll(RegExp(r'[^0-9]'), ''))?? 0;
+        if (ort > 0) {
+          debugPrint("💾 [CACHE] analizHash ile bulundu -> $fiyat");
+          return {
+            "minimumButce": ort * 0.9,
+            "muhtemelButce": ort.toDouble(),
+            "maksimumButce": ort * 1.1,
+            "fiyatBilgisi": fiyat,
+            "aralikliFiyatBilgisi": "${(ort * 0.9).toInt()} - ${(ort * 1.1).toInt()} ₺",
+            "kaynak": "FIREBASE_ILANLAR_CACHE",
+            "durum": "BASARILI",
+            "analizHash": hash,
+          };
+        }
+      }
+      debugPrint("💾 [CACHE] Hash yok, teknikDetaylar birebir taranıyor...");
+      var yedekSnap = await _firestore.collection('ilanlar').where('kategoriId', isEqualTo: kategoriId).where('durum', isEqualTo: 'aktif').limit(25).get();
+      debugPrint("💾 [CACHE] ${yedekSnap.docs.length} aktif ilan bulundu, karşılaştırılıyor");
+      for (var doc in yedekSnap.docs) {
+        var data = doc.data();
+        var dbTeknik = data['teknikDetaylar'] as Map<String, dynamic>?;
+        if (dbTeknik == null || dbTeknik.length!= teknikDetaylar.length) continue;
+        bool eslesiyor = true;
+        for (var k in teknikDetaylar.keys) {
+          if (dbTeknik[k]?.toString().trim().toLowerCase()!= teknikDetaylar[k]?.toString().trim().toLowerCase()) {
+            eslesiyor = false;
+            break;
+          }
+        }
+        if (!eslesiyor) continue;
+        if (ilId.isNotEmpty && ilId!= "0" && data['ilId']?.toString()!= ilId) continue;
+        String fiyat = data['fiyatBilgisi']?.toString()?? "";
+        int ort = int.tryParse(fiyat.replaceAll(RegExp(r'[^0-9]'), ''))?? 0;
+        if (ort > 0) {
+          debugPrint("💾 [CACHE] teknikDetaylar eşleşti! Doc: ${doc.id} -> $fiyat");
+          return {
+            "minimumButce": ort * 0.9,
+            "muhtemelButce": ort.toDouble(),
+            "maksimumButce": ort * 1.1,
+            "fiyatBilgisi": fiyat,
+            "aralikliFiyatBilgisi": "${(ort * 0.9).toInt()} - ${(ort * 1.1).toInt()} ₺",
+            "kaynak": "FIREBASE_ILANLAR_CACHE",
+            "durum": "BASARILI",
+            "analizHash": hash,
+          };
+        }
+      }
+      debugPrint("💾 [CACHE] Hiç eşleşme yok");
+    } catch (e) {
+      debugPrint("💾⚠ [CACHE KONTROL HATASI] $e");
+    }
+    return null;
   }
 }

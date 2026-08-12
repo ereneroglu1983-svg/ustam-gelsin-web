@@ -1,157 +1,143 @@
-// lib/core/calculation/meslek_sorulari/temizlik_hizmetleri.dart - PROFESYONEL AKIŞLI VERSİYON
-// id ve options ASLA değiştirilmedi.
-
+// lib/core/calculation/meslek_sorulari/temizlik_hizmetleri.dart - FINAL
 class TemizlikHizmetleriSorulari {
   static final List<Map<String, dynamic>> sorular = [
-    // ADIM 1: KÖK
     {
-      "id": "hizmet_tipi",
-      "label": "Temizlik Hizmeti Seçin",
+      "id": "is_kapsami",
+      "label": "Temizlik Hizmet Tipi",
       "type": "single",
       "required": true,
       "options": [
         "İnşaat Sonrası Temizlik",
-        "Genel Ev ve Derin Temizlik",
-        "Taşınma Öncesi/Sonrası Temizlik",
-        "Cam ve Cephe Temizliği",
-        "Mutfak ve Banyo Temizliği",
-        "Merdiven ve Ortak Alan Temizliği",
-        "Bahçe ve Dış Alan Temizliği",
-        "Havuz Temizliği ve Bakımı"
+        "Genel Ev Derin Temizlik",
+        "Taşınma Öncesi Sonrası Temizlik",
+        "Cam Cephe Temizliği",
+        "Mutfak Banyo Temizliği",
+        "Merdiven Ortak Alan Temizliği",
+        "Bahçe Dış Alan Temizliği",
+        "Havuz Temizliği Bakımı"
       ]
     },
-
-    // ==========================================
-    // 🏗 İNŞAAT / GENEL EV / TAŞINMA YOLU - 4'lü patlama zincire bağlandı
-    // ==========================================
+    // İNŞAAT + GENEL + TAŞINMA ORTAK İSKELET
     {
-      "id": "m2",
-      "label": "Alan Büyüklüğü (m²)",
+      "id": "m2_ev",
+      "label": "Alan Büyüklüğü m²",
       "type": "single",
       "required": true,
-      "dependsOnId": "hizmet_tipi",
-      "dependsOnValue": ["İnşaat Sonrası Temizlik", "Genel Ev ve Derin Temizlik", "Taşınma Öncesi/Sonrası Temizlik"],
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["İnşaat Sonrası Temizlik", "Genel Ev Derin Temizlik", "Taşınma Öncesi Sonrası Temizlik"],
       "options": ["0-50 m²", "51-100 m²", "101-150 m²", "151-200 m²", "201-300 m²", "300+ m²"]
     },
     {
-      "id": "tadilat_tipi",
+      "id": "tadilat_detay",
       "label": "Tadilat Detayı",
       "type": "single",
-      "dependsOnId": "m2",
-      "dependsOnValue": ["0-50 m²", "51-100 m²", "101-150 m²", "151-200 m²", "201-300 m²", "300+ m²"],
-      "options": ["Sadece Boya Temizliği", "Komple Tadilat Temizliği(Molozlu)", "Yeni İnşaat Temizliği", "Kısmi Tadilat Temizliği"]
+      "required": true,
+      "dependsOnId": "m2_ev",
+      "options": ["Sadece Boya Temizliği", "Komple Tadilat Molozlu", "Yeni İnşaat Temizliği", "Kısmi Tadilat"]
     },
     {
-      "id": "durum",
+      "id": "durum_ev",
       "label": "Mevcut Durum",
-      "type": "multi",
-      "dependsOnId": "tadilat_tipi",
-      "dependsOnValue": ["Sadece Boya Temizliği", "Komple Tadilat Temizliği(Molozlu)", "Yeni İnşaat Temizliği", "Kısmi Tadilat Temizliği"],
-      "options": ["İnşaat Malzemeleri Mevcut", "Sadece Toz/Alçı Artığı", "Eşyalı ve Yerleşimli"]
+      "type": "single",
+      "required": true,
+      "dependsOnId": "tadilat_detay",
+      "options": ["İnşaat Malzemeleri Mevcut", "Sadece Toz Alçı Artığı", "Eşyalı Yerleşimli"]
     },
     {
-      "id": "ekipman",
-      "label": "İhtiyaç Duyulan Ekipman",
+      "id": "ekipman_ev",
+      "label": "İhtiyaç Ekipman",
       "type": "multi",
-      "dependsOnId": "durum",
-      "dependsOnValue": ["İnşaat Malzemeleri Mevcut", "Sadece Toz/Alçı Artığı", "Eşyalı ve Yerleşimli"],
-      "options": ["Sanayi Tipi Süpürge", "Zemin Kazıma/Cila Makinesi", "Buharlı Temizlik Cihazı"]
+      "required": true,
+      "dependsOnId": "durum_ev",
+      "options": ["Sanayi Tipi Süpürge", "Zemin Kazıma Cila Makinesi", "Buharlı Temizlik Cihazı", "Ekstra İstemiyorum"]
     },
-
-    // ==========================================
-    // 🏢 CAM VE CEPHE YOLU - 3'lü patlama zincire bağlandı
-    // ==========================================
+    // CAM CEPHE DALI
     {
-      "id": "yapi",
+      "id": "yapi_cam",
       "label": "Cephe Tipi",
       "type": "single",
-      "dependsOnId": "hizmet_tipi",
-      "dependsOnValue": ["Cam ve Cephe Temizliği"],
-      "options": ["Cam Giydirme", "Kompozit / Alüminyum", "Taş / Mermer / Beton"]
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Cam Cephe Temizliği"],
+      "options": ["Cam Giydirme", "Kompozit Alüminyum", "Taş Mermer Beton"]
     },
     {
-      "id": "yukseklik",
+      "id": "yukseklik_cam",
       "label": "Erişim Detayı",
       "type": "single",
-      "dependsOnId": "yapi",
-      "dependsOnValue": ["Cam Giydirme", "Kompozit / Alüminyum", "Taş / Mermer / Beton"],
-      "options": ["Zemin Kat", "1-3. Kat (Merdivenle)", "Yüksek Kat (Vinç/Platform Gerekli)", "Dağcı/İp ile Erişim"]
+      "required": true,
+      "dependsOnId": "yapi_cam",
+      "options": ["Zemin Kat", "1-3 Kat Merdivenle", "Yüksek Kat Vinç Platform Gerekli", "Dağcı İp ile Erişim"]
     },
     {
-      "id": "kirlilik",
+      "id": "kirlilik_cam",
       "label": "Kirlilik Seviyesi",
       "type": "single",
-      "dependsOnId": "yukseklik",
-      "dependsOnValue": ["Zemin Kat", "1-3. Kat (Merdivenle)", "Yüksek Kat (Vinç/Platform Gerekli)", "Dağcı/İp ile Erişim"],
-      "options": ["Hafif (Tozlu)", "Ağır (İnşaat Harcı/Boyası)", "Kireç/Dış Etken"]
+      "required": true,
+      "dependsOnId": "yukseklik_cam",
+      "options": ["Hafif Tozlu", "Ağır İnşaat Harcı Boya", "Kireç Dış Etken"]
     },
-
-    // ==========================================
-    // 🛁 MUTFAK VE BANYO YOLU - 2'li zincir
-    // ==========================================
+    // MUTFAK BANYO DALI
     {
-      "id": "hacim",
+      "id": "hacim_mb",
       "label": "Bölüm Sayısı",
       "type": "single",
-      "dependsOnId": "hizmet_tipi",
-      "dependsOnValue": ["Mutfak ve Banyo Temizliği"],
-      "options": ["Sadece Mutfak", "Sadece Banyo", "Mutfak + Banyo", "Komple Islak Hacimler"]
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Mutfak Banyo Temizliği"],
+      "options": ["Sadece Mutfak", "Sadece Banyo", "Mutfak Banyo", "Komple Islak Hacimler"]
     },
     {
-      "id": "dezenfeksiyon",
+      "id": "hijyen_mb",
       "label": "Hijyen Gereksinimi",
       "type": "single",
-      "dependsOnId": "hacim",
-      "dependsOnValue": ["Sadece Mutfak", "Sadece Banyo", "Mutfak + Banyo", "Komple Islak Hacimler"],
-      "options": ["Standart Temizlik", "Derin Hijyen / Dezenfeksiyon", "Kireç ve Derz Temizliği"]
+      "required": true,
+      "dependsOnId": "hacim_mb",
+      "options": ["Standart Temizlik", "Derin Hijyen Dezenfeksiyon", "Kireç Derz Temizliği"]
     },
-
-    // ==========================================
-    // 🌳 BAHÇE / HAVUZ YOLU - 2'li zincir
-    // ==========================================
+    // ORTAK ALAN DALI
     {
-      "id": "alan_tipi",
-      "label": "Alan/Hacim Ölçeği",
-      "type": "single",
-      "dependsOnId": "hizmet_tipi",
-      "dependsOnValue": ["Bahçe ve Dış Alan Temizliği", "Havuz Temizliği ve Bakımı"],
-      "options": ["Küçük (0-50m²/m³)", "Orta (50-150m²/m³)", "Büyük (150-300m²/m³)", "Çok Büyük (300+ m²/m³)"]
-    },
-    {
-      "id": "kapsam",
-      "label": "Uygulama Kapsamı",
-      "type": "multi",
-      "dependsOnId": "alan_tipi",
-      "dependsOnValue": ["Küçük (0-50m²/m³)", "Orta (50-150m²/m³)", "Büyük (150-300m²/m³)", "Çok Büyük (300+ m²/m³)"],
-      "options": ["Ot ve Yabani Bitki Temizliği", "Havuz Kimyasalları ve Bakımı", "İnşaat Atığı/Moloz Tahliyesi", "Dış Zemin Yıkama"]
-    },
-
-    // ==========================================
-    // 🏢 MERDİVEN VE ORTAK ALAN YOLU - 3'lü patlama zincire bağlandı
-    // ==========================================
-    {
-      "id": "kat",
+      "id": "kat_ortak",
       "label": "Kat Sayısı",
       "type": "single",
-      "dependsOnId": "hizmet_tipi",
-      "dependsOnValue": ["Merdiven ve Ortak Alan Temizliği"],
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Merdiven Ortak Alan Temizliği"],
       "options": ["1-5 Kat", "6-10 Kat", "11-20 Kat", "20+ Kat"]
     },
     {
-      "id": "periyot",
+      "id": "periyot_ortak",
       "label": "Temizlik Sıklığı",
       "type": "single",
-      "dependsOnId": "kat",
-      "dependsOnValue": ["1-5 Kat", "6-10 Kat", "11-20 Kat", "20+ Kat"],
+      "required": true,
+      "dependsOnId": "kat_ortak",
       "options": ["Tek Seferlik", "Haftalık", "15 Günde Bir", "Aylık Sabit"]
     },
     {
-      "id": "alanlar",
+      "id": "kapsam_ortak",
       "label": "Kapsam",
       "type": "multi",
-      "dependsOnId": "periyot",
-      "dependsOnValue": ["Tek Seferlik", "Haftalık", "15 Günde Bir", "Aylık Sabit"],
-      "options": ["Asansör İçleri", "Giriş Holü", "Dış Kapı Önü", "Kat Koridorları"]
+      "required": true,
+      "dependsOnId": "periyot_ortak",
+      "options": ["Asansör İçleri", "Giriş Holü", "Dış Kapı Önü", "Kat Koridorları", "Ekstra İstemiyorum"]
+    },
+    // BAHÇE HAVUZ DALI
+    {
+      "id": "alan_dıs",
+      "label": "Alan Hacim Ölçeği",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Bahçe Dış Alan Temizliği", "Havuz Temizliği Bakımı"],
+      "options": ["Küçük 0-50", "Orta 50-150", "Büyük 150-300", "Çok Büyük 300+"]
+    },
+    {
+      "id": "kapsam_dıs",
+      "label": "Uygulama Kapsamı",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "alan_dıs",
+      "options": ["Ot Yabani Bitki Temizliği", "Havuz Kimyasalları Bakım", "İnşaat Atığı Moloz Tahliyesi", "Dış Zemin Yıkama", "Ekstra İstemiyorum"]
     }
   ];
 }

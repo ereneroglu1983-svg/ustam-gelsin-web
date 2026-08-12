@@ -59,19 +59,19 @@ class UstaAcilIsDetaySayfasi extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _bilgiKutusu("MÜŞTERİ ADI SOYADI", data['musteriAd'] ?? "Belirtilmedi"),
-                        _bilgiKutusu("KONUM", data['konumMetin'] ?? "Belirtilmedi"),
-                        _bilgiKutusu("AÇIK ADRES", data['acikAdres'] ?? "Belirtilmedi"),
+                        _bilgiKutusu("MÜŞTERİ ADI SOYADI", data['musteriAd']?? "Belirtilmedi"),
+                        _bilgiKutusu("KONUM", data['konumMetin']?? "Belirtilmedi"),
+                        _bilgiKutusu("AÇIK ADRES", data['acikAdres']?? "Belirtilmedi"),
 
                         const Divider(height: 40, color: Colors.grey),
 
-                        _bilgiKutusu("ACİL İŞİN NE OLDUĞU", data['baslik'] ?? "Belirtilmedi"),
-                        _bilgiKutusu("MÜŞTERİNİN İŞ TANIMI", data['detaylar'] ?? "Belirtilmedi"),
+                        _bilgiKutusu("ACİL İŞİN NE OLDUĞU", data['baslik']?? "Belirtilmedi"),
+                        _bilgiKutusu("MÜŞTERİNİN İŞ TANIMI", data['detaylar']?? "Belirtilmedi"),
 
                         const SizedBox(height: 10),
 
                         GestureDetector(
-                          onTap: () => _telefonuAra(data['musteriTelefon'] ?? ""),
+                          onTap: () => _telefonuAra(data['musteriTelefon']?? ""),
                           child: Container(
                             width: double.infinity,
                             padding: const EdgeInsets.all(15),
@@ -80,7 +80,7 @@ class UstaAcilIsDetaySayfasi extends StatelessWidget {
                                 children: [
                                   const Icon(Icons.phone, color: Colors.black),
                                   const SizedBox(width: 10),
-                                  Text(data['musteriTelefon'] ?? "Telefon Yok", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black))
+                                  Text(data['musteriTelefon']?? "Telefon Yok", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black))
                                 ]
                             ),
                           ),

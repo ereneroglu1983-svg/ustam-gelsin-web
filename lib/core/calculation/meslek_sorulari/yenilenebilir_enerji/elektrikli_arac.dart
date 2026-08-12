@@ -1,5 +1,4 @@
-// lib/core/calculation/meslek_sorulari/yenilenebilir_enerji/elektrikli_arac.dart
-
+// lib/core/calculation/meslek_sorulari/yenilenebilir_enerji/elektrikli_arac.dart - FINAL ZİNCİRLİ
 class ElektrikliAracSorulari {
   static final List<Map<String, dynamic>> sorular = [
     {
@@ -22,7 +21,7 @@ class ElektrikliAracSorulari {
     },
 
     // ==========================================
-    // 1) EV TİPİ ŞARJ İSTASYONU KURULUMU
+    // 1) EV TİPİ - ZİNCİR: yer -> araç sayısı -> güç -> altyapı -> sayaç -> akıllı
     // ==========================================
     {
       "id": "kurulum_yeri_ev",
@@ -31,85 +30,51 @@ class ElektrikliAracSorulari {
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["Ev Tipi Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Müstakil Ev",
-        "Villa",
-        "Apartman Otoparkı",
-        "Kapalı Garaj",
-        "Açık Otopark",
-        "Diğer"
-      ]
+      "options": ["Müstakil Ev", "Villa", "Apartman Otoparkı", "Kapalı Garaj", "Açık Otopark"]
     },
     {
       "id": "arac_sayisi_ev",
-      "label": "Araç Sayısı",
+      "label": "Şarj Edilecek Araç Sayısı",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Ev Tipi Şarj İstasyonu Kurulumu"],
-      "options": [
-        "1 araç",
-        "2 araç",
-        "3+ araç"
-      ]
+      "dependsOnId": "kurulum_yeri_ev",
+      "options": ["1 Araç", "2 Araç", "3 ve Üzeri Araç"]
     },
     {
       "id": "sarj_gucu_ev",
       "label": "Şarj Gücü İhtiyacı",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Ev Tipi Şarj İstasyonu Kurulumu"],
-      "options": [
-        "3.7 kW (Standart)",
-        "7.4 kW (Hızlı ev tipi)",
-        "11 kW",
-        "22 kW",
-        "Bilmiyorum"
-      ]
+      "dependsOnId": "arac_sayisi_ev",
+      "options": ["3.7 kW Standart", "7.4 kW Hızlı Ev Tipi", "11 kW", "22 kW"]
     },
     {
       "id": "elektrik_altyapisi_ev",
       "label": "Elektrik Altyapısı Hazır mı?",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Ev Tipi Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Evet hazır",
-        "Kısmen hazır",
-        "Yeni tesisat gerekli"
-      ]
+      "dependsOnId": "sarj_gucu_ev",
+      "options": ["Evet Hazır", "Kısmen Hazır", "Yeni Tesisat Gerekli"]
     },
     {
       "id": "sayac_durumu",
-      "label": "Sayaç Durumu",
+      "label": "Mevcut Sayaç / Hat Tipi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Ev Tipi Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Tek faz",
-        "Trifaze",
-        "Bilmiyorum"
-      ]
+      "dependsOnId": "elektrik_altyapisi_ev",
+      "options": ["Tek Faz Hat Mevcut", "Trifaze Hat Mevcut"]
     },
     {
       "id": "akilli_sarj",
-      "label": "İnternet / Akıllı Şarj İsteniyor mu?",
+      "label": "Akıllı Şarj / Uygulama Kontrolü",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Ev Tipi Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Evet (App kontrollü)",
-        "Hayır",
-        "Ustanın önerisi"
-      ]
+      "dependsOnId": "sayac_durumu",
+      "options": ["Evet Uygulama Kontrollü Olsun", "Hayır Basit Şarj Yeterli"]
     },
 
     // ==========================================
-    // 2) SİTE VE APARTMAN ŞARJ İSTASYONU KURULUMU
+    // 2) SİTE VE APARTMAN - ZİNCİR
     // ==========================================
     {
       "id": "kurulum_tipi_site",
@@ -118,69 +83,43 @@ class ElektrikliAracSorulari {
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["Site ve Apartman Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Ortak kullanım istasyonu",
-        "Bireysel kullanıcı noktaları",
-        "Her ikisi"
-      ]
+      "options": ["Ortak Kullanım İstasyonu", "Bireysel Kullanıcı Noktaları", "Hem Ortak Hem Bireysel"]
     },
     {
       "id": "arac_kapasitesi_site",
-      "label": "Araç Kapasitesi",
+      "label": "Toplam Araç Kapasitesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Site ve Apartman Şarj İstasyonu Kurulumu"],
-      "options": [
-        "1–5 araç",
-        "5–10 araç",
-        "10–20 araç",
-        "20+ araç"
-      ]
+      "dependsOnId": "kurulum_tipi_site",
+      "options": ["1-5 Araç", "6-10 Araç", "11-20 Araç", "20+ Araç"]
     },
     {
       "id": "load_balancing",
-      "label": "Güç Yönetimi Sistemi (Load Balancing)",
+      "label": "Güç Yönetimi (Load Balancing)",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Site ve Apartman Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Evet istiyorum",
-        "Hayır",
-        "Bilmiyorum"
-      ]
+      "dependsOnId": "arac_kapasitesi_site",
+      "options": ["Evet Load Balancing Gerekli", "Hayır Gerekli Değil"]
     },
     {
       "id": "olcum_sistemi",
-      "label": "Ölçüm Sistemi",
+      "label": "Ölçüm / Faturalandırma Sistemi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Site ve Apartman Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Kişisel sayaçlı",
-        "Ortak sayaç",
-        "Kart / RFID sistemli"
-      ]
+      "dependsOnId": "load_balancing",
+      "options": ["Kişisel Sayaçlı", "Ortak Sayaç", "Kart / RFID Sistemli"]
     },
     {
       "id": "yetkilendirme_sistemi",
       "label": "Yetkilendirme Sistemi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Site ve Apartman Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Mobil uygulama",
-        "Kart sistemi",
-        "Şifreli kullanım",
-        "Serbest kullanım"
-      ]
+      "dependsOnId": "olcum_sistemi",
+      "options": ["Mobil Uygulama", "Kart Sistemi", "Şifreli Kullanım", "Serbest Kullanım"]
     },
 
     // ==========================================
-    // 3) TİCARİ ŞARJ İSTASYONU KURULUMU
+    // 3) TİCARİ - ZİNCİR
     // ==========================================
     {
       "id": "isletme_tipi_ticari",
@@ -189,59 +128,35 @@ class ElektrikliAracSorulari {
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["Ticari Şarj İstasyonu Kurulumu"],
-      "options": [
-        "AVM",
-        "Akaryakıt istasyonu",
-        "Otopark işletmesi",
-        "Otel",
-        "Restoran / Kafe",
-        "Diğer"
-      ]
+      "options": ["AVM", "Akaryakıt İstasyonu", "Otopark İşletmesi", "Otel", "Restoran / Kafe"]
     },
     {
       "id": "sarj_kapasitesi_ticari",
-      "label": "Şarj Kapasitesi",
+      "label": "Aynı Anda Şarj Kapasitesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Ticari Şarj İstasyonu Kurulumu"],
-      "options": [
-        "1–2 araç",
-        "3–5 araç",
-        "5–10 araç",
-        "10+ araç"
-      ]
+      "dependsOnId": "isletme_tipi_ticari",
+      "options": ["1-2 Araç", "3-5 Araç", "6-10 Araç", "10+ Araç"]
     },
     {
       "id": "gelir_modeli",
       "label": "Gelir Modeli",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Ticari Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Ücretli şarj",
-        "Ücretsiz (müşteri çekme amaçlı)",
-        "Karma model"
-      ]
+      "dependsOnId": "sarj_kapasitesi_ticari",
+      "options": ["Ücretli Şarj", "Ücretsiz Müşteri Hizmeti", "Karma Model"]
     },
     {
       "id": "odeme_sistemi",
       "label": "Ödeme Sistemi",
       "type": "multi",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Ticari Şarj İstasyonu Kurulumu"],
-      "options": [
-        "Kart",
-        "Mobil uygulama",
-        "QR ödeme",
-        "Abonelik sistemi"
-      ]
+      "dependsOnId": "gelir_modeli",
+      "options": ["Kart ile Ödeme", "Mobil Uygulama", "QR Ödeme", "Abonelik Sistemi", "Ödeme Sistemi İstemiyorum"]
     },
 
     // ==========================================
-    // 4) OTOPARK ŞARJ ALTYAPISI KURULUMU
+    // 4) OTOPARK ALTYAPI - ZİNCİR
     // ==========================================
     {
       "id": "otopark_tipi",
@@ -250,55 +165,35 @@ class ElektrikliAracSorulari {
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["Otopark Şarj Altyapısı Kurulumu"],
-      "options": [
-        "Açık otopark",
-        "Kapalı otopark",
-        "AVM otoparkı",
-        "Site otoparkı"
-      ]
+      "options": ["Açık Otopark", "Kapalı Otopark", "AVM Otoparkı", "Site Otoparkı"]
     },
     {
       "id": "altyapi_durumu",
-      "label": "Altyapı Durumu",
+      "label": "Mevcut Elektrik Altyapısı",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Otopark Şarj Altyapısı Kurulumu"],
-      "options": [
-        "Elektrik hazır",
-        "Kısmen hazır",
-        "Komple altyapı kurulacak"
-      ]
+      "dependsOnId": "otopark_tipi",
+      "options": ["Elektrik Altyapısı Hazır", "Kısmen Hazır", "Komple Yeni Altyapı Kurulacak"]
     },
     {
       "id": "kablo_altyapisi",
-      "label": "Kablo Altyapısı",
+      "label": "Kablo Altyapısı Tipi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Otopark Şarj Altyapısı Kurulumu"],
-      "options": [
-        "Yer altı",
-        "Kanal üstü",
-        "Karışık sistem"
-      ]
+      "dependsOnId": "altyapi_durumu",
+      "options": ["Yer Altı Kablo", "Kanal Üstü Kablo", "Karışık Sistem"]
     },
     {
       "id": "gelecek_genisleme",
-      "label": "Gelecek Genişleme Planı",
+      "label": "Gelecekte Genişleme Planı Var mı?",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Otopark Şarj Altyapısı Kurulumu"],
-      "options": [
-        "Evet (ölçeklenebilir sistem)",
-        "Hayır",
-        "Bilmiyorum"
-      ]
+      "dependsOnId": "kablo_altyapisi",
+      "options": ["Evet Ölçeklenebilir Olsun", "Hayır Sabit Sistem Yeterli"]
     },
 
     // ==========================================
-    // 5) AC ŞARJ ÜNİTESİ KURULUMU
+    // 5) AC ÜNİTE - ZİNCİR
     // ==========================================
     {
       "id": "kullanim_amaci_ac",
@@ -307,57 +202,35 @@ class ElektrikliAracSorulari {
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["AC Şarj Ünitesi Kurulumu"],
-      "options": [
-        "Ev",
-        "İş yeri",
-        "Site",
-        "Otopark"
-      ]
+      "options": ["Ev Kullanımı", "İş Yeri", "Site Ortak Alan", "Otopark"]
     },
     {
       "id": "guc_seviyesi_ac",
       "label": "Güç Seviyesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["AC Şarj Ünitesi Kurulumu"],
-      "options": [
-        "3.7 kW",
-        "7.4 kW",
-        "11 kW",
-        "22 kW"
-      ]
+      "dependsOnId": "kullanim_amaci_ac",
+      "options": ["3.7 kW", "7.4 kW", "11 kW", "22 kW"]
     },
     {
       "id": "baglanti_tipi",
-      "label": "Bağlantı Tipi",
+      "label": "Araç Bağlantı Tipi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["AC Şarj Ünitesi Kurulumu"],
-      "options": [
-        "Type 2",
-        "Type 1",
-        "Bilmiyorum"
-      ]
+      "dependsOnId": "guc_seviyesi_ac",
+      "options": ["Type 2 Soket", "Type 1 Soket"]
     },
     {
       "id": "akilli_ozellikler",
-      "label": "Akıllı Özellikler",
+      "label": "İstenen Akıllı Özellikler",
       "type": "multi",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["AC Şarj Ünitesi Kurulumu"],
-      "options": [
-        "Zamanlama",
-        "Uygulama kontrolü",
-        "Enerji takibi",
-        "Basit sistem"
-      ]
+      "dependsOnId": "baglanti_tipi",
+      "options": ["Zamanlama Özelliği", "Uygulama Kontrolü", "Enerji Takibi", "Akıllı Özellik İstemiyorum"]
     },
 
     // ==========================================
-    // 6) DC HIZLI ŞARJ ÜNİTESİ KURULUMU
+    // 6) DC HIZLI ŞARJ - ZİNCİR
     // ==========================================
     {
       "id": "kurulum_amaci_dc",
@@ -366,102 +239,64 @@ class ElektrikliAracSorulari {
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["DC Hızlı Şarj Ünitesi Kurulumu"],
-      "options": [
-        "Ticari kullanım",
-        "Kamu alanı",
-        "Otoyol / geçiş noktası",
-        "Kurumsal filo"
-      ]
+      "options": ["Ticari Kullanım", "Kamu Alanı", "Otoyol Geçiş Noktası", "Kurumsal Filo"]
     },
     {
       "id": "guc_seviyesi_dc",
-      "label": "Güç Seviyesi",
+      "label": "DC Güç Seviyesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["DC Hızlı Şarj Ünitesi Kurulumu"],
-      "options": [
-        "30 kW",
-        "60 kW",
-        "120 kW",
-        "150 kW+",
-        "300 kW+"
-      ]
+      "dependsOnId": "kurulum_amaci_dc",
+      "options": ["30 kW", "60 kW", "120 kW", "150 kW ve Üzeri", "300 kW ve Üzeri"]
     },
     {
       "id": "sarj_suresi_hedefi",
-      "label": "Şarj Süresi Hedefi",
+      "label": "Hedeflenen Şarj Süresi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["DC Hızlı Şarj Ünitesi Kurulumu"],
-      "options": [
-        "20–30 dakika",
-        "30–60 dakika",
-        "1 saat+"
-      ]
+      "dependsOnId": "guc_seviyesi_dc",
+      "options": ["20-30 Dakika", "30-60 Dakika", "60 Dakika Üzeri"]
     },
     {
       "id": "ayni_anda_arac",
-      "label": "Aynı Anda Şarj Araç Sayısı",
+      "label": "Aynı Anda Şarj Edilecek Araç Sayısı",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["DC Hızlı Şarj Ünitesi Kurulumu"],
-      "options": [
-        "1",
-        "2",
-        "3+"
-      ]
+      "dependsOnId": "sarj_suresi_hedefi",
+      "options": ["1 Araç", "2 Araç", "3 ve Üzeri Araç"]
     },
 
     // ==========================================
-    // 7) ŞARJ İSTASYONU ARIZA VE SERVİSİ
+    // 7) ARIZA VE SERVİS - ZİNCİR
     // ==========================================
     {
       "id": "ariza_tipi_sarj",
-      "label": "Sorun Tipi",
+      "label": "Sorun Tipi Nedir?",
       "type": "single",
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["Şarj İstasyonu Arıza ve Servisi"],
-      "options": [
-        "Şarj başlamıyor",
-        "Bağlantı hatası",
-        "Güç vermiyor",
-        "Kart / uygulama çalışmıyor",
-        "Fiziksel hasar",
-        "Diğer"
-      ]
+      "options": ["Şarj Başlamıyor", "Bağlantı Hatası", "Güç Vermiyor", "Kart / Uygulama Çalışmıyor", "Fiziksel Hasar Mevcut"]
     },
     {
       "id": "cihaz_durumu",
-      "label": "Cihaz Durumu",
+      "label": "Cihazın Mevcut Durumu",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj İstasyonu Arıza ve Servisi"],
-      "options": [
-        "Tam çalışmıyor",
-        "Aralıklı çalışıyor",
-        "Performans düşüklüğü"
-      ]
+      "dependsOnId": "ariza_tipi_sarj",
+      "options": ["Tamamen Çalışmıyor", "Aralıklı Çalışıyor", "Performans Düşüklüğü Var"]
     },
     {
       "id": "acil_durum",
-      "label": "Acil Durum mu?",
+      "label": "Acil Servis Gerekli mi?",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj İstasyonu Arıza ve Servisi"],
-      "options": [
-        "Evet",
-        "Hayır"
-      ]
+      "dependsOnId": "cihaz_durumu",
+      "options": ["Evet Acil Müdahale Gerekli", "Hayır Normal Servis Yeterli"]
     },
 
     // ==========================================
-    // 8) ŞARJ İSTASYONU BAKIMI
+    // 8) BAKIM - ZİNCİR
     // ==========================================
     {
       "id": "bakim_tipi",
@@ -470,43 +305,27 @@ class ElektrikliAracSorulari {
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["Şarj İstasyonu Bakımı"],
-      "options": [
-        "Periyodik bakım",
-        "Arıza sonrası kontrol",
-        "Kurulum sonrası kontrol"
-      ]
-    },
-    {
-      "id": "yapilacak_islemler_bakim",
-      "label": "Yapılacak İşlemler",
-      "type": "multi",
-      "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj İstasyonu Bakımı"],
-      "options": [
-        "Kablo kontrolü",
-        "Yazılım güncelleme",
-        "Güç testi",
-        "Bağlantı kontrolü",
-        "Güvenlik testi"
-      ]
+      "options": ["Periyodik Bakım", "Arıza Sonrası Kontrol", "Kurulum Sonrası İlk Kontrol"]
     },
     {
       "id": "sistem_yogunlugu",
-      "label": "Sistem Yoğunluğu",
+      "label": "Sistem Kullanım Yoğunluğu",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj İstasyonu Bakımı"],
-      "options": [
-        "Az kullanım",
-        "Orta kullanım",
-        "Yoğun kullanım"
-      ]
+      "dependsOnId": "bakim_tipi",
+      "options": ["Az Kullanım", "Orta Yoğunlukta Kullanım", "Yoğun Kullanım"]
+    },
+    {
+      "id": "yapilacak_islemler_bakim",
+      "label": "Yapılacak Bakım İşlemleri",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "sistem_yogunlugu",
+      "options": ["Kablo Kontrolü", "Yazılım Güncelleme", "Güç Testi", "Bağlantı Kontrolü", "Güvenlik Testi"]
     },
 
     // ==========================================
-    // 9) ŞARJ ALTYAPISI PROJELENDİRME
+    // 9) PROJELENDİRME - ZİNCİR
     // ==========================================
     {
       "id": "proje_tipi",
@@ -515,108 +334,68 @@ class ElektrikliAracSorulari {
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["Şarj Altyapısı Projelendirme"],
-      "options": [
-        "Bireysel",
-        "Site / apartman",
-        "Ticari",
-        "Endüstriyel"
-      ]
-    },
-    {
-      "id": "planlama_icerigi",
-      "label": "Planlama İçeriği",
-      "type": "multi",
-      "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj Altyapısı Projelendirme"],
-      "options": [
-        "Güç dağılımı",
-        "Kablo güzergahı",
-        "İstasyon yerleşimi",
-        "Yük hesaplaması"
-      ]
-    },
-    {
-      "id": "resmi_surec",
-      "label": "Resmi Süreç Gerekiyor mu?",
-      "type": "single",
-      "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj Altyapısı Projelendirme"],
-      "options": [
-        "Evet",
-        "Hayır",
-        "Bilmiyorum"
-      ]
+      "options": ["Bireysel Konut Projesi", "Site / Apartman Projesi", "Ticari Proje", "Endüstriyel Proje"]
     },
     {
       "id": "gelecek_kapasite",
       "label": "Gelecek Kapasite Planı",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj Altyapısı Projelendirme"],
-      "options": [
-        "Sabit sistem",
-        "Genişletilebilir sistem"
-      ]
+      "dependsOnId": "proje_tipi",
+      "options": ["Sabit Sistem", "Genişletilebilir Sistem"]
+    },
+    {
+      "id": "planlama_icerigi",
+      "label": "Planlama İçeriği Neleri Kapsasın?",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "gelecek_kapasite",
+      "options": ["Güç Dağılımı Hesabı", "Kablo Güzergahı", "İstasyon Yerleşimi", "Yük Hesaplaması"]
+    },
+    {
+      "id": "resmi_surec",
+      "label": "Resmi İzin / Başvuru Süreci Gerekiyor mu?",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "planlama_icerigi",
+      "options": ["Evet Resmi Süreç Gerekli", "Hayır Gerekli Değil"]
     },
 
     // ==========================================
-    // 10) ŞARJ İSTASYONU ELEKTRİK TESİSATI
+    // 10) ELEKTRİK TESİSATI - ZİNCİR
     // ==========================================
     {
       "id": "mevcut_durum_tesisat",
-      "label": "Mevcut Durum",
+      "label": "Mevcut Elektrik Durumu",
       "type": "single",
       "required": true,
       "dependsOnId": "is_turu",
       "dependsOnValue": ["Şarj İstasyonu Elektrik Tesisatı"],
-      "options": [
-        "Elektrik hazır",
-        "Kısmen hazır",
-        "Komple yeni tesisat"
-      ]
+      "options": ["Elektrik Altyapısı Hazır", "Kısmen Hazır", "Komple Yeni Tesisat Gerekli"]
     },
     {
       "id": "hat_tipi",
-      "label": "Hat Tipi",
+      "label": "Gerekli Hat Tipi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj İstasyonu Elektrik Tesisatı"],
-      "options": [
-        "Tek faz",
-        "Trifaze",
-        "Bilmiyorum"
-      ]
+      "dependsOnId": "mevcut_durum_tesisat",
+      "options": ["Tek Faz Hat", "Trifaze Hat"]
     },
     {
       "id": "kablo_mesafesi",
-      "label": "Kablo Mesafesi",
+      "label": "Pano ile İstasyon Arası Kablo Mesafesi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj İstasyonu Elektrik Tesisatı"],
-      "options": [
-        "0–10 metre",
-        "10–30 metre",
-        "30–100 metre",
-        "100+ metre"
-      ]
+      "dependsOnId": "hat_tipi",
+      "options": ["0-10 Metre", "10-30 Metre", "30-100 Metre", "100 Metre Üzeri"]
     },
     {
       "id": "guc_ihtiyaci",
-      "label": "Güç İhtiyacı",
+      "label": "Toplam Güç İhtiyacı",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Şarj İstasyonu Elektrik Tesisatı"],
-      "options": [
-        "Düşük",
-        "Orta",
-        "Yüksek"
-      ]
+      "dependsOnId": "kablo_mesafesi",
+      "options": ["Düşük Güç", "Orta Güç", "Yüksek Güç"]
     },
   ];
 }

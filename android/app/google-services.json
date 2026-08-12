@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:715610995273:android:5c89fd4796dff3265a1d98",
+        "android_client_info": {
+          "package_name": "com.hemenustamgelsin.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1vi6WcCMAwA_BK_1I9QBUo93480b1V4g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:715610995273:android:a9455e1d89e7324f5a1d98",
         "android_client_info": {
           "package_name": "com.ustamgelsin.app.ustam_gelsin"

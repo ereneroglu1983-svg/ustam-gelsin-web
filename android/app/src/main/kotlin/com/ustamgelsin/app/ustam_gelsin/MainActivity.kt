@@ -1,7 +1,5 @@
-package com.ustamgelsin.app.ustam_gelsin
+package com.hemenustamgelsin.android
 
 import io.flutter.embedding.android.FlutterActivity
 
-class MainActivity: FlutterActivity() {
-
-}
+class MainActivity: FlutterActivity()

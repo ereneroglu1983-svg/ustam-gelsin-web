@@ -6,7 +6,6 @@ import 'package:ustam_gelsin/features/wallet/screens/odeme_sonuc_screen.dart';
 import 'iyzico_config.dart';
 
 class WebviewPaymentScreen extends StatefulWidget {
-  // 1. REVİZE: Artık URL değil form içeriği, geriye uyum için ikisi de opsiyonel
   final String? paymentUrl;
   final String? checkoutFormContent;
   final String orderId;
@@ -20,7 +19,6 @@ class WebviewPaymentScreen extends StatefulWidget {
     this.conversationId = '',
   });
 
-  // Eski kullanım için factory
   factory WebviewPaymentScreen.fromUrl({
     Key? key,
     required String paymentUrl,
@@ -61,7 +59,6 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
           },
           onNavigationRequest: (request) {
             final url = request.url;
-            // 2. REVİZE: Gerçek callback - hemenustam://
             if (url.startsWith('hemenustam://payment-success')) {
               _finishWithResult(true, "Ödeme başarılı! Bakiye güncelleniyor...");
               return NavigationDecision.prevent;
@@ -70,7 +67,6 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
               _finishWithResult(false, "Ödeme başarısız veya iptal edildi.");
               return NavigationDecision.prevent;
             }
-            // Geriye uyum: Eski IyzicoConfig URL'leri hala çalışsın
             if (url.startsWith(IyzicoConfig.successUrl)) {
               _finishWithResult(true, "Ödeme başarılı! Bakiye güncelleniyor...");
               return NavigationDecision.prevent;
@@ -84,7 +80,6 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
         ),
       );
 
-    // 1. REVİZE: Form içeriği varsa HTML bas, yoksa URL yükle
     if (widget.checkoutFormContent != null && widget.checkoutFormContent!.isNotEmpty) {
       final html = '''
         <html>
@@ -95,7 +90,8 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
           </body>
         </html>
       ''';
-      _controller.loadHtmlString(html, baseUrl: "https://sandbox-api.iyzipay.com");
+      // CANLI FIX: Artık sandbox'a çakılı değil, config'den geliyor
+      _controller.loadHtmlString(html, baseUrl: IyzicoConfig.baseUrl);
     } else if (widget.paymentUrl != null && widget.paymentUrl!.isNotEmpty) {
       _controller.loadRequest(Uri.parse(widget.paymentUrl!));
     } else {
@@ -106,11 +102,7 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
   void _finishWithResult(bool success, String message) {
     if (_hasFinished) return;
     _hasFinished = true;
-
     if (!mounted) return;
-
-    // YENİ AKIŞ: SnackBar + pop yerine tam sayfa sonuç ekranı
-    // Bu ekran kendi içinde 3 sn sonra UstaProfilSayfasi'na atacak
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => OdemeSonucScreen(
@@ -127,7 +119,6 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        // Çift pop engellendi, tek noktadan çıkış -> başarısız ekranına git
         _finishWithResult(false, "Ödeme iptal edildi.");
       },
       child: Scaffold(

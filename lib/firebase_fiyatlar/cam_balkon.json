@@ -1,0 +1,137 @@
+﻿{
+  "meslekId": "cam_balkon",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 750,
+    "asgariKucuk": 14000,
+    "asgariBuyuk": 24000
+  },
+  "malzeme": {
+    "m2": 2850,
+    "aciklama": "Temperli 8mm baz - Standart 3000-3500 TL/m2, isicamli 3750-5000 TL, katlanir 5600-6750 TL, surme 5900-7850 TL, ust segment isicamli surme 8500-10500 TL bandi ortalamasi"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.14,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 650,
+    "3_ve_ustu_asansorsuz": 2200,
+    "moloz_tasima_var": 0,
+    "vinc_gerektiren_yuksek": 4500
+  },
+  "ekstralar": {
+    "katlanir_8mm_klasik": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Katlanir Cam Balkon 8mm Klasik Temperli Tek Cam - Baz 3500-4500 TL/m2, guncel 5500-6500 TL"
+    },
+    "surgulu_esikli_esiksiz": {
+      "tip": "m2",
+      "fiyat": 850,
+      "etiket": "Surgulu Cam Balkon Esikli/Esiksiz Surme - 3200-4000 TL baz, guncel 5900-7850 TL"
+    },
+    "giyotin_motorlu_dikey": {
+      "tip": "m2",
+      "fiyat": 4250,
+      "etiket": "Giyotin Cam Motorlu Dikey Uzaktan Kumandali - Standart 7500-8200 TL, otomatik 8300-8800 TL, tambalkon 8800-9200 TL"
+    },
+    "isicamli_cift_cam_yuksek_yalitim": {
+      "tip": "m2",
+      "fiyat": 2850,
+      "etiket": "Isicamli Cam Balkon Yuksek Isi Yalitimli Konfor Cift Cam - 3750-5000 TL, isicamli giyotin 9000-9500 TL"
+    },
+    "motor_somfy_akilli_ev": {
+      "tip": "sabit",
+      "fiyat": 16500,
+      "etiket": "Somfy Motor Avrupa Ust Segment Akilli Ev Entegreli Akustik - 12000-16500 TL motor farki"
+    },
+    "motor_becker_cherubini": {
+      "tip": "sabit",
+      "fiyat": 11500,
+      "etiket": "Becker / Cherubini Avrupa Dayanikli Orta-Ust Segment"
+    },
+    "motor_yerli_ekonomik_tork": {
+      "tip": "sabit",
+      "fiyat": 6500,
+      "etiket": "Yerli / Yerel Marka Ekonomik Tork Motoru Sistemi"
+    },
+    "motor_fark_etmez_standart": {
+      "tip": "sabit",
+      "fiyat": 7500,
+      "etiket": "Motor Markasi Fark Etmez Usta Standart Garantili Motor - TrendTente 4490 TL sistem + Mosel/Somfy/Becker"
+    },
+    "cam_seffaf_standart": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Seffaf Cam Standart Seffaf Temperli - Baz"
+    },
+    "cam_fume_gunes_kirici": {
+      "tip": "m2",
+      "fiyat": 420,
+      "etiket": "Fume Cam Gunes Kirici Koyu Renkli - Renkli 3800-4600 TL farki"
+    },
+    "cam_bronz_mavi_mimari": {
+      "tip": "m2",
+      "fiyat": 580,
+      "etiket": "Bronz veya Mavi Cam Mimari Estetik Renkli Seriler"
+    },
+    "profil_eloksal_naturel": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Eloksal Naturel Gri Mat Aluminyum - Standart"
+    },
+    "profil_antrasit_siyah_ral": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Antrasit Gri veya Siyah Toz Firin Boya RAL Kodu"
+    },
+    "profil_beyaz_boyali": {
+      "tip": "m2",
+      "fiyat": 120,
+      "etiket": "Beyaz Boyali Kasa"
+    },
+    "profil_ahsap_desen_transfer": {
+      "tip": "m2",
+      "fiyat": 450,
+      "etiket": "Ahsap Desenli Ozel Transfer Kaplama Profil"
+    },
+    "kavisli_acili_kose_donus": {
+      "tip": "sabit",
+      "fiyat": 5800,
+      "etiket": "Kavisli / Acili Balkon Kose Donuslu Oval Donus Iscilik Farki"
+    },
+    "plise_perde_akordeon": {
+      "tip": "m2",
+      "fiyat": 950,
+      "etiket": "Plise Perde Sistemi Cam Balkona Ozel Akordeon Perde Paketi"
+    },
+    "cocuk_kilit_guvenlik": {
+      "tip": "sabit",
+      "fiyat": 850,
+      "etiket": "Ekstra Guvenlikli Cocuk Kilit Sistemi Kurulumu"
+    },
+    "pileli_sineklik_tul": {
+      "tip": "m2",
+      "fiyat": 720,
+      "etiket": "Pileli Sineklik Sistemi Kanat Onu Koruma Tulu"
+    }
+  },
+  "carpanlar": {
+    "katlanir_sistem": 1.0,
+    "surgulu_sistem": 1.18,
+    "giyotin_sistem": 1.85,
+    "isicamli_sistem": 1.45
+  },
+  "alanKatsayilari": {
+    "0_5_m2_kucuk": 1.35,
+    "5_10_m2_standart": 1.0,
+    "10_20_m2_genis_teras": 0.92,
+    "20_40_m2_kis_bahcesi": 0.85,
+    "40_m2_uzeri_ticari": 0.78
+  },
+  "kaynak": "Temmuz 2026 Turkiye - bycambalkon standart 3000-5000 TL isicamli 3750-5000 TL renkli fume 3800-4600 TL surme 3200-4000 TL katlanir 3500-4500 TL seffaf 2030 TL isicamli 2420 TL baslangic, bioklimatik ortalama 3000-3500 TL isicamli 3750-5000 TL katlanir 5600-6750 TL surme 5900-7850 TL ust segment 8500-10500 TL, giyotin standart 7750-8200 TL otomatik 8300-8800 TL isicamli 9000-9500 TL, Somfy motor farki 12k-16.5k TL, Armut Istanbul giyotin 60k-90k TL"
+}

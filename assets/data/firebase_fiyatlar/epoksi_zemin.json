@@ -1,0 +1,122 @@
+﻿{
+  "meslekId": "epoksi_zemin",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 280,
+    "asgariKucuk": 12000,
+    "asgariBuyuk": 25000
+  },
+  "malzeme": {
+    "m2": 620,
+    "aciklama": "Ince kat 500-700 TL, self leveling 750-1100 TL 650-800 1mm 800-950 1.5mm 950-1150 2mm 1150-1450 3mm, portakal kabugu 700-1000 TL, dekoratif metalik/3D 1300-1800 TL - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.25,
+    "ankara_izmir_antalya_bursa": 1.12,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 450,
+    "3_ve_ustu_asansorsuz": 1400,
+    "agir_malzeme_tasima": 1800
+  },
+  "ekstralar": {
+    "komple_sifirdan_kaplama": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Komple Sifirdan Epoksi Zemin Kaplama - Baz"
+    },
+    "mevcut_lokal_onarim_catlak": {
+      "tip": "m2",
+      "fiyat": 320,
+      "etiket": "Mevcut Epoksi Zeminin Lokal Onarimi ve Catlak Tamiri - 100m2 rulo 28k-55k TL portakal 55k-95k TL self 75k-130k TL ref"
+    },
+    "self_leveling_duz_puruzsuz": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Self-Leveling Epoksi Duz Puruzsuz Baslangic - 1mm 650-800 TL 2mm 950-1150 TL 3mm 1150-1450 TL"
+    },
+    "portakal_kabugu_textured_kaymaz": {
+      "tip": "m2",
+      "fiyat": -80,
+      "etiket": "Portakal Kabugu Textured Kaymaz Yuzeyli Endustriyel - 700-1000 TL 700-1150 TL kaymaz"
+    },
+    "metalik_dekoratif_mermer_artistik": {
+      "tip": "m2",
+      "fiyat": 480,
+      "etiket": "Metalik Epoksi Dekoratif Mermer Gorunumlu Artistik - Dekoratif 1300-1800 TL 1100-1600 TL"
+    },
+    "3d_gorsel_grafik_likit_cam": {
+      "tip": "m2",
+      "fiyat": 720,
+      "etiket": "3D Gorsel Grafik Tasarim Kaplama Likit Cam Korumali - Seffaf dekoratif 800-1400 TL + baski"
+    },
+    "zemin_eski_beton_elmas_silim": {
+      "tip": "m2",
+      "fiyat": 185,
+      "etiket": "Eski Beton Agir Elmas Silim Vakumlu Toz Emme Gerektirir - En agir hazirlik"
+    },
+    "seramik_fayans_puruzlendirme_astar": {
+      "tip": "m2",
+      "fiyat": 145,
+      "etiket": "Seramik / Fayans Zemin Puruzlendirme Ozel Gecis Astarli"
+    },
+    "helikopter_sap_hafif_zimpara_hazir": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Helikopter Sap Zemin Hafif Zimparali Hazir Yuzey - Ideal"
+    },
+    "derin_catlak_kirik_tamir_macunu": {
+      "tip": "m2",
+      "fiyat": 120,
+      "etiket": "Yuzeyde Derin Catlaklar Kiriklar Tamir Macunu Ihtiyaci"
+    },
+    "yogun_tozuma_problemi": {
+      "tip": "m2",
+      "fiyat": 45,
+      "etiket": "Zeminde Yogun Tozuma Problemi Mevcut - Astar artirim"
+    },
+    "yaglanma_kimyasal_solvent_yikama": {
+      "tip": "m2",
+      "fiyat": 95,
+      "etiket": "Endustriyel Yaglanma Kimyasal Atik Ozel Solventli Yikama Gerekli"
+    },
+    "nem_bariyeri_katmani_astar": {
+      "tip": "m2",
+      "fiyat": 145,
+      "etiket": "Nem Bariyeri Katmani Zeminden Su Yurumesini Engelleyen Ozel Astar - KDV haric ekstra"
+    },
+    "anti_statik_bakir_seritli": {
+      "tip": "m2",
+      "fiyat": 320,
+      "etiket": "Anti-Statik Sistem Laboratuvar/Data Icin Bakir Seritli Statik Alici - 1000-1500 TL antistatik"
+    },
+    "ekstra_koruyucu_poliuretan_vernik": {
+      "tip": "m2",
+      "fiyat": 95,
+      "etiket": "Ekstra Koruyucu Kat Cizilmelere Karsi Poliuretan Mat/Parlak Vernik"
+    },
+    "catlak_tamiri_v_yatak_enjeksiyon": {
+      "tip": "mt",
+      "fiyat": 180,
+      "etiket": "Catlak Tamiri Paketi V-Yatak Acma ve Epoksi Enjeksiyon - Mt basi"
+    }
+  },
+  "carpanlar": {
+    "self_leveling": 1.0,
+    "portakal_kabugu": 0.92,
+    "metalik_dekoratif": 1.55,
+    "3d_gorsel": 1.85,
+    "lokal_onarim": 0.85
+  },
+  "alanKatsayilari": {
+    "0_50_m2": 1.42,
+    "50_100_m2": 1.18,
+    "100_250_m2": 1.0,
+    "250_500_m2": 0.88,
+    "500_m2_uzeri": 0.78
+  },
+  "kaynak": "Temmuz 2026 - Dek-Mar self leveling 1mm 650-800 TL 1.5mm 800-950 TL 2mm 950-1150 TL 3mm 1150-1450 TL dekoratif 1300-1800 TL, ince kat 500-700 TL, portakal 700-1000 TL, multilayer 900-1300 TL, Avista ince kat 450-750 TL self/multilayer 900-2000 TL, 100m2 ekonomik 28k-55k TL portakal 55k-95k TL self 75k-130k TL"
+}

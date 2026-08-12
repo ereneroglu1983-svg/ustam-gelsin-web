@@ -1,152 +1,138 @@
-// lib/core/calculation/meslek_sorulari/uydu_kamera.dart - PROFESYONEL AKIŞLI VERSİYON
-// id ve options ASLA değiştirilmedi.
-
+// lib/core/calculation/meslek_sorulari/uydu_kamera.dart - FINAL
 class UyduKameraSorulari {
   static final List<Map<String, dynamic>> sorular = [
-    // ADIM 1: KÖK
     {
-      "id": "is_turu",
-      "label": "Yapılacak Ana İş Türü / Altyapı Kapsamı",
+      "id": "is_kapsami",
+      "label": "Ana İş Türü Altyapı Kapsamı",
       "type": "single",
       "required": true,
-      "options": [
-        "Güvenlik Kamerası Sistemi (IP Tabanlı NVR Altyapısı)",
-        "Merkezi / Bireysel Uydu TV Sistemleri Kurulumu",
-        "İnternet / Network Kablolu Hat Çekimi ve Rack Kabin Düzenleme"
-      ]
+      "options": ["Güvenlik Kamerası IP NVR", "Merkezi Bireysel Uydu TV Kurulum", "İnternet Network Kablolama Rack Düzenleme"]
     },
-
-    // ADIM 2: TEKNOLOJİ DETAYI - kök sonrası, 3 yol
+    // GÜVENLİK DALI
     {
-      "id": "kamera_detay",
-      "label": "Kamera Mercek ve Çözünürlük Teknolojisi",
+      "id": "mekan_kamera",
+      "label": "Mekan Yapı Mimari Sınıf",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Güvenlik Kamerası Sistemi (IP Tabanlı NVR Altyapısı)"],
-      "options": [
-        "Standart Full HD Çözünürlük (Kızılötesi Gece Görüşlü Sabit Lens)",
-        "4K Ultra HD Yüksek Çözünürlük (Geniş Açı ve Dijital Zoom Destekli Premium Lens)",
-        "AI Yapay Zeka Destekli Akıllı Akış (Yüz Tanıma ve Plaka Okuma Analitik Yazılımlı)",
-        "Full Color Renkli Gece Görüşlü (Ses Kayıt ve Çift Yönlü Konuşma Özellikli)"
-      ]
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Güvenlik Kamerası IP NVR"],
+      "options": ["Daire Asma Tavan Süpürgelik Kolay Hat", "Villa Müstakil Geniş Bahçe Toprak Altı Borulama", "Fabrika Site Depo Galvaniz Tava Yüksek İrtifa"]
     },
     {
-      "id": "uydu_altyapi_tipi",
-      "label": "Uydu Altyapı ve Dağıtım Sistemi Türü",
+      "id": "kamera_teknik",
+      "label": "Kamera Mercek Çözünürlük Teknolojisi",
       "type": "single",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["Merkezi / Bireysel Uydu TV Sistemleri Kurulumu"],
-      "options": [
-        "Merkezi Santral Sistemi Kurulumu (Apartman Tipi Çoklu Dağıtım ve Multiswitch)",
-        "Bireysel Çanak Anten Kurulumu (Balkon / Çatı Montajı ve Tekli LNB)",
-        "Mevcut Uydu Hattı Sinyal Ayarı (Frekans Güncelleme ve İnce Sinyal Optimizasyonu)",
-        "Komple Dağıtıcı Splitter, LNB ve Eskimiş Koaksiyel Kablo Değişimi"
-      ]
+      "dependsOnId": "mekan_kamera",
+      "options": ["Full HD Kızılötesi Sabit Lens", "4K Ultra HD Geniş Açı Dijital Zoom Premium", "AI Yüz Tanıma Plaka Analitik", "Full Color Renkli Gece Görüş Ses Çift Yönlü"]
     },
     {
-      "id": "network_ekipman_detay",
-      "label": "Talep Edilen Network Donanım ve Dağıtım Altyapısı",
+      "id": "nokta_kamera",
+      "label": "Toplam Nokta Sayısı Kamera",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "kamera_teknik",
+      "options": ["1-4 Nokta Küçük", "4-8 Nokta Standart Konut Ofis", "8-16 Nokta Geniş Villa", "16-32 Nokta Büyük İşletme Site Fabrika", "32+ Endüstriyel Komple"]
+    },
+    {
+      "id": "kablo_kamera",
+      "label": "Kablolama Teknolojisi Estetik",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "nokta_kamera",
+      "options": ["UTP Cat6 PoE Bakır Kanal", "Fiber Optik Pigtail Füzyon Ek", "Sıva Altı Kırım Spiral Boru Alçı Rütuş"]
+    },
+    {
+      "id": "ekstra_kamera",
+      "label": "Lens AI Erişim Ekstraları",
       "type": "multi",
       "required": true,
-      "dependsOnId": "is_turu",
-      "dependsOnValue": ["İnternet / Network Kablolu Hat Çekimi ve Rack Kabin Düzenleme"],
-      "options": [
-        "Kablosuz Kapsama Alanı Genişletme (Access Point ve Kesintisiz Mesh Sistem Kurulumu)",
-        "Sıfırdan Sistem Odası Kurulumu (Rack Kabin Montajı, Patch Panel ve Switch Sonlandırma)",
-        "Kurumsal Ağ Yönetimi (Router Konfigürasyonu, VLAN Bölümlendirme ve Firewall Kurulumu)"
-      ]
+      "dependsOnId": "kablo_kamera",
+      "options": ["4K Ultra HD Fark Entegrasyon", "AI Akıllı Analitik Sensör", "PTZ Motorize Pan Tilt Zoom Otomatik Takip", "Yüksek İrtifa Vinç Platform Sepetli", "UPS Kesintisiz Güç Akü Kit", "Ekstra İstemiyorum"]
     },
-
-    // ADIM 3: MEKAN TİPİ - teknoloji detayı sonrası gelsin (3 yolun birleşimi)
+    // UYDU DALI
     {
-      "id": "mekan_tipi",
-      "label": "Uygulama Yapılacak Mekan Yapısı ve Mimari Sınıfı",
+      "id": "mekan_uydu",
+      "label": "Mekan Yapı",
       "type": "single",
       "required": true,
-      "dependsOnId": ["kamera_detay", "uydu_altyapi_tipi", "network_ekipman_detay"],
-      "dependsOnValue": [
-        "Standart Full HD Çözünürlük (Kızılötesi Gece Görüşlü Sabit Lens)",
-        "4K Ultra HD Yüksek Çözünürlük (Geniş Açı ve Dijital Zoom Destekli Premium Lens)",
-        "AI Yapay Zeka Destekli Akıllı Akış (Yüz Tanıma ve Plaka Okuma Analitik Yazılımlı)",
-        "Full Color Renkli Gece Görüşlü (Ses Kayıt ve Çift Yönlü Konuşma Özellikli)",
-        "Merkezi Santral Sistemi Kurulumu (Apartman Tipi Çoklu Dağıtım ve Multiswitch)",
-        "Bireysel Çanak Anten Kurulumu (Balkon / Çatı Montajı ve Tekli LNB)",
-        "Mevcut Uydu Hattı Sinyal Ayarı (Frekans Güncelleme ve İnce Sinyal Optimizasyonu)",
-        "Komple Dağıtıcı Splitter, LNB ve Eskimiş Koaksiyel Kablo Değişimi",
-        "Kablosuz Kapsama Alanı Genişletme (Access Point ve Kesintisiz Mesh Sistem Kurulumu)",
-        "Sıfırdan Sistem Odası Kurulumu (Rack Kabin Montajı, Patch Panel ve Switch Sonlandırma)",
-        "Kurumsal Ağ Yönetimi (Router Konfigürasyonu, VLAN Bölümlendirme ve Firewall Kurulumu)"
-      ],
-      "options": [
-        "Daire Standart İç Mekan (Asma Tavan / Süpürgelik Üstü Kolay Hat Çekimi)",
-        "Villa / Müstakil Ev (Geniş Bahçe ve Çevre Duvarı Toprak Altı Borulama Zorluğu)",
-        "Fabrika / Site / Depo (Galvaniz Sac Tava Montajı ve Yüksek İrtifa Geniş Omurga Mimari)"
-      ]
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Merkezi Bireysel Uydu TV Kurulum"],
+      "options": ["Daire İç Mekan", "Villa Müstakil", "Fabrika Site Depo"]
     },
-
-    // ADIM 4: CİHAZ ADEDİ - mekan sonrası gelsin
     {
-      "id": "cihaz_adedi",
-      "label": "Sisteme Dahil Edilecek Toplam Nokta Sayısı (Kamera / Uydu Uç / Data Hattı)",
+      "id": "uydu_tip",
+      "label": "Uydu Altyapı Dağıtım Türü",
       "type": "single",
       "required": true,
-      "dependsOnId": "mekan_tipi",
-      "dependsOnValue": [
-        "Daire Standart İç Mekan (Asma Tavan / Süpürgelik Üstü Kolay Hat Çekimi)",
-        "Villa / Müstakil Ev (Geniş Bahçe ve Çevre Duvarı Toprak Altı Borulama Zorluğu)",
-        "Fabrika / Site / Depo (Galvaniz Sac Tava Montajı ve Yüksek İrtifa Geniş Omurga Mimari)"
-      ],
-      "options": [
-        "1 - 4 Arası Nokta / Hat Dağıtımı (Küçük Ölçekli)",
-        "4 - 8 Arası Nokta / Hat Dağıtımı (Standart Konut / Ofis)",
-        "8 - 16 Arası Nokta / Hat Dağıtımı (Geniş Yapı / Villa)",
-        "16 - 32 Arası Nokta / Hat Dağıtımı (Büyük İşletme / Site / Fabrika)",
-        "32 Nokta ve Üzeri / Komple Ağ Altyapısı (Endüstriyel Proje)"
-      ]
+      "dependsOnId": "mekan_uydu",
+      "options": ["Merkezi Santral Çoklu Multiswitch", "Bireysel Çanak Balkon Çatı Tek LNB", "Mevcut Hat Sinyal Ayar Frekans Optimizasyon", "Komple Splitter LNB Koaksiyel Kablo Değişim"]
     },
-
-    // ADIM 5: KABLOLAMA TİPİ - cihaz adedi sonrası gelsin
     {
-      "id": "kablolama_tipi",
-      "label": "Kablolama Teknolojisi ve Hat Kanal Estetiği",
+      "id": "nokta_uydu",
+      "label": "Uydu Uç Nokta Sayısı",
       "type": "single",
       "required": true,
-      "dependsOnId": "cihaz_adedi",
-      "dependsOnValue": [
-        "1 - 4 Arası Nokta / Hat Dağıtımı (Küçük Ölçekli)",
-        "4 - 8 Arası Nokta / Hat Dağıtımı (Standart Konut / Ofis)",
-        "8 - 16 Arası Nokta / Hat Dağıtımı (Geniş Yapı / Villa)",
-        "16 - 32 Arası Nokta / Hat Dağıtımı (Büyük İşletme / Site / Fabrika)",
-        "32 Nokta ve Üzeri / Komple Ağ Altyapısı (Endüstriyel Proje)"
-      ],
-      "options": [
-        "UTP Kablolama (Cat6 / PoE Standart Bakır Network Kablo Döşeme ve Kanal İşçiliği)",
-        "Fiber Optik Kablolama (Pigtail Sonlandırma ve Hassas Füzyon Ek Cihazı Mesaisi)",
-        "Sıva Altı Kablolama / Kanal İçi Kırım (Duvar Kırma, Spiral Boru Geçişi ve Alçı Rütuş Payı)"
-      ]
+      "dependsOnId": "uydu_tip",
+      "options": ["1-4 Nokta Küçük", "4-8 Nokta Standart", "8-16 Nokta Geniş", "16-32 Nokta Büyük", "32+ Komple"]
     },
-
-    // ADIM 6: FİNAL - kablolama sonrası yeşil kutuda
     {
-      "id": "ekstra_ozellikler",
-      "label": "Lens Teknolojisi, Yapay Zeka ve Erişim Ekstraları",
+      "id": "kablo_uydu",
+      "label": "Kablolama",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "nokta_uydu",
+      "options": ["UTP Kanal", "Fiber Füzyon", "Sıva Altı Kırım Spiral"]
+    },
+    {
+      "id": "ekstra_uydu",
+      "label": "Ekstralar",
       "type": "multi",
-      "required": false,
-      "dependsOnId": "kablolama_tipi",
-      "dependsOnValue": [
-        "UTP Kablolama (Cat6 / PoE Standart Bakır Network Kablo Döşeme ve Kanal İşçiliği)",
-        "Fiber Optik Kablolama (Pigtail Sonlandırma ve Hassas Füzyon Ek Cihazı Mesaisi)",
-        "Sıva Altı Kablolama / Kanal İçi Kırım (Duvar Kırma, Spiral Boru Geçişi ve Alçı Rütuş Payı)"
-      ],
-      "options": [
-        "4K Ultra HD Ultra Yüksek Çözünürlüklü Kamera Farkı Entegrasyonu",
-        "AI Yapay Zeka Sınıfı Akıllı Analitik Yazılım Sensörleri İlavesi",
-        "PTZ (Motorize / Hareketli / Pan-Tilt-Zoom) Otomatik Nesne Takip Sistemi",
-        "Yüksek İrtifa / Çatı Erişimi İçin Özel Platform ve Sepetli Vinç Kiralama Desteği",
-        "Kesintisiz Güç Kaynağı (UPS) ve Koruyucu Akü Kiti Entegrasyonu"
-      ]
+      "required": true,
+      "dependsOnId": "kablo_uydu",
+      "options": ["Yüksek İrtifa Vinç", "UPS Akü Kit", "Ekstra İstemiyorum"]
+    },
+    // NETWORK DALI
+    {
+      "id": "mekan_net",
+      "label": "Mekan Yapı",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["İnternet Network Kablolama Rack Düzenleme"],
+      "options": ["Daire", "Villa Müstakil", "Fabrika Site Depo Tava Montaj"]
+    },
+    {
+      "id": "network_tur",
+      "label": "Network Donanım Dağıtım Altyapısı",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "mekan_net",
+      "options": ["Kablosuz Access Point Mesh Kapsama Genişletme", "Sıfırdan Sistem Odası Rack Patch Panel Switch", "Kurumsal Ağ Router VLAN Firewall Konfigürasyon"]
+    },
+    {
+      "id": "nokta_net",
+      "label": "Data Hat Nokta Sayısı",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "network_tur",
+      "options": ["1-4 Hat Küçük", "4-8 Hat Standart Ofis", "8-16 Hat Geniş", "16-32 Hat Büyük", "32+ Komple Ağ"]
+    },
+    {
+      "id": "kablo_net",
+      "label": "Kablolama Teknolojisi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "nokta_net",
+      "options": ["UTP Cat6 PoE", "Fiber Optik Pigtail Füzyon", "Sıva Altı Kırım Spiral Boru"]
+    },
+    {
+      "id": "ekstra_net",
+      "label": "Ekstralar",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "kablo_net",
+      "options": ["Yüksek İrtifa Vinç Platform", "UPS Kesintisiz Güç", "Ekstra İstemiyorum"]
     }
   ];
 }

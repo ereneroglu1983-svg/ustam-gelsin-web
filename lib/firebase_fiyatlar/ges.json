@@ -1,0 +1,184 @@
+﻿{
+  "meslekId": "ges",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 8500,
+    "asgariBuyuk": 22000
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "12kWp on-grid mesken GES tum kalemler panel inverter konstruksiyon montaj pano projelendirme muhendislik toplam maliyet amortisman 2026 video, tarla panel 0.12-0.25 USD/W 100kW 12k-25k USD, Antalya 6.5kW x3 grup 50k-62k TL 60k TL, ciftlige off-grid 150k TL gitti, bahce sulama 90k TL kurulum, 3kW 6-8 adet 400-500W panel 4-6 yil geri donus, 4kW 14 panel 6kW 20 panel 8kW 28 panel 10kW 40 panel 12kW 48 panel yillik uretim, 60W mono panel 1760 TL Gesper, Adana 30kWp off-grid tarimsal sulama 56 adet 550W A+ mono 30kW Frecon surucu"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.15,
+    "ankara_izmir_antalya_bursa": 1.08,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "tek_kat": 0,
+    "2_kat": 650,
+    "3_5_kat": 1450,
+    "5_uzeri": 2800,
+    "arazi": 0
+  },
+  "ekstralar": {
+    "gunes_panel_kurulum": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Gunes Paneli Kurulumu - 12kWp on-grid ornek panel inverter konstruksiyon pano projelendirme"
+    },
+    "arazi_ges": {
+      "tip": "sabit",
+      "fiyat": 18000,
+      "etiket": "Arazi GES Kurulumu - 100kW 12k-25k USD panel 0.12-0.25 USD/W zemin tipine gore"
+    },
+    "tarimsal_sulama_ges": {
+      "tip": "sabit",
+      "fiyat": 22000,
+      "etiket": "Tarimsal Sulama GES Kurulumu - 30kWp off-grid 56x550W A+ mono 30kW surucu damlama yagmurlama 1-20HP kuyu 0-100m+"
+    },
+    "sokum_tasima": {
+      "tip": "sabit",
+      "fiyat": 4500,
+      "etiket": "Gunes Paneli Sokum ve Tasma - 1-100+ panel vinc cati yuksekligi 0-20m+"
+    },
+    "bakim_temizlik": {
+      "tip": "sabit",
+      "fiyat": 1800,
+      "etiket": "Gunes Paneli Bakim ve Temizligi - 1-100+ panel son bakim 6 ay 1 yil termal kamera yuksekte calisma"
+    },
+    "ariza_tespiti": {
+      "tip": "sabit",
+      "fiyat": 2200,
+      "etiket": "Gunes Paneli Ariza Tespiti - Uretmiyor dusuk uretim inverter hata sigorta kapanma hasar 24 saat-uzun sure"
+    },
+    "performans_kontrol": {
+      "tip": "sabit",
+      "fiyat": 2800,
+      "etiket": "Gunes Paneli Performans Kontrolu - Termal analiz drone kontrol detayli rapor"
+    },
+    "inverter_montaj": {
+      "tip": "sabit",
+      "fiyat": 3500,
+      "etiket": "Inverter Montaji - 1-25kW+ Huawei Fronius GoodWe Solis SMA Growatt hibrit on-grid off-grid beton tugla celik pano"
+    },
+    "inverter_ariza_degisim": {
+      "tip": "sabit",
+      "fiyat": 2800,
+      "etiket": "Inverter Ariza ve Degisimi - Hic calismiyor hata veriyor aralikli hata kodu Huawei Fronius GoodWe Solis SMA Growatt"
+    },
+    "solar_kablo_tesisat": {
+      "tip": "sabit",
+      "fiyat": 2200,
+      "etiket": "Solar Kablo ve Elektrik Tesisati - 0-100m+ AC DC AC+DC kanal acma"
+    },
+    "konstruksiyon_montaj": {
+      "tip": "sabit",
+      "fiyat": 4500,
+      "etiket": "Panel Tasiyici Konstruksiyon Montaji - Kiremit sandvic beton trapez arazi galvaniz celik aluminyum cati arazi otopark"
+    },
+    "projelendirme_danismanlik": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "GES Projelendirme ve Danismanlik - Mahsuplasmali oz tuketim tarimsal ticari endustriyel kesif tesvik resmi surec Tedas cagri mektubu"
+    },
+    "guc_3kw_kadar": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "3 kW'a Kadar - 6-8 adet 400-500W 3kW baz 4kW 14 panel"
+    },
+    "guc_3_5kw": {
+      "tip": "sabit",
+      "fiyat": 18000,
+      "etiket": "3-5 kW Arasi - 4kW 14 panel 4954 kWh/yil orta"
+    },
+    "guc_5_10kw": {
+      "tip": "sabit",
+      "fiyat": 45000,
+      "etiket": "5-10 kW Arasi - 6kW 20 panel 7161 kWh 8kW 28 panel 9909 kWh 10kW 40 panel 14165 kWh"
+    },
+    "guc_10_25kw": {
+      "tip": "sabit",
+      "fiyat": 95000,
+      "etiket": "10-25 kW Arasi - 12kW 48 panel 16987 kWh 14kW 69 panel 21234 kWh Antalya 6.5kW x3 50k-62k TL"
+    },
+    "guc_25_50kw": {
+      "tip": "sabit",
+      "fiyat": 185000,
+      "etiket": "25-50 kW Arasi - Tarla 100kW 12k-25k USD panel"
+    },
+    "guc_50kw_uzeri": {
+      "tip": "sabit",
+      "fiyat": 350000,
+      "etiket": "50 kW ve Uzeri - Endustriyel 30kWp sulama 56x550W ornek"
+    },
+    "konut_catisi": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Konut Catisi - Tek kat baz"
+    },
+    "villa_mustakil": {
+      "tip": "carpan",
+      "fiyat": 1.08,
+      "etiket": "Villa / Mustakil Ev Catisi - Villa"
+    },
+    "is_yeri_fabrika": {
+      "tip": "carpan",
+      "fiyat": 1.15,
+      "etiket": "Is Yeri / Fabrika Catisi - Ticari endustriyel"
+    },
+    "tarimsal_arazi_acik_otopark": {
+      "tip": "carpan",
+      "fiyat": 1.22,
+      "etiket": "Tarimsal Arazi Acik Arazi Otopark Ustu GES - Arazi konstruksiyon"
+    },
+    "aku_evet": {
+      "tip": "sabit",
+      "fiyat": 18500,
+      "etiket": "Evet Akulu Sistem - LiFePO4 maliyet artirir off-grid ciftlik 150k TL"
+    },
+    "hibrit_sistem": {
+      "tip": "sabit",
+      "fiyat": 12000,
+      "etiket": "Hibrit Sistem - Hibrit inverter"
+    },
+    "sebake_destekli": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Hayir Sebeke Destekli On-grid - Standart on-grid inverter baz"
+    },
+    "vinc_ozel_ekipman": {
+      "tip": "sabit",
+      "fiyat": 3500,
+      "etiket": "Vinc veya Ozel Ekipman Gerekiyor - Arac kismi erisim vinc 3-5 kat 5 uzeri yukseklik"
+    },
+    "projelendirme_resmi_tedas_cagri_tesvik_bakim_sigorta": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Projelendirme Resmi Basvuru TEDAS Cagri Mektubu Tesvik Hibe Temizlik Bakim Sigorta - Ek hizmetler"
+    }
+  },
+  "carpanlar": {
+    "3kw": 1.0,
+    "5kw": 1.28,
+    "10kw": 1.85,
+    "25kw": 2.8,
+    "50kw": 4.2,
+    "konut": 1.0,
+    "fabrika": 1.15,
+    "arazi": 1.22,
+    "aku_var": 1.35,
+    "on_grid": 1.0
+  },
+  "alanKatsayilari": {
+    "0_500_m2": 1.18,
+    "500_1000_m2": 1.0,
+    "1000_5000_m2": 0.88,
+    "5000_10000_m2": 0.78,
+    "10000_uzeri": 0.68
+  },
+  "kaynak": "Temmuz 2026 - 12kWp on-grid mesken GES maliyet panel inverter konstruksiyon montaj pano projelendirme muhendislik amortisman video 2026, tarla 0.12-0.25 USD/W 100kW 12k-25k USD Retgen, Antalya 6.5kW x3 50k-62k TL 60k TL, ciftlik off-grid 150k TL, bahce 90k TL sulama, 3kW 6-8x400-500W 4-6 yil geri donus Cimri, 4kW 14 panel 4954 kWh 6kW 20 7161 kWh 8kW 28 9909 10kW 40 14165 12kW 48 16987 kWh alan tablosu DonanimHaber, 60W mono 1760 TL, 30kWp sulama 56x550W A+ 30kW Frecon Adana Saricam"
+}

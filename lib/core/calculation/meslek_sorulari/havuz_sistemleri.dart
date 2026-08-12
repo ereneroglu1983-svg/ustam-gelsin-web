@@ -1,120 +1,145 @@
-// lib/core/calculation/meslek_sorulari/havuz_sistemleri.dart - PROFESYONEL AKIŞLI VERSİYON
-// id ve options ASLA değiştirilmedi.
-
+// lib/core/calculation/meslek_sorulari/havuz_sistemleri.dart - FINAL
 class HavuzSistemleriSorulari {
   static final List<Map<String, dynamic>> sorular = [
-    // ADIM 1: KÖK
     {
       "id": "is_kapsami",
-      "label": "İhtiyacınız Olan Hizmet Kapsamı",
+      "label": "Hizmet Kapsamı",
       "type": "single",
       "required": true,
       "options": [
-        "Sıfırdan Havuz Yapımı (Komple Anahtar Teslim İnşaat ve Mekanik)",
-        "Mevcut Havuz Tadilatı / Liner Değişimi (Yenileme ve Onarım)",
-        "Periyodik Sezonluk Bakım Servisi (Kimyasal ve Filtrasyon Temizliği)",
-        "Havuz Kapatma / Isı Sistemi Kurulumu (Sezon Uzatma Çözümleri)"
+        "Sıfırdan Havuz Yapımı Anahtar Teslim",
+        "Mevcut Havuz Tadilat Liner Değişim",
+        "Periyodik Sezonluk Bakım",
+        "Kapatma Isı Sistemi Kurulumu"
       ]
     },
-
-    // ADIM 2: HAVUZ TİPİ - sadece Sıfırdan'da gelsin
+    // SIFIRDAN DALI
     {
       "id": "havuz_tipi",
-      "label": "Havuz Yapım Teknolojisi ve İşletim Modeli",
+      "label": "Havuz Yapım Teknolojisi",
       "type": "single",
       "required": true,
       "dependsOnId": "is_kapsami",
-      "dependsOnValue": ["Sıfırdan Havuz Yapımı (Komple Anahtar Teslim İnşaat ve Mekanik)"],
-      "options": [
-        "Betonarme Gövde (Skimmerlı Standart Filtrasyon Sistemi)",
-        "Üstten Taşmalı Betonarme / Infinity (Denge Tanklı Lüks Sistem)",
-        "Prefabrik / Panel Havuz Sistemi (Hızlı Kurulum Çelik Panel Altyapılı)",
-        "Fiberglass Havuz Gövdesi (Hazır Monoblok Kabuk Kasa Montajı)"
-      ]
+      "dependsOnValue": ["Sıfırdan Havuz Yapımı Anahtar Teslim"],
+      "options": ["Betonarme Skimmerlı Standart", "Taşmalı Infinity Denge Tanklı", "Prefabrik Panel Hızlı Kurulum", "Fiberglass Monoblok Hazır"]
     },
-
-    // ADIM 3: ARAZİ ŞARTI - havuz tipi sonrası gelsin
     {
       "id": "arazi_sarti",
-      "label": "Zemin Yapısı ve Hafriyat Koşulları",
+      "label": "Zemin Yapısı Hafriyat Koşulu",
       "type": "single",
       "required": true,
       "dependsOnId": "havuz_tipi",
-      "dependsOnValue": [
-        "Betonarme Gövde (Skimmerlı Standart Filtrasyon Sistemi)",
-        "Üstten Taşmalı Betonarme / Infinity (Denge Tanklı Lüks Sistem)",
-        "Prefabrik / Panel Havuz Sistemi (Hızlı Kurulum Çelik Panel Altyapılı)",
-        "Fiberglass Havuz Gövdesi (Hazır Monoblok Kabuk Kasa Montajı)"
-      ],
-      "options": [
-        "Normal Toprak Yapısı (Düz Arazi / Kolay Ekskavatör Kazısı)",
-        "Kayalık / Sert Zemin Yapısı (Ağır İş Makinesi ve Kırıcı Mesaisi Gereken)",
-        "Bataklık / Yüksek Yeraltı Suyu Olan Balçık Zemin (Zemin Islahı, Kazık ve Drenaj Gereken)"
-      ]
+      "options": ["Normal Toprak Düz Kolay Kazı", "Kayalık Sert Zemin Kırıcı Gerekli", "Bataklık Yeraltı Suyu Islah Drenaj Gerekli"]
     },
-
-    // ADIM 4: KAPLAMA - Sıfırdan için arazi sonrası, Tadilat için direkt kökten gelsin
     {
-      "id": "kaplama_tipi",
-      "label": "Havuz İç Yüzey Kaplama Malzemesi",
+      "id": "kaplama_tipi_sifir",
+      "label": "İç Yüzey Kaplama Malzemesi",
       "type": "single",
       "required": true,
-      "dependsOnId": ["arazi_sarti", "is_kapsami"],
-      "dependsOnValue": [
-        "Normal Toprak Yapısı (Düz Arazi / Kolay Ekskavatör Kazısı)",
-        "Kayalık / Sert Zemin Yapısı (Ağır İş Makinesi ve Kırıcı Mesaisi Gereken)",
-        "Bataklık / Yüksek Yeraltı Suyu Olan Balçık Zemin (Zemin Islahı, Kazık ve Drenaj Gereken)",
-        "Mevcut Havuz Tadilatı / Liner Değişimi (Yenileme ve Onarım)"
-      ],
-      "options": [
-        "Porselen Mozaik Kaplama (Yüksek Dayanımlı Havuz Seramiği)",
-        "Cam Mozaik veya Doğal Taş Kaplama (Premium Derinlik Efektli Lüks Seri)",
-        "Liner Kaplama Uygulaması (Sızdırmaz PVC Membran Hazır İç Hazne Örtüsü)"
-      ]
+      "dependsOnId": "arazi_sarti",
+      "options": ["Porselen Mozaik Seramik", "Cam Mozaik Doğal Taş Lüks", "Liner PVC Membran"]
     },
-
-    // ADIM 5: ALAN - kaplama sonrası veya Bakım/Kapatma'da direkt kökten gelsin
     {
-      "id": "alan_segmenti",
-      "label": "Havuz Yüzey Alanı Ölçü Segmenti",
+      "id": "alan_sifir",
+      "label": "Havuz Yüzey Alan Ölçüsü",
       "type": "single",
       "required": true,
-      "dependsOnId": ["kaplama_tipi", "is_kapsami"],
-      "dependsOnValue": [
-        "Porselen Mozaik Kaplama (Yüksek Dayanımlı Havuz Seramiği)",
-        "Cam Mozaik veya Doğal Taş Kaplama (Premium Derinlik Efektli Lüks Seri)",
-        "Liner Kaplama Uygulaması (Sızdırmaz PVC Membran Hazır İç Hazne Örtüsü)",
-        "Periyodik Sezonluk Bakım Servisi (Kimyasal ve Filtrasyon Temizliği)",
-        "Havuz Kapatma / Isı Sistemi Kurulumu (Sezon Uzatma Çözümleri)"
-      ],
-      "options": [
-        "0-25 m² Arası (Küçük Ölçekli / Müstakil Villa Tipi Havuz)",
-        "25-50 m² Arası (Orta Boy Standart Bahçe Tipi Aile Havuzu)",
-        "50-100 m² Arası (Geniş / Ticari / Sosyal Tesis Havuzu)",
-        "100 m² ve Üzeri (Yarı Olimpik / Büyük Otel Tesis Tipi)"
-      ]
+      "dependsOnId": "kaplama_tipi_sifir",
+      "options": ["0-25 m² Küçük Villa Tipi", "25-50 m² Orta Bahçe Aile", "50-100 m² Geniş Ticari", "100 m² Üzeri Olimpik Otel"]
     },
-
-    // ADIM 6: FİNAL EKSTRA - alan sonrası yeşil kutuda
+    // TADİLAT DALI
     {
-      "id": "ekstra_ozellikler",
-      "label": "Elektromekanik Donanımlar ve Konfor Ekstraları",
+      "id": "kaplama_tipi_tadilat",
+      "label": "Yeni İç Kaplama Malzemesi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Mevcut Havuz Tadilat Liner Değişim"],
+      "options": ["Porselen Mozaik Kaplama", "Cam Mozaik Doğal Taş", "Liner PVC Membran Değişim"]
+    },
+    {
+      "id": "alan_tadilat",
+      "label": "Havuz Alan Ölçüsü",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "kaplama_tipi_tadilat",
+      "options": ["0-25 m²", "25-50 m²", "50-100 m²", "100 m² Üzeri"]
+    },
+    // BAKIM DALI
+    {
+      "id": "bakim_detay",
+      "label": "Bakım Kapsam Detayı",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Periyodik Sezonluk Bakım"],
+      "options": ["Haftalık Kimyasal Filtrasyon", "Aylık Detaylı Bakım", "Sezon Açılış Bakımı", "Sezon Kapanış Bakımı"]
+    },
+    {
+      "id": "alan_bakim",
+      "label": "Havuz Alan Ölçüsü",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "bakim_detay",
+      "options": ["0-25 m²", "25-50 m²", "50-100 m²", "100 m² Üzeri"]
+    },
+    // KAPATMA ISI DALI
+    {
+      "id": "kapatma_tipi",
+      "label": "Kapatma Isı Sistemi Tipi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Kapatma Isı Sistemi Kurulumu"],
+      "options": ["Otomatik Lamel Kapak", "Teleskopik Kapatma", "Isı Pompası Kurulumu", "Güneş Kolektörü Isıtma"]
+    },
+    {
+      "id": "alan_kapatma",
+      "label": "Havuz Alan Ölçüsü",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "kapatma_tipi",
+      "options": ["0-25 m²", "25-50 m²", "50-100 m²", "100 m² Üzeri"]
+    },
+    // EKSTRALAR
+    {
+      "id": "ekstra_sifir",
+      "label": "Elektromekanik Konfor Ekstraları",
       "type": "multi",
-      "required": false,
-      "dependsOnId": "alan_segmenti",
-      "dependsOnValue": [
-        "0-25 m² Arası (Küçük Ölçekli / Müstakil Villa Tipi Havuz)",
-        "25-50 m² Arası (Orta Boy Standart Bahçe Tipi Aile Havuzu)",
-        "50-100 m² Arası (Geniş / Ticari / Sosyal Tesis Havuzu)",
-        "100 m² ve Üzeri (Yarı Olimpik / Büyük Otel Tesis Tipi)"
-      ],
+      "required": true,
+      "dependsOnId": "alan_sifir",
       "options": [
-        "Inverter Isı Pompası Entegrasyonu (Dört Mevsim Yüzme İçin Akıllı Havuz Isıtma Sistemi)",
-        "Tuz Klorlama Jeneratörü Otomasyonu (Doğal Dezenfeksiyon ve Otomatik pH Dozajlama Ünitesi)",
-        "Paslanmaz Çelik Şelale veya Jakuzi SPA Köşesi (Bağımsız Pompa ve Masaj Jet Ekipmanları)",
-        "RGB Akıllı Aydınlatma Paketeti (Uzaktan Kumandalı ve Trafolu Renkli LED Armatür Seti)",
-        "Otomatik Kapak Sistemi (Isı ve Buharlaşma Kaybını Önleyen Motorlu Lamel Örtü)"
+        "Inverter Isı Pompası Dört Mevsim",
+        "Tuz Klorlama Otomasyon pH Dozaj",
+        "Şelale Jakuzi SPA Masaj Jet",
+        "RGB Akıllı LED Aydınlatma",
+        "Otomatik Lamel Örtü",
+        "Ekstra İstemiyorum"
       ]
+    },
+    {
+      "id": "ekstra_tadilat",
+      "label": "Ekstra Donanım",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "alan_tadilat",
+      "options": ["Filtrasyon Pompa Yenileme", "LED Aydınlatma Yenileme", "Merdiven Tutamak", "Ekstra İstemiyorum"]
+    },
+    {
+      "id": "ekstra_bakim",
+      "label": "Ekstra Hizmet",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "alan_bakim",
+      "options": ["Yeşil Su Temizleme", "Kum Filtre Değişim", "Robot Süpürge Temizlik", "Ekstra İstemiyorum"]
+    },
+    {
+      "id": "ekstra_kapatma",
+      "label": "Ekstra Donanım",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "alan_kapatma",
+      "options": ["Isı Yalıtım Örtüsü", "Rüzgar Sensörü Otomasyon", "LED Aydınlatma", "Ekstra İstemiyorum"]
     }
   ];
 }

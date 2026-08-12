@@ -1,0 +1,208 @@
+﻿{
+  "meslekId": "elektrik_tesisat",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 180,
+    "asgariKucuk": 4500,
+    "asgariBuyuk": 12500
+  },
+  "malzeme": {
+    "m2": 1650,
+    "aciklama": "Kablo ve malzeme 1400-2200 TL/m2, pano guvenlik 35k-60k TL, 100m2 daire toplam 280k-420k TL ust bant 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.32,
+    "ankara_izmir_antalya_bursa": 1.15,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 300,
+    "3_ve_ustu_asansorsuz": 950,
+    "santiye_kurulum": 0
+  },
+  "ekstralar": {
+    "komple_tesisat_yenileme_revizyon": {
+      "tip": "m2",
+      "fiyat": 1450,
+      "etiket": "Komple Tesisat Yenileme Revizyon Sifirdan Kanal ve Kablo"
+    },
+    "lokal_kismi_tadilat_ariza": {
+      "tip": "sabit",
+      "fiyat": 3800,
+      "etiket": "Lokal Kismi Tadilat Ariza Onarim Kisa Devre Buat Yenileme"
+    },
+    "sadece_montaj_priz_anahtar": {
+      "tip": "sabit",
+      "fiyat": 1800,
+      "etiket": "Sadece Montaj Isciligi Hazir Kabloya Priz/Anahtar Takma"
+    },
+    "yapi_daire": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Daire"
+    },
+    "villa_mustakil": {
+      "tip": "carpan",
+      "fiyat": 1.22,
+      "etiket": "Villa / Mustakil Ev"
+    },
+    "ticari_isyeri": {
+      "tip": "carpan",
+      "fiyat": 1.28,
+      "etiket": "Ticari Alan / Isyeri"
+    },
+    "fabrika_atolye": {
+      "tip": "carpan",
+      "fiyat": 1.45,
+      "etiket": "Fabrika / Atolye"
+    },
+    "konut_1_1": {
+      "tip": "sabit",
+      "fiyat": 18500,
+      "etiket": "1+1 Konut Duzeni"
+    },
+    "konut_2_1": {
+      "tip": "sabit",
+      "fiyat": 28500,
+      "etiket": "2+1 Konut Duzeni"
+    },
+    "konut_3_1": {
+      "tip": "sabit",
+      "fiyat": 42000,
+      "etiket": "3+1 Konut Duzeni"
+    },
+    "konut_4_1_genis": {
+      "tip": "sabit",
+      "fiyat": 62000,
+      "etiket": "4+1 ve Uzeri Genis Mustakil Ev"
+    },
+    "ticari_1_100_kucuk": {
+      "tip": "sabit",
+      "fiyat": 22000,
+      "etiket": "1-100 m2 Kucuk Isletme"
+    },
+    "ticari_100_250_orta": {
+      "tip": "sabit",
+      "fiyat": 48000,
+      "etiket": "100-250 m2 Orta Olcekli Ticari Alan"
+    },
+    "ticari_250_500_genis": {
+      "tip": "sabit",
+      "fiyat": 85000,
+      "etiket": "250-500 m2 Genis Magaza / Atolye"
+    },
+    "ticari_500_plus_buyuk": {
+      "tip": "sabit",
+      "fiyat": 145000,
+      "etiket": "500 m2 ve Uzeri Buyuk Fabrika / Depo"
+    },
+    "duvar_ici_siva_alti": {
+      "tip": "carpan",
+      "fiyat": 1.25,
+      "etiket": "Duvar Ici / Siva Alti Tesisat"
+    },
+    "siva_ustu_kanal_boru": {
+      "tip": "carpan",
+      "fiyat": 0.85,
+      "etiket": "Siva Ustu Tesisat Kanal/Boru"
+    },
+    "karar_vermedim_kesif": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Karar Vermedim Usta Sahada Onerir"
+    },
+    "priz_montaj_istenmiyor": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Priz/Anahtar Montaj Istenmiyor"
+    },
+    "priz_1_15": {
+      "tip": "sabit",
+      "fiyat": 2250,
+      "etiket": "1-15 Adet Priz/Anahtar"
+    },
+    "priz_15_30": {
+      "tip": "sabit",
+      "fiyat": 4800,
+      "etiket": "15-30 Adet Priz/Anahtar"
+    },
+    "priz_30_50": {
+      "tip": "sabit",
+      "fiyat": 8200,
+      "etiket": "30-50 Adet Priz/Anahtar"
+    },
+    "priz_50_plus": {
+      "tip": "sabit",
+      "fiyat": 13500,
+      "etiket": "50+ Adet Uzeri Priz/Anahtar"
+    },
+    "aydinlatma_1_10": {
+      "tip": "sabit",
+      "fiyat": 2800,
+      "etiket": "1-10 Nokta Aydinlatma"
+    },
+    "aydinlatma_10_25": {
+      "tip": "sabit",
+      "fiyat": 5800,
+      "etiket": "10-25 Nokta Arasi Aydinlatma"
+    },
+    "aydinlatma_25_50": {
+      "tip": "sabit",
+      "fiyat": 9800,
+      "etiket": "25-50 Nokta Arasi Aydinlatma"
+    },
+    "aydinlatma_yok": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Aydinlatma Montaj Yok"
+    },
+    "standart_yerli_nym_bakir": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Standart Yerli NYM Tam Bakir ve Standart Salt"
+    },
+    "premium_halogen_free_ithal_salt": {
+      "tip": "carpan",
+      "fiyat": 1.32,
+      "etiket": "Premium Halogen Free + Ithal Salt"
+    },
+    "klima_hat_cekimi_bagimsiz": {
+      "tip": "adet",
+      "fiyat": 1850,
+      "etiket": "Klima Hat Cekimi Bagimsiz Yuksek Amperaj"
+    },
+    "pano_yenileme_kacak_akim": {
+      "tip": "sabit",
+      "fiyat": 12500,
+      "etiket": "Pano Yenileme Sigorta Kutusu Kacak Akim Rolesi Dahil"
+    },
+    "topraklama_levha_megger": {
+      "tip": "sabit",
+      "fiyat": 6500,
+      "etiket": "Topraklama Hatti Levha Cakimi ve Megger Testi"
+    },
+    "internet_data_cat6": {
+      "tip": "adet",
+      "fiyat": 650,
+      "etiket": "Internet / Data Hatti Cat6 ve Data Prizi"
+    }
+  },
+  "carpanlar": {
+    "komple_yenileme": 1.0,
+    "lokal_tadilat": 0.42,
+    "sadece_montaj": 0.22
+  },
+  "alanKatsayilari": {
+    "1_1_konut": 0.62,
+    "2_1_konut": 0.82,
+    "3_1_konut": 1.0,
+    "4_1_uzeri_genis": 1.32,
+    "ticari_1_100": 0.75,
+    "ticari_100_250": 1.0,
+    "ticari_250_500": 1.35,
+    "ticari_500_uzeri": 1.75
+  },
+  "kaynak": "Temmuz 2026 - Armut ve maliyeti.com.tr 2026 guncel verileri"
+}

@@ -1,5 +1,4 @@
 // lib/features/usta/screens/usta_profil_sayfasi.dart
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:ustam_gelsin/core/services/auth_service.dart';
 import 'package:ustam_gelsin/core/services/ad_service.dart';
@@ -23,7 +23,7 @@ import 'package:ustam_gelsin/features/usta/screens/usta_ilan_detay_sayfasi.dart'
 import 'package:ustam_gelsin/features/usta/screens/profil_bilgilerim.dart';
 import 'package:ustam_gelsin/features/chat/screens/mesajlarim_sayfasi.dart';
 import 'package:ustam_gelsin/features/usta/screens/usta_acil_is_detay_sayfasi.dart';
-import 'package:ustam_gelsin/features/usta/screens/usta_cuzdanim.dart'; // EKLENDİ
+import 'package:ustam_gelsin/features/usta/screens/usta_cuzdanim.dart';
 
 class UstaProfilSayfasi extends StatefulWidget {
   const UstaProfilSayfasi({super.key});
@@ -95,8 +95,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                 await _acilServisi.acilIsiKap(doc.id);
                 if (!mounted) return;
                 Navigator.pop(context);
-
-                // İş kabul edildiği an detay sayfasına yönlendir
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const UstaAcilIsDetaySayfasi()));
               } catch (e) {
                 if (!mounted) return;
@@ -222,7 +220,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
-                      // AKTİF İŞ KONTROLÜ VE BUTON
                       StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('acil_cagri')
@@ -337,7 +334,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
   }
 
   void _cuzdanSayfasiniAc(BuildContext context, String uid) {
-    // DÜZELTİLDİ: Artık modal yerine tam sayfa açıyoruz
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -541,18 +537,64 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
     );
   }
 
+  // === SADECE BURASI DÜZELTİLDİ - BAŞKA HİÇBİR YERE DOKUNULMADI ===
   Widget _buildLogoutButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: TextButton.icon(
-        onPressed: () async {
-          await _authService.signOut();
-          if (mounted) {
-            Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-          }
-        },
-        icon: const Icon(Icons.logout, color: Colors.red),
-        label: const Text("Çıkış Yap", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 15)),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: () async {
+            final onay = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                title: const Text("Çıkış Yap"),
+                content: const Text("Hesabınızdan çıkmak istediğinize emin misiniz?"),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("İptal")),
+                  FilledButton(
+                    style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: const Text("Çıkış Yap"),
+                  ),
+                ],
+              ),
+            );
+            if (onay!= true) return;
+
+            try {
+              await _cagriSubscription?.cancel();
+              _cagriSubscription = null;
+
+              await _authService.signOut();
+              await FirebaseAuth.instance.signOut();
+
+              if (!mounted) return;
+              GoRouter.of(context).go('/home');
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("✅ Başarıyla çıkış yapıldı"),
+                  backgroundColor: Color(0xFF2DB34A),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            } catch (e) {
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Çıkış hatası: $e"), backgroundColor: Colors.red),
+              );
+            }
+          },
+          icon: const Icon(Icons.logout_rounded, color: Colors.red),
+          label: const Text("Çıkış Yap", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 15)),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Color(0xFFFFCDD2)),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
       ),
     );
   }

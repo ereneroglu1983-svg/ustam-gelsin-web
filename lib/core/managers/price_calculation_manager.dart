@@ -1,18 +1,31 @@
-// lib/core/managers/price_calculation_manager.dart
-
+// lib/core/managers/price_calculation_manager.dart - REVİZE FİNAL V12 - MÜHÜRLÜ - HATASIZ
+// GÖREVİ: HESAPLA emriyle ORKESTRA'ya koşar, gelen ham fiyatı süsler, ilan detay ekranına atar
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../calculation/butce_orkestra_servisi.dart';
 
 class PriceCalculationManager {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static double fiyatTemizle(String fiyat) {
+    if (fiyat.isEmpty) return 0.0;
+    try {
+      String temizlenmis = fiyat.trim().replaceAll(RegExp(r'[^0-9.,]'), '');
+      if (temizlenmis.contains(',') && temizlenmis.contains('.')) {
+        temizlenmis = temizlenmis.replaceAll('.', '').replaceAll(',', '.');
+      } else if (temizlenmis.contains(',')) {
+        temizlenmis = temizlenmis.replaceAll(',', '.');
+      } else if (temizlenmis.contains('.')) {
+        List<String> parcalar = temizlenmis.split('.');
+        if (parcalar.length > 2 || (parcalar.length == 2 && parcalar[1].length == 3)) {
+          temizlenmis = temizlenmis.replaceAll('.', '');
+        }
+      }
+      return double.tryParse(temizlenmis)?? 0.0;
+    } catch (e) {
+      final fallbackTemiz = fiyat.replaceAll(RegExp(r'[^0-9]'), '');
+      return double.tryParse(fallbackTemiz)?? 0.0;
+    }
+  }
 
-  // Sadece gösterim için - Orkestra zaten 35.000 - 45.000 aralığını veriyor
-  static double fiyatTemizle(String fiyat) => double.tryParse(fiyat.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0.0;
-
-  /// TEK GİRİŞ NOKTASI - Tüm hesaplama buradan yürüyecek
-  /// Eski tek String yerine artık aralıklı String döndürür: "35.000 - 45.000 ₺"
   Future<Map<String, dynamic>> orkestraFiyatHesapla({
     required String userId,
     required String talepId,
@@ -22,97 +35,70 @@ class PriceCalculationManager {
     required Map<String, dynamic> detaylar,
     required String bolgeKodu,
   }) async {
-    // Detayları orkestranın beklediği formata çevir
-    // detaylar: { "soru_id": "cevap" } -> [ {id, cevap}, ... ]
-    List<Map<String, dynamic>> cevapListesi = detaylar.entries.map((e) => {
-      "id": e.key,
-      "cevap": e.value
-    }).toList();
+    List<Map<String, dynamic>> cevapListesi = detaylar.entries
+        .map((e) => {"id": e.key, "cevap": e.value})
+        .toList();
 
-    // Yerel hafıza için geçici map - Silsile 1 için
-    Map<String, dynamic> yerelHafiza = {};
+    debugPrint("💲 [PRICE] HESAPLA TETİKLENDİ | başlık:$baslik | kategori:$kategori ($kategoriId) | bölge:$bolgeKodu");
 
     try {
-      // TEK SİLSİLE - Orkestraya devret
       final Map<String, dynamic> orkestraRapor = await ButceOrkestraServisi.silsileYurut(
         talepId: talepId,
         kategoriAdi: kategori,
         kategoriId: kategoriId,
+        ilanBasligi: baslik, // ✅ 1. KRİTİK FIX - GERÇEK BAŞLIK ARTIK GROK'A GİDİYOR
         kullaniciCevaplari: cevapListesi,
-        yerelHafizaVerisi: yerelHafiza,
+        yerelHafizaVerisi: {"ilId": bolgeKodu}, // ✅ 2. KRİTİK FIX - ilId ARTIK BOŞ GİTMİYOR, CACHE ÇALIŞACAK
         anlikBolgeKodu: bolgeKodu,
         anlikKullaniciSegmenti: "standart",
       );
 
-      final Map<String, dynamic> robotSonuc = Map<String, dynamic>.from(orkestraRapor['robotSonucu'] ?? {});
+      final Map<String, dynamic> robotSonuc = Map<String, dynamic>.from(orkestraRapor['robotSonucu']?? {});
 
-      double min = (robotSonuc['minimumButce'] as num?)?.toDouble() ?? 3000;
-      double ort = (robotSonuc['muhtemelButce'] as num?)?.toDouble() ?? 5000;
-      double max = (robotSonuc['maksimumButce'] as num?)?.toDouble() ?? 8000;
+      if (robotSonuc['minimumButce'] == null || robotSonuc['maksimumButce'] == null || robotSonuc['muhtemelButce'] == null) {
+        throw Exception("Orkestra eksik veri döndü: $robotSonuc");
+      }
 
-      // SENİN İSTEDİĞİN MANTIK: Komisyon = (min+max)/2 * %1
-      double komisyonTabani = (min + max) / 2;
-      double komisyon = komisyonTabani * 0.01;
+      double min = (robotSonuc['minimumButce'] as num).toDouble();
+      double ort = (robotSonuc['muhtemelButce'] as num).toDouble();
+      double max = (robotSonuc['maksimumButce'] as num).toDouble();
+      String kaynak = robotSonuc['kaynak']?.toString()?? 'BILINMEYEN';
 
-      // Müşteriye gösterilecek metin
-      String aralikliFiyat = "${min.toInt()} - ${max.toInt()} ₺";
-      String tekilFiyat = "${ort.toInt()} ₺"; // Eski kodlar için geriye uyumlu
+      String formatla(double n) {
+        return n.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+      }
 
-      debugPrint("✅ [ORKESTRA BAŞARILI] $kategoriId | $aralikliFiyat | Komisyon: $komisyon");
+      String aralikliFiyat = "${formatla(min)} - ${formatla(max)} ₺";
+      String tekilFiyat = "${formatla(ort)} ₺";
+
+      // İKONLU LOG
+      String ikon = "❓";
+      if (kaynak.contains("FIREBASE")) ikon = "💾";
+      else if (kaynak.contains("GROK")) ikon = "👑";
+      else if (kaynak.contains("GROQ")) ikon = "⚡";
+      else if (kaynak.contains("LLAMA")) ikon = "🦙";
+      else if (kaynak.contains("YEREL")) ikon = "🦾";
+
+      debugPrint("$ikon✅ [PRICE <- ORKESTRA BAŞARILI] $kategoriId | $aralikliFiyat | Kaynak: $kaynak | Başlık: $baslik");
 
       return {
         "basarili": true,
-        "kaynak": robotSonuc['kaynak'] ?? 'ORKESTRA',
+        "kaynak": kaynak,
         "minimumButce": min,
         "muhtemelButce": ort,
         "maksimumButce": max,
-        "fiyatBilgisi": tekilFiyat, // Eski IlanModel için
-        "aralikliFiyatBilgisi": aralikliFiyat, // Yeni gösterim için - FIX: ı -> i
-        "komisyonTutari": komisyon,
-        "komisyonTabani": komisyonTabani,
+        "fiyatBilgisi": tekilFiyat,
+        "aralikliFiyatBilgisi": aralikliFiyat,
         "tamRapor": orkestraRapor,
       };
     } catch (e, stack) {
-      debugPrint("❌ [ORKESTRA HATA] $e\n$stack");
-      // En kötü senaryoda bile sistem çökmesin, sabit bir aralık ver
-      return {
-        "basarili": false,
-        "minimumButce": 3500.0,
-        "muhtemelButce": 5000.0,
-        "maksimumButce": 7500.0,
-        "fiyatBilgisi": "5000 ₺",
-        "aralikliFiyatBilgisi": "3500 - 7500 ₺", // FIX: ı -> i
-        "komisyonTutari": 55.0, // (3500+7500)/2 * 0.01
-        "komisyonTabani": 5500.0,
-        "hata": e.toString(),
-      };
+      debugPrint("❌ [PRICE - ORKESTRA ÇÖKTÜ] $e\n$stack");
+      rethrow;
     }
   }
 
-  /// ESKİ KODLARIN ÇAĞIRDIĞI String döndüren fonksiyon - Geriye uyum için duruyor
-  /// Yeni kodlar Map döndüren üstteki fonksiyonu kullanmalı
-  @Deprecated("Yerine orkestraFiyatHesapla(Map döndüren) kullan")
-  Future<String> eski_orkestraFiyatHesapla_String({
-    required String userId,
-    required String baslik,
-    required String kategori,
-    required String kategoriId,
-    required Map<String, dynamic> detaylar,
-  }) async {
-    final sonuc = await orkestraFiyatHesapla(
-      userId: userId,
-      talepId: userId,
-      baslik: baslik,
-      kategori: kategori,
-      kategoriId: kategoriId,
-      detaylar: detaylar,
-      bolgeKodu: "diger",
-    );
-    return sonuc['aralikliFiyatBilgisi'] as String;
-  }
-
   String formatFiyatGosterim(String text) {
-    if (text.contains('₺')) return "Tahmini: $text";
-    return "Tahmini: $text ₺";
+    if (text.contains('₺')) return text;
+    return "$text ₺";
   }
 }

@@ -33,23 +33,21 @@ class AcilIsYonetimServisi {
     }
   }
 
-  // REVİZE: Usta offline olduğunda veya konum alınamadığında bile durumu temizleyip güncelleyelim.
   Future<void> usta724DurumunuGuncelle(bool aktifMi) async {
     final ustaId = _auth.currentUser?.uid;
     if (ustaId == null) return;
 
     Map<String, dynamic> updateData = {
       'is724Active': aktifMi,
-      'lastActive': FieldValue.serverTimestamp(), // Bildirim tetikleyicisi için zaman damgası
+      'lastActive': FieldValue.serverTimestamp(),
     };
 
     if (aktifMi) {
       Position? position = await konumKontrolVeAl();
       if (position != null) {
         updateData['geohash'] = _geoHasher.encode(position.longitude, position.latitude, precision: 5);
-        updateData['konum'] = GeoPoint(position.latitude, position.longitude); // Cloud Function sorgusu için ekledik
+        updateData['konum'] = GeoPoint(position.latitude, position.longitude);
       } else {
-        // Konum alınamazsa aktif yapılamaz
         updateData['is724Active'] = false;
       }
     } else {
@@ -63,22 +61,14 @@ class AcilIsYonetimServisi {
     final ustaId = _auth.currentUser?.uid;
     if (ustaId == null) return false;
 
-    // Ustanın profil bilgilerini çek (Akıllı isim yakalama mantığı ile)
     final ustaDoc = await _firestore.collection('users').doc(ustaId).get();
     final ustaData = ustaDoc.data();
 
-    // İsim çekme mantığı: önce first+last, yoksa name
     final String firstName = ustaData?['firstName'] ?? '';
     final String lastName = ustaData?['lastName'] ?? '';
     final String name = ustaData?['name'] ?? '';
-
-    final String ustaAd = (firstName.isNotEmpty || lastName.isNotEmpty)
-        ? "$firstName $lastName".trim()
-        : name.trim();
-
+    final String ustaAd = (firstName.isNotEmpty || lastName.isNotEmpty) ? "$firstName $lastName".trim() : name.trim();
     final String ustaTelefon = ustaData?['phoneNumber'] ?? ustaData?['phone'] ?? "";
-
-    // Müşteri tarafında gösterilecek ek bilgiler
     final String ustaProfilResmi = ustaData?['profileImageUrl'] ?? "";
     final bool ustaUstalikBelgesi = ustaData?['ustalikBelgesiVarMi'] ?? false;
 
@@ -87,26 +77,48 @@ class AcilIsYonetimServisi {
     final ilanRef = _firestore.collection('acil_cagri').doc(ilanId);
 
     try {
-      return await _firestore.runTransaction((transaction) async {
+      // 1. ÖNCE BAKİYE KONTROLÜ - Transaction DIŞINDA
+      DocumentSnapshot walletSnap = await _firestore.collection('wallets').doc(ustaId).get();
+      double mevcutBakiye = 0.0;
+      if (walletSnap.exists) {
+        mevcutBakiye = (walletSnap.data() as Map<String, dynamic>)['balance']?.toDouble() ?? 0.0;
+      }
+      if (mevcutBakiye < 250.0) {
+        debugPrint("Bakiye yetersiz: $mevcutBakiye");
+        return false;
+      }
+
+      // 2. İLANI KİLİTLE - Sadece ilanı güncelleyen transaction
+      bool ilanAlindi = await _firestore.runTransaction((transaction) async {
         DocumentSnapshot ilanSnap = await transaction.get(ilanRef);
-
-        if (!ilanSnap.exists || ilanSnap.get('durum') != 'bekliyor') return false;
-
-        if (!await _walletService.bakiyeDus(ustaId, 250.0)) return false;
+        if (!ilanSnap.exists) return false;
+        if (ilanSnap.get('durum') != 'bekliyor') return false;
 
         transaction.update(ilanRef, {
-          'durum': 'atandi', // Cloud Function tetikleyicisi için 'atandi' yapıldı
+          'durum': 'atandi',
           'secilenUstaId': ustaId,
-          'ustaAd': ustaAd,       // Bildirim için eklendi
-          'ustaTelefon': ustaTelefon, // Bildirim için eklendi
-          'ustaProfilResmi': ustaProfilResmi, // İlan kartında görünmesi için eklendi
-          'ustaUstalikBelgesi': ustaUstalikBelgesi, // Rozet kontrolü için eklendi
+          'ustaAd': ustaAd,
+          'ustaTelefon': ustaTelefon,
+          'ustaProfilResmi': ustaProfilResmi,
+          'ustaUstalikBelgesi': ustaUstalikBelgesi,
           'kabulEdilmeTarihi': FieldValue.serverTimestamp(),
           'teknikDetaylar.kilitAcildi': true,
           'teklifUcreti': 250,
         });
         return true;
       });
+
+      if (!ilanAlindi) return false;
+
+      // 3. BAKİYE DÜŞ - Transaction DIŞINDA, ilan alındıktan sonra
+      bool bakiyeDustu = await _walletService.bakiyeDus(ustaId, 250.0);
+      if (!bakiyeDustu) {
+        // Bakiye düşmezse ilanı geri al - rollback
+        await ilanRef.update({'durum': 'bekliyor', 'secilenUstaId': FieldValue.delete()});
+        return false;
+      }
+
+      return true;
     } catch (e) {
       debugPrint("İş kapma işlem hatası: $e");
       return false;

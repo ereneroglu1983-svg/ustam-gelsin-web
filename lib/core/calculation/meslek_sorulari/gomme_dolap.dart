@@ -1,178 +1,122 @@
-// lib/core/calculation/meslek_sorulari/ray_dolap.dart - PROFESYONEL AKIŞLI VERSİYON
-// id ve options ASLA değiştirilmedi.
-
+// lib/core/calculation/meslek_sorulari/ray_dolap.dart - FINAL
 class RayDolapSorulari {
   static final List<Map<String, dynamic>> sorular = [
-    // ADIM 1: KÖK
     {
       "id": "islem_kapsami",
-      "label": "Talep Edilen Hizmet Türü Kapsamı",
+      "label": "Hizmet Kapsamı",
       "type": "single",
       "required": true,
-      "options": [
-        "Sıfırdan İmalat Navlun ve Montaj Dahil (Komple Ray Dolap Yapımı)",
-        "Sadece Kapak Yenileme (Mevcut Dolaba Yeni Sürgülü/Ray Kapak Sistemi)",
-        "İç Raf Düzenleme / Tadilat (Gövde İçi Raf ve Bölme Ekleme)"
-      ]
+      "options": ["Sıfırdan İmalat Montaj Dahil", "Sadece Kapak Yenileme", "İç Raf Düzenleme Tadilat"]
     },
-
-    // ADIM 2: GÖVDE - Sıfırdan ve İç Raf'ta gelsin
     {
-      "id": "govde_malzemesi",
-      "label": "Gövde ve Raf İskelet Malzemesi",
+      "id": "yapi_tip",
+      "label": "Uygulama Alan Mimarisi",
       "type": "single",
       "required": true,
       "dependsOnId": "islem_kapsami",
-      "dependsOnValue": [
-        "Sıfırdan İmalat Navlun ve Montaj Dahil (Komple Ray Dolap Yapımı)",
-        "İç Raf Düzenleme / Tadilat (Gövde İçi Raf ve Bölme Ekleme)"
-      ],
-      "options": [
-        "Suntalam (Standart Ekonomik Gövde ve Raf İçeriği)",
-        "MDF Lam (Dayanıklı ve Yüksek Yoğunluklu 1. Kalite Uzun Ömürlü Panel)",
-        "Masif Ahşap Kaplama (Doğal Kereste Üzeri Özel Laka İşçilikli Lüks Seri)"
-      ]
+      "options": ["Yatak Odası", "Giyinme Odası", "Antre Koridor", "Çocuk Genç Odası", "Ofis Arşiv"]
     },
-
-    // ADIM 3: KAPAK - Sıfırdan için gövde sonrası, Kapak Yenileme için direkt kökten gelsin
-    {
-      "id": "kapak_modeli",
-      "label": "Kapak Teknolojisi ve Yüzey Tasarımı",
-      "type": "single",
-      "required": true,
-      "dependsOnId": ["govde_malzemesi", "islem_kapsami"],
-      "dependsOnValue": [
-        "Suntalam (Standart Ekonomik Gövde ve Raf İçeriği)",
-        "MDF Lam (Dayanıklı ve Yüksek Yoğunluklu 1. Kalite Uzun Ömürlü Panel)",
-        "Masif Ahşap Kaplama (Doğal Kereste Üzeri Özel Laka İşçilikli Lüks Seri)",
-        "Sadece Kapak Yenileme (Mevcut Dolaba Yeni Sürgülü/Ray Kapak Sistemi)"
-      ],
-      "options": [
-        "Düz / Suntalam Kapak (Modern Ekonomik Hatlar)",
-        "Akrilik Panel Kapak (Yüksek Parlaklıkta Parlak/Mat Çizilmez Yüzey)",
-        "Membran / Balon Pres Kapak (PVC Vakum Pres Esnek Kaplama)",
-        "Lake Boya Kapak (MDF Üzeri CNC Desen İşlemeli Poliüretan Boyalı Lüks Seri)"
-      ]
-    },
-
-    // ADIM 4: ALAN - Kapak sonrası (Sıfırdan ve Kapak Yenileme) veya Gövde sonrası (İç Raf)
     {
       "id": "alan_segmenti",
-      "label": "Dolap Ölçüsü ve Alan Kademesi",
+      "label": "Dolap Ölçüsü Alan Kademesi",
       "type": "single",
       "required": true,
-      "dependsOnId": ["kapak_modeli", "govde_malzemesi"],
-      "dependsOnValue": [
-        "Düz / Suntalam Kapak (Modern Ekonomik Hatlar)",
-        "Akrilik Panel Kapak (Yüksek Parlaklıkta Parlak/Mat Çizilmez Yüzey)",
-        "Membran / Balon Pres Kapak (PVC Vakum Pres Esnek Kaplama)",
-        "Lake Boya Kapak (MDF Üzeri CNC Desen İşlemeli Poliüretan Boyalı Lüks Seri)",
-        "Suntalam (Standart Ekonomik Gövde ve Raf İçeriği)",
-        "MDF Lam (Dayanıklı ve Yüksek Yoğunluklu 1. Kalite Uzun Ömürlü Panel)",
-        "Masif Ahşap Kaplama (Doğal Kereste Üzeri Özel Laka İşçilikli Lüks Seri)"
-      ],
-      "options": [
-        "0 - 4 m² Arası Standart Küçük Boy Dolap",
-        "4 - 8 m² Arası Orta Boy Odalar İçin İdeal Düzen",
-        "8 - 12 m² Arası Geniş Boy Giyinme Odası Blokları",
-        "12 m² ve Üzeri Duvarı Komple Kaplayan Büyük Sistemler"
-      ]
+      "dependsOnId": "yapi_tip",
+      "options": ["0-4 m² Küçük", "4-8 m² Orta", "8-12 m² Geniş Giyinme", "12 m² Üzeri Duvar Kaplama"]
     },
-
-    // ADIM 5: RAY MEKANİZMASI - sadece Sıfırdan ve Kapak Yenileme'de, alan sonrası gelsin
     {
-      "id": "ray_mekanizmasi",
-      "label": "Ray Mekanizması ve Kapak Açılış Akıllı Sistemi",
+      "id": "yukseklik_tip",
+      "label": "Dolap Yükseklik Tavan Durumu",
       "type": "single",
       "required": true,
       "dependsOnId": "alan_segmenti",
-      "visibleIf": {
-        "islem_kapsami": [
-          "Sıfırdan İmalat Navlun ve Montaj Dahil (Komple Ray Dolap Yapımı)",
-          "Sadece Kapak Yenileme (Mevcut Dolaba Yeni Sürgülü/Ray Kapak Sistemi)"
-        ]
-      },
-      "dependsOnValue": [
-        "0 - 4 m² Arası Standart Küçük Boy Dolap",
-        "4 - 8 m² Arası Orta Boy Odalar İçin İdeal Düzen",
-        "8 - 12 m² Arası Geniş Boy Giyinme Odası Blokları",
-        "12 m² ve Üzeri Duvarı Komple Kaplayan Büyük Sistemler"
-      ],
-      "options": [
-        "Standart Ray Sistemi (Manuel Açılış Alttan Makaralı)",
-        "Menteşeli Frenli Stoplu Kapak Grubu",
-        "Lüks Üstten Askılı Frenli Ray Sistemi (Gizli Yavaşlatıcılı Sessiz Stop Mekanizması)"
-      ]
+      "options": ["Tavana Kadar Tam Boy Pervazlı", "Standart 210-230 cm Üstü Açık", "Özel Alçak Eğim Kesimli"]
     },
-
-    // ADIM 6: YÜKSEKLİK - ray varsa ray sonrası, İç Raf'ta direkt alan sonrası gelsin
+    // SIFIRDAN DALI
     {
-      "id": "yukseklik_tip",
-      "label": "Dolap Yükseklik ve Tavan Durumu",
+      "id": "govde_malzemesi",
+      "label": "Gövde Raf İskelet Malzemesi",
       "type": "single",
       "required": true,
-      "dependsOnId": ["ray_mekanizmasi", "alan_segmenti"],
-      "dependsOnValue": [
-        "Standart Ray Sistemi (Manuel Açılış Alttan Makaralı)",
-        "Menteşeli Frenli Stoplu Kapak Grubu",
-        "Lüks Üstten Askılı Frenli Ray Sistemi (Gizli Yavaşlatıcılı Sessiz Stop Mekanizması)",
-        "0 - 4 m² Arası Standart Küçük Boy Dolap",
-        "4 - 8 m² Arası Orta Boy Odalar İçin İdeal Düzen",
-        "8 - 12 m² Arası Geniş Boy Giyinme Odası Blokları",
-        "12 m² ve Üzeri Duvarı Komple Kaplayan Büyük Sistemler"
-      ],
-      "options": [
-        "Tavana Kadar Tam Boy (Sıfır Boşluklu Pervaz Entegreli)",
-        "Standart Ölçü (210 - 230 cm Arası Üstü Açık)",
-        "Özel Ölçü / Alçak Tavan (Kiriş / Çatı Katı Eğim Kesimli İşçilik)"
-      ]
+      "dependsOnId": "islem_kapsami",
+      "dependsOnValue": ["Sıfırdan İmalat Montaj Dahil"],
+      "options": ["Suntalam Ekonomik", "MDF Lam Dayanıklı 1. Kalite", "Masif Kaplama Lake Lüks"]
     },
-
-    // ADIM 7: YAPI TİP - yükseklik sonrası gelsin
     {
-      "id": "yapi_tip",
-      "label": "Uygulama Yapılacak Alanın Mimarisi",
+      "id": "kapak_modeli_sifir",
+      "label": "Kapak Teknolojisi Yüzey",
       "type": "single",
       "required": true,
-      "dependsOnId": "yukseklik_tip",
-      "dependsOnValue": [
-        "Tavana Kadar Tam Boy (Sıfır Boşluklu Pervaz Entegreli)",
-        "Standart Ölçü (210 - 230 cm Arası Üstü Açık)",
-        "Özel Ölçü / Alçak Tavan (Kiriş / Çatı Katı Eğim Kesimli İşçilik)"
-      ],
-      "options": [
-        "Yatak Odası",
-        "Giyinme Odası",
-        "Antre / Koridor",
-        "Çocuk / Genç Odası",
-        "Ofis / Arşiv Odası"
-      ]
+      "dependsOnId": "govde_malzemesi",
+      "options": ["Düz Suntalam Ekonomik", "Akrilik Parlak Çizilmez", "Membran Balon Pres PVC", "Lake Boya CNC Desenli Lüks"]
     },
-
-    // ADIM 8: FİNAL EKSTRA - sadece Sıfırdan'da ve yapı tipi sonrası gelsin
     {
-      "id": "ekstra_donanim",
-      "label": "Dolap İçi Fonksiyonel Donanım ve Aksesuar Ekstraları",
+      "id": "ray_mekanizmasi_sifir",
+      "label": "Ray Mekanizma Sistemi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "kapak_modeli_sifir",
+      "options": ["Standart Alttan Makaralı Manuel", "Menteşeli Frenli Stoplu", "Lüks Üstten Askılı Frenli Sessiz"]
+    },
+    // KAPAK YENİLEME DALI
+    {
+      "id": "kapak_modeli_yenileme",
+      "label": "Yeni Kapak Teknolojisi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "islem_kapsami",
+      "dependsOnValue": ["Sadece Kapak Yenileme"],
+      "options": ["Düz Suntalam Ekonomik", "Akrilik Parlak Çizilmez", "Membran Balon Pres", "Lake Boya CNC Lüks"]
+    },
+    {
+      "id": "ray_mekanizmasi_yenileme",
+      "label": "Ray Mekanizma Sistemi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "kapak_modeli_yenileme",
+      "options": ["Standart Alttan Makaralı", "Menteşeli Frenli Stoplu", "Lüks Üstten Askılı Frenli"]
+    },
+    // İÇ RAF DALI
+    {
+      "id": "govde_raf",
+      "label": "Raf Malzemesi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "islem_kapsami",
+      "dependsOnValue": ["İç Raf Düzenleme Tadilat"],
+      "options": ["Suntalam Ekonomik", "MDF Lam Dayanıklı", "Masif Kaplama"]
+    },
+    // EKSTRALAR
+    {
+      "id": "ekstra_sifir",
+      "label": "Fonksiyonel Donanım Ekstraları",
       "type": "multi",
-      "required": false,
-      "dependsOnId": "yapi_tip",
-      "visibleIf": {
-        "islem_kapsami": "Sıfırdan İmalat Navlun ve Montaj Dahil (Komple Ray Dolap Yapımı)"
-      },
-      "dependsOnValue": [
-        "Yatak Odası",
-        "Giyinme Odası",
-        "Antre / Koridor",
-        "Çocuk / Genç Odası",
-        "Ofis / Arşiv Odası"
-      ],
+      "required": true,
+      "dependsOnId": "ray_mekanizmasi_sifir",
       "options": [
-        "LED Aydınlatma Sistemi (Sensörlü, Alüminyum Kanallı Dolap İçi Profil Işık Paketi)",
-        "Ayna veya Cam Kapak Entegrasyonu (Reflekte Cam / Flotal Füme Ayna İşçilik Farkı)",
-        "Pantolonluk veya Asansör Askı Sistemi Entegrasyonu (Fonksiyonel Çekme Aparatları)",
-        "Ekstra Derin Ölçü Tasarımı (70 - 80 cm Özel Ölçü İmalat Malzeme Firesi Çarpanı)",
-        "Çekmece Modülü Ünitesi İlavesi (Dolap İçi Ekstra 3'lü Frenli Ray Çekmece Kutusu)"
+        "LED Sensörlü Profil Işık",
+        "Ayna Cam Entegrasyonu",
+        "Pantolonluk Asansör Askı",
+        "Ekstra Derin 70-80 cm Tasarım",
+        "Çekmece Modülü 3lü Frenli",
+        "Ekstra İstemiyorum"
       ]
+    },
+    {
+      "id": "ekstra_kapak",
+      "label": "Ekstra Donanım",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "ray_mekanizmasi_yenileme",
+      "options": ["Frenli Stop Yavaşlatıcı", "Ayna Cam Kapak", "Kulp Değişim Gizli Kulp", "Ekstra İstemiyorum"]
+    },
+    {
+      "id": "ekstra_raf",
+      "label": "Ekstra Donanım",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "govde_raf",
+      "options": ["Çekmece Kutusu Frenli", "LED Aydınlatma", "Askılık Pantolonluk", "Ekstra İstemiyorum"]
     }
   ];
 }

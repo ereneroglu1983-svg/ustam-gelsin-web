@@ -1,0 +1,174 @@
+﻿{
+  "meslekId": "banyo_vestiyer",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 7500,
+    "asgariBuyuk": 12500
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "Mtul bazli - Hazir vestiyer 90cm MDF 8345 TL, portmanto 110cm 6885 TL, ozel olcu mutfak/gardrop kampanya 7000 TL/mt - 2026 Trendyol/Armut ort"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.12,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 450,
+    "3_ve_ustu_asansorsuz": 1200,
+    "moloz_tasima_var": 850
+  },
+  "ekstralar": {
+    "banyo_dolabi_lavabolu": {
+      "tip": "mt",
+      "fiyat": 18500,
+      "etiket": "Banyo Dolabi Lavabolu/Lavabosuz - 80cm 3lu set MDF baz"
+    },
+    "vestiyer_portmanto": {
+      "tip": "mt",
+      "fiyat": 16500,
+      "etiket": "Vestiyer / Portmanto Antre Grubu - 90-150cm hazir 6k-9.6k TL, ozel olcu mt 7000 TL kampanya ustu"
+    },
+    "camasir_makinesi_dolabi": {
+      "tip": "mt",
+      "fiyat": 14500,
+      "etiket": "Camasir Makinesi Dolabi 65x182x67 cm - Koctas Adore tip"
+    },
+    "gomme_dolap_yukluk": {
+      "tip": "mt",
+      "fiyat": 12500,
+      "etiket": "Gomme Dolap / Yukluk - 60cm derinlik 2mt gardrop 14k TL ornek"
+    },
+    "banyo_yesil_mdf_lam": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Suya Dayanikli Yesil MDF Lam - Neme direncli standart"
+    },
+    "banyo_poliuretan_lake": {
+      "tip": "carpan",
+      "fiyat": 1.45,
+      "etiket": "Poliuretan Lake Kapak MDF Uzeri Luks Su Gecirmez Boya"
+    },
+    "banyo_akrilik_high_gloss": {
+      "tip": "carpan",
+      "fiyat": 1.28,
+      "etiket": "Akrilik / High Gloss Kapak - Parlak su itici"
+    },
+    "kuru_standart_mdf_lam": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Standart MDF Lam Govde ve Kapak - Baz"
+    },
+    "kuru_high_gloss_akrilik": {
+      "tip": "carpan",
+      "fiyat": 1.22,
+      "etiket": "High Gloss / Akrilik Kapak - Cizilmeye dayanikli"
+    },
+    "kuru_ipek_mat_lake_cnc": {
+      "tip": "carpan",
+      "fiyat": 1.48,
+      "etiket": "Ipek Mat Lake Kapak CNC Islemeli Luks Panel"
+    },
+    "dogal_masif_kaplama": {
+      "tip": "carpan",
+      "fiyat": 1.75,
+      "etiket": "Dogal Masif Ahsap Kaplama Plaka - En yuksek sinif"
+    },
+    "olcu_0_1_kucuk": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Kucuk Olcek 0-1 Metre Dar Alan Cozumu"
+    },
+    "olcu_1_2_orta": {
+      "tip": "sabit",
+      "fiyat": 15500,
+      "etiket": "Orta Olcek 1-2 Metre Standart - En cok tercih"
+    },
+    "olcu_2_3_genis": {
+      "tip": "sabit",
+      "fiyat": 28500,
+      "etiket": "Genis Olcek 2-3 Metre - 3mt mutfak 21k TL referans"
+    },
+    "olcu_3_plus_tam_boy": {
+      "tip": "sabit",
+      "fiyat": 42000,
+      "etiket": "Tam Boy 3 Metre ve Uzeri Duvar Blok Komple"
+    },
+    "kapak_duz_modern": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Duz / Standart Modern Kapak - Baz"
+    },
+    "kapak_citali_country_cnc": {
+      "tip": "mt",
+      "fiyat": 2800,
+      "etiket": "Citali / Country Model Ozel CNC Kesim - 150cm Kartopu 9664 TL ornek"
+    },
+    "demontaj_moloz_dahil": {
+      "tip": "sabit",
+      "fiyat": 1800,
+      "etiket": "Eski Dolap Sokulecek Demontaj ve Moloz Temizligi"
+    },
+    "bos_alan_sifir_montaj": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Bos Alan Sifir Duvar Yuvasi Dogrudan Montaj"
+    },
+    "apartman_dairesi": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Apartman Dairesi"
+    },
+    "mustakil_villa": {
+      "tip": "carpan",
+      "fiyat": 1.08,
+      "etiket": "Mustakil Ev / Villa - Yuksek tavan ve genis antre"
+    },
+    "ofis_ticari": {
+      "tip": "carpan",
+      "fiyat": 1.12,
+      "etiket": "Ofis / Is Yeri Ticari - Dayanikli kullanim"
+    },
+    "otel_pansiyon_proje": {
+      "tip": "carpan",
+      "fiyat": 0.92,
+      "etiket": "Otel / Pansiyon Projesi - Toplu adet indirimi"
+    },
+    "led_serit_sensorlu": {
+      "tip": "mt",
+      "fiyat": 1250,
+      "etiket": "LED Serit / Sensorlu Dolap Ici Aydinlatma"
+    },
+    "aluminyum_cerceve_cam": {
+      "tip": "mt",
+      "fiyat": 2850,
+      "etiket": "Aluminyum Cerceveli Cam Kapak Tasarimi Farki"
+    },
+    "premium_frenli_mentese_ray": {
+      "tip": "mt",
+      "fiyat": 950,
+      "etiket": "Premium Frenli Mentese ve Ray Sessiz Konfor Paketi"
+    },
+    "boy_aynasi_rodajli": {
+      "tip": "adet",
+      "fiyat": 1850,
+      "etiket": "Boy Aynasi / Rodajli Guvenlikli Ayna Entegrasyonu"
+    },
+    "seramik_lavabo_batarya_set": {
+      "tip": "sabit",
+      "fiyat": 4500,
+      "etiket": "Seramik Lavabo ve Batarya Seti Tedarigi - Sadece banyo"
+    }
+  },
+  "carpanlar": {
+    "banyo_grubu": 1.15,
+    "vestiyer_grubu": 1.0,
+    "camasir_dolabi": 0.95,
+    "gomme_dolap": 0.88
+  },
+  "kaynak": "Temmuz 2026 - Trendyol vestiyer 90cm MDF 8345 TL, 110cm ayna 6885 TL, KZNMOB Stella 90cm MDF, Kartopu 150cm 9664 TL, Izmir 63 yillik marangoz ozel olcu mt 7000 TL - 3mt mutfak 21k TL 2mt gardrop 14k TL, Armut ozel olcu dolap 5.9k-47.5k TL"
+}

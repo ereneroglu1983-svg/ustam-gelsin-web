@@ -1,0 +1,160 @@
+﻿{
+  "meslekId": "fayans_seramik",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 420,
+    "asgariKucuk": 4000,
+    "asgariBuyuk": 10000
+  },
+  "malzeme": {
+    "m2": 380,
+    "aciklama": "Seramik malzeme ort 300-600 TL/m2, 10m2 mutfak 500x7=3100 TL malzeme ornek, iscilik 1500 TL/m2 den basliyor tezgah arasi - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.3,
+    "ankara_izmir_antalya_bursa": 1.14,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 350,
+    "3_ve_ustu_asansorsuz": 1100,
+    "moloz_tasima_var": 950
+  },
+  "ekstralar": {
+    "komple_seramik_doseme": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Komple Seramik Doseme Iscilik veya Malzeme Dahil - Baz 350-450 TL duz 380-480 TL fayans duvar"
+    },
+    "sadece_kirim_kazima": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Sadece Eski Fayans Kirim ve Duvar/Zemin Kazima Isciligi - Hilti + cuvallama"
+    },
+    "standart_30x60_60x60": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Standart 30x60 60x60 Olculeri - 475-600 TL duvar fayans Ankara, 350-450 TL duz doseme"
+    },
+    "buyuk_ebat_60x120_porselen": {
+      "tip": "m2",
+      "fiyat": 120,
+      "etiket": "Buyuk Ebat 60x120 ve Uzeri Porselen - 450-550 TL +%15-25 ek maliyet tipik"
+    },
+    "mozaik_metro_dekoratif_kucuk": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Mozaik / Metro / Dekoratif Kucuk Ebat - 500-600 TL ince iscilik"
+    },
+    "dev_plaka_120x240_slab_ozel_ekip": {
+      "tip": "m2",
+      "fiyat": 420,
+      "etiket": "Dev Plaka Lamine 120x240 Slab Ozel Ekip Isciligi - Vakum vantuz ve kesim"
+    },
+    "sapli_duz_zemin_ham_hazir": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Sapli / Duz Zemin Ham Yapi Seramige Hazir - Ideal"
+    },
+    "zeminde_eski_fayans_kirim_moloz": {
+      "tip": "m2",
+      "fiyat": 145,
+      "etiket": "Zeminde Eski Fayans Var Hilti Kirim Moloz Cuvallama Dahil"
+    },
+    "fayans_ustu_fayans_astarli": {
+      "tip": "m2",
+      "fiyat": 65,
+      "etiket": "Fayans Ustu Fayans Uygulamasi Gecis Astarli - Kirim yok astar var"
+    },
+    "moloz_kamyona_yukleme_asansorlu": {
+      "tip": "sabit",
+      "fiyat": 2200,
+      "etiket": "Moloz Cuvallanip Kamyona Yuklenecek Kat Basit / Asansorlu"
+    },
+    "moloz_sadece_cuvallama_kapi_onu": {
+      "tip": "sabit",
+      "fiyat": 900,
+      "etiket": "Moloz Sadece Cuvallanacak Kapi Onune Birakilacak"
+    },
+    "kirim_moloz_musteri_cozecek": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Kirim Yapilsin Moloz Atimini Musteri Cozecek - Atim yok"
+    },
+    "banyo_duvar_zemin": {
+      "tip": "carpan",
+      "fiyat": 1.15,
+      "etiket": "Banyo Duvar / Zemin - Kose ve delik fazla"
+    },
+    "mutfak_tezgah_arasi": {
+      "tip": "m2",
+      "fiyat": 580,
+      "etiket": "Mutfak Tezgah Arasi - 1500-2000 TL/m2 sadece tezgah arasi Ankara, kesim fazla"
+    },
+    "balkon_teras": {
+      "tip": "carpan",
+      "fiyat": 1.08,
+      "etiket": "Balkon / Teras - Egim ve dis mekan 400-500 TL"
+    },
+    "havuz_ici_kaplama": {
+      "tip": "m2",
+      "fiyat": 320,
+      "etiket": "Havuz Ici Kaplama - Su yalitim + ozel derz"
+    },
+    "tum_ev_zemin": {
+      "tip": "carpan",
+      "fiyat": 0.88,
+      "etiket": "Tum Ev Zemin - Genis alan indirimi"
+    },
+    "birinci_kalite_malzeme": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "1. Kalite Malzeme - Baz"
+    },
+    "defolu_ekonomik_seri": {
+      "tip": "carpan",
+      "fiyat": 0.82,
+      "etiket": "Defolu / Ekonomik Seri - Fire riski yuksek"
+    },
+    "usta_tedarik_etsin": {
+      "tip": "carpan",
+      "fiyat": 1.12,
+      "etiket": "Usta Tedarik Etsin - Nakliye ve secim ustada"
+    },
+    "su_yalitimi_cift_kat_kose_pah_bandi": {
+      "tip": "m2",
+      "fiyat": 145,
+      "etiket": "Su Yalitimi Izolasyon Cift Kat Surme + Kose Pah Bandi - Islak hacim"
+    },
+    "45_derece_jolly_kose_taslama": {
+      "tip": "mt",
+      "fiyat": 185,
+      "etiket": "45 Derece Jolly Kose Taslama Estetik Birlesim - Mt basi"
+    },
+    "epoksi_derz_leke_tutmaz_kimyasal": {
+      "tip": "m2",
+      "fiyat": 95,
+      "etiket": "Epoksi Derz Uygulamasi Leke Tutmaz Kimyasal Dayanimli"
+    },
+    "tesviye_sapi_kendinden_yayilan": {
+      "tip": "m2",
+      "fiyat": 165,
+      "etiket": "Tesviye Sapi Bozuk Zeminler Icin Kendinden Yayilan Akilli Sap"
+    }
+  },
+  "carpanlar": {
+    "standart_ebat": 1.0,
+    "buyuk_ebat": 1.22,
+    "mozaik_dekoratif": 1.35,
+    "dev_plaka_slab": 1.85
+  },
+  "alanKatsayilari": {
+    "0_10_m2_kucuk_wc_tezgah": 1.45,
+    "10_30_m2_banyo_balkon": 1.18,
+    "30_70_m2_teras_orta": 1.0,
+    "70_m2_uzeri_tum_ev_magaza": 0.85
+  },
+  "kaynak": "Temmuz 2026 - Dek-Mar duz seramik 350-450 TL fayans duvar 380-480 TL 60x120 450-550 TL mozaik 500-600 TL balkon 400-500 TL, Ozyurt Ankara duvar fayans 475-600 TL tezgah arasi dekoratif 1500-2000 TL, buyuk ebat %15-25 ek, Armut ornekler 5k-16k TL, 10m2 mutfak iscilik 1500 TL/m2 den baslar malzeme 3100 TL ornek"
+}
