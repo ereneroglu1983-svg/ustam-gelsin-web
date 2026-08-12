@@ -21,6 +21,7 @@ if exist _functions_temp (
 )
 
 echo [3/3] GitHub'a yedekleniyor...
+call git pull --rebase origin main
 call git add .
 call git commit -m "deploy: %date% %time% - canliya atildi" --allow-empty
 call git push origin main
