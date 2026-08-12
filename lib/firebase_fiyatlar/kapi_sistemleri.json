@@ -1,0 +1,186 @@
+﻿{
+  "meslekId": "kapi_sistemleri",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 2500,
+    "asgariBuyuk": 6000
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "Amerikan kapı standart lake 3200-12800 TL, Adana 9 adet 66k TL ~7333 TL/adet, Ankara 5 kapi 6500-7000 TL/adet, celik kapi 11k-18.5k TL Antalya 11k-16k Konya 12k-18.5k Istanbul 13k-17k/4 adet, 3+1+celk 111k-350k TL paket - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.14,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 180,
+    "3_ve_ustu_asansorsuz": 650,
+    "sokum_moloz": 450
+  },
+  "ekstralar": {
+    "melamin_panel_standart_oda": {
+      "tip": "adet",
+      "fiyat": 5200,
+      "etiket": "Melamin Panel Kapi Standart Oda Kapisi - Dayanikli cizilmez leke direncli MDF uzeri melamin"
+    },
+    "celik_dis_6_nokta_kilitli": {
+      "tip": "adet",
+      "fiyat": 14500,
+      "etiket": "Celik Dis Kapi Dis Mekan Giris 6 Noktadan Kilitli - 11k-18.5k TL Antalya/Konya, 13k-17k TL Istanbul"
+    },
+    "cnc_akrilik_lake_luks_oda": {
+      "tip": "adet",
+      "fiyat": 8200,
+      "etiket": "CNC Islemeli Akrilik Lake Kapi Luks Oda Serisi - 3200-12800 TL araligi ust bant lake"
+    },
+    "amerikan_pres_ekonomik": {
+      "tip": "adet",
+      "fiyat": 3800,
+      "etiket": "Amerikan Pres Panel Kapi Ekonomik Seri - Petek dolgulu 35-45mm MDF, 6500-7000 TL/adet Ankara"
+    },
+    "celik_standart_muhafazali_govde": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "Standart Muhafazali Celik Kapi Govdesi - Baz celik"
+    },
+    "zirhli_agir_sac_1_5mm_esnemez": {
+      "tip": "adet",
+      "fiyat": 6500,
+      "etiket": "Zirhli Agir Sac Govde 1.5mm Esnemeyen Sac Farki - Guvenlik artirim"
+    },
+    "pivot_celik_villa_mafsalli": {
+      "tip": "adet",
+      "fiyat": 28000,
+      "etiket": "Pivot Celik Kapi Genis Villa Giris Ozel Mafsalli - Pivot mekanizma + genis olcu"
+    },
+    "standart_kaplama_boya_yuzeyi": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "Standart Kaplama / Boya Yuzeyi - Baz ic kapi"
+    },
+    "laminat_cizilmez_yuksek_dayanim": {
+      "tip": "adet",
+      "fiyat": 950,
+      "etiket": "Laminat / Cizilmez Yuksek Dayanimli Yuzey Farkı Evcil Hayvan / Cocuk - CPL/laminat"
+    },
+    "ayarli_gecme_kasa_teleskopik_pervaz": {
+      "tip": "adet",
+      "fiyat": 850,
+      "etiket": "Ayarli Gecme Kasa Duvar Kalinligina Gore Esneyen Teleskopik Pervaz - 9-13cm 14-17cm 18-27cm secenek"
+    },
+    "sabit_kasa_montaj": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "Sabit Kasa Montaji - Standart"
+    },
+    "mevcut_eski_kasa_kullanimi_sadece_kanat": {
+      "tip": "adet",
+      "fiyat": -1200,
+      "etiket": "Mevcut Eski Kasa Kullanilacak Sadece Kanat Degisimi - Kasa maliyeti yok"
+    },
+    "kasa_tipi_bilmiyorum_kesif": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "Kasa Tipi Bilmiyorum Usta Kesif Olcsun - Kesif"
+    },
+    "adet_1_tekil_dis_kapi": {
+      "tip": "carpan",
+      "fiyat": 1.15,
+      "etiket": "1 Adet Tekil Degisim / Dis Kapi - Tekil nakliye"
+    },
+    "adet_2_4_kucuk_daire_kismi": {
+      "tip": "carpan",
+      "fiyat": 1.05,
+      "etiket": "2-4 Adet Kucuk Daire Kismi Yenileme"
+    },
+    "adet_5_7_standart_2_1_3_1_paket": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "5-7 Adet Standart 2+1 / 3+1 Daire Paketi - Baz paket"
+    },
+    "adet_8_12_genis_dubleks_villa": {
+      "tip": "carpan",
+      "fiyat": 0.92,
+      "etiket": "8-12 Adet Genis Daire / Dubleks / Villa - Indirim"
+    },
+    "adet_12_uzeri_toplu_proje": {
+      "tip": "carpan",
+      "fiyat": 0.85,
+      "etiket": "12 Adet Uzeri Coklu Dagitim Toplu Proje - Toptan"
+    },
+    "beyaz_standart_akrilik_lake": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "Beyaz Standart Akrilik / Lake - En cok satan"
+    },
+    "antrasit_gri_siyah_mat_ral": {
+      "tip": "adet",
+      "fiyat": 380,
+      "etiket": "Antrasit Gri / Siyah Mat Ral Tonlari - Ozel ral"
+    },
+    "ceviz_mese_dogal_ahsap_desen": {
+      "tip": "adet",
+      "fiyat": 420,
+      "etiket": "Ceviz / Mese / Dogal Ahsap Desen Kaplama - Ahsap desen melamin"
+    },
+    "krem_vizon_sicak_soft": {
+      "tip": "adet",
+      "fiyat": 180,
+      "etiket": "Krem / Vizon Sicak Soft Tonlar"
+    },
+    "eski_kapilar_sokulecek_demontaj_moloz": {
+      "tip": "adet",
+      "fiyat": 450,
+      "etiket": "Eski Kapilar Sokulecek Demontaj ve Moloz Temizligi Dahil - Sokum + tasima"
+    },
+    "sifir_insaat_bos_kasa_yuvasi": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "Sifir Insaat / Bos Kasa Yuvasi Sokum Yok Dogrudan Montaj"
+    },
+    "akilli_kilit_parmak_izi_kartli_dijital": {
+      "tip": "adet",
+      "fiyat": 6800,
+      "etiket": "Akilli Kilit Entegrasyonu Parmak Izi / Kartli Dijital Giris Sistemi"
+    },
+    "monoblok_kancali_guvenlik_ust_duzey": {
+      "tip": "adet",
+      "fiyat": 2200,
+      "etiket": "Monoblok / Kancali Guvenlik Sistemi Entegrasyonu Celik Kapi Ust Duzey Kilitleme"
+    },
+    "sove_pervaz_genisletme_kalin_duvar": {
+      "tip": "adet",
+      "fiyat": 650,
+      "etiket": "Sove / Pervaz Genisletme Takimi Kalin Duvarlar Icin Ilave Ahsap Pervaz - 14-17cm 18-27cm gecis"
+    },
+    "camli_model_temperli_cita_kanal": {
+      "tip": "adet",
+      "fiyat": 950,
+      "etiket": "Camli Model Gecisi Temperli Cam Cita ve Kanal Isciligi - 2 kapi camli ornek"
+    },
+    "gizli_mentese_manyetik_kilit_sessiz": {
+      "tip": "adet",
+      "fiyat": 720,
+      "etiket": "Gizli Mentese / Manyetik Kilit Kombinasyonu Sessiz Konfor Mekanizma Paketi"
+    }
+  },
+  "carpanlar": {
+    "melamin_panel": 1.0,
+    "celik_dis": 2.15,
+    "cnc_akrilik_lake": 1.45,
+    "amerikan_pres": 0.72
+  },
+  "alanKatsayilari": {
+    "1_adet": 1.15,
+    "2_4_adet": 1.05,
+    "5_7_adet_paket": 1.0,
+    "8_12_adet_villa": 0.92,
+    "12_uzeri_toplu": 0.85
+  },
+  "kaynak": "Temmuz 2026 - Amerikan kapi standart lake 3200-12800 TL Hepsiburada 2026, Ankara 5 kapi 6500-7000 TL/adet camsiz, Adana 9 adet en ucuz beyaz 66k TL, 3 oda 1 salon + celik 111k-350k TL paket, celik kapi Antalya ort 11k-16k TL Konya 12k-18.5k TL Istanbul 4 adet 13k-17k TL, celik kapi boyama 4500-7500 TL, melamin dayanikli cizilmez"
+}

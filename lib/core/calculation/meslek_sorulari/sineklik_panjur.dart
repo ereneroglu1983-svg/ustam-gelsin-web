@@ -1,207 +1,139 @@
-// lib/core/calculation/meslek_sorulari/sineklik_panjur.dart - PROFESYONEL AKIŞLI VERSİYON
-// id ve options ASLA değiştirilmedi.
-
+// lib/core/calculation/meslek_sorulari/sineklik_panjur.dart - FINAL
 class SineklikPanjurSorulari {
   static final List<Map<String, dynamic>> sorular = [
-    // ADIM 1: KÖK
     {
-      "id": "hizmet_turu",
-      "label": "Almak İstediğiniz Hizmet Kapsamı",
+      "id": "is_kapsami",
+      "label": "Hizmet Kapsamı",
       "type": "single",
       "required": true,
-      "options": [
-        "Sadece Sineklik Sistemleri",
-        "Sadece Panjur Sistemleri",
-        "Hem Panjur Hem Sineklik Sistemleri (Komple Paket)"
-      ]
-    },
-
-    // ========== SADECE SİNEKLİK YOLU ==========
-    {
-      "id": "sineklik_tipi",
-      "label": "Sineklik Mekanizması ve Tül Teknolojisi",
-      "type": "single",
-      "required": true,
-      "dependsOnId": "hizmet_turu",
-      "dependsOnValue": ["Sadece Sineklik Sistemleri"],
-      "options": [
-        "Plise (Pileli) Sineklik (Akordeon Katlanır Standart Sistem)",
-        "Sabit Çerçeveli Sineklik (Ekonomik Mekanizmasız Çıkar-Tak)",
-        "Sürgülü Sistem / Duble Kasetli Sineklik (Geniş Açıklıklar İçin Rulmanlı)"
-      ]
-    },
-
-    // ========== SADECE PANJUR YOLU ==========
-    {
-      "id": "panjur_ici_sineklik_durum",
-      "label": "Panjur Sistemine Entegre Sineklik İstiyor musunuz?",
-      "type": "single",
-      "required": true,
-      "dependsOnId": "hizmet_turu",
-      "dependsOnValue": ["Sadece Panjur Sistemleri"],
-      "options": [
-        "Evet, Panjura Ek Olarak Sineklik de İstiyorum",
-        "Hayır, Sadece Panjur İmalatı Yapılsın"
-      ]
+      "options": ["Sadece Sineklik", "Sadece Panjur", "Hem Panjur Hem Sineklik Komple Paket"]
     },
     {
-      "id": "sineklik_tipi_panjur_ici",
-      "label": "Entegre Sineklik Mekanizması",
+      "id": "dograma_adet",
+      "label": "Montaj Doğrama Adedi Pencere Kapı",
       "type": "single",
       "required": true,
-      "dependsOnId": "panjur_ici_sineklik_durum",
-      "dependsOnValue": ["Evet, Panjura Ek Olarak Sineklik de İstiyorum"],
-      "options": [
-        "Plise (Pileli) Sineklik (Akordeon Katlanır Standart Sistem)",
-        "Sabit Çerçeveli Sineklik (Ekonomik Mekanizmasız Çıkar-Tak)",
-        "Sürgülü Sistem / Duble Kasetli Sineklik (Geniş Açıklıklar İçin Rulmanlı)"
-      ]
+      "dependsOnId": "is_kapsami",
+      "options": ["1 Adet Tekil", "2-4 Adet Kısmi", "5-8 Adet Standart Daire Paket", "9-14 Adet Geniş Dubleks Müstakil", "14+ Villa Toplu"]
     },
-
-    // ========== KOMPLE PAKET YOLU ==========
-    // Komple paket için sineklik tipi (ayrı id, aynı mantık)
-    {
-      "id": "sineklik_tipi_komple",
-      "label": "Sineklik Mekanizması ve Tül Teknolojisi",
-      "type": "single",
-      "required": true,
-      "dependsOnId": "hizmet_turu",
-      "dependsOnValue": ["Hem Panjur Hem Sineklik Sistemleri (Komple Paket)"],
-      "options": [
-        "Plise (Pileli) Sineklik (Akordeon Katlanır Standart Sistem)",
-        "Sabit Çerçeveli Sineklik (Ekonomik Mekanizmasız Çıkar-Tak)",
-        "Sürgülü Sistem / Duble Kasetli Sineklik (Geniş Açıklıklar İçin Rulmanlı)"
-      ]
-    },
-
-    // ADIM: PANJUR TİPİ - Sadece Panjur'da iç durum sonrası, Komple'de sineklik sonrası gelsin
-    {
-      "id": "panjur_tipi",
-      "label": "Panjur Tahrik ve Kontrol Sistemi",
-      "type": "single",
-      "required": true,
-      "dependsOnId": ["panjur_ici_sineklik_durum", "sineklik_tipi_panjur_ici", "sineklik_tipi_komple"],
-      "dependsOnValue": [
-        "Evet, Panjura Ek Olarak Sineklik de İstiyorum",
-        "Hayır, Sadece Panjur İmalatı Yapılsın",
-        "Plise (Pileli) Sineklik (Akordeon Katlanır Standart Sistem)",
-        "Sabit Çerçeveli Sineklik (Ekonomik Mekanizmasız Çıkar-Tak)",
-        "Sürgülü Sistem / Duble Kasetli Sineklik (Geniş Açıklıklar İçin Rulmanlı)"
-      ],
-      "options": [
-        "Manuel Makaralı Panjur (Standart İpli / Duvar Makaralı Sistem)",
-        "Motorlu / Otomatik Uzaktan Kumandalı Panjur (Tüp Motorlu Yüksek Torklu Sistem)"
-      ]
-    },
-
-    // ADIM: PANJUR ALANI - panjur tipi sonrası gelsin
-    {
-      "id": "panjur_alani_secim",
-      "label": "Panjur Yapılacak Tahmini Toplam Alan",
-      "type": "single",
-      "required": true,
-      "dependsOnId": "panjur_tipi",
-      "dependsOnValue": [
-        "Manuel Makaralı Panjur (Standart İpli / Duvar Makaralı Sistem)",
-        "Motorlu / Otomatik Uzaktan Kumandalı Panjur (Tüp Motorlu Yüksek Torklu Sistem)"
-      ],
-      "options": [
-        "0 - 3 m² Arası Küçük Pencere / Menfez",
-        "3 - 6 m² Arası Standart Oda Pencereleri",
-        "6 - 12 m² Arası Geniş Doğramalar / Balkon Kapıları",
-        "12 - 20 m² Arası Büyük Alan / Teras Kapatma",
-        "20 m² ve Üzeri Çoklu Komple Ev Panjur Projesi"
-      ]
-    },
-
-    // ADIM: ORTAK DOĞRAMA ADEDİ - Sadece Sineklik'te sineklik sonrası, Panjur'da alan sonrası gelsin
-    {
-      "id": "dograma_adedi_secim",
-      "label": "Montaj Yapılacak Toplam Doğrama Adedi (Pencere / Kapı)",
-      "type": "single",
-      "required": true,
-      "dependsOnId": ["sineklik_tipi", "panjur_alani_secim"],
-      "dependsOnValue": [
-        "Plise (Pileli) Sineklik (Akordeon Katlanır Standart Sistem)",
-        "Sabit Çerçeveli Sineklik (Ekonomik Mekanizmasız Çıkar-Tak)",
-        "Sürgülü Sistem / Duble Kasetli Sineklik (Geniş Açıklıklar İçin Rulmanlı)",
-        "0 - 3 m² Arası Küçük Pencere / Menfez",
-        "3 - 6 m² Arası Standart Oda Pencereleri",
-        "6 - 12 m² Arası Geniş Doğramalar / Balkon Kapıları",
-        "12 - 20 m² Arası Büyük Alan / Teras Kapatma",
-        "20 m² ve Üzeri Çoklu Komple Ev Panjur Projesi"
-      ],
-      "options": [
-        "1 Adet (Tekil Değişim / Eksik Tamamlama)",
-        "2 - 4 Adet Arası (Kısmi Yenileme)",
-        "5 - 8 Adet Arası (Standart Daire Paket Kurulumu)",
-        "9 - 14 Adet Arası (Geniş Daire / Dubleks / Müstakil)",
-        "14 Adet Üzeri (Toplu İmalat / Villa Projesi)"
-      ]
-    },
-
-    // ADIM: YAPI TİP - adedi sonrası gelsin
     {
       "id": "yapi_tip",
-      "label": "Uygulama Yapılacak Yapı Mimarisi",
+      "label": "Yapı Mimarisi",
       "type": "single",
       "required": true,
-      "dependsOnId": "dograma_adedi_secim",
-      "dependsOnValue": [
-        "1 Adet (Tekil Değişim / Eksik Tamamlama)",
-        "2 - 4 Adet Arası (Kısmi Yenileme)",
-        "5 - 8 Adet Arası (Standart Daire Paket Kurulumu)",
-        "9 - 14 Adet Arası (Geniş Daire / Dubleks / Müstakil)",
-        "14 Adet Üzeri (Toplu İmalat / Villa Projesi)"
-      ],
-      "options": [
-        "Apartman Dairesi",
-        "Müstakil Ev / Villa",
-        "Ofis / İş Yeri / Ticari Alan",
-        "Yazlık / Bağ Evi"
-      ]
+      "dependsOnId": "dograma_adet",
+      "options": ["Apartman Dairesi", "Müstakil Villa", "Ofis Ticari", "Yazlık Bağ Evi"]
     },
-
-    // ADIM: MONTAJ ZEMİN - yapı tipi sonrası gelsin
     {
       "id": "montaj_zemin",
-      "label": "Montaj Yapılacak Mevcut Doğrama Altyapısı",
+      "label": "Mevcut Doğrama Altyapı",
       "type": "single",
       "required": true,
       "dependsOnId": "yapi_tip",
-      "dependsOnValue": [
-        "Apartman Dairesi",
-        "Müstakil Ev / Villa",
-        "Ofis / İş Yeri / Ticari Alan",
-        "Yazlık / Bağ Evi"
-      ],
-      "options": [
-        "PVC Doğrama Hazır Kasa",
-        "Alüminyum Doğrama Profil Üzeri",
-        "Ahşap Çerçeve",
-        "Mermer / Beton Zemin Üzeri (Dış Cephe Montajı)"
-      ]
+      "options": ["PVC Hazır Kasa", "Alüminyum Profil Üzeri", "Ahşap Çerçeve", "Mermer Beton Dış Cephe"]
     },
-
-    // ADIM FİNAL: EKSTRA - zemin sonrası yeşil kutuda
+    // SADECE SİNEKLİK DALI
     {
-      "id": "ekstra_ozellikler",
-      "label": "Güvenlik Tülü, Otomasyon ve Profil Renk Ekstraları",
+      "id": "sineklik_tipi",
+      "label": "Sineklik Mekanizma Tül Teknolojisi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Sadece Sineklik"],
+      "options": ["Plise Pileli Akordeon Katlanır", "Sabit Çerçeveli Ekonomik Çıkar Tak", "Sürgülü Duble Kasetli Rulmanlı Geniş Açıklık"]
+    },
+    {
+      "id": "ekstra_sineklik",
+      "label": "Ekstralar",
       "type": "multi",
-      "required": false,
-      "dependsOnId": "montaj_zemin",
-      "dependsOnValue": [
-        "PVC Doğrama Hazır Kasa",
-        "Alüminyum Doğrama Profil Üzeri",
-        "Ahşap Çerçeve",
-        "Mermer / Beton Zemin Üzeri (Dış Cephe Montajı)"
-      ],
-      "options": [
-        "Kedi / Köpek Tülü (Yırtılmaz Mukavemetli Mikron Çelik Dokuma Tel)",
-        "Akıllı Ev / Otomasyon Rölesi Entegrasyonu (Mobil Uygulama Kontrolü)",
-        "Antrasit / Özel Renk Profil Profil Kaplama (Standart Beyaz Dışı Renk Farkı)",
-        "Eski Panjur Sökümü / Revizyon ve Mekanizma Yenileme İşçiliği"
-      ]
+      "required": true,
+      "dependsOnId": "sineklik_tipi",
+      "options": ["Kedi Köpek Yırtılmaz Çelik Tül", "Antrasit Özel Renk Profil", "Eski Söküm Revizyon", "Ekstra İstemiyorum"]
+    },
+    // SADECE PANJUR DALI
+    {
+      "id": "panjur_ici_sineklik",
+      "label": "Panjura Entegre Sineklik İstiyor musun",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Sadece Panjur"],
+      "options": ["Evet Sineklik de İstiyorum", "Hayır Sadece Panjur"]
+    },
+    {
+      "id": "panjur_tipi",
+      "label": "Panjur Tahrik Kontrol Sistemi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "panjur_ici_sineklik",
+      "options": ["Manuel Makaralı İpli Duvar Makaralı", "Motorlu Otomatik Uzaktan Kumandalı Tüp Motorlu"]
+    },
+    {
+      "id": "panjur_alan",
+      "label": "Panjur Toplam Alan",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "panjur_tipi",
+      "options": ["0-3 m² Küçük Menfez", "3-6 m² Standart Oda", "6-12 m² Geniş Balkon Kapı", "12-20 m² Büyük Teras", "20 m² Üzeri Komple Ev"]
+    },
+    {
+      "id": "sineklik_entegre",
+      "label": "Entegre Sineklik Mekanizması",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "panjur_ici_sineklik",
+      "dependsOnValue": ["Evet Sineklik de İstiyorum"],
+      "options": ["Plise Akordeon", "Sabit Çerçeveli", "Sürgülü Duble Kasetli"]
+    },
+    {
+      "id": "ekstra_panjur",
+      "label": "Ekstralar",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "panjur_alan",
+      "options": ["Akıllı Ev Otomasyon Röle Mobil", "Antrasit Özel Renk", "Eski Panjur Söküm Revizyon", "Ekstra İstemiyorum"]
+    },
+    {
+      "id": "ekstra_panjur_sineklikli",
+      "label": "Ekstralar",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "sineklik_entegre",
+      "options": ["Kedi Köpek Çelik Tül", "Akıllı Ev Otomasyon", "Antrasit Renk", "Ekstra İstemiyorum"]
+    },
+    // KOMPLE PAKET DALI
+    {
+      "id": "panjur_tipi_paket",
+      "label": "Panjur Tahrik Sistemi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Hem Panjur Hem Sineklik Komple Paket"],
+      "options": ["Manuel Makaralı", "Motorlu Otomatik Uzaktan Kumandalı"]
+    },
+    {
+      "id": "sineklik_tipi_paket",
+      "label": "Sineklik Mekanizması",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "panjur_tipi_paket",
+      "options": ["Plise Pileli", "Sabit Çerçeveli", "Sürgülü Duble Kasetli"]
+    },
+    {
+      "id": "panjur_alan_paket",
+      "label": "Panjur Toplam Alan",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "sineklik_tipi_paket",
+      "options": ["0-3 m²", "3-6 m²", "6-12 m²", "12-20 m²", "20 m² Üzeri"]
+    },
+    {
+      "id": "ekstra_paket",
+      "label": "Ekstralar",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "panjur_alan_paket",
+      "options": ["Kedi Köpek Tülü Çelik", "Akıllı Ev Otomasyon", "Antrasit Özel Renk", "Eski Söküm Revizyon", "Ekstra İstemiyorum"]
     }
   ];
 }

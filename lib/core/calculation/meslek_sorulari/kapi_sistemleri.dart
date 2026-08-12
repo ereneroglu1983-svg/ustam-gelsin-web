@@ -1,179 +1,108 @@
-// lib/core/calculation/meslek_sorulari/kapi_sistemleri.dart - PROFESYONEL AKIŞLI VERSİYON
-// id ve options ASLA değiştirilmedi.
-
+// lib/core/calculation/meslek_sorulari/kapi_sistemleri.dart - FINAL
 class KapiSistemleriSorulari {
   static final List<Map<String, dynamic>> sorular = [
-    // ADIM 1: KÖK
     {
       "id": "kapi_tipi",
-      "label": "Ana Kapı Teknolojisi ve Malzeme Tipi",
+      "label": "Ana Kapı Teknolojisi",
       "type": "single",
       "required": true,
-      "options": [
-        "Melamin Panel Kapı (Standart Oda Kapısı)",
-        "Çelik Dış Kapı (Dış Mekan Giriş / 6 Noktadan Kilitli)",
-        "CNC İşlemeli Akrilik Lake Kapı (Lüks Oda Serisi)",
-        "Amerikan Pres Panel Kapı (Ekonomik Seri)"
-      ]
+      "options": ["Melamin Panel Standart Oda", "Çelik Dış Kapı 6 Nokta Kilitli", "CNC Akrilik Lake Lüks Oda", "Amerikan Pres Ekonomik"]
     },
-
-    // ========== ÇELİK DIŞ KAPI YOLU ==========
-    {
-      "id": "celik_kapi_yuzeyi",
-      "label": "Çelik Kapı Gövde Mukavemeti ve Güvenlik Sınıfı",
-      "type": "single",
-      "required": true,
-      "dependsOnId": "kapi_tipi",
-      "dependsOnValue": ["Çelik Dış Kapı (Dış Mekan Giriş / 6 Noktadan Kilitli)"],
-      "options": [
-        "Standart Muhafazalı Çelik Kapı Gövdesi",
-        "Zırhlı Ağır Sac Gövde Teknolojisi (1.5 mm Esnemeyen Sac Gövde Farkı)",
-        "Pivot Çelik Kapı Sistemi (Geniş Villa Girişleri İçin Özel Mafsallı)"
-      ]
-    },
-
-    // ========== İÇ KAPI YOLU ==========
+    // İÇ KAPI DALI
     {
       "id": "oda_kapi_yuzeyi",
-      "label": "İç Kapı Yüzey Teknolojisi ve Koruma Katmanı",
+      "label": "İç Kapı Yüzey Teknolojisi",
       "type": "single",
       "required": true,
       "dependsOnId": "kapi_tipi",
-      "dependsOnValue": [
-        "Melamin Panel Kapı (Standart Oda Kapısı)",
-        "CNC İşlemeli Akrilik Lake Kapı (Lüks Oda Serisi)",
-        "Amerikan Pres Panel Kapı (Ekonomik Seri)"
-      ],
-      "options": [
-        "Standart Kaplama / Boya Yüzeyi",
-        "Laminat / Çizilmez Yüksek Dayanımlı Yüzey Farkı (Evcil Hayvan / Çocuk Yoğun Evler İçin)"
-      ]
+      "dependsOnValue": ["Melamin Panel Standart Oda", "CNC Akrilik Lake Lüks Oda", "Amerikan Pres Ekonomik"],
+      "options": ["Standart Kaplama Boya", "Laminat Çizilmez Yüksek Dayanımlı"]
     },
     {
       "id": "kasa_tipi",
-      "label": "Kasa ve Pervaz Montaj Altyapısı",
+      "label": "Kasa Pervaz Altyapısı",
       "type": "single",
       "required": true,
       "dependsOnId": "oda_kapi_yuzeyi",
-      "dependsOnValue": [
-        "Standart Kaplama / Boya Yüzeyi",
-        "Laminat / Çizilmez Yüksek Dayanımlı Yüzey Farkı (Evcil Hayvan / Çocuk Yoğun Evler İçin)"
-      ],
-      "options": [
-        "Ayarlı Geçme Kasa (Duvar Kalınlığına Göre Esneyen Teleskopik Pervaz)",
-        "Sabit Kasa Montajı",
-        "Mevcut Eski Kasa Kullanılacak (Sadece Kanat Değişimi)",
-        "Kasa Tipi Bilmiyorum (Usta Keşif Esnasında Ölçsün)"
-      ]
+      "options": ["Ayarlı Geçme Teleskopik Pervaz", "Sabit Kasa", "Mevcut Kasa Sadece Kanat Değişim"]
     },
-
-    // ========== ORTAK ZİNCİR - ADET - çelik yüzey sonrası veya iç kapıda kasa sonrası gelsin
     {
-      "id": "kapi_adedi_secim",
-      "label": "İhtiyacınız Olan Net Kapı Adedi",
+      "id": "kapi_adedi_ic",
+      "label": "Net Kapı Adedi",
       "type": "single",
       "required": true,
-      "dependsOnId": ["celik_kapi_yuzeyi", "kasa_tipi"],
-      "dependsOnValue": [
-        "Standart Muhafazalı Çelik Kapı Gövdesi",
-        "Zırhlı Ağır Sac Gövde Teknolojisi (1.5 mm Esnemeyen Sac Gövde Farkı)",
-        "Pivot Çelik Kapı Sistemi (Geniş Villa Girişleri İçin Özel Mafsallı)",
-        "Ayarlı Geçme Kasa (Duvar Kalınlığına Göre Esneyen Teleskopik Pervaz)",
-        "Sabit Kasa Montajı",
-        "Mevcut Eski Kasa Kullanılacak (Sadece Kanat Değişimi)",
-        "Kasa Tipi Bilmiyorum (Usta Keşif Esnasında Ölçsün)"
-      ],
-      "options": [
-        "1 Adet (Tekil Değişim / Dış Kapı)",
-        "2 - 4 Adet Arası (Küçük Daire / Kısmi Yenileme)",
-        "5 - 7 Adet Arası (Standart 2+1 / 3+1 Daire Paketi)",
-        "8 - 12 Adet Arası (Geniş Daire / Dubleks / Villa)",
-        "12 Adet Üzeri (Çoklu Dağıtım / Toplu Proje)"
-      ]
+      "dependsOnId": "kasa_tipi",
+      "options": ["1 Adet", "2-4 Adet Küçük Daire", "5-7 Adet Standart Daire", "8-12 Adet Geniş Villa", "12 Üzeri Toplu Proje"]
     },
-
-    // ADIM: RENK - adet sonrası gelsin
     {
-      "id": "renk_tercihi",
-      "label": "Renk ve Ahşap Desen Tercihi",
+      "id": "renk_ic",
+      "label": "Renk Desen Tercihi",
       "type": "single",
       "required": true,
-      "dependsOnId": "kapi_adedi_secim",
-      "dependsOnValue": [
-        "1 Adet (Tekil Değişim / Dış Kapı)",
-        "2 - 4 Adet Arası (Küçük Daire / Kısmi Yenileme)",
-        "5 - 7 Adet Arası (Standart 2+1 / 3+1 Daire Paketi)",
-        "8 - 12 Adet Arası (Geniş Daire / Dubleks / Villa)",
-        "12 Adet Üzeri (Çoklu Dağıtım / Toplu Proje)"
-      ],
-      "options": [
-        "Beyaz (Standart Akrilik / Lake)",
-        "Antrasit Gri / Siyah Mat Ral Tonları",
-        "Ceviz / Meşe / Doğal Ahşap Desen Kaplama",
-        "Krem / Vizon Sıcak Soft Tonlar"
-      ]
+      "dependsOnId": "kapi_adedi_ic",
+      "options": ["Beyaz Standart", "Antrasit Siyah Mat", "Ceviz Meşe Doğal Desen", "Krem Vizon Soft Ton"]
     },
-
-    // ADIM: MONTAJ - renk sonrası gelsin
     {
-      "id": "montaj_durum",
-      "label": "Mevcut Kapıların Demontaj Durumu",
+      "id": "montaj_ic",
+      "label": "Mevcut Kapı Demontaj Durumu",
       "type": "single",
       "required": true,
-      "dependsOnId": "renk_tercihi",
-      "dependsOnValue": [
-        "Beyaz (Standart Akrilik / Lake)",
-        "Antrasit Gri / Siyah Mat Ral Tonları",
-        "Ceviz / Meşe / Doğal Ahşap Desen Kaplama",
-        "Krem / Vizon Sıcak Soft Tonlar"
-      ],
-      "options": [
-        "Eski Kapılar Sökülecek (Demontaj ve Moloz Temizliği İşçiliği Dahil)",
-        "Sıfır İnşaat / Boş Kasa Yuvası (Söküm Yok Doğrudan Montaj)"
-      ]
+      "dependsOnId": "renk_ic",
+      "options": ["Eski Kapı Sökülecek Demontaj Dahil", "Sıfır İnşaat Boş Kasa Yuvası"]
     },
-
-    // ADIM FİNAL - ÇELİK EKSTRA - sadece Çelik'te ve montaj sonrası yeşil kutuda
     {
-      "id": "celik_kapi_ekstralari",
-      "label": "Çelik Kapı Güvenlik ve Otomasyon Ekstraları",
+      "id": "ekstra_ic",
+      "label": "İç Kapı Donanım Ekstraları",
       "type": "multi",
-      "required": false,
-      "dependsOnId": "montaj_durum",
-      "visibleIf": {"kapi_tipi": "Çelik Dış Kapı (Dış Mekan Giriş / 6 Noktadan Kilitli)"},
-      "dependsOnValue": [
-        "Eski Kapılar Sökülecek (Demontaj ve Moloz Temizliği İşçiliği Dahil)",
-        "Sıfır İnşaat / Boş Kasa Yuvası (Söküm Yok Doğrudan Montaj)"
-      ],
-      "options": [
-        "Akıllı Kilit Entegrasyonu (Parmak İzi / Kartlı Dijital Giriş Sistemi)",
-        "Monoblok / Kancalı Güvenlik Sistemi Entegrasyonu (Çelik Kapı Üst Düzey Kilitleme)",
-        "Söve / Pervaz Genişletme Takımı (Kalın Duvarlar İçin İlave Ahşap Pervaz)"
-      ]
+      "required": true,
+      "dependsOnId": "montaj_ic",
+      "options": ["Camlı Model Temperli Cam", "Gizli Menteşe Manyetik Kilit", "Pervaz Genişletme Kalın Duvar", "Ekstra İstemiyorum"]
     },
-
-    // ADIM FİNAL - İÇ KAPI EKSTRA - sadece iç kapılarda ve montaj sonrası yeşil kutuda
+    // ÇELİK DIŞ DALI
     {
-      "id": "oda_kapi_ekstralari",
-      "label": "İç Kapı Donanım ve Tasarım Ekstraları",
+      "id": "celik_govde",
+      "label": "Çelik Kapı Gövde Güvenlik Sınıfı",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "kapi_tipi",
+      "dependsOnValue": ["Çelik Dış Kapı 6 Nokta Kilitli"],
+      "options": ["Standart Muhafazalı Çelik Gövde", "Zırhlı Ağır Sac 1.5mm", "Pivot Villa Sistem Mafsallı"]
+    },
+    {
+      "id": "celik_adet",
+      "label": "Net Kapı Adedi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "celik_govde",
+      "options": ["1 Adet Tekil", "2-4 Adet", "5 Üzeri Toplu"]
+    },
+    {
+      "id": "renk_celik",
+      "label": "Renk Desen",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "celik_adet",
+      "options": ["Beyaz", "Antrasit Siyah", "Ahşap Desen Kaplama", "Krem Vizon"]
+    },
+    {
+      "id": "montaj_celik",
+      "label": "Demontaj Durumu",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "renk_celik",
+      "options": ["Eski Kapı Sökülecek", "Sıfır İnşaat Boş Yuva"]
+    },
+    {
+      "id": "ekstra_celik",
+      "label": "Çelik Kapı Güvenlik Ekstraları",
       "type": "multi",
-      "required": false,
-      "dependsOnId": "montaj_durum",
-      "visibleIf": {
-        "kapi_tipi": [
-          "Melamin Panel Kapı (Standart Oda Kapısı)",
-          "CNC İşlemeli Akrilik Lake Kapı (Lüks Oda Serisi)",
-          "Amerikan Pres Panel Kapı (Ekonomik Seri)"
-        ]
-      },
-      "dependsOnValue": [
-        "Eski Kapılar Sökülecek (Demontaj ve Moloz Temizliği İşçiliği Dahil)",
-        "Sıfır İnşaat / Boş Kasa Yuvası (Söküm Yok Doğrudan Montaj)"
-      ],
+      "required": true,
+      "dependsOnId": "montaj_celik",
       "options": [
-        "Camlı Model Geçişi (İç Kapılar İçin Temperli Cam, Çıta ve Kanal İşçiliği)",
-        "Gizli Menteşe / Manyetik Kilit Kombinasyonu (Sessiz Konfor Mekanizma Paketi)",
-        "Söve / Pervaz Genişletme Takımı (Kalın Duvarlar İçin İlave Ahşap Pervaz)"
+        "Akıllı Kilit Parmak İzi Kartlı",
+        "Monoblok Kancalı Güvenlik Sistemi",
+        "Pervaz Genişletme Takımı",
+        "Ekstra İstemiyorum"
       ]
     }
   ];

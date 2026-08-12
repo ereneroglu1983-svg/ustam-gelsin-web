@@ -1,169 +1,144 @@
-// lib/core/calculation/meslek_sorulari/su_yalitimi.dart - PROFESYONEL AKIŞLI VERSİYON
-// id ve options ASLA değiştirilmedi.
-
+// lib/core/calculation/meslek_sorulari/su_yalitimi.dart - FINAL
 class SuYalitimiSorulari {
   static final List<Map<String, dynamic>> sorular = [
-    // ADIM 1: KÖK
     {
-      "id": "yapi_durumu",
-      "label": "Yapı ve Uygulama Mevcut Durumu",
+      "id": "is_kapsami",
+      "label": "Yapı ve Uygulama Durumu",
       "type": "single",
       "required": true,
-      "options": [
-        "Yeni İnşaat (Temel Aşamasında Komple Bohçalama Sistemi)",
-        "Mevcut Bina (Bodrum Kattan Su Alma / Perde Beton İzolasyon Onarımı)",
-        "İstinat Duvarı Yalıtımı (Toprak Altı Dikey Yüzey Koruma)"
-      ]
+      "options": ["Yeni İnşaat Temel Bohçalama", "Mevcut Bina Bodrum Su Alma Onarım", "İstinat Duvarı Toprak Altı Dikey Koruma"]
     },
-
-    // ADIM 2: YALITIM TİPİ - kök sonrası gelsin
+    // YENİ İNŞAAT DALI
     {
-      "id": "yalitimi_tipi",
-      "label": "Uygulanacak Ana İzolasyon ve Yalıtım Teknolojisi",
+      "id": "yalitim_teknik_yeni",
+      "label": "Ana İzolasyon Teknolojisi",
       "type": "single",
       "required": true,
-      "dependsOnId": "yapi_durumu",
-      "dependsOnValue": [
-        "Yeni İnşaat (Temel Aşamasında Komple Bohçalama Sistemi)",
-        "Mevcut Bina (Bodrum Kattan Su Alma / Perde Beton İzolasyon Onarımı)",
-        "İstinat Duvarı Yalıtımı (Toprak Altı Dikey Yüzey Koruma)"
-      ],
-      "options": [
-        "Bitümlü Membran (Bohçalama - Çift Kat Şaloma Alevli Standart Eritme Sistem)",
-        "Poliüretan Sürme Esaslı Yalıtım (Ek Yersiz, Lüks Elastikiyetli Likit Kimyasal Kaplama)",
-        "Polyurea İzolasyon (Mobil Araçla Reaktörlü Uygulanan, Anında Kürlenen Püskürtme Sistem)"
-      ]
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Yeni İnşaat Temel Bohçalama"],
+      "options": ["Bitümlü Membran Çift Kat Şaloma", "Poliüretan Sürme Likit Elastik", "Polyurea Reaktörlü Püskürtme Anında Kürlenen"]
     },
-
-    // ========== YENİ İNŞAAT YOLU ==========
     {
-      "id": "alan_m2",
-      "label": "Yatay Temel Taban Alanı (Net m²)",
+      "id": "alan_yeni",
+      "label": "Yatay Temel Taban Alanı m²",
       "type": "single",
       "required": true,
-      "dependsOnId": "yalitimi_tipi",
-      "visibleIf": {"yapi_durumu": "Yeni İnşaat (Temel Aşamasında Komple Bohçalama Sistemi)"},
-      "dependsOnValue": [
-        "Bitümlü Membran (Bohçalama - Çift Kat Şaloma Alevli Standart Eritme Sistem)",
-        "Poliüretan Sürme Esaslı Yalıtım (Ek Yersiz, Lüks Elastikiyetli Likit Kimyasal Kaplama)",
-        "Polyurea İzolasyon (Mobil Araçla Reaktörlü Uygulanan, Anında Kürlenen Püskürtme Sistem)"
-      ],
-      "options": [
-        "0 - 100 m² Arası Küçük Ölçekli Temel Tabanı",
-        "101 - 250 m² Arası Standart Müstakil Yapı / Bina Temeli",
-        "251 - 500 m² Arası Geniş Apartman / Site Bloğu Temeli",
-        "501 m² ve Üzeri Büyük Endüstriyel Tesis / Fabrika Tabanı"
-      ]
+      "dependsOnId": "yalitim_teknik_yeni",
+      "options": ["0-100 m² Küçük Temel", "101-250 m² Standart Müstakil Bina", "251-500 m² Geniş Apartman Site", "501 m² Üzeri Endüstriyel Fabrika"]
     },
-
-    // ========== MEVCUT / İSTİNAT YOLU ==========
     {
-      "id": "perde_uzunluk_m",
-      "label": "Çevre Perde Beton Toplam Uzunluğu (Doğrusal Metre)",
+      "id": "ana_sorun_yeni",
+      "label": "İhtiyaç Kapsamı",
       "type": "single",
       "required": true,
-      "dependsOnId": "yalitimi_tipi",
-      "visibleIf": {
-        "yapi_durumu": [
-          "Mevcut Bina (Bodrum Kattan Su Alma / Perde Beton İzolasyon Onarımı)",
-          "İstinat Duvarı Yalıtımı (Toprak Altı Dikey Yüzey Koruma)"
-        ]
-      },
-      "dependsOnValue": [
-        "Bitümlü Membran (Bohçalama - Çift Kat Şaloma Alevli Standart Eritme Sistem)",
-        "Poliüretan Sürme Esaslı Yalıtım (Ek Yersiz, Lüks Elastikiyetli Likit Kimyasal Kaplama)",
-        "Polyurea İzolasyon (Mobil Araçla Reaktörlü Uygulanan, Anında Kürlenen Püskürtme Sistem)"
-      ],
-      "options": [
-        "1 - 25 Metre Arası Kısa Hat",
-        "26 - 60 Metre Arası Standart Çevre Uzunluğu",
-        "61 - 120 Metre Arası Geniş Bina Çevresi",
-        "121 Metre ve Üzeri Uzun Ticari / Endüstriyel Hat"
-      ]
+      "dependsOnId": "alan_yeni",
+      "options": ["Sıfırdan Komple Bohçalama", "Tabandan Su Kusması Önlem", "Duvar Nem Küf Rutubet Önlem", "Çatlak Sızıntı Önlem"]
     },
     {
-      "id": "bodrum_yukseklik_m",
-      "label": "Bodrum Duvarı / Perde Beton Yüksekliği (Metre)",
-      "type": "single",
-      "required": true,
-      "dependsOnId": "perde_uzunluk_m",
-      "dependsOnValue": [
-        "1 - 25 Metre Arası Kısa Hat",
-        "26 - 60 Metre Arası Standart Çevre Uzunluğu",
-        "61 - 120 Metre Arası Geniş Bina Çevresi",
-        "121 Metre ve Üzeri Uzun Ticari / Endüstriyel Hat"
-      ],
-      "options": [
-        "0.0 - 2.5 Metre Arası Alçak Bodrum Perdesi",
-        "2.6 - 3.5 Metre Arası Standart Kat Yüksekliği",
-        "3.6 - 5.0 Metre Arası Yüksek Perde Beton",
-        "5.0 Metre Üzeri Çift Katlı / Derin İstinat Hattı"
-      ]
-    },
-    {
-      "id": "yapi_derinlik_m",
-      "label": "Yapı Temel Derinliği (Zemin Altı Kaç Metre Sıfır Noktası?)",
-      "type": "single",
-      "required": true,
-      "dependsOnId": "bodrum_yukseklik_m",
-      "dependsOnValue": [
-        "0.0 - 2.5 Metre Arası Alçak Bodrum Perdesi",
-        "2.6 - 3.5 Metre Arası Standart Kat Yüksekliği",
-        "3.6 - 5.0 Metre Arası Yüksek Perde Beton",
-        "5.0 Metre Üzeri Çift Katlı / Derin İstinat Hattı"
-      ],
-      "options": [
-        "0.0 - 1.5 Metre Yüzeysel Temel Kotu",
-        "1.6 - 3.5 Metre Tek Kat Bodrum Derinliği",
-        "3.6 - 6.0 Metre Çift Kat Bodrum / Derin Kazı Kotu",
-        "6.0 Metre Üzeri Çok Katlı Derin Bodrum Alanı"
-      ]
-    },
-
-    // ADIM: ORTAK ANA SORUN - Yeni'de alan sonrası, Mevcut/İstinat'ta derinlik sonrası gelsin
-    {
-      "id": "ana_sorun",
-      "label": "Gözlemlenen Kritik Sorun / İhtiyaç Kapsamı",
+      "id": "ekstra_yeni",
+      "label": "Altyapı Koruma Mukavemet Ekstraları",
       "type": "multi",
-      "required": false,
-      "dependsOnId": ["alan_m2", "yapi_derinlik_m"],
-      "dependsOnValue": [
-        "0 - 100 m² Arası Küçük Ölçekli Temel Tabanı",
-        "101 - 250 m² Arası Standart Müstakil Yapı / Bina Temeli",
-        "251 - 500 m² Arası Geniş Apartman / Site Bloğu Temeli",
-        "501 m² ve Üzeri Büyük Endüstriyel Tesis / Fabrika Tabanı",
-        "0.0 - 1.5 Metre Yüzeysel Temel Kotu",
-        "1.6 - 3.5 Metre Tek Kat Bodrum Derinliği",
-        "3.6 - 6.0 Metre Çift Kat Bodrum / Derin Kazı Kotu",
-        "6.0 Metre Üzeri Çok Katlı Derin Bodrum Alanı"
-      ],
+      "required": true,
+      "dependsOnId": "ana_sorun_yeni",
       "options": [
-        "Tabandan Aktif Su Çıkması / Kusması",
-        "Duvarlarda Kronik Nem, Küf ve Rutubet Oluşumu",
-        "Perde Beton Çatlaklarından Sızıntı Suyu",
-        "Sıfırdan Komple Güvenlikli Bohçalama Yapılması"
+        "Drenaj Boru Keçeli Mıcır Tahliye",
+        "Pah Bandı Köşe Güçlendirme",
+        "XPS Isı Yalıtım Koruma Plaka",
+        "Su Tutucu Şişen Bant Soğuk Derz Bariyer",
+        "Ekstra İstemiyorum"
       ]
     },
-
-    // ADIM FİNAL: EKSTRA - ana sorun sonrası yeşil kutuda
+    // MEVCUT BİNA DALI
     {
-      "id": "ekstra_ozellikler",
-      "label": "Altyapı Çözümleri, Koruma Plakaları ve Mukavemet Ekstraları",
+      "id": "perde_uzunluk_mevcut",
+      "label": "Çevre Perde Beton Uzunluk Metre",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Mevcut Bina Bodrum Su Alma Onarım"],
+      "options": ["1-25 Metre Kısa", "26-60 Metre Standart Çevre", "61-120 Metre Geniş Çevre", "121 Metre Üzeri Ticari Endüstriyel"]
+    },
+    {
+      "id": "bodrum_yukseklik_mevcut",
+      "label": "Bodrum Perde Yüksekliği Metre",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "perde_uzunluk_mevcut",
+      "options": ["0-2.5 Metre Alçak", "2.6-3.5 Metre Standart Kat", "3.6-5.0 Metre Yüksek Perde", "5.0 Metre Üzeri Çift Katlı Derin"]
+    },
+    {
+      "id": "derinlik_mevcut",
+      "label": "Temel Derinlik Zemin Altı Metre",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "bodrum_yukseklik_mevcut",
+      "options": ["0-1.5 Metre Yüzeysel", "1.6-3.5 Metre Tek Bodrum", "3.6-6.0 Metre Çift Bodrum Derin Kazı", "6.0 Metre Üzeri Çok Katlı Derin"]
+    },
+    {
+      "id": "yalitim_mevcut",
+      "label": "Ana İzolasyon Teknolojisi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "derinlik_mevcut",
+      "options": ["Bitümlü Membran", "Poliüretan Sürme Ek Yersiz", "Polyurea Reaktörlü"]
+    },
+    {
+      "id": "ana_sorun_mevcut",
+      "label": "Kritik Sorun",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "yalitim_mevcut",
+      "options": ["Tabandan Aktif Su Çıkması", "Duvar Nem Küf Rutubet", "Perde Çatlak Sızıntı", "Komple Bohçalama İhtiyaç"]
+    },
+    {
+      "id": "ekstra_mevcut",
+      "label": "Altyapı Ekstraları",
       "type": "multi",
-      "required": false,
-      "dependsOnId": "ana_sorun",
-      "dependsOnValue": [
-        "Tabandan Aktif Su Çıkması / Kusması",
-        "Duvarlarda Kronik Nem, Küf ve Rutubet Oluşumu",
-        "Perde Beton Çatlaklarından Sızıntı Suyu",
-        "Sıfırdan Komple Güvenlikli Bohçalama Yapılması"
-      ],
-      "options": [
-        "Drenaj Boru Hattı Kurulumu ve Keçeli Mıcır Serimi (Suyun Yapıya Yaklaşmasını Engelleyen Tahliye Hattı)",
-        "Pah Bandı / Köşe Güçlendirmesi Uygulaması (Kritik Dikey ve Yatay Birleşim Noktaları Köşe Pahı İşçiliği)",
-        "XPS Isı Yalıtım Levhası ile Koruma (Yalıtım Üzeri Ekstra Isı İzolasyonu ve Mekanik Darbe Koruma Plakası)",
-        "Su Tutucu Şerit (Şişen Bant) Montajı (İnşaat Soğuk Derz Alanlarında Akıllı Su Sızdırmazlık Bariyeri)"
-      ]
+      "required": true,
+      "dependsOnId": "ana_sorun_mevcut",
+      "options": ["Drenaj Hattı Mıcır", "Pah Bandı Köşe Güçlendirme", "XPS Koruma Plaka", "Su Tutucu Bant", "Ekstra İstemiyorum"]
+    },
+    // İSTİNAT DALI
+    {
+      "id": "perde_istinat",
+      "label": "Perde Uzunluk Metre",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["İstinat Duvarı Toprak Altı Dikey Koruma"],
+      "options": ["1-25 Metre", "26-60 Metre", "61-120 Metre", "121 Metre Üzeri"]
+    },
+    {
+      "id": "yukseklik_istinat",
+      "label": "Perde Yüksekliği",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "perde_istinat",
+      "options": ["0-2.5 Metre Alçak", "2.6-3.5 Metre Standart", "3.6-5.0 Metre Yüksek", "5.0 Metre Üzeri Derin"]
+    },
+    {
+      "id": "derinlik_istinat",
+      "label": "Derinlik",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "yukseklik_istinat",
+      "options": ["0-1.5 Metre", "1.6-3.5 Metre", "3.6-6.0 Metre", "6.0 Metre Üzeri"]
+    },
+    {
+      "id": "yalitim_istinat",
+      "label": "Teknoloji",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "derinlik_istinat",
+      "options": ["Bitümlü Membran", "Poliüretan Sürme", "Polyurea"]
+    },
+    {
+      "id": "ekstra_istinat",
+      "label": "Ekstralar",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "yalitim_istinat",
+      "options": ["Drenaj Boru Mıcır", "Pah Bandı", "XPS Koruma", "Su Tutucu Şerit", "Ekstra İstemiyorum"]
     }
   ];
 }

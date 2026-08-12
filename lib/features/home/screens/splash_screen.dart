@@ -1,306 +1,235 @@
-// lib/features/home/screens/splash_screen.dart
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final VoidCallback? onFinished;
+  const SplashScreen({super.key, this.onFinished});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
-  late AnimationController _logoController;
-  late AnimationController _shineController;
-  late Animation<double> _logoScale;
-  late Animation<double> _logoFade;
-  late Animation<double> _shineAnimation;
-
-  bool showTitle = false;
-  bool showLogo = false;
-  bool showBrand = false;
-  bool show1 = false;
-  bool show2 = false;
-  bool show3 = false;
+  late final AnimationController _logoController;
+  late final AnimationController _shimmerController;
+  final List<bool> _visible = List.filled(6, false);
 
   @override
   void initState() {
     super.initState();
+    _logoController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat(reverse: true);
+    _shimmerController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))..repeat();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _start());
+  }
 
-    _logoController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..repeat(reverse: true);
-
-    _shineController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2200),
-    )..repeat();
-
-    _logoScale = Tween<double>(begin: 0.92, end: 1.08).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeInOut),
-    );
-
-    _logoFade = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeIn),
-    );
-
-    _shineAnimation = Tween<double>(begin: -1.0, end: 2.0).animate(
-      CurvedAnimation(parent: _shineController, curve: Curves.easeInOut),
-    );
-
-    // SİNEMATİK AKIŞ - SÜRELER UZATILDI
-    Timer(const Duration(milliseconds: 200), () => setState(() => showTitle = true));
-    Timer(const Duration(milliseconds: 700), () => setState(() => showLogo = true));
-    Timer(const Duration(milliseconds: 1200), () => setState(() => showBrand = true));
-
-    Timer(const Duration(milliseconds: 1800), () => setState(() => show1 = true));
-    Timer(const Duration(milliseconds: 2600), () => setState(() => show2 = true));
-    Timer(const Duration(milliseconds: 3400), () => setState(() => show3 = true));
-
-    Timer(const Duration(milliseconds: 4800), () {
-      if (mounted) Navigator.pushReplacementNamed(context, '/home');
-    });
+  Future<void> _start() async {
+    for (int i = 0; i < _visible.length; i++) {
+      await Future.delayed(Duration(milliseconds: i == 0? 300 : 480));
+      if (!mounted) return;
+      setState(() => _visible[i] = true);
+    }
+    await Future.delayed(const Duration(milliseconds: 2200));
+    if (!mounted) return;
+    widget.onFinished?.call();
   }
 
   @override
   void dispose() {
     _logoController.dispose();
-    _shineController.dispose();
+    _shimmerController.dispose();
     super.dispose();
-  }
-
-  Widget tickItem(bool visible, String text, int index) {
-    return AnimatedOpacity(
-      opacity: visible? 1 : 0,
-      duration: const Duration(milliseconds: 650),
-      curve: Curves.easeOut,
-      child: AnimatedSlide(
-        offset: visible? Offset.zero : const Offset(0, 0.6),
-        duration: const Duration(milliseconds: 650),
-        curve: Curves.easeOutCubic,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-          decoration: BoxDecoration(
-            color: visible? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: visible
-                ? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              )
-            ]
-                : [],
-            border: Border.all(
-              color: visible? const Color(0xFFEEEEEE) : Colors.transparent,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 26,
-                height: 26,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF00C853), Color(0xFF2DB34A)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF00C853).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    )
-                  ],
-                ),
-                child: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                text,
-                style: GoogleFonts.poppins(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1A1A1A),
-                  letterSpacing: 0.1,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // BAŞLIK - SENİN HOMESCREEN AYARINLA AYNI
-              AnimatedOpacity(
-                opacity: showTitle? 1 : 0,
-                duration: const Duration(milliseconds: 800),
-                child: AnimatedSlide(
-                  offset: showTitle? Offset.zero : const Offset(0, -0.3),
-                  duration: const Duration(milliseconds: 800),
-                  curve: Curves.easeOutCubic,
-                  child: RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Aradığın usta,\n",
-                          style: GoogleFonts.poppins(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.black,
-                            height: 1.15,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        TextSpan(
-                          text: "bir tık uzağında!",
-                          style: GoogleFonts.poppins(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFFE53935),
-                            height: 1.15,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+      body: Stack(
+        children: [
+          // Üstten hafif yeşil radial glow - premium his
+          Positioned(
+            top: -180,
+            left: -80,
+            right: -80,
+            child: Container(
+              height: 380,
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment.topCenter,
+                  radius: 1.1,
+                  colors: [
+                    const Color(0xFF2DB34A).withValues(alpha: 0.12),
+                    Colors.white.withValues(alpha: 0),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 36),
-
-              // LOGO - GELİŞMİŞ ANİMASYON
-              AnimatedOpacity(
-                opacity: showLogo? 1 : 0,
-                duration: const Duration(milliseconds: 900),
-                curve: Curves.easeOut,
-                child: AnimatedScale(
-                  scale: showLogo? 1.0 : 0.6,
-                  duration: const Duration(milliseconds: 900),
-                  curve: Curves.elasticOut,
-                  child: ScaleTransition(
-                    scale: _logoScale,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Glow efekti
-                        Container(
-                          width: 160,
-                          height: 160,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF2DB34A).withOpacity(0.15),
-                                blurRadius: 30,
-                                spreadRadius: 10,
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Logo
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(28),
-                          child: Image.asset(
-                            'assets/app_logo.png',
-                            width: 135,
-                            height: 135,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // MARKA ADI
-              AnimatedOpacity(
-                opacity: showBrand? 1 : 0,
-                duration: const Duration(milliseconds: 700),
-                child: AnimatedSlide(
-                  offset: showBrand? Offset.zero : const Offset(0, 0.3),
-                  duration: const Duration(milliseconds: 700),
-                  curve: Curves.easeOutCubic,
-                  child: Column(
-                    children: [
-                      Text(
-                        "HEMEN USTAM GELSİN",
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.5,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        width: 40,
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE53935),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 52),
-
-              // TICK'LER
-              tickItem(show1, "Ücretsiz İlan Oluştur", 1),
-              const SizedBox(height: 14),
-              tickItem(show2, "Yapay Zekâ Maliyet Hesabı", 2),
-              const SizedBox(height: 14),
-              tickItem(show3, "Doğrulanmış Ustalar", 3),
-
-              const SizedBox(height: 60),
-
-              // Loading dots
-              AnimatedOpacity(
-                opacity: show3? 1 : 0,
-                duration: const Duration(milliseconds: 500),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (index) {
-                    return AnimatedContainer(
-                      duration: Duration(milliseconds: 400 + (index * 150)),
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: show3? const Color(0xFF2DB34A) : Colors.grey[300],
-                        shape: BoxShape.circle,
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ],
+            ),
           ),
+          SafeArea(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _anim(0, _slogan()),
+                  const SizedBox(height: 34),
+                  _anim(1, _logoPro()),
+                  const SizedBox(height: 22),
+                  _anim(2, _titlePro()),
+                  const SizedBox(height: 52),
+                  _anim(3, _featurePro(icon: Icons.bolt_rounded, title: "Ücretsiz İlan Oluştur", subtitle: "30 saniyede, komisyonsuz")),
+                  const SizedBox(height: 12),
+                  _anim(4, _featurePro(icon: Icons.auto_awesome_rounded, title: "Yapay Zekâ Maliyet Hesabı", subtitle: "Fotoğraftan anında fiyat tahmini")),
+                  const SizedBox(height: 12),
+                  _anim(5, _featurePro(icon: Icons.verified_rounded, title: "Doğrulanmış Ustalar", subtitle: "Puanlı, belgeli, güvenilir")),
+                  const SizedBox(height: 56),
+                  _anim(5, _bottomLoader()),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- WIDGETS ---
+
+  Widget _slogan() {
+    return Column(
+      children: [
+        Text("Aradığın usta,", style: GoogleFonts.poppins(fontSize: 30, fontWeight: FontWeight.w800, height: 1.15, color: const Color(0xFF111111), letterSpacing: -0.5)),
+        const SizedBox(height: 2),
+        ShaderMask(
+          shaderCallback: (bounds) => const LinearGradient(colors: [Color(0xFFE53935), Color(0xFFFF6B6B)]).createShader(bounds),
+          child: Text("bir tık uzağında!", style: GoogleFonts.poppins(fontSize: 30, fontWeight: FontWeight.w800, height: 1.15, color: Colors.white, letterSpacing: -0.5)),
         ),
+      ],
+    );
+  }
+
+  Widget _titlePro() {
+    return Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(width: 18, height: 2, decoration: BoxDecoration(color: const Color(0xFFE0E0E0), borderRadius: BorderRadius.circular(2))),
+            const SizedBox(width: 10),
+            Text("HEMEN USTAM GELSİN", style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 2.2, color: const Color(0xFF8A8A8A))),
+            const SizedBox(width: 10),
+            Container(width: 18, height: 2, decoration: BoxDecoration(color: const Color(0xFFE0E0E0), borderRadius: BorderRadius.circular(2))),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _logoPro() {
+    return AnimatedBuilder(
+      animation: _logoController,
+      builder: (context, child) {
+        double scale = 0.98 + (_logoController.value * 0.06);
+        return Transform.scale(scale: scale, child: child);
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 148, height: 148,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(color: const Color(0xFF2DB34A).withValues(alpha: 0.22), blurRadius: 36, spreadRadius: 4),
+                BoxShadow(color: const Color(0xFF2DB34A).withValues(alpha: 0.10), blurRadius: 80, spreadRadius: 18),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: const Color(0xFFF1F1F1)),
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 8))],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.asset('assets/app_logo.png', width: 108, height: 108, fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(width: 108, height: 108, color: const Color(0xFFF7F7F7), child: const Icon(Icons.handyman_rounded, size: 44, color: Color(0xFF2DB34A)))),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _featurePro({required IconData icon, required String title, required String subtitle}) {
+    return Container(
+      width: 320,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFEEEEEE)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 18, offset: const Offset(0, 6))],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38, height: 38,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(11),
+              gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF2ECC71), Color(0xFF27AE60)]),
+            ),
+            child: Icon(icon, size: 20, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w700, color: const Color(0xFF1A1A1A))),
+              const SizedBox(height: 1),
+              Text(subtitle, style: GoogleFonts.poppins(fontSize: 11.5, fontWeight: FontWeight.w500, color: const Color(0xFF8E8E8E))),
+            ]),
+          ),
+          const Icon(Icons.check_circle_rounded, size: 18, color: Color(0xFF2DB34A)),
+        ],
+      ),
+    );
+  }
+
+  Widget _bottomLoader() {
+    return SizedBox(
+      width: 120,
+      child: Column(
+        children: [
+          AnimatedBuilder(
+            animation: _shimmerController,
+            builder: (context, _) => LinearProgressIndicator(
+              value: _shimmerController.value,
+              backgroundColor: const Color(0xFFF0F0F0),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2DB34A)),
+              minHeight: 3,
+              borderRadius: BorderRadius.circular(99),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text("USTALAR HAZIRLANIYOR...", style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1.6, color: const Color(0xFFB0B0B0))),
+        ],
+      ),
+    );
+  }
+
+  Widget _anim(int i, Widget child) {
+    final v = _visible[i];
+    return AnimatedOpacity(
+      opacity: v? 1 : 0,
+      duration: const Duration(milliseconds: 650),
+      curve: Curves.easeOutCubic,
+      child: AnimatedSlide(
+        offset: v? Offset.zero : const Offset(0, 0.18),
+        duration: const Duration(milliseconds: 650),
+        curve: Curves.easeOutCubic,
+        child: child,
       ),
     );
   }

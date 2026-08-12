@@ -1,0 +1,117 @@
+﻿{
+  "meslekId": "su_yalitimi",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 95,
+    "asgariKucuk": 5000,
+    "asgariBuyuk": 13800
+  },
+  "malzeme": {
+    "m2": 420,
+    "aciklama": "Poliuretan surme 650-900 TL/m2 2025, poliuretan sprey kopuk 800-1200 TL/m2, poliuretan kaplama UV 950-1400 TL/m2, bitum-kaucuk membran 500-600 TL Koster KBE Sika Igolflex, poliuretan esasli 650-750 TL Koster KB-Pur 214, teras 13.8k-25k TL Esenyurt, balkon 13.8k-20k TL Kagithane poliuretan/polyurea+micro beton+mat vernik Marmaraereglisi 5k-134k TL - 2025-2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.14,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "0_1_5m_yuzeysel": 0,
+    "1_6_3_5m_tek_kat_bodrum": 650,
+    "3_6_6_0m_cift_kat_derin_kazi": 1450,
+    "6m_uzeri_cok_katli_derin": 2800
+  },
+  "ekstralar": {
+    "yeni_insaat_temel_bohcalama_komple": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Yeni Insaat Temel Asamasinda Komple Bohcalama Sistemi - Baz yeni insaat"
+    },
+    "mevcut_bina_bodrum_su_alma_perde_beton_onarim": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Mevcut Bina Bodrum Kattan Su Alma / Perde Beton Izolasyon Onarimi - Mevcut bina onarim +180"
+    },
+    "istinat_duvari_toprak_alti_dikey_koruma": {
+      "tip": "m2",
+      "fiyat": 95,
+      "etiket": "Istinat Duvari Yalitimi Toprak Alti Dikey Yuzey Koruma - Istinat dikey"
+    },
+    "bitumlu_membran_bohcalama_cift_kat_saloma_alevli": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Bitumlu Membran Bohcalama Cift Kat Saloma Alevli Standart Eritme Sistem - 500-600 TL/m2 bitum-kaucuk membran Koster KBE"
+    },
+    "poliuretan_surme_ek_yersiz_luks_elastik_likit": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Poliuretan Surme Esasli Yalitim Ek Yersiz Luks Elastikiyetli Likit Kimyasal Kaplama - 650-900 TL/m2 surme 650-750 TL esasli"
+    },
+    "polyurea_mobil_arac_reaktorlu_aninda_kurlenen_puskurtme": {
+      "tip": "m2",
+      "fiyat": 420,
+      "etiket": "Polyurea Izolasyon Mobil Aracla Reaktorlu Uygulanan Aninda Kurlenen Puskurtme Sistem - En yuksek performans en yuksek maliyet polyurea"
+    },
+    "tabandan_aktif_su_cikmasi_kusmasi": {
+      "tip": "sabit",
+      "fiyat": 1850,
+      "etiket": "Tabandan Aktif Su Cikmasi / Kusmasi - Aktif su pompa gerekebilir"
+    },
+    "duvar_kronik_nem_kuf_rutubet": {
+      "tip": "sabit",
+      "fiyat": 650,
+      "etiket": "Duvarlarda Kronik Nem Kuf ve Rutubet Olusumu - Nem onarim"
+    },
+    "perde_beton_catlak_sizinti": {
+      "tip": "sabit",
+      "fiyat": 950,
+      "etiket": "Perde Beton Catlaklarindan Sizinti Suyu - Catlak enjeksiyon"
+    },
+    "sifirdan_komple_guvenlikli_bohcalama": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Sifirdan Komple Guvenlikli Bohcalama Yapilmasi - Sifirdan baz"
+    },
+    "drenaj_boru_kece_micir_tahliye_hatti": {
+      "tip": "mt",
+      "fiyat": 180,
+      "etiket": "Drenaj Boru Hatti Kurulumu ve Keceli Micir Serimi Suyun Yapiya Yaklasmasini Engelleyen Tahliye Hatti - Drenaj mt"
+    },
+    "pah_bandi_kose_guclendirme_dikey_yatay_birlesim": {
+      "tip": "mt",
+      "fiyat": 45,
+      "etiket": "Pah Bandi / Kose Guclendirmesi Uygulamasi Kritik Dikey ve Yatay Birlesim Noktalari Kose Pahi Isciligi - Pah bandi mt"
+    },
+    "xps_isi_yalitim_levha_koruma_mekanik_darbe": {
+      "tip": "m2",
+      "fiyat": 95,
+      "etiket": "XPS Isi Yalitim Levhasi ile Koruma Yalitim Uzeri Ekstra Isi Izolasyonu ve Mekanik Darbe Koruma Plakasi - XPS 800-1200 TL sprey kopuk ref"
+    },
+    "su_tutucu_serit_sisen_bant_soguk_derz_akilli_bariyer": {
+      "tip": "mt",
+      "fiyat": 55,
+      "etiket": "Su Tutucu Serit Sisen Bant Montaji Insaat Soguk Derz Alanlarinda Akilli Su Sizdirmazlik Bariyeri - Sisen bant mt"
+    }
+  },
+  "carpanlar": {
+    "bitumlu_membran": 1.0,
+    "poliuretan_surme": 1.28,
+    "polyurea_reaktorlu": 1.65,
+    "yeni_insaat": 1.0,
+    "mevcut_bina": 1.32,
+    "istinat_duvari": 1.18
+  },
+  "alanKatsayilari": {
+    "0_100_kucuk_temel": 1.32,
+    "101_250_standart_mustakil_bina_temeli": 1.0,
+    "251_500_genis_apartman_site_blogu": 0.88,
+    "501_uzeri_buyuk_endustriyel_fabrika": 0.75,
+    "1_25_kisa_hat": 1.25,
+    "26_60_standart_cevre": 1.0,
+    "61_120_genis_bina_cevresi": 0.9,
+    "121_uzeri_ticari_endustriyel": 0.82
+  },
+  "kaynak": "Temmuz 2026 - Poliuretan surme 650-900 TL/m2 sprey kopuk 800-1200 TL kaplama UV 950-1400 TL 2025 Dek-Mar, bitum-kaucuk membran 500-600 TL Koster KBE Sika Igolflex poliuretan 650-750 TL KB-Pur 214, teras 13.8k-25k TL Esenyurt balkon 13.8k-20k TL Kagithane poliuretan/polyurea+micro beton+mat vernik Marmaraereglisi 5k-134k TL, polyurea en yuksek performans en yuksek maliyet 2026, %1000 elastik ek yersiz yek pare bohcalama yuzde 100 su gecirimsizlik sprey poliuretan gezilebilir teras"
+}

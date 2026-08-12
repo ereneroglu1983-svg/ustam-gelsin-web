@@ -1,129 +1,78 @@
-// lib/core/calculation/meslek_sorulari/mermer_granit.dart - PROFESYONEL AKIŞLI VERSİYON
-// id ve options ASLA değiştirilmedi.
-
+// lib/core/calculation/meslek_sorulari/mermer_granit.dart - FINAL
 class MermerGranitSorulari {
   static final List<Map<String, dynamic>> sorular = [
-    // ADIM 1: KÖK - Uygulama alanı tüm akışı kilitler
     {
       "id": "is_kapsami",
-      "label": "Mermer / Granit Uygulama Alanı",
+      "label": "Mermer Granit Uygulama Alanı",
       "type": "single",
       "required": true,
-      "options": [
-        "Mutfak Tezgahı (Evye/Ocak Deliği ve Şablon İşçilikli)",
-        "Banyo / Zemin Kaplama",
-        "Merdiven Basamağı (Rıht Kesimi ve Kaymazlık Kanallı)",
-        "Balkon Denizliği Uygulaması",
-        "Asansör Sövesi / Dış Mekan Kaplama",
-        "Mezar Yapımı ve Restorasyonu"
-      ]
+      "options": ["Mutfak Tezgahı Evye Ocak Şablonlu", "Banyo Zemin Kaplama", "Merdiven Basamağı Rıht Kaymaz Kanallı", "Balkon Denizliği", "Asansör Sövesi Dış Kaplama", "Mezar Yapımı Restorasyon"]
     },
-
-    // ADIM 2: MEZAR TİPİ - sadece Mezar seçildiyse gelsin
+    // MEZAR DALI
     {
       "id": "mezar_tipi",
-      "label": "Mezar Modeli ve Yapım Seçeneği",
+      "label": "Mezar Modeli Yapım Seçeneği",
       "type": "single",
       "required": true,
       "dependsOnId": "is_kapsami",
-      "dependsOnValue": ["Mezar Yapımı ve Restorasyonu"],
-      "options": [
-        "Tek Kişilik (Standart Blok Kaplama)",
-        "Çift Kişilik (Aile Kabri)",
-        "Katlı Mezar (Gömme Sistemi)",
-        "Sadece Baş Taşı Değişimi / Onarım Hizmeti"
-      ]
+      "dependsOnValue": ["Mezar Yapımı Restorasyon"],
+      "options": ["Tek Kişilik Standart Blok", "Çift Kişilik Aile Kabri", "Katlı Gömme Sistem", "Sadece Baş Taşı Değişim Onarım"]
     },
-
-    // ADIM 3: MALZEME - Mezar ise mezar tipi sonrası, diğerleri için direkt kök sonrası gelsin
     {
-      "id": "malzeme_tipi",
-      "label": "Kullanılacak Taş / Plaka Teknolojisi",
+      "id": "malzeme_mezar",
+      "label": "Taş Plaka Teknolojisi",
       "type": "single",
       "required": true,
-      "dependsOnId": ["mezar_tipi", "is_kapsami"],
-      "dependsOnValue": [
-        "Tek Kişilik (Standart Blok Kaplama)",
-        "Çift Kişilik (Aile Kabri)",
-        "Katlı Mezar (Gömme Sistemi)",
-        "Sadece Baş Taşı Değişimi / Onarım Hizmeti",
-        "Mutfak Tezgahı (Evye/Ocak Deliği ve Şablon İşçilikli)",
-        "Banyo / Zemin Kaplama",
-        "Merdiven Basamağı (Rıht Kesimi ve Kaymazlık Kanallı)",
-        "Balkon Denizliği Uygulaması",
-        "Asansör Sövesi / Dış Mekan Kaplama"
-      ],
-      "options": [
-        "Yerli Mermer (Muğla Beyazı / Marmara Serisi - Standart)",
-        "İthal Granit (Yüksek Sertlik Dereceli Sert Taş Serisi)",
-        "Kuvars / Belenco / Coante Kompoze Taş Grubu (Lüks Plaka)",
-        "Ultra İnce Porselen Plaka (Özel Kesim ve Yüksek Dayanımlı Üst Segment)"
-      ]
+      "dependsOnId": "mezar_tipi",
+      "options": ["Yerli Mermer Muğla Marmara", "İthal Granit Yüksek Sertlik", "Kuvars Belenco Kompoze Lüks", "Ultra İnce Porselen Üst Segment"]
     },
-
-    // ADIM 4: METRAJ SEGMENTİ - malzeme sonrası gelsin
     {
-      "id": "metraj_segmenti",
-      "label": "Tahmini Ölçü / Uzunluk veya Alan Kademesi",
+      "id": "metraj_mezar",
+      "label": "Tahmini Ölçü Kademe",
       "type": "single",
       "required": true,
-      "dependsOnId": "malzeme_tipi",
-      "dependsOnValue": [
-        "Yerli Mermer (Muğla Beyazı / Marmara Serisi - Standart)",
-        "İthal Granit (Yüksek Sertlik Dereceli Sert Taş Serisi)",
-        "Kuvars / Belenco / Coante Kompoze Taş Grubu (Lüks Plaka)",
-        "Ultra İnce Porselen Plaka (Özel Kesim ve Yüksek Dayanımlı Üst Segment)"
-      ],
-      "options": [
-        "0-5 Metretül / m² Arası",
-        "5-10 Metretül / m² Arası",
-        "10-20 Metretül / m² Arası",
-        "20 Metretül / m² ve Üzeri"
-      ]
+      "dependsOnId": "malzeme_mezar",
+      "options": ["0-5 m²", "5-10 m²", "10-20 m²", "20 m² Üzeri"]
     },
-
-    // ADIM 5: NET ÖLÇÜ - metraj sonrası gelsin
+    // TEZGAH DALI
     {
-      "id": "metre_kare",
-      "label": "Net Ölçü Girin (m² veya Metretül - Opsiyonel)",
-      "type": "text",
-      "required": false,
-      "keyboardType": "number",
-      "hint": "Örn: 4.5",
-      "dependsOnId": "metraj_segmenti",
-      "dependsOnValue": [
-        "0-5 Metretül / m² Arası",
-        "5-10 Metretül / m² Arası",
-        "10-20 Metretül / m² Arası",
-        "20 Metretül / m² ve Üzeri"
-      ]
+      "id": "malzeme_tezgah",
+      "label": "Taş Plaka Teknolojisi",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "is_kapsami",
+      "dependsOnValue": ["Mutfak Tezgahı Evye Ocak Şablonlu", "Banyo Zemin Kaplama", "Merdiven Basamağı Rıht Kaymaz Kanallı", "Balkon Denizliği", "Asansör Sövesi Dış Kaplama"],
+      "options": ["Yerli Mermer Muğla Marmara", "İthal Granit Yüksek Sertlik", "Kuvars Belenco Kompoze Lüks", "Ultra İnce Porselen Üst Segment"]
     },
-
-    // ADIM 6: FİNAL - net ölçü sonrası yeşil kutuda
     {
-      "id": "ekstra_ozellikler",
-      "label": "Atölye İşçilikleri, Kenar Detayları ve Donanımlar",
+      "id": "metraj_tezgah",
+      "label": "Tahmini Ölçü Uzunluk Alan",
+      "type": "single",
+      "required": true,
+      "dependsOnId": "malzeme_tezgah",
+      "options": ["0-5 Metretül m²", "5-10 Metretül m²", "10-20 Metretül m²", "20 Metretül m² Üzeri"]
+    },
+    {
+      "id": "ekstra_tezgah",
+      "label": "Atölye Kenar Donanım Ekstraları",
       "type": "multi",
-      "required": false,
-      "dependsOnId": ["metraj_segmenti", "metre_kare"],
-      "dependsOnValue": [
-        "0-5 Metretül / m² Arası",
-        "5-10 Metretül / m² Arası",
-        "10-20 Metretül / m² Arası",
-        "20 Metretül / m² ve Üzeri",
-        "0",
-        "1",
-        "2",
-        "3",
-        "4",
-        "5"
-      ],
+      "required": true,
+      "dependsOnId": "metraj_tezgah",
       "options": [
-        "Balıksırtı / Tam Pah İşçiliği (Kenarların Makine ile Yuvarlatılıp Parlatılması)",
-        "Alttan Montaj Evye Entegrasyonu (İç Kısmın Hassas Rodajlanması)",
-        "L Çıta / Kalınlaştırma Uygulaması (Ön Kısmın Kalın Görünmesi İçin 45° Gönye Birleştirme)",
-        "Süpürgelik Dahil Hizmeti (Duvar Dibine Çekilecek Koruma Şeritleri)"
+        "Balıksırtı Tam Pah Kenar Parlatma",
+        "Alttan Montaj Evye Rodaj Entegrasyon",
+        "L Çıta Kalınlaştırma 45° Gönye",
+        "Süpürgelik Koruma Şerit Dahil",
+        "Ekstra İstemiyorum"
       ]
+    },
+    {
+      "id": "ekstra_mezar",
+      "label": "Ekstra İşçilikler",
+      "type": "multi",
+      "required": true,
+      "dependsOnId": "metraj_mezar",
+      "options": ["Balıksırtı Pah Parlatma", "Yazı Gravür İşçilik", "Süpürgelik Çevre Taşı", "Ekstra İstemiyorum"]
     }
   ];
 }

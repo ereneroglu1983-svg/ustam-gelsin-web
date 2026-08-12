@@ -1,5 +1,3 @@
-// lib/core/services/auth_service.dart
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -14,15 +12,26 @@ class AuthService {
 
   Map<String, dynamic>? _cachedUserData;
 
+  String _normalizeRole(String? role) {
+    if (role == null) return 'musteri';
+    if (role == 'customer') return 'musteri';
+    if (role == 'musteri' || role == 'usta' || role == 'admin') return role;
+    return 'musteri';
+  }
+
   Future<void> signIn(String email, String password) async {
     try {
+      _cachedUserData = null; // ÖNEMLİ: Eski önbelleği sil
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
 
       if (userCredential.user != null) {
         DocumentSnapshot userDoc = await _firestore.collection('users').doc(userCredential.user!.uid).get();
-        if (userDoc.exists) {
-          List<String> uzmanliklar = List<String>.from((userDoc.data() as Map<String, dynamic>)['uzmanliklar'] ?? []);
+        if (userDoc.exists && userDoc.data() != null) {
+          _cachedUserData = userDoc.data() as Map<String, dynamic>;
+          // Rolü normalize et
+          _cachedUserData!['role'] = _normalizeRole(_cachedUserData!['role']);
+          List<String> uzmanliklar = List<String>.from(_cachedUserData!['uzmanliklar'] ?? []);
           await _notificationService.updateUserToken(userCredential.user!.uid, uzmanliklar);
         }
       }
@@ -42,24 +51,21 @@ class AuthService {
     DocumentSnapshot doc = await _firestore.collection('users').doc(user.uid).get();
     if (doc.exists && doc.data() != null) {
       _cachedUserData = doc.data() as Map<String, dynamic>;
+      _cachedUserData!['role'] = _normalizeRole(_cachedUserData!['role']);
       return _cachedUserData;
     }
     return null;
   }
 
-  // --- EKLENEN METOTLAR (Hataları çözer) ---
-
   Future<String?> getUserRole() async {
-    Map<String, dynamic>? profile = await getUserProfile();
-    return profile?['role'];
+    Map<String, dynamic>? profile = await getUserProfile(refresh: true); // Her zaman taze al
+    return _normalizeRole(profile?['role']);
   }
 
   Future<bool> isAdmin() async {
     String? role = await getUserRole();
     return role == 'admin';
   }
-
-  // ----------------------------------------
 
   Future<void> registerUser({
     required String name,
@@ -74,7 +80,7 @@ class AuthService {
         email: email.trim(), password: password.trim(),
       );
 
-      String finalRole = (role == 'musteri') ? 'customer' : role;
+      String finalRole = _normalizeRole(role); // Artık hep musteri/usta olarak kaydediyor
 
       UserModel user = UserModel(
         uid: userCredential.user!.uid,
@@ -90,6 +96,7 @@ class AuthService {
 
       await _firestore.collection('users').doc(userCredential.user!.uid).set(data);
       await _notificationService.updateUserToken(userCredential.user!.uid, uzmanliklar ?? []);
+      _cachedUserData = data;
 
     } on FirebaseAuthException catch (e) { throw e.message ?? "Kayıt hatası"; }
   }

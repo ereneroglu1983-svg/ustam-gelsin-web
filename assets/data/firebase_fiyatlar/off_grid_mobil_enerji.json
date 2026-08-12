@@ -1,0 +1,145 @@
+﻿{
+  "meslekId": "off_grid_mobil_enerji",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 4500,
+    "asgariBuyuk": 12000
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "Off-grid deneyim 16 panel 10kW batarya 280k TL yatirim Akyaka evi DonanimHaber, 3 katli sebeke yok 45 panel 20kW buzdolabi derin dondurucu kamera asansor sehir konforu, tinyhouse 4200W 7x600W half-cut mono 7.5kW Exelon lityum 6.2kW MPPT smart inverter, bag evi karavan TV aydinlatma solar paket 1.2kWp N&D Lighting, bag evi hazir paket 1200W inverter 170W panel 36.9k TL Lexron mini, 3kVA inverter 280W panel 150Ah jel 55.1k TL Teknovasyon, konteyner 100Ah LiFePO4 1200W EnerjiStar, 50W panel 12V 24Ah jel TV bag evi yayla karavan BataryaBank, Hyundai mini karavan 520W panel 5 saat 2.6kWh"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.15,
+    "ankara_izmir_antalya_bursa": 1.08,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "kolay_ulasim": 0,
+    "zor_ulasim_arazi_arac": 1800,
+    "yayla_sert_kis_yogun_kar_ruzgar": 1200
+  },
+  "ekstralar": {
+    "karavan_kurulum": {
+      "tip": "sabit",
+      "fiyat": 28000,
+      "etiket": "Karavan Gunes Enerji Sistemi Kurulumu - Cekme motokaravan camper van 0-8m+ dusuk orta yuksek tuketim 520W 2.6kWh/gun Hyundai ornek 50W 12V 24Ah jel TV"
+    },
+    "tiny_house_kurulum": {
+      "tip": "sabit",
+      "fiyat": 45000,
+      "etiket": "Tiny House Gunes Enerji Sistemi Kurulumu - 0-60m2+ surekli yazlik kiralama donemsel tam bagimsiz hibrit 4200W 7x600W 7.5kW lityum 6.2kW MPPT"
+    },
+    "bag_evi_kurulum": {
+      "tip": "sabit",
+      "fiyat": 38000,
+      "etiket": "Bag Evi Gunes Enerji Sistemi Kurulumu - Hafta sonu yaz tum yil nadir aydinlatma buzdolabi sulama TV klima guvenlik su pompasi 1.2kWp paket 36.9k-55.1k TL"
+    },
+    "yayla_evi_kurulum": {
+      "tip": "sabit",
+      "fiyat": 42000,
+      "etiket": "Yayla Evi Enerji Sistemi Kurulumu - Kolay zor arazi araci sert kis yogun kar ruzgarli iliman temel kesintisiz tam bagimsiz gunes gunes+ruzgar gunes+jenerator"
+    },
+    "tekne_yat_solar": {
+      "tip": "sabit",
+      "fiyat": 32000,
+      "etiket": "Tekne ve Yat Solar Sistemi Kurulumu - Balikci yelkenli motor yat katamaran 0-25m+ aydinlatma navigasyon buzdolabi klima haberlesme yasam alani gunluk haftalarca uzun seyir"
+    },
+    "mobil_enerji_kurulum": {
+      "tip": "sabit",
+      "fiyat": 28000,
+      "etiket": "Mobil Enerji Sistemleri Kurulumu - Karavan tiny mobil ofis etkinlik santiye tarim cok onemli tasinabilir acil surekli yedek ticari dusuk orta yuksek"
+    },
+    "off_grid_bakim_onarim": {
+      "tip": "sabit",
+      "fiyat": 2800,
+      "etiket": "Off-Grid Sistem Bakim ve Onarimi - Uretmiyor aku sarj olmuyor inverter calismiyor dusuk performans kapanma hata kodu 0-10 yil+ son 24 saat-uzun sure acil"
+    },
+    "aku_inverter_entegrasyon": {
+      "tip": "sabit",
+      "fiyat": 6500,
+      "etiket": "Aku ve Inverter Entegrasyonu - Sadece aku sadece inverter her ikisi yeni jel AGM lityum tam sinus modifiye hibrit yedek off-grid mobil hibrit uzaktan izleme 16 panel 10kW 280k TL deneyim"
+    },
+    "dusuk_tuketim_aydinlatma_telefon_laptop": {
+      "tip": "carpan",
+      "fiyat": 0.75,
+      "etiket": "Dusuk Aydinlatma Telefon Laptop - Dusuk"
+    },
+    "orta_buzdolabi_tv_kucuk_cihaz": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Orta Buzdolabi TV Kucuk Cihazlar - Orta baz 50W 12V 24Ah jel TV calistirma"
+    },
+    "yuksek_klima_kahve_makinesi": {
+      "tip": "carpan",
+      "fiyat": 1.45,
+      "etiket": "Yuksek Klima Kahve Makinesi vb - Yuksek 1200W konteyner 100Ah LiFePO4 1.2kWp bag evi karavan paket"
+    },
+    "jel_aku": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Jel Aku - 150Ah jel 55.1k TL pakette 24Ah jel 50W sette baz"
+    },
+    "agm_aku": {
+      "tip": "sabit",
+      "fiyat": -1200,
+      "etiket": "AGM Aku - AGM ekonomik"
+    },
+    "lityum_aku": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Lityum Aku - LiFePO4 100Ah 1200W 7.5kW Exelon lityum 10kW batarya 280k TL sistemde 7x600W"
+    },
+    "tam_bagimsiz_off_grid": {
+      "tip": "sabit",
+      "fiyat": 4500,
+      "etiket": "Tam Bagimsiz Off-Grid - Sebeke yok 45 panel 20kW 3 katli asansor sehir konforu"
+    },
+    "hibrit_sebeke_destekli": {
+      "tip": "sabit",
+      "fiyat": 2200,
+      "etiket": "Sebeke Destekli Hibrit - Hibrit inverter MPPT smart"
+    },
+    "jenerator_destek_evet": {
+      "tip": "sabit",
+      "fiyat": 8500,
+      "etiket": "Jenerator Destegi Evet - Gunes+Jenerator gunes+ruzgar secenegi"
+    },
+    "zor_ulasim_arazi_arac_gerekiyor": {
+      "tip": "sabit",
+      "fiyat": 1800,
+      "etiket": "Zor Ulasilabilir Arazi Araci Gerekiyor - Yayla ulasim zor"
+    },
+    "sert_kis_yogun_kar_ruzgarli": {
+      "tip": "sabit",
+      "fiyat": 1200,
+      "etiket": "Sert Kis Yogun Kar Ruzgarli Bolge - Iklim kosullari konstruksiyon guclendirme"
+    }
+  },
+  "carpanlar": {
+    "karavan": 1.0,
+    "tiny_house": 1.35,
+    "bag_evi": 1.15,
+    "yayla_evi": 1.22,
+    "tekne_yat": 1.28,
+    "dusuk_tuketim": 0.75,
+    "orta_tuketim": 1.0,
+    "yuksek_tuketim": 1.45,
+    "jel": 1.0,
+    "lityum": 1.32
+  },
+  "alanKatsayilari": {
+    "0_4_m_karavan": 0.85,
+    "4_6_m": 1.0,
+    "6_8_m": 1.18,
+    "8_m_uzeri": 1.32,
+    "0_20_m2_tiny": 0.9,
+    "20_40_m2": 1.0,
+    "40_60_m2": 1.18,
+    "60_m2_uzeri": 1.35
+  },
+  "kaynak": "Temmuz 2026 - Off-grid 16 panel 10kW batarya 280k TL Akyaka DonanimHaber fatura derdi, 3 katli sebeke yok 45 panel 20kW asansor buzdolabi derin dondurucu kamera, tinyhouse 4200W 7x600W half-cut mono 7.5kW lityum 6.2kW MPPT Talay, bag evi karavan TV aydinlatma 1.2kWp N&D, bag evi hazir 1200W inverter 170W panel 36.9k TL Lexron 3kVA 280W 150Ah jel 55.1k TL Teknovasyon, konteyner 100Ah LiFePO4 1200W, 50W 12V 24Ah jel TV bag evi yayla karavan, Hyundai 520W 2.6kWh/gun 5 saat"
+}

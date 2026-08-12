@@ -1,0 +1,171 @@
+﻿{
+  "meslekId": "ic_boya",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 95,
+    "asgariKucuk": 3500,
+    "asgariBuyuk": 7500
+  },
+  "malzeme": {
+    "m2": 55,
+    "aciklama": "Ic cephe 110-180 TL/m2 plastik/silikonlu, tavan 100-150 TL astar+2kat, luks silinebilir 120-200 TL, dekoratif 220-380 TL - 2026 Istanbul"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.28,
+    "ankara_izmir_antalya_bursa": 1.12,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 200,
+    "3_ve_ustu_asansorsuz": 650,
+    "esyali_koruma_ortu": 400
+  },
+  "ekstralar": {
+    "yapi_daire": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Daire - Standart"
+    },
+    "mustakil_ev": {
+      "tip": "carpan",
+      "fiyat": 1.12,
+      "etiket": "Mustakil Ev - Yuksek tavan ve dis etken"
+    },
+    "ofis": {
+      "tip": "carpan",
+      "fiyat": 1.08,
+      "etiket": "Ofis - Mesai disi"
+    },
+    "is_yeri": {
+      "tip": "carpan",
+      "fiyat": 1.15,
+      "etiket": "Is Yeri - Ticari alan"
+    },
+    "oda_1_0": {
+      "tip": "carpan",
+      "fiyat": 0.55,
+      "etiket": "1+0 - Kucuk studio"
+    },
+    "oda_1_1": {
+      "tip": "carpan",
+      "fiyat": 0.72,
+      "etiket": "1+1"
+    },
+    "oda_2_1": {
+      "tip": "carpan",
+      "fiyat": 0.88,
+      "etiket": "2+1"
+    },
+    "oda_3_1": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "3+1 - Baz"
+    },
+    "oda_4_1": {
+      "tip": "carpan",
+      "fiyat": 1.22,
+      "etiket": "4+1"
+    },
+    "oda_5_1": {
+      "tip": "carpan",
+      "fiyat": 1.38,
+      "etiket": "5+1"
+    },
+    "oda_6_plus": {
+      "tip": "carpan",
+      "fiyat": 1.55,
+      "etiket": "6+ ve Uzeri - Villa tipi"
+    },
+    "bos": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Bos - Hizli ilerleme"
+    },
+    "esyali": {
+      "tip": "carpan",
+      "fiyat": 1.18,
+      "etiket": "Esyali - Koruma ortu ve tasima"
+    },
+    "zemin_gerekmez": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Mevcut Duvar Durumu Gerekmez - Hazir zemin"
+    },
+    "zemin_gerekir": {
+      "tip": "m2",
+      "fiyat": 35,
+      "etiket": "Mevcut Duvar Tamir Gerekir - Macun zimpara astar"
+    },
+    "koyu_acik_donusum": {
+      "tip": "m2",
+      "fiyat": 25,
+      "etiket": "Koyu Renkten Acik Renge Donusum - Ekstra kat 3-4 kat gerekir"
+    },
+    "kazima_macunlama": {
+      "tip": "m2",
+      "fiyat": 45,
+      "etiket": "Kazima + Macunlama Islemleri - Kabarma dokulme"
+    },
+    "duvar_kagidi_sokumu": {
+      "tip": "m2",
+      "fiyat": 55,
+      "etiket": "Mevcut Duvar Kagidi Sokumu - Kazima + astar"
+    },
+    "komple_bolgesel_alci_siva": {
+      "tip": "m2",
+      "fiyat": 85,
+      "etiket": "Komple / Bolgesel Alci Siva Isciligi - Saten alci 391 TL/m2 ref"
+    },
+    "su_bazli_silikonlu_silinebilir": {
+      "tip": "m2",
+      "fiyat": 18,
+      "etiket": "Su Bazli Silikonlu Silinebilir - 15L Dyo 2700 TL Marshall Fit 1446 TL Polisan Elegans 15L"
+    },
+    "plastik_boya": {
+      "tip": "m2",
+      "fiyat": 0,
+      "etiket": "Plastik Boya - En ekonomik 12L Dufa 1291 TL 15L Mercan 1894 TL"
+    },
+    "yagli_boya": {
+      "tip": "m2",
+      "fiyat": 32,
+      "etiket": "Yagli Boya - Kapi pervaz icin, koku ve kuruma uzun"
+    },
+    "antibakteriyel_boya": {
+      "tip": "m2",
+      "fiyat": 28,
+      "etiket": "Antibakteriyel Boya - 2.5L Marshall antibakteriyel 690 TL Filli Momento Silan 7.5L, cocuk odasi saglik"
+    },
+    "tavan_hayir": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Tavan Boyasi Hayir - Sadece duvar"
+    },
+    "tavan_evet": {
+      "tip": "m2",
+      "fiyat": 38,
+      "etiket": "Tavan Boyasi Evet - 100-150 TL/m2 astar+2kat tavan, iskele gerekebilir"
+    }
+  },
+  "carpanlar": {
+    "ic_cephe_boyama": 1.0,
+    "tavan_dahil": 1.28,
+    "esyali_mekan": 1.18,
+    "luks_silinebilir": 1.22
+  },
+  "alanKatsayilari": {
+    "0_40_m2": 1.35,
+    "40_60_m2": 1.22,
+    "60_80_m2": 1.12,
+    "80_100_m2": 1.0,
+    "100_120_m2": 0.95,
+    "120_150_m2": 0.9,
+    "150_200_m2": 0.85,
+    "200_250_m2": 0.82,
+    "250_300_m2": 0.78,
+    "300_plus_m2": 0.72
+  },
+  "kaynak": "Temmuz 2026 - Istanbul ic cephe 110-180 TL plastik/silikonlu tavan 100-150 TL dekoratif 220-380 TL Eleman.net, ic cephe 70-120 TL boya dahil luks 120-200 TL villa 200-400 TL Dek-Mar, boya fiyat 15L Dyo silikonlu ipek mat 2700 TL 15L Marshall Fit silikonlu 1446 TL 12L Dufa 1291 TL 7.5L Dufa zeolit 1291 TL 15L Yonca 2094 TL 15L Mercan 1894 TL 2.5L Marshall antibakteriyel 690 TL"
+}

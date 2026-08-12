@@ -1,0 +1,180 @@
+﻿{
+  "meslekId": "klima",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 0,
+    "asgariKucuk": 1500,
+    "asgariBuyuk": 3500
+  },
+  "malzeme": {
+    "m2": 0,
+    "aciklama": "Bakim 1500-2500 TL, montaj 3500-4500 TL min 3000 TL, sokme 1500-2500 TL, gaz 2000-4500 TL, ariza tespit 1000 TL, detayli bakim 700-1200 TL standart 400-700 TL, gaz 9/12 700 TL 18/24 850 TL - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.25,
+    "ankara_izmir_antalya_bursa": 1.12,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "zemin_kolay": 0,
+    "1_3_kat_standart": 250,
+    "4_ve_uzeri_vinc_sepet": 1850
+  },
+  "ekstralar": {
+    "periyodik_bakim_ilacli_ic_dis_filtre": {
+      "tip": "adet",
+      "fiyat": 1900,
+      "etiket": "Periyodik Bakim Ilacli Ic / Dis Unite Temizligi ve Filtre Dezenfeksiyonu - 1500-2500 TL, Daikin kampanya 2500 TL baslangic, temizlik+gaz 1800-2500 TL"
+    },
+    "montaj_sadece_kurulum_vakum_konsol_devreye": {
+      "tip": "adet",
+      "fiyat": 3800,
+      "etiket": "Montaj Sadece Kurulum Vakumlama Konsol Montaji ve Devreye Alma - 3500-4500 TL, min 3000 TL, 9000 BTU 23k-32k TL cihaz, standart montaj 1500-3000 TL eski tarife"
+    },
+    "sokme_montaj_yer_degisim_pump_down_gaz_toplama": {
+      "tip": "adet",
+      "fiyat": 4800,
+      "etiket": "Sokme + Montaj Yer Degisimi Pump-Down Gaz Toplama Demontaj ve Yeniden Kurulum - Sancaktepe 5k TL ornek bakim+gaz dahil, demontaj 800-1500 TL + montaj"
+    },
+    "gaz_basimi_sarj_kacak_kontrol_vakum_tam_kat": {
+      "tip": "adet",
+      "fiyat": 2900,
+      "etiket": "Gaz Basimi / Sarj Sistem Kacak Kontrolu Vakum ve Tam Kat Gaz Sarji - 2000-4500 TL, 22 gaz 9/12/15 700 TL 18/24 850 TL eski, R32 700gr 1300 TL"
+    },
+    "dis_cephe_duvari_konsol_baglantili": {
+      "tip": "adet",
+      "fiyat": 350,
+      "etiket": "Dis Cephe Duvari Konsol Baglantili - Konsol + duvel"
+    },
+    "cati_teras_zemini": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "Cati / Teras Zemini - En kolay erisim, zemin ustu"
+    },
+    "balkon_korkulugu_ici_zemin": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "Balkon Korkulugu / Balkon Ici Zemin - Kolay"
+    },
+    "hazir_klima_askisi_altyapi_yuvasi": {
+      "tip": "adet",
+      "fiyat": -250,
+      "etiket": "Hazir Klima Askisi / Hazir Altyapi Yuvasi - Konsol gerekmez"
+    },
+    "zemin_kat_kolay_bahce_balkon": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Zemin Kat / Kolay Erisilebilir Bahce-Balkon - Baz"
+    },
+    "kat_1_3_standart_merdiven_uzatma": {
+      "tip": "sabit",
+      "fiyat": 250,
+      "etiket": "1.-3. Kat Arasi Standart Merdiven/Uzatma Ile Erisilebilir - Uzatma merdiven"
+    },
+    "kat_4_uzeri_riskli_vinc_sepet_platform": {
+      "tip": "sabit",
+      "fiyat": 2200,
+      "etiket": "4. Kat ve Uzeri Dis Cephe Riskli Vinc veya Sepetli Platform Gerekebilir - Vinc kiralama 1850 TL+"
+    },
+    "kapasite_9k_12k_standart_duvar_split": {
+      "tip": "adet",
+      "fiyat": 0,
+      "etiket": "9.000-12.000 BTU Standart Duvar Tipi Split - Baz"
+    },
+    "kapasite_18k_24k_genis_agir_cift_usta": {
+      "tip": "adet",
+      "fiyat": 850,
+      "etiket": "18.000-24.000 BTU Genis Alan Agir Dis Unite Cift Usta Mesaisi - Agir unite, 18/24 gaz 850 TL"
+    },
+    "salon_ayakli_kaset_kanalli_tavan_karmasik_drenaj": {
+      "tip": "adet",
+      "fiyat": 1650,
+      "etiket": "Salon Tipi Ayakli / Kaset ve Kanalli Tavan Tipi Karmasik Drenaj - Tavan tipi kaset drenaj pompa"
+    },
+    "cihaz_1_adet": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "1 Cihaz - Baz"
+    },
+    "cihaz_2_3_adet": {
+      "tip": "carpan",
+      "fiyat": 0.92,
+      "etiket": "2-3 Cihaz Arasi - Indirim"
+    },
+    "cihaz_4_10_adet": {
+      "tip": "carpan",
+      "fiyat": 0.82,
+      "etiket": "4-10 Cihaz Arasi - Toplu"
+    },
+    "cihaz_10_uzeri": {
+      "tip": "carpan",
+      "fiyat": 0.72,
+      "etiket": "10 Cihaz ve Uzeri - Kurumsal"
+    },
+    "apartman_dairesi": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Apartman Dairesi - Standart"
+    },
+    "mustakil_villa": {
+      "tip": "carpan",
+      "fiyat": 1.12,
+      "etiket": "Mustakil Ev / Villa - Dis cephe uzun hat"
+    },
+    "ofis_is_yeri_magaza": {
+      "tip": "carpan",
+      "fiyat": 1.08,
+      "etiket": "Ofis / Is Yeri / Magaza - Mesai disi"
+    },
+    "fabrika_endustriyel_buyuk_alan": {
+      "tip": "carpan",
+      "fiyat": 1.25,
+      "etiket": "Fabrika / Endustriyel Buyuk Alan - Buyuk kapasite"
+    },
+    "hat_hazir_priz_salter_sigorta": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Hat Hazir Klima Yaninda Priz veya Salter Sigortasi Mevcut - Hazir"
+    },
+    "hat_cekilmesi_panodan_kablo": {
+      "tip": "mt",
+      "fiyat": 85,
+      "etiket": "Hat Cekilmesi Gerekiyor Panodan Ilgili Noktaya Kablo Cekimi - Mt basi NYY + sigorta, elektrik hat dahil 3000 TL Odunpazari ornek"
+    },
+    "ekstra_bakir_boru_izoleli_hat": {
+      "tip": "mt",
+      "fiyat": 650,
+      "etiket": "Ekstra Bakir Boru Tedarigi Varsayilan Mesafe Uzerinden Ilave Izoleli Hat - Bakir + izolasyon mt"
+    },
+    "dis_unite_konsol_seti_kaucuk_paslanmaz": {
+      "tip": "adet",
+      "fiyat": 850,
+      "etiket": "Dis Unite Konsol Seti Degisimi Kaucuk Takozlu Paslanmaz Agir Hizmet Konsolu"
+    },
+    "kacak_tespiti_azot_testi_sizinti": {
+      "tip": "adet",
+      "fiyat": 1200,
+      "etiket": "Kacak Tespiti / Azot Testi Sisteme Azot Basilarak Sızıntı Aranmasi - Ariza tespit 1000 TL ref"
+    },
+    "drenaj_pompasi_otomatik_tahliye": {
+      "tip": "adet",
+      "fiyat": 1850,
+      "etiket": "Drenaj Pompasi Montaji Su Tahliyesi Zor Alanlar Icin Otomatik Tahliye Pompasi - Hortum 3m + krose"
+    }
+  },
+  "carpanlar": {
+    "bakim": 1.0,
+    "montaj": 1.85,
+    "sokme_montaj": 2.35,
+    "gaz_basimi": 1.45
+  },
+  "alanKatsayilari": {
+    "1_cihaz": 1.0,
+    "2_3_cihaz": 1.85,
+    "4_10_cihaz": 3.2,
+    "10_cihaz_uzeri": 6.5
+  },
+  "kaynak": "Temmuz 2026 - Klima bakim 1500-2500 TL montaj 3500-4500 TL sokme 1500-2500 TL gaz 2000-4500 TL ariza tespit 1000 TL, Incek bakim 400-700 TL detayli 700-1200 TL gaz 600-1500 TL montaj 1500-3000 TL demontaj 800-1500 TL, Oveceler gaz 22 9/12/15 700 TL 18/24 850 TL, min montaj 3000 TL 9k BTU 23k-32k TL temizlik+gaz 1800-2500 TL, Sancaktepe sok-tak+bakim+gaz 5k TL, Eskisehir montaj elektrik dahil 3k TL, Daikin bakim 2500 TL kampanya"
+}

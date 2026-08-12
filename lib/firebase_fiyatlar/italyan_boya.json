@@ -1,0 +1,105 @@
+﻿{
+  "meslekId": "italyan_boya",
+  "guncellemeTarihi": "2026-07-17",
+  "paraBirimi": "TRY",
+  "iscilik": {
+    "m2": 280,
+    "asgariKucuk": 6500,
+    "asgariBuyuk": 12000
+  },
+  "malzeme": {
+    "m2": 320,
+    "aciklama": "Dekoratif sedef/efekt 220-380 TL/m2, ic cephe 90-160 TL/m2, saten alci 120-220 TL/m2 oncesi, luks silinebilir 200-280 TL/m2 premium tamirat dahil 280-350 TL/m2 - 2026"
+  },
+  "sehirCarpani": {
+    "istanbul": 1.32,
+    "ankara_izmir_antalya_bursa": 1.15,
+    "diger_iller": 1.0
+  },
+  "katFarki": {
+    "asansor_var": 0,
+    "1_2_kat_asansorsuz": 250,
+    "3_ve_ustu_asansorsuz": 850,
+    "iskele_kurulum_3m_plus": 2200
+  },
+  "ekstralar": {
+    "mermer_dokulu_stucco_veneziano_parlatmali": {
+      "tip": "m2",
+      "fiyat": 280,
+      "etiket": "Mermer Dokulu Stucco Veneziano Yogun Parlatmali Luks - En yuksek iscilik, DECOS STUCCO mermer efekt ornek"
+    },
+    "kadife_sedef_sand_isik_acisi": {
+      "tip": "m2",
+      "fiyat": 140,
+      "etiket": "Kadife Doku / Sedef / Sand Isik Acisina Gore Renk Degistiren - Dekoratif sedef/efekt 220-380 TL/m2 baz"
+    },
+    "pasli_metallik_oksit_efekt": {
+      "tip": "m2",
+      "fiyat": 180,
+      "etiket": "Pasli / Metalik Oksit Dokulu Efekt Boya - Cift kat oksit + vernik"
+    },
+    "beton_traverten_brut_efekt_siva": {
+      "tip": "m2",
+      "fiyat": 120,
+      "etiket": "Beton / Traverten Gorunumlu Brut Efekt Siva - DECOS Travertino 1.5Kg 312 TL 4Kg, beton gorunumlu siva 1kg"
+    },
+    "saten_alci_kusursuz_puruzsuz_hazir": {
+      "tip": "sabit",
+      "fiyat": 0,
+      "etiket": "Saten Alci Kusursuz Puruzsuz Hazir Zemin - Ideal, 120-220 TL/m2 saten alci zaten yapilmis"
+    },
+    "tamir_macun_alci_altyapi_eski_duvar": {
+      "tip": "m2",
+      "fiyat": 95,
+      "etiket": "Tamir / Macun / Alci Altyapi Gerekiyor Eski Duvar Hazirligi - Saten alci uygulamasi 120-220 TL/m2"
+    },
+    "belirli_duvarlar_salon": {
+      "tip": "carpan",
+      "fiyat": 1.0,
+      "etiket": "Belirli Duvarlar / Salon - Vurgu duvari TV arkasi"
+    },
+    "ofis_ticari_alan": {
+      "tip": "carpan",
+      "fiyat": 1.08,
+      "etiket": "Ofis / Ticari Alan - Genis alan ama mesai disi"
+    },
+    "tavan_uygulamasi": {
+      "tip": "carpan",
+      "fiyat": 1.28,
+      "etiket": "Tavan Uygulamasi - Bas ustu calisma zor, iskele 100-150 TL tavan boyasi ref"
+    },
+    "italyan_wax_cila_su_iticilik_derinlik": {
+      "tip": "m2",
+      "fiyat": 65,
+      "etiket": "Italyan Wax / Cila Su Iticilik ve Derinlik - Clear coating wax 800gr stucco icin"
+    },
+    "altin_gumus_varak_lokal_kalem": {
+      "tip": "sabit",
+      "fiyat": 2800,
+      "etiket": "Altin / Gumus Varak Detaylari Lokal Kalem Isciligi - Sanatsal"
+    },
+    "dis_cephe_nemli_alan_modifikasyon": {
+      "tip": "m2",
+      "fiyat": 85,
+      "etiket": "Dis Cephe / Nemli Alan Modifikasyonu Banyo ve Dis Ortam - Dis cephe boyama 150-280 TL iskele dahil ref"
+    },
+    "yuksek_tavan_iskele_3m_asan": {
+      "tip": "sabit",
+      "fiyat": 2500,
+      "etiket": "Yuksek Tavan / Iskele Kurulumu 3 Metreyi Asan Alanlar - Iskele kurulum"
+    }
+  },
+  "carpanlar": {
+    "mermer_stucco_veneziano": 1.55,
+    "kadife_sedef_sand": 1.18,
+    "pasli_metallik_oksit": 1.32,
+    "beton_traverten": 1.12
+  },
+  "alanKatsayilari": {
+    "0_10_m2_kolon_nis": 1.65,
+    "10_30_m2_vurgu_tv_salon": 1.25,
+    "30_70_m2_orta_ticari_komple_oda": 1.0,
+    "70_m2_uzeri_genis_mimari": 0.82
+  },
+  "kaynak": "Temmuz 2026 - Dekoratif sedef/efekt 220-380 TL/m2 ic cephe 90-160 TL/m2 Eleman.net, Dek-Mar ic cephe 70-120 TL luks 120-200 TL, saten alci 120-220 TL/m2, Ozyurt su bazli saten 201 TL plastik 177 TL tavan plastik 137 TL yagli 289 TL, 3+1 ev standart 150-220 TL/m2 silikonlu silinebilir 200-280 TL/m2 premium tamirat 280-350 TL/m2, DECOS Travertino 1.5Kg"
+}

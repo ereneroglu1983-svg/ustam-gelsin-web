@@ -1,0 +1,371 @@
+{
+ "alci_siva": {
+  "birimM2Fiyati": 310.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 18000.0,
+  "siva_filesi_m2": 65.0,
+  "kose_profili_m2": 45.0,
+  "tamir_m2": 40.0,
+  "iskele_sabit": 9500.0,
+  "dis_cephe_carpan": 1.35
+ },
+ "aluminyum_cephe": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 35000.0,
+  "ek_bilinmeyen_350.0": 350.0,
+  "ek_bilinmeyen_950.0": 950.0,
+  "carpan_1.15": 1.15,
+  "carpan_1.25": 1.25,
+  "carpan_1.4": 1.4
+ },
+ "asansor_servis": {
+  "tabanFiyat": 165000.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 200000.0,
+  "sabit_18000": 18000.0,
+  "sabit_8500": 8500.0,
+  "sabit_22000": 22000.0,
+  "sabit_9500": 9500.0,
+  "sabit_7000": 7000.0,
+  "sabit_32000": 32000.0,
+  "sabit_4500": 4500.0,
+  "sabit_95000": 95000.0,
+  "sabit_68000": 68000.0,
+  "sabit_48000": 48000.0,
+  "sabit_8000": 8000.0,
+  "carpan_1.45": 1.45,
+  "carpan_1.3": 1.3,
+  "carpan_1.35": 1.35,
+  "carpan_1.25": 1.25,
+  "carpan_1.5": 1.5,
+  "carpan_1.4": 1.4
+ },
+ "asma_tavan": {
+  "birimM2Fiyati": 1600.0,
+  "ekMaliyet": 0.0,
+  "ek_bilinmeyen_380.0": 380.0,
+  "ek_bilinmeyen_90.0": 90.0,
+  "ek_bilinmeyen_180.0": 180.0,
+  "ek_bilinmeyen_240.0": 240.0,
+  "carpan_1.25": 1.25,
+  "carpan_1.5": 1.5,
+  "carpan_1.05": 1.05,
+  "carpan_1.1": 1.1,
+  "carpan_1.15": 1.15
+ },
+ "bahce_peyzaj": {
+  "birimM2Fiyati": 950.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 45000.0,
+  "ek_bilinmeyen_220.0": 220.0,
+  "ek_bilinmeyen_550.0": 550.0,
+  "ek_bilinmeyen_75.0": 75.0,
+  "sabit_35000": 35000.0,
+  "carpan_1.85": 1.85,
+  "carpan_1.05": 1.05,
+  "carpan_1.1": 1.1,
+  "carpan_1.4": 1.4
+ },
+ "banyo_vestiyer": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 13500.0,
+  "sabit_4800": 4800.0,
+  "sabit_8500": 8500.0,
+  "carpan_1.7": 1.7,
+  "carpan_1.3": 1.3,
+  "carpan_1.25": 1.25,
+  "carpan_1.6": 1.6,
+  "carpan_2.1": 2.1,
+  "carpan_1.15": 1.15,
+  "carpan_1.05": 1.05,
+  "carpan_1.1": 1.1
+ },
+ "bina_temizlik_hesaplayici": {
+  "birimM2Fiyati": 45.0,
+  "ekMaliyet": 0.0,
+  "sabit_6500": 6500.0,
+  "sabit_3500": 3500.0,
+  "carpan_1.15": 1.15,
+  "carpan_1.1": 1.1,
+  "carpan_1.2": 1.2
+ },
+ "bolme_duvar": {
+  "birimM2Fiyati": 1600.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 35000.0,
+  "ek_bilinmeyen_240.0": 240.0,
+  "ek_bilinmeyen_120.0": 120.0,
+  "ek_bilinmeyen_260.0": 260.0,
+  "ek_bilinmeyen_1150.0": 1150.0,
+  "sabit_6500": 6500.0,
+  "sabit_9500": 9500.0,
+  "sabit_3200": 3200.0,
+  "carpan_1.2": 1.2,
+  "carpan_1.45": 1.45,
+  "carpan_1.05": 1.05,
+  "carpan_1.1": 1.1
+ },
+ "cam_balkon": {
+  "birimM2Fiyati": 4600.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 40000.0,
+  "ek_bilinmeyen_1400.0": 1400.0,
+  "ek_bilinmeyen_950.0": 950.0,
+  "sabit_21000": 21000.0,
+  "sabit_16500": 16500.0,
+  "sabit_10500": 10500.0,
+  "sabit_13000": 13000.0,
+  "sabit_1800": 1800.0
+ },
+ "cati_isleri": {
+  "birimM2Fiyati": 350.0,
+  "ekMaliyet": 0.0,
+  "carpan_1.05": 1.05,
+  "carpan_1.1": 1.1
+ },
+ "cilingir": {},
+ "dis_cephe": {
+  "birimM2Fiyati": 1250.0,
+  "ekMaliyet": 0.0,
+  "ek_bilinmeyen_180.0": 180.0,
+  "tamir_m2": 110.0,
+  "carpan_1.05": 1.05,
+  "carpan_1.1": 1.1
+ },
+ "dogalgaz_kombi": {
+  "birimM2Fiyati": 720.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 1500.0,
+  "sabit_2000": 2000.0,
+  "sabit_3500": 3500.0,
+  "sabit_2500": 2500.0,
+  "sabit_8500": 8500.0,
+  "sabit_6800": 6800.0,
+  "carpan_1.75": 1.75,
+  "carpan_1.25": 1.25,
+  "carpan_1.4": 1.4
+ },
+ "duvar_kagidi": {
+  "birimM2Fiyati": 350.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 4000.0,
+  "ek_bilinmeyen_60.0": 60.0,
+  "ek_bilinmeyen_80.0": 80.0,
+  "carpan_1.4": 1.4
+ },
+ "elektrik_tesisat": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 2000.0,
+  "sabit_4800": 4800.0,
+  "sabit_8000": 8000.0,
+  "sabit_4500": 4500.0,
+  "carpan_1.5": 1.5
+ },
+ "epoksi_zemin": {
+  "birimM2Fiyati": 950.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 7000.0,
+  "ek_bilinmeyen_160.0": 160.0,
+  "ek_bilinmeyen_280.0": 280.0,
+  "ek_bilinmeyen_120.0": 120.0,
+  "sabit_6000": 6000.0
+ },
+ "fayans_seramik": {
+  "birimM2Fiyati": 1400.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 5000.0,
+  "ek_bilinmeyen_280.0": 280.0,
+  "ek_bilinmeyen_250.0": 250.0,
+  "ek_bilinmeyen_180.0": 180.0,
+  "sabit_5000": 5000.0
+ },
+ "ferforje_metal": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 4500.0,
+  "sabit_6000": 6000.0,
+  "sabit_4500": 4500.0,
+  "sabit_24000": 24000.0,
+  "sabit_4800": 4800.0,
+  "carpan_1.65": 1.65,
+  "carpan_1.25": 1.25,
+  "carpan_1.3": 1.3
+ },
+ "gergi_tavan": {
+  "birimM2Fiyati": 1450.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 4000.0,
+  "ek_bilinmeyen_90.0": 90.0,
+  "sabit_4500": 4500.0,
+  "sabit_3500": 3500.0,
+  "carpan_1.6": 1.6,
+  "carpan_1.25": 1.25,
+  "carpan_1.15": 1.15
+ },
+ "gomme_dolap": {
+  "birimM2Fiyati": 16500.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 6500.0,
+  "ek_bilinmeyen_1100.0": 1100.0,
+  "ek_bilinmeyen_1400.0": 1400.0,
+  "ek_bilinmeyen_450.0": 450.0,
+  "sabit_6500": 6500.0,
+  "sabit_3500": 3500.0,
+  "carpan_1.25": 1.25,
+  "carpan_1.2": 1.2
+ },
+ "gunes_enerjisi": {
+  "ekMaliyet": 0.0,
+  "toplamFiyat": 0.0,
+  "asgariBaraj": 2200.0,
+  "sabit_2800": 2800.0,
+  "sabit_6500": 6500.0,
+  "sabit_3500": 3500.0
+ },
+ "havuz_sistemleri": {
+  "birimM2Fiyati": 68000.0,
+  "asgariBaraj": 90000.0
+ },
+ "ic_boya": {
+  "birimM2Fiyati": 230.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 9500.0
+ },
+ "italyan_boya": {
+  "birimM2Fiyati": 1950.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 16000.0,
+  "ek_bilinmeyen_250.0": 250.0,
+  "sabit_12000": 12000.0,
+  "iskele_sabit": 6500.0,
+  "dis_cephe_carpan": 1.35
+ },
+ "kapi_sistemleri": {},
+ "kartonpiyer": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 5500.0,
+  "sabit_6000": 6000.0,
+  "sabit_4500": 4500.0,
+  "carpan_1.35": 1.35
+ },
+ "klima_servis": {
+  "asgariBaraj": 4800.0,
+  "carpan_1.35": 1.35,
+  "carpan_1.7": 1.7
+ },
+ "komple_tadilat": {
+  "birimM2Fiyati": 26000.0,
+  "asgariBaraj": 220000.0,
+  "carpan_1.25": 1.25
+ },
+ "marangozluk": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 15000.0,
+  "sabit_4200": 4200.0,
+  "carpan_1.6": 1.6,
+  "carpan_1.2": 1.2
+ },
+ "mermer_granit": {
+  "ekMaliyet": 0.0,
+  "toplamFiyat": 0.0,
+  "asgariBaraj": 12000.0,
+  "sabit_3600": 3600.0
+ },
+ "mutfak_dolabi": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 55000.0,
+  "sabit_13500": 13500.0,
+  "sabit_5500": 5500.0
+ },
+ "otomatik_sulama": {
+  "birimM2Fiyati": 160.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 14000.0,
+  "ek_bilinmeyen_60.0": 60.0,
+  "sabit_5200": 5200.0,
+  "sabit_5800": 5800.0,
+  "sabit_8800": 8800.0
+ },
+ "panel_singil": {
+  "birimM2Fiyati": 780.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 30000.0,
+  "ek_bilinmeyen_180.0": 180.0,
+  "ek_bilinmeyen_220.0": 220.0,
+  "ek_bilinmeyen_140.0": 140.0,
+  "ek_bilinmeyen_110.0": 110.0,
+  "sabit_16000": 16000.0
+ },
+ "parke_doseme": {
+  "birimM2Fiyati": 340.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 6000.0,
+  "sabit_2000": 2000.0,
+  "sabit_2800": 2800.0
+ },
+ "prefabrik_yapi": {
+  "birimM2Fiyati": 0.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 65000.0,
+  "ek_bilinmeyen_450.0": 450.0,
+  "ek_bilinmeyen_380.0": 380.0,
+  "ek_bilinmeyen_650.0": 650.0,
+  "ek_bilinmeyen_400.0": 400.0,
+  "ek_bilinmeyen_2200.0": 2200.0,
+  "ek_bilinmeyen_1850.0": 1850.0,
+  "ek_bilinmeyen_3500.0": 3500.0,
+  "sabit_28000": 28000.0,
+  "sabit_18000": 18000.0,
+  "sabit_32000": 32000.0,
+  "sabit_55000": 55000.0,
+  "sabit_35000": 35000.0,
+  "carpan_1.45": 1.45
+ },
+ "pvc_dograma": {
+  "ekMaliyet": 0.0,
+  "toplamFiyat": 0.0,
+  "asgariBaraj": 55000.0,
+  "sabit_3500": 3500.0,
+  "sabit_1800": 1800.0,
+  "sabit_2900": 2900.0,
+  "sabit_6500": 6500.0,
+  "sabit_850": 850.0,
+  "sabit_1950": 1950.0,
+  "sabit_1200": 1200.0,
+  "sabit_14000": 14000.0,
+  "sabit_2500": 2500.0
+ },
+ "sihhi_tesisat": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 3500.0,
+  "sabit_5500": 5500.0,
+  "sabit_9000": 9000.0,
+  "sabit_3500": 3500.0,
+  "sabit_3000": 3000.0
+ },
+ "sineklik_panjur": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 18000.0
+ },
+ "sistre_cila": {
+  "birimM2Fiyati": 880.0,
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 6000.0,
+  "sabit_4500": 4500.0
+ },
+ "su_yalitimi": {
+  "ekMaliyet": 0.0,
+  "asgariBaraj": 25000.0,
+  "sabit_9500": 9500.0,
+  "sabit_7500": 7500.0
+ },
+ "temizlik_hizmetleri": {
+  "toplamFiyat": 5000.0,
+  "carpan_1.15": 1.15,
+  "carpan_1.3": 1.3,
+  "carpan_1.2": 1.2
+ },
+ "uydu_kamera": {
+  "tabanFiyat": 9800.0,
+  "asgariBaraj": 3500.0
+ }
+}

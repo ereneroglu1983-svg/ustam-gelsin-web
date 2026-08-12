@@ -21,6 +21,14 @@ import 'destek_iletisim.dart';
 import 'insaat_rehberi.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+// SADECE EKLENEN KISIM - Hiçbir yeri bozmaz
+String _normalizeRole(String? role) {
+  if (role == null) return 'musteri';
+  if (role == 'customer') return 'musteri';
+  if (role == 'musteri' || role == 'usta' || role == 'admin') return role;
+  return 'musteri';
+}
+
 Future<void> showSozlesmeDialog(BuildContext context, String documentId, String defaultBaslik) async {
   showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
   try {
@@ -95,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
         if (doc.exists && mounted) {
           setState(() {
-            _userRole = doc.data()?['role'] as String?;
+            _userRole = _normalizeRole(doc.data()?['role'] as String?);
             _roleYukleniyor = false;
           });
         } else {
@@ -109,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _handleProfilIcon() {
     if (_currentUser == null) return;
-    if (_userRole == 'usta') {
+    if (_normalizeRole(_userRole) == 'usta') {
       Navigator.push(context, MaterialPageRoute(builder: (_) => const UstaProfilSayfasi()));
     } else {
       Navigator.push(context, MaterialPageRoute(builder: (_) => const MusteriProfilSayfasi()));
@@ -121,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerAuthPage(role: "customer")));
       return;
     }
-    if (_userRole == 'usta') {
+    if (_normalizeRole(_userRole) == 'usta') {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bu alan sadece müşteriler içindir.')));
       return;
     }
@@ -133,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta")));
       return;
     }
-    if (_userRole == 'customer') {
+    if (_normalizeRole(_userRole) == 'musteri') {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bu alan sadece ustalar içindir.')));
       return;
     }
@@ -219,11 +227,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   else if (_currentUser!= null)
                     ListTile(
                       leading: const Icon(Icons.person, color: Color(0xFF2DB34A)),
-                      title: Text(_userRole == 'usta'? "USTA PROFİLİM" : "PROFİLİM"),
+                      title: Text(_normalizeRole(_userRole) == 'usta'? "USTA PROFİLİM" : "PROFİLİM"),
                       titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                       onTap: () {
                         Navigator.pop(context);
-                        if (_userRole == 'usta') {
+                        if (_normalizeRole(_userRole) == 'usta') {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const UstaProfilSayfasi()));
                         } else {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const MusteriProfilSayfasi()));
@@ -283,7 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text("Güvenilir ustalar, şeffaf fiyatlar, hızlı çözümler.", style: GoogleFonts.poppins(fontSize: 14, color: Colors.black54)),
                 const SizedBox(height: 22),
                 Row(children: [
-                  Expanded(child: SizedBox(height: 58, child: ElevatedButton.icon(onPressed: _handleMusteriAction, icon: const Icon(Icons.add, color: Colors.white), label: Text("ÜCRETSİZ İLAN OLUŞTUR", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: ElevatedButton.styleFrom(backgroundColor: _userRole == 'usta'? Colors.grey : Colors.red, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
+                  Expanded(child: SizedBox(height: 58, child: ElevatedButton.icon(onPressed: _handleMusteriAction, icon: const Icon(Icons.add, color: Colors.white), label: Text("ÜCRETSİZ İLAN OLUŞTUR", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: ElevatedButton.styleFrom(backgroundColor: _normalizeRole(_userRole) == 'usta'? Colors.grey : Colors.red, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
                   const SizedBox(width: 10),
                   Expanded(child: SizedBox(height: 58, child: OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePageAI())), icon: const Icon(Icons.calculate_outlined), label: Text("AI MALİYET HESAPLA", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: OutlinedButton.styleFrom(foregroundColor: Colors.black, side: const BorderSide(color: Colors.black, width: 1.3), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
                 ]),
@@ -308,11 +316,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text("SON İLANLAR", style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold)),
                   InkWell(
-                    onTap: _userRole == 'customer'? null : _handleUstaAction,
+                    onTap: _normalizeRole(_userRole) == 'musteri'? null : _handleUstaAction,
                     child: Text(
                       "Tümünü Gör →",
                       style: TextStyle(
-                        color: _userRole == 'customer'? Colors.grey : Colors.red,
+                        color: _normalizeRole(_userRole) == 'musteri'? Colors.grey : Colors.red,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -324,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _konumYukleniyor
                 ? const Center(child: CircularProgressIndicator())
                 : IgnorePointer(
-              ignoring: _userRole == 'customer',
+              ignoring: _normalizeRole(_userRole) == 'musteri',
               child: Opacity(
                 opacity: 1.0, // HER ZAMAN CANLI
                 child: IlanAkisiSlider(ustaLat: _lat, ustaLng: _lng),
@@ -388,10 +396,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: FloatingActionButton(
                         elevation: 0,
                         onPressed: _handleMusteriAction,
-                        backgroundColor: _userRole == 'usta'? Colors.grey : Colors.red,
+                        backgroundColor: _normalizeRole(_userRole) == 'usta'? Colors.grey : Colors.red,
                         child: const Icon(Icons.add, color: Colors.white, size: 30)),
                   ),
-                  Text("İLAN VER", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _userRole == 'usta'? Colors.grey : Colors.black)),
+                  Text("İLAN VER", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: _normalizeRole(_userRole) == 'usta'? Colors.grey : Colors.black)),
                 ],
               ),
               _buildNavItem(Icons.article_outlined, "İNŞAAT REHBERİ", () => Navigator.push(context, MaterialPageRoute(builder: (context) => const InsaatRehberiScreen()))),

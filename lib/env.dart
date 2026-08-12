@@ -67,7 +67,7 @@ abstract class Env {
   @EnviedField(varName: 'R2_FLUTTER_ENDPOINT')
   static final String r2FlutterEndpoint = _Env.r2FlutterEndpoint;
 
-  @EnviedField(varName: 'R2_PUBLIC_URL') // Bu GÖRÜNTÜLEME için yenisini ekliyoruz
+  @EnviedField(varName: 'R2_PUBLIC_URL')
   static final String r2PublicUrl = _Env.r2PublicUrl;
 
   @EnviedField(varName: 'FACEBOOK_PAGE_TOKEN')
@@ -81,4 +81,11 @@ abstract class Env {
 
   @EnviedField(varName: 'INSTAGRAM_TOKEN')
   static final String instagramToken = _Env.instagramToken;
+
+  @EnviedField(varName: 'GROQ_API_KEY')
+  static final String groqApiKey = _Env.groqApiKey;
+
+  // ✅ YENİ EKLENDİ - XAI GROK
+  @EnviedField(varName: 'XAI_API_KEY')
+  static final String xaiApiKey = _Env.xaiApiKey;
 }

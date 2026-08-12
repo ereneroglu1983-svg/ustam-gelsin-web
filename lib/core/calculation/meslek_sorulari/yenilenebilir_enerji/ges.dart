@@ -1,6 +1,5 @@
-// lib/core/calculation/meslek_sorulari/yenilenebilir_enerji/ges.dart
-
-class GesSorulari{
+// lib/core/calculation/meslek_sorulari/yenilenebilir_enerji/ges.dart - FINAL KURALA UYGUN
+class GesSorulari {
     static final List<Map<String, dynamic>> sorular = [
         {
             "id": "is_turu",
@@ -23,164 +22,98 @@ class GesSorulari{
             ]
         },
 
-        // ==========================================
-        // 1) GÜNEŞ PANELİ KURULUMU
-        // ==========================================
+        // 1) GÜNEŞ PANELİ KURULUMU - ZİNCİR
         {
             "id": "kurulum_alan_turu",
-            "label": "Kurulum Yapılacak Alan Türü Nedir?",
+            "label": "Kurulum Yapılacak Alan Türü",
             "type": "single",
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "Konut Çatısı",
-                "Villa / Müstakil Ev Çatısı",
-                "İş Yeri / Fabrika Çatısı",
-                "Tarımsal Arazi",
-                "Açık Arazi",
-                "Otopark Üstü GES",
-                "Diğer"
-            ]
+            "options": ["Konut Çatısı", "Villa Müstakil Çatı", "İş Yeri Fabrika Çatısı", "Tarımsal Arazi", "Açık Arazi", "Otopark Üstü"]
+        },
+        {
+            "id": "cati_kaplama_tipi",
+            "label": "Çatı Kaplama Tipi",
+            "type": "single",
+            "required": true,
+            "dependsOnId": "kurulum_alan_turu",
+            "options": ["Kiremit Çatı", "Trapez Sac Çatı", "Sandviç Panel Çatı", "Beton Düz Çatı", "Membran Kaplı Çatı", "Çatı Yok Arazi Kurulumu"]
         },
         {
             "id": "sistem_gucu",
-            "label": "Yaklaşık Kurulmak İstenen Sistem Gücü Nedir?",
+            "label": "Kurulacak Sistem Gücü",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "3 kW'a Kadar",
-                "3 - 5 kW Arası",
-                "5 - 10 kW Arası",
-                "10 - 25 kW Arası",
-                "25 - 50 kW Arası",
-                "50 kW ve Üzeri",
-                "Uzman Keşfi Gerekiyor"
-            ]
+            "dependsOnId": "cati_kaplama_tipi",
+            "options": ["3 kW'a Kadar", "3-5 kW Arası", "5-10 kW Arası", "10-25 kW Arası", "25-50 kW Arası", "50 kW ve Üzeri"]
+        },
+        {
+            "id": "panel_adedi_ges",
+            "label": "Panel Adedi",
+            "type": "single",
+            "required": true,
+            "dependsOnId": "sistem_gucu",
+            "options": ["10 Adete Kadar", "10-20 Adet", "20-40 Adet", "40-80 Adet", "80 Adet Üzeri", "Adet Hesaplansın"]
         },
         {
             "id": "elektrik_abonelik",
-            "label": "Elektrik Abonelik Tipi Nedir?",
+            "label": "Elektrik Abonelik Tipi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "Monofaze (Tek Faz)",
-                "Trifaze (Üç Faz)",
-                "Henüz Elektrik Aboneliği Yok",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "panel_adedi_ges",
+            "options": ["Monofaze Tek Faz", "Trifaze Üç Faz", "Henüz Abonelik Mevcut Değil"]
         },
         {
             "id": "yapi_yuksekligi",
-            "label": "Kurulum Yapılacak Yapı Yüksekliği Nedir?",
+            "label": "Yapı Yüksekliği",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "Tek Katlı Yapı",
-                "2 Katlı Yapı",
-                "3 - 5 Katlı Yapı",
-                "5 Kat Üzeri Yapı",
-                "Arazi Kurulumu Yapılacak"
-            ]
+            "dependsOnId": "elektrik_abonelik",
+            "options": ["Tek Katlı", "2 Katlı", "3-5 Katlı", "5 Kat Üzeri", "Arazi Kurulumu Yüksekliğe Gerek Yok"]
         },
         {
             "id": "kurulum_sekli",
-            "label": "Kurulum Şekli Nasıl Olacak?",
+            "label": "Kurulum Şekli",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "Sıfırdan Komple Sistem Kurulacak",
-                "Mevcut Sisteme İlave Panel Eklenecek",
-                "Eski Sistem Yenilenecek",
-                "Uzman Keşfi Sonrası Belirlenecek"
-            ]
+            "dependsOnId": "yapi_yuksekligi",
+            "options": ["Sıfırdan Komple Kurulum", "Mevcut Sisteme İlave", "Eski Sistem Yenilenecek"]
         },
         {
             "id": "aku_sistemi",
-            "label": "Enerji Depolama (Akü) Sistemi İstiyor Musunuz?",
+            "label": "Akü Sistemi İstiyor musunuz?",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "Evet, Akülü Sistem İstiyorum",
-                "Hayır, Şebeke Destekli Sistem İstiyorum",
-                "Hibrit Sistem İstiyorum",
-                "Ustanın Önerisine Göre Karar Vereceğim"
-            ]
+            "dependsOnId": "kurulum_sekli",
+            "options": ["Evet Akülü Sistem Olsun", "Hayır Şebeke Destekli Olsun", "Hibrit Sistem Olsun", "Akü İstemiyorum"]
         },
         {
             "id": "inverter_tercihi",
-            "label": "İnverter Tercihiniz Nedir?",
+            "label": "İnverter Tercihi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "Standart On-Grid İnverter",
-                "Hibrit İnverter",
-                "Off-Grid İnverter",
-                "Mevcut İnverter Kullanılacak",
-                "Ustanın Önerisine Göre Belirlenecek"
-            ]
-        },
-        {
-            "id": "kesif_istegi",
-            "label": "Kurulum Öncesi Keşif Yapılmasını İstiyor Musunuz?",
-            "type": "single",
-            "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "Evet Yerinde Keşif Yapılsın",
-                "Hayır Fotoğraf Üzerinden Teklif Almak İstiyorum",
-                "Önce Telefon Görüşmesi Yapmak İstiyorum"
-            ]
-        },
-        {
-            "id": "ek_hizmetler",
-            "label": "Ek Olarak Hangi Hizmetlere İhtiyacınız Var?",
-            "type": "multi",
-            "required": false,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "Projelendirme Hizmeti",
-                "Resmi Başvuru İşlemleri",
-                "TEDAŞ Süreç Desteği",
-                "Çağrı Mektubu Danışmanlığı",
-                "Teşvik / Hibe Danışmanlığı",
-                "Panel Temizlik Hizmeti",
-                "Periyodik Bakım Hizmeti",
-                "Sigorta Danışmanlığı"
-            ]
+            "dependsOnId": "aku_sistemi",
+            "options": ["On-Grid İnverter", "Hibrit İnverter", "Off-Grid İnverter", "Mevcut İnverter Kullanılacak"]
         },
         {
             "id": "arac_erisim",
-            "label": "Kurulum Alanına Araç Erişimi Nasıldır?",
+            "label": "Alana Araç Erişimi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Kurulumu"],
-            "options": [
-                "Araç Doğrudan Alana Ulaşabiliyor",
-                "Kısmi Erişim Var",
-                "Vinç veya Özel Ekipman Gerekiyor",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "inverter_tercihi",
+            "options": ["Araç Doğrudan Ulaşıyor", "Kısmi Erişim Var", "Vinç Gerekiyor", "Erişim Yok El Taşıması Gerekir"]
+        },
+        {
+            "id": "ek_hizmetler",
+            "label": "Ek Hizmet İhtiyaçları",
+            "type": "multi",
+            "required": false,
+            "dependsOnId": "arac_erisim",
+            "options": ["Projelendirme", "Resmi Başvuru TEDAŞ", "Teşvik Hibe Danışmanlığı", "Bakım Temizlik Anlaşması", "Sigorta Danışmanlığı", "Ek Hizmet İstemiyorum"]
         },
 
-        // ==========================================
-        // 2) ARAZİ GES KURULUMU
-        // ==========================================
+        // 2) ARAZİ GES
         {
             "id": "arazi_buyuklugu",
             "label": "Arazi Büyüklüğü",
@@ -188,74 +121,42 @@ class GesSorulari{
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["Arazi GES Kurulumu"],
-            "options": [
-                "0 - 500 m²",
-                "500 - 1.000 m²",
-                "1.000 - 5.000 m²",
-                "5.000 - 10.000 m²",
-                "10.000 m² ve Üzeri",
-                "Bilmiyorum"
-            ]
+            "options": ["0-500 m²", "500-1000 m²", "1000-5000 m²", "5000-10000 m²", "10000 m² Üzeri"]
         },
         {
             "id": "zemin_tipi",
             "label": "Zemin Tipi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Arazi GES Kurulumu"],
-            "options": [
-                "Toprak",
-                "Kayalık",
-                "Beton",
-                "Stabilize Dolgu Zemin",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "arazi_buyuklugu",
+            "options": ["Toprak Zemin", "Kayalık Zemin", "Beton Zemin", "Dolgu Zemin"]
         },
         {
             "id": "elektrik_hatti",
             "label": "Elektrik Hattı Mevcut mu?",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Arazi GES Kurulumu"],
-            "options": [
-                "Evet, elektrik hattı mevcut",
-                "Hayır, yeni hat çekilecek",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "zemin_tipi",
+            "options": ["Evet Hat Mevcut", "Hayır Yeni Hat Çekilecek"]
         },
         {
             "id": "cevre_citi",
             "label": "Çevre Çiti Gerekiyor mu?",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Arazi GES Kurulumu"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Ustanın Değerlendirmesine Göre"
-            ]
+            "dependsOnId": "elektrik_hatti",
+            "options": ["Evet Çit Gerekiyor", "Hayır Çit İstemiyorum", "Çit Mevcut"]
         },
         {
             "id": "trafo_ihtiyaci",
-            "label": "Trafo İhtiyacı Var mı?",
+            "label": "Trafo İhtiyacı",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Arazi GES Kurulumu"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Bilmiyorum",
-                "Ustanın Belirlemesini İstiyorum"
-            ]
+            "dependsOnId": "cevre_citi",
+            "options": ["Evet Trafo Gerekiyor", "Hayır Trafo Gerekmez"]
         },
 
-        // ==========================================
-        // 3) TARIMSAL SULAMA GES KURULUMU
-        // ==========================================
+        // 3) TARIMSAL SULAMA
         {
             "id": "sulama_yontemi",
             "label": "Sulama Yöntemi",
@@ -263,136 +164,77 @@ class GesSorulari{
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["Tarımsal Sulama GES Kurulumu"],
-            "options": [
-                "Damlama Sulama",
-                "Yağmurlama Sulama",
-                "Salma Sulama",
-                "Damla + Yağmurlama Karma Sistem",
-                "Bilmiyorum"
-            ]
+            "options": ["Damlama Sulama", "Yağmurlama Sulama", "Salma Sulama", "Karma Sistem"]
         },
         {
             "id": "pompa_gucu",
             "label": "Pompa Gücü",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Tarımsal Sulama GES Kurulumu"],
-            "options": [
-                "1 - 5 HP",
-                "5 - 10 HP",
-                "10 - 20 HP",
-                "20 HP ve Üzeri",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "sulama_yontemi",
+            "options": ["1-5 HP", "5-10 HP", "10-20 HP", "20 HP Üzeri"]
         },
         {
             "id": "kuyu_derinligi",
             "label": "Kuyu Derinliği",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Tarımsal Sulama GES Kurulumu"],
-            "options": [
-                "0 - 25 Metre",
-                "25 - 50 Metre",
-                "50 - 100 Metre",
-                "100 Metre ve Üzeri",
-                "Kuyu Yok",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "pompa_gucu",
+            "options": ["0-25 Metre", "25-50 Metre", "50-100 Metre", "100 Metre Üzeri", "Kuyu Mevcut Değil"]
         },
         {
             "id": "elektrik_hatti_sulama",
-            "label": "Elektrik Hattı Mevcut mu?",
+            "label": "Elektrik Hattı Var mı?",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Tarımsal Sulama GES Kurulumu"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "kuyu_derinligi",
+            "options": ["Evet Var", "Hayır Yok"]
         },
         {
             "id": "kullanim_sekli",
-            "label": "Kullanım Şekli",
+            "label": "Kullanım Dönemi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Tarımsal Sulama GES Kurulumu"],
-            "options": [
-                "Sadece Yaz Sezonunda",
-                "İlkbahar - Yaz Döneminde",
-                "Tüm Yıl Sürekli Kullanım",
-                "Ustanın Önerisine Göre"
-            ]
+            "dependsOnId": "elektrik_hatti_sulama",
+            "options": ["Sadece Yaz", "İlkbahar Yaz", "Yıl Boyu Sürekli"]
         },
 
-        // ==========================================
-        // 4) GÜNEŞ PANELİ SÖKÜM VE TAŞIMA
-        // ==========================================
+        // 4) SÖKÜM TAŞIMA
         {
             "id": "panel_sayisi_sokum",
-            "label": "Kaç Panel Sökülecek?",
+            "label": "Sökülecek Panel Sayısı",
             "type": "single",
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["Güneş Paneli Söküm ve Taşıma"],
-            "options": [
-                "1 - 10 Adet",
-                "10 - 25 Adet",
-                "25 - 50 Adet",
-                "50 - 100 Adet",
-                "100 Adet ve Üzeri"
-            ]
-        },
-        {
-            "id": "tekrar_kurulum",
-            "label": "Aynı Adrese Tekrar Kurulacak mı?",
-            "type": "single",
-            "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Söküm ve Taşıma"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Henüz Belli Değil"
-            ]
-        },
-        {
-            "id": "vinc_ihtiyaci",
-            "label": "Vinç İhtiyacı Var mı?",
-            "type": "single",
-            "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Söküm ve Taşıma"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Ustanın Belirlemesini İstiyorum"
-            ]
+            "options": ["1-10 Adet", "10-25 Adet", "25-50 Adet", "50-100 Adet", "100+ Adet"]
         },
         {
             "id": "cati_yuksekligi_sokum",
-            "label": "Çatı Yüksekliği Nedir?",
+            "label": "Mevcut Çatı Yüksekliği",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Söküm ve Taşıma"],
-            "options": [
-                "0 - 5 Metre",
-                "5 - 10 Metre",
-                "10 - 20 Metre",
-                "20 Metre Üzeri",
-                "Arazi Kurulumu"
-            ]
+            "dependsOnId": "panel_sayisi_sokum",
+            "options": ["0-5 Metre", "5-10 Metre", "10-20 Metre", "20 Metre Üzeri", "Arazi Kurulumu"]
+        },
+        {
+            "id": "tekrar_kurulum",
+            "label": "Tekrar Kurulum Olacak mı?",
+            "type": "single",
+            "required": true,
+            "dependsOnId": "cati_yuksekligi_sokum",
+            "options": ["Evet Aynı Adrese Kurulacak", "Evet Farklı Adrese Kurulacak", "Hayır Sadece Söküm"]
+        },
+        {
+            "id": "vinc_ihtiyaci",
+            "label": "Vinç İhtiyacı",
+            "type": "single",
+            "required": true,
+            "dependsOnId": "tekrar_kurulum",
+            "options": ["Evet Vinç Gerekiyor", "Hayır Vinç Gerekmez"]
         },
 
-        // ==========================================
-        // 5) GÜNEŞ PANELİ BAKIM VE TEMİZLİĞİ
-        // ==========================================
+        // 5) BAKIM TEMİZLİK
         {
             "id": "panel_sayisi_bakim",
             "label": "Panel Sayısı",
@@ -400,59 +242,34 @@ class GesSorulari{
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["Güneş Paneli Bakım ve Temizliği"],
-            "options": [
-                "1 - 10 Adet",
-                "10 - 25 Adet",
-                "25 - 50 Adet",
-                "50 - 100 Adet",
-                "100 Adet ve Üzeri"
-            ]
+            "options": ["1-10 Adet", "10-25 Adet", "25-50 Adet", "50-100 Adet", "100+ Adet"]
         },
         {
             "id": "son_bakim_tarihi",
-            "label": "Son Bakım Tarihi",
+            "label": "Son Bakım Ne Zaman Yapıldı?",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Bakım ve Temizliği"],
-            "options": [
-                "Son 6 Ay İçinde",
-                "Son 1 Yıl İçinde",
-                "1 Yıldan Uzun Süredir Yapılmadı",
-                "İlk Kez Bakım Yapılacak",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "panel_sayisi_bakim",
+            "options": ["Son 6 Ay İçinde", "Son 1 Yıl İçinde", "1 Yıldan Uzun Süre Önce", "Hiç Bakım Yapılmadı"]
         },
         {
             "id": "yuksekte_calisma",
             "label": "Yüksekte Çalışma Gerekiyor mu?",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Bakım ve Temizliği"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "son_bakim_tarihi",
+            "options": ["Evet Yüksekte Çalışma Var", "Hayır Zeminden Erişim Var"]
         },
         {
             "id": "termal_kamera",
-            "label": "Termal Kamera Kontrolü İsteniyor mu?",
+            "label": "Termal Kamera Kontrolü",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Bakım ve Temizliği"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Ustanın Önerisine Göre"
-            ]
+            "dependsOnId": "yuksekte_calisma",
+            "options": ["Evet Termal Kontrol Olsun", "Hayır Sadece Temizlik Yeterli"]
         },
 
-        // ==========================================
-        // 6) GÜNEŞ PANELİ ARIZA TESPİTİ
-        // ==========================================
+        // 6) ARIZA TESPİTİ
         {
             "id": "ariza_tipi",
             "label": "Sorun Tipi",
@@ -460,35 +277,18 @@ class GesSorulari{
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["Güneş Paneli Arıza Tespiti"],
-            "options": [
-                "Enerji Üretmiyor",
-                "Düşük Enerji Üretiyor",
-                "İnverter Hata Veriyor",
-                "Sigorta Atıyor",
-                "Sistem Sık Sık Kapanıyor",
-                "Panel Hasarı Var",
-                "Diğer"
-            ]
+            "options": ["Enerji Üretmiyor", "Düşük Enerji Üretiyor", "İnverter Hata Veriyor", "Sigorta Atıyor", "Sistem Kapanıyor", "Panel Hasarı Var"]
         },
         {
             "id": "ariza_suresi",
-            "label": "Arıza Ne Zamandır Mevcut?",
+            "label": "Arıza Ne Zamandır Var?",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Arıza Tespiti"],
-            "options": [
-                "Son 24 Saat İçinde",
-                "Son 1 Hafta İçinde",
-                "Son 1 Ay İçinde",
-                "Uzun Süredir Devam Ediyor",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "ariza_tipi",
+            "options": ["Son 24 Saat", "Son 1 Hafta", "Son 1 Ay", "Uzun Süredir Var"]
         },
 
-        // ==========================================
-        // 7) GÜNEŞ PANELİ PERFORMANS KONTROLÜ
-        // ==========================================
+        // 7) PERFORMANS KONTROL
         {
             "id": "termal_analiz",
             "label": "Termal Analiz İsteniyor mu?",
@@ -496,40 +296,26 @@ class GesSorulari{
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["Güneş Paneli Performans Kontrolü"],
-            "options": [
-                "Evet",
-                "Hayır"
-            ]
+            "options": ["Evet İsteniyor", "Hayır İstenmiyor"]
         },
         {
             "id": "drone_kontrol",
-            "label": "Drone ile Kontrol İsteniyor mu?",
+            "label": "Drone ile Kontrol",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Performans Kontrolü"],
-            "options": [
-                "Evet",
-                "Hayır"
-            ]
+            "dependsOnId": "termal_analiz",
+            "options": ["Evet Drone Kullanılsın", "Hayır Gerek Yok"]
         },
         {
             "id": "performans_raporu",
-            "label": "Performans Raporu İsteniyor mu?",
+            "label": "Rapor Talebi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Güneş Paneli Performans Kontrolü"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Detaylı Teknik Rapor İstiyorum"
-            ]
+            "dependsOnId": "drone_kontrol",
+            "options": ["Sözlü Bilgilendirme Yeterli", "Yazılı Rapor İstiyorum", "Detaylı Teknik Rapor İstiyorum"]
         },
 
-        // ==========================================
-        // 8) İNVERTER MONTAJI
-        // ==========================================
+        // 8) İNVERTER MONTAJ
         {
             "id": "inverter_gucu",
             "label": "İnverter Gücü",
@@ -537,115 +323,61 @@ class GesSorulari{
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["İnverter Montajı"],
-            "options": [
-                "1 - 3 kW",
-                "3 - 5 kW",
-                "5 - 10 kW",
-                "10 - 25 kW",
-                "25 kW ve Üzeri",
-                "Bilmiyorum"
-            ]
+            "options": ["1-3 kW", "3-5 kW", "5-10 kW", "10-25 kW", "25 kW Üzeri"]
         },
         {
             "id": "inverter_marka",
-            "label": "Marka",
+            "label": "İnverter Markası",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["İnverter Montajı"],
-            "options": [
-                "Huawei",
-                "Fronius",
-                "GoodWe",
-                "Solis",
-                "SMA",
-                "Growatt",
-                "Diğer",
-                "Henüz Satın Alınmadı"
-            ]
+            "dependsOnId": "inverter_gucu",
+            "options": ["Huawei", "Fronius", "GoodWe", "Solis", "SMA", "Growatt", "Marka Mevcut Değil Henüz Alınmadı"]
         },
         {
             "id": "inverter_tipi",
             "label": "İnverter Tipi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["İnverter Montajı"],
-            "options": [
-                "Hibrit",
-                "On-Grid",
-                "Off-Grid",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "inverter_marka",
+            "options": ["Hibrit İnverter", "On-Grid İnverter", "Off-Grid İnverter"]
         },
         {
             "id": "montaj_yuzeyi",
-            "label": "Montaj Yapılacak Yüzey",
+            "label": "Montaj Yüzeyi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["İnverter Montajı"],
-            "options": [
-                "Beton Duvar",
-                "Tuğla Duvar",
-                "Çelik Konstrüksiyon",
-                "Pano İçi Montaj",
-                "Diğer"
-            ]
+            "dependsOnId": "inverter_tipi",
+            "options": ["Beton Duvar", "Tuğla Duvar", "Çelik Konstrüksiyon", "Pano İçi Montaj"]
         },
 
-        // ==========================================
-        // 9) İNVERTER ARIZA VE DEĞİŞİMİ
-        // ==========================================
+        // 9) İNVERTER ARIZA
         {
             "id": "inverter_calisma_durumu",
-            "label": "İnverter Çalışıyor mu?",
+            "label": "İnverter Çalışma Durumu",
             "type": "single",
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["İnverter Arıza ve Değişimi"],
-            "options": [
-                "Hiç Çalışmıyor",
-                "Çalışıyor Ancak Hata Veriyor",
-                "Aralıklı Çalışıyor",
-                "Bilmiyorum"
-            ]
+            "options": ["Hiç Çalışmıyor", "Hata Vererek Çalışıyor", "Aralıklı Çalışıyor"]
         },
         {
             "id": "hata_kodu",
-            "label": "Hata Kodu Var mı?",
+            "label": "Ekranda Hata Kodu Var mı?",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["İnverter Arıza ve Değişimi"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "inverter_calisma_durumu",
+            "options": ["Evet Hata Kodu Var", "Hayır Hata Kodu Yok"]
         },
         {
             "id": "inverter_marka_model",
-            "label": "Marka / Model",
+            "label": "İnverter Markası",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["İnverter Arıza ve Değişimi"],
-            "options": [
-                "Huawei",
-                "Fronius",
-                "GoodWe",
-                "Solis",
-                "SMA",
-                "Growatt",
-                "Diğer",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "hata_kodu",
+            "options": ["Huawei", "Fronius", "GoodWe", "Solis", "SMA", "Growatt", "Etiketi Okunmuyor"]
         },
 
-        // ==========================================
-        // 10) SOLAR KABLO VE ELEKTRİK TESİSATI
-        // ==========================================
+        // 10) KABLO TESİSAT
         {
             "id": "kablo_mesafesi",
             "label": "Kablo Mesafesi",
@@ -653,45 +385,26 @@ class GesSorulari{
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["Solar Kablo ve Elektrik Tesisatı"],
-            "options": [
-                "0 - 10 Metre",
-                "10 - 25 Metre",
-                "25 - 50 Metre",
-                "50 - 100 Metre",
-                "100 Metre ve Üzeri"
-            ]
+            "options": ["0-10 Metre", "10-25 Metre", "25-50 Metre", "50-100 Metre", "100 Metre Üzeri"]
         },
         {
             "id": "tesisat_tipi",
             "label": "Tesisat Tipi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Solar Kablo ve Elektrik Tesisatı"],
-            "options": [
-                "AC Tesisat",
-                "DC Tesisat",
-                "AC + DC Tesisat",
-                "Bilmiyorum"
-            ]
+            "dependsOnId": "kablo_mesafesi",
+            "options": ["AC Tesisat", "DC Tesisat", "AC + DC Tesisat"]
         },
         {
             "id": "kanal_acma",
             "label": "Kanal Açılması Gerekiyor mu?",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Solar Kablo ve Elektrik Tesisatı"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Ustanın Değerlendirmesine Göre"
-            ]
+            "dependsOnId": "tesisat_tipi",
+            "options": ["Evet Kanal Açılacak", "Hayır Mevcut Kanal Kullanılacak", "Kanal Gerekmiyor"]
         },
 
-        // ==========================================
-        // 11) PANEL TAŞIYICI KONSTRÜKSİYON MONTAJI
-        // ==========================================
+        // 11) KONSTRÜKSİYON
         {
             "id": "konstruksiyon_cati_tipi",
             "label": "Çatı Tipi",
@@ -699,44 +412,26 @@ class GesSorulari{
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["Panel Taşıyıcı Konstrüksiyon Montajı"],
-            "options": [
-                "Kiremit Çatı",
-                "Sandviç Panel Çatı",
-                "Beton Çatı",
-                "Trapez Sac Çatı",
-                "Arazi Kurulumu"
-            ]
+            "options": ["Kiremit Çatı", "Sandviç Panel Çatı", "Beton Çatı", "Trapez Sac Çatı", "Arazi Kurulumu"]
         },
         {
             "id": "konstruksiyon_malzeme",
-            "label": "Konstrüksiyon Malzemesi",
+            "label": "Konstrüksiyon Malzeme Tercihi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Panel Taşıyıcı Konstrüksiyon Montajı"],
-            "options": [
-                "Galvaniz Çelik",
-                "Alüminyum",
-                "Ustanın Önerisine Göre"
-            ]
+            "dependsOnId": "konstruksiyon_cati_tipi",
+            "options": ["Galvaniz Çelik", "Alüminyum Konstrüksiyon"]
         },
         {
             "id": "montaj_tipi",
             "label": "Montaj Tipi",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["Panel Taşıyıcı Konstrüksiyon Montajı"],
-            "options": [
-                "Çatı Montajı",
-                "Arazi Montajı",
-                "Otopark Üstü Montaj"
-            ]
+            "dependsOnId": "konstruksiyon_malzeme",
+            "options": ["Çatı Montajı", "Arazi Montajı", "Otopark Üstü Montaj"]
         },
 
-        // ==========================================
-        // 12) GES PROJELENDİRME VE DANIŞMANLIK
-        // ==========================================
+        // 12) PROJELENDİRME
         {
             "id": "proje_amaci",
             "label": "Proje Amacı",
@@ -744,50 +439,31 @@ class GesSorulari{
             "required": true,
             "dependsOnId": "is_turu",
             "dependsOnValue": ["GES Projelendirme ve Danışmanlık"],
-            "options": [
-                "Mahsuplaşmalı Sistem",
-                "Öz Tüketim Amaçlı",
-                "Tarımsal Sulama",
-                "Ticari Amaçlı",
-                "Endüstriyel Kullanım"
-            ]
+            "options": ["Mahsuplaşmalı Sistem", "Öz Tüketim", "Tarımsal Sulama", "Ticari Amaçlı", "Endüstriyel Kullanım"]
         },
         {
             "id": "kesif_isteniyor",
-            "label": "Keşif İsteniyor mu?",
+            "label": "Yerinde Keşif",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["GES Projelendirme ve Danışmanlık"],
-            "options": [
-                "Evet",
-                "Hayır"
-            ]
+            "dependsOnId": "proje_amaci",
+            "options": ["Evet Keşif İstiyorum", "Hayır Keşif İstemiyorum"]
         },
         {
             "id": "tesvik_danismanligi",
-            "label": "Teşvik Danışmanlığı İsteniyor mu?",
+            "label": "Teşvik Danışmanlığı",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["GES Projelendirme ve Danışmanlık"],
-            "options": [
-                "Evet",
-                "Hayır"
-            ]
+            "dependsOnId": "kesif_isteniyor",
+            "options": ["Evet Teşvik Danışmanlığı İstiyorum", "Hayır İstemiyorum"]
         },
         {
             "id": "resmi_surec_destegi",
-            "label": "Resmi Süreç Desteği İsteniyor mu?",
+            "label": "Resmi Süreç Desteği",
             "type": "single",
             "required": true,
-            "dependsOnId": "is_turu",
-            "dependsOnValue": ["GES Projelendirme ve Danışmanlık"],
-            "options": [
-                "Evet",
-                "Hayır",
-                "Tüm Süreç Yönetilsin İstiyorum"
-            ]
+            "dependsOnId": "tesvik_danismanligi",
+            "options": ["Evet Resmi Süreç Desteği İstiyorum", "Hayır İstemiyorum", "Tüm Süreç Yönetilsin"]
         },
     ];
 }
