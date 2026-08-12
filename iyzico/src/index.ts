@@ -11,10 +11,11 @@ const db = admin.firestore();
 const API_KEY = defineSecret("IYZICO_API_KEY");
 const SECRET_KEY = defineSecret("IYZICO_SECRET_KEY");
 
+// CANLI - ELLEME
 const BASE_URL = "https://api.iyzipay.com";
 const CALLBACK_URL = "https://europe-west3-device-streaming-6f29b03c.cloudfunctions.net/callback";
 
-// --- JSON DOSYALARINI OKUMA - DİNAMİK ---
+// --- JSON DOSYALARI ---
 let cachedSehirler: any[] | null = null;
 let cachedIlceler: any[] | null = null;
 
@@ -39,7 +40,7 @@ function getSehirIsim(sehir_id: any): string {
   try {
     const sehirler = loadSehirler();
     const s = sehirler.find((x) => x.sehir_id.toString().trim() === sehir_id.toString().trim());
-    return s ? s.sehir_adi : "Istanbul";
+    return s? s.sehir_adi : "Istanbul";
   } catch {
     return "Istanbul";
   }
@@ -50,7 +51,7 @@ function getIlceIsim(ilce_id: any): string {
   try {
     const ilceler = loadIlceler();
     const i = ilceler.find((x) => x.ilce_id.toString().trim() === ilce_id.toString().trim());
-    return i ? i.ilce_adi : "";
+    return i? i.ilce_adi : "";
   } catch {
     return "";
   }
@@ -61,18 +62,18 @@ function formatPhone(phone: string): string {
   let p = phone.replace(/\D/g, "");
   if (p.startsWith("0")) p = p.substring(1);
   if (!p.startsWith("90")) p = "90" + p;
-  // Iyzico bazen + işaretini sevmiyor, ama buyer'da + ile gidiyor
-  // Eğer telefon çok kısa ise fallback
   if (p.length < 12) return "+905000000000";
   return `+${p}`;
 }
 
+// IYZICO CANLI V2 - KESİN ÇÖZÜM
 function createAuthHeader(apiKey: string, secretKey: string, randomStr: string, payload: any) {
   const payloadStr = JSON.stringify(payload);
-  const hashStr = apiKey + randomStr + secretKey + payloadStr;
-  const hash = createHash("sha1").update(hashStr).digest("base64");
-  const authString = `apiKey:${apiKey}&randomKey:${randomStr}&signature:${hash}`;
-  return `IYZWSv2 ${Buffer.from(authString).toString("base64")}`;
+  const dataToHash = apiKey + randomStr + secretKey + payloadStr;
+  const signature = createHash("sha1").update(dataToHash, "utf8").digest("base64");
+  const authString = `apiKey:${apiKey}&randomKey:${randomStr}&signature:${signature}`;
+  const base64AuthString = Buffer.from(authString, "utf8").toString("base64");
+  return `IYZWSv2 ${base64AuthString}`;
 }
 
 export const checkout = onCall(
@@ -83,13 +84,13 @@ export const checkout = onCall(
     const uid = request.auth.uid;
     const { amount } = request.data as { amount: number };
 
-    if (typeof amount !== "number" || amount < 10) {
+    if (typeof amount!== "number" || amount < 10) {
       throw new HttpsError("invalid-argument", "Gecersiz tutar");
     }
 
-    const apiKey = API_KEY.value()?.trim();
-    const secretKey = SECRET_KEY.value()?.trim();
-    if (!apiKey || !secretKey) throw new HttpsError("failed-precondition", "API anahtari yok");
+    const apiKey = API_KEY.value()?.replace(/\s/g, "").trim();
+    const secretKey = SECRET_KEY.value()?.replace(/\s/g, "").trim();
+    if (!apiKey ||!secretKey) throw new HttpsError("failed-precondition", "API anahtari yok");
 
     const userSnap = await db.collection("users").doc(uid).get();
     if (!userSnap.exists) throw new HttpsError("not-found", "Kullanici bulunamadi");
@@ -100,12 +101,10 @@ export const checkout = onCall(
     const email = userData.email || request.auth.token.email || `user_${uid}@example.com`;
     const phone = formatPhone(userData.phone || "");
 
-    // ADRES FIX - Boşsa fallback
     let adresRaw = (userData.faturaAdresi || userData.adres || "").trim();
     if (!adresRaw) adresRaw = "Manisa Salihli Merkez Mah. Ataturk Cad. No:1";
     const adres = adresRaw.substring(0, 200);
 
-    // VERGI NO FIX - Senin alan adın vergiNo, onu başa aldım
     const identityNumberRaw = (
       userData.vergiNo ||
       userData.tcVergiNo ||
@@ -116,21 +115,16 @@ export const checkout = onCall(
     ).toString().trim();
 
     const cleanId = identityNumberRaw.replace(/\D/g, "");
-
     const city = getSehirIsim(userData.sehir_id);
     const district = getIlceIsim(userData.ilce_id);
 
-    // TCKN 11 hane, VKN 10 hane - ikisini de kabul et
     if (!/^\d{10,11}$/.test(cleanId)) {
-      console.error(`[IYZICO] TCKN/VKN HATASI uid:${uid} gelen:${identityNumberRaw} temiz:${cleanId}`);
-      throw new HttpsError("failed-precondition", `Gecerli TCKN/VKN bulunamadi (Gelen: ${identityNumberRaw}) - Lutfen profilden vergiNo ekleyin`);
+      throw new HttpsError("failed-precondition", `Gecerli TCKN/VKN bulunamadi (Gelen: ${identityNumberRaw})`);
     }
 
-    // IP FIX - Iyzico IPv6 sevmiyor
     let realIp =
       (request.rawRequest as any)?.headers?.["x-forwarded-for"]?.toString().split(",")[0]?.trim() ||
       (request.rawRequest as any)?.ip ||
-      userData.ipKaydi ||
       "85.34.78.112";
 
     if (!realIp || realIp.includes(":") || realIp.length < 7 || realIp === "::1") {
@@ -140,9 +134,9 @@ export const checkout = onCall(
     const conversationId = `${uid.substring(0, 8)}_${Date.now()}`.substring(0, 30);
     const basketId = `WALLET_${uid.substring(0, 5)}_${Date.now()}`;
     const priceStr = amount.toFixed(2);
-    const randomStr = randomBytes(16).toString("hex");
+    const randomStr = `${Date.now()}${randomBytes(2).toString("hex")}`;
 
-    const createdAt = userData.createdAt?.toDate ? userData.createdAt.toDate() : new Date("2023-01-01");
+    const createdAt = userData.createdAt?.toDate? userData.createdAt.toDate() : new Date("2023-01-01");
     const formatDate = (d: Date) => d.toISOString().slice(0, 19).replace("T", " ");
 
     const payload = {
@@ -195,8 +189,6 @@ export const checkout = onCall(
       ],
     };
 
-    console.log(`[IYZICO] ${uid} - ${city}/${district} - IP:${realIp} - Amount:${priceStr} - ID:${cleanId}`);
-
     const authHeader = createAuthHeader(apiKey, secretKey, randomStr, payload);
 
     const res = await fetch(`${BASE_URL}/payment/iyzipos/checkoutform/initialize/auth/ecom`, {
@@ -212,7 +204,7 @@ export const checkout = onCall(
     const result = (await res.json()) as any;
     console.log("IYZICO INIT RESULT:", JSON.stringify(result));
 
-    if (result.status !== "success") {
+    if (result.status!== "success") {
       throw new HttpsError("internal", `Iyzico: ${result.errorMessage} (${result.errorCode})`);
     }
 
@@ -228,10 +220,14 @@ export const checkout = onCall(
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    // FLUTTER İLE TAM UYUMLU RETURN
     return {
       token: result.token,
       checkoutFormContent: result.checkoutFormContent,
       paymentPageUrl: result.paymentPageUrl,
+      conversationId: conversationId,
+      basketId: basketId,
+      orderId: conversationId,
     };
   }
 );
