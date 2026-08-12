@@ -1,4 +1,4 @@
-// lib/main.dart - FINAL - DOTENV REMOVED + TOKEN LOOP FIX + BİLDİRİM FIX
+// lib/main.dart - FINAL - BİLDİRİM TIKLAMA FIX + ACİL YÖNLENDİRME
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,6 +18,7 @@ import 'package:ustam_gelsin/features/home/screens/home_screen.dart';
 import 'package:ustam_gelsin/features/home/screens/splash_screen.dart';
 import 'package:ustam_gelsin/features/rehber/screens/rehber_detay_screen.dart';
 import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dart';
+import 'package:ustam_gelsin/features/usta/screens/acil_ilanlar.dart';
 import 'package:ustam_gelsin/core/theme/usta_theme.dart';
 import 'package:ustam_gelsin/services/yorum_service.dart';
 import 'package:ustam_gelsin/features/admin/screens/blog_ekle_screen.dart';
@@ -29,12 +30,16 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await NotificationService().showLocalNotification(message);
 }
 
+// Global navigator key - Bildirimden yönlendirme için
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final GoRouter _router = GoRouter(
+  navigatorKey: navigatorKey,
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (context, state) => const SplashWrapper()),
     GoRoute(path: '/home', builder: (context, state) => const AuthGate()),
     GoRoute(path: '/musteri_profil', builder: (context, state) => const MusteriProfilSayfasi()),
+    GoRoute(path: '/acil_ilanlar', builder: (context, state) => AcilIlanlarSayfasi()),
     GoRoute(path: '/admin', builder: (context, state) => const AdminDashboard()),
     GoRoute(path: '/admin/blog-ekle', builder: (context, state) => const BlogEkleScreen()),
     GoRoute(
@@ -46,6 +51,23 @@ final GoRouter _router = GoRouter(
     ),
   ],
 );
+
+// BİLDİRİM TIKLAMA YÖNLENDİRMESİ - EKSİK OLAN KISIM
+void _handleNotificationClick(RemoteMessage message) {
+  debugPrint("Bildirime tıklandı: ${message.data}");
+  final data = message.data;
+  final type = data['type'] ?? data['tip'] ?? '';
+
+  // USTA için: acil çağrı bildirimi -> 7/24 acil ilanlar ekranına git
+  if (type == 'acil_cagri' || type == 'acil_cagri_ustalar' || data['acilCagriId'] != null) {
+    navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => AcilIlanlarSayfasi()));
+    // veya GoRouter ile: _router.go('/acil_ilanlar');
+  }
+  // MÜŞTERİ için: usta kabul etti bildirimi -> profiline git
+  else if (type == 'acil_kabul') {
+    navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const MusteriProfilSayfasi()));
+  }
+}
 
 void main() async {
   if (kIsWeb) {
@@ -88,6 +110,17 @@ void main() async {
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
       await NotificationService().initialize();
       await FirebaseMessaging.instance.subscribeToTopic('acil_cagri_ustalar').catchError((_) {});
+
+      // EKSİK OLAN 2 LİSTENER EKLENDİ
+      // 1. Uygulama kapalıyken bildirimden açılınca
+      RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+      if (initialMessage != null) {
+        Future.delayed(const Duration(seconds: 1), () => _handleNotificationClick(initialMessage));
+      }
+
+      // 2. Uygulama arka plandayken bildirimden açılınca
+      FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationClick);
+
     } catch (notificationError) {
       debugPrint("Bildirim Servisi Başlatma Hatası: $notificationError");
     }

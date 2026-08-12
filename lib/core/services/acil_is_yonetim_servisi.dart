@@ -1,5 +1,3 @@
-// lib/core/services/acil_is_yonetim_servisi.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -75,9 +73,10 @@ class AcilIsYonetimServisi {
     await konumKontrolVeAl();
 
     final ilanRef = _firestore.collection('acil_cagri').doc(ilanId);
+    String musteriId = "";
 
     try {
-      // 1. ÖNCE BAKİYE KONTROLÜ - Transaction DIŞINDA
+      // 1. ÖNCE BAKİYE KONTROLÜ
       DocumentSnapshot walletSnap = await _firestore.collection('wallets').doc(ustaId).get();
       double mevcutBakiye = 0.0;
       if (walletSnap.exists) {
@@ -88,11 +87,14 @@ class AcilIsYonetimServisi {
         return false;
       }
 
-      // 2. İLANI KİLİTLE - Sadece ilanı güncelleyen transaction
+      // 2. İLANI KİLİTLE
       bool ilanAlindi = await _firestore.runTransaction((transaction) async {
         DocumentSnapshot ilanSnap = await transaction.get(ilanRef);
         if (!ilanSnap.exists) return false;
         if (ilanSnap.get('durum') != 'bekliyor') return false;
+
+        var ilanData = ilanSnap.data() as Map<String, dynamic>;
+        musteriId = ilanData['musteriId'] ?? ilanData['userId'] ?? "";
 
         transaction.update(ilanRef, {
           'durum': 'atandi',
@@ -110,12 +112,42 @@ class AcilIsYonetimServisi {
 
       if (!ilanAlindi) return false;
 
-      // 3. BAKİYE DÜŞ - Transaction DIŞINDA, ilan alındıktan sonra
+      // 3. BAKİYE DÜŞ
       bool bakiyeDustu = await _walletService.bakiyeDus(ustaId, 250.0);
       if (!bakiyeDustu) {
-        // Bakiye düşmezse ilanı geri al - rollback
         await ilanRef.update({'durum': 'bekliyor', 'secilenUstaId': FieldValue.delete()});
         return false;
+      }
+
+      // 4. YENİ EKLENEN KISIM - MÜŞTERİYE GÜVENLİK BİLDİRİMİ GÖNDER
+      if (musteriId.isNotEmpty) {
+        try {
+          // Bildirimler koleksiyonuna ekle
+          await _firestore.collection('bildirimler').add({
+            'aliciId': musteriId,
+            'receiverId': musteriId,
+            'musteriId': musteriId,
+            'gonderenId': ustaId,
+            'ustaId': ustaId,
+            'ustaAd': ustaAd,
+            'ustaTelefon': ustaTelefon,
+            'baslik': 'Ustanız Yola Çıktı!',
+            'mesaj': '$ustaAd isimli usta işinizi kabul etti, birazdan sizi $ustaTelefon numarasıyla arayacak.',
+            'message': '$ustaAd isimli usta işinizi kabul etti, birazdan sizi $ustaTelefon numarasıyla arayacak.',
+            'tip': 'acil_kabul',
+            'type': 'acil_kabul',
+            'ilanId': ilanId,
+            'acilCagriId': ilanId,
+            'okundu': false,
+            'isRead': false,
+            'olusturulmaTarihi': FieldValue.serverTimestamp(),
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+          debugPrint("Müşteriye güvenlik bildirimi gönderildi: $musteriId");
+        } catch (e) {
+          debugPrint("Bildirim gönderme hatası (iş alındı ama bildirim gitmedi): $e");
+          // Bildirim gitmese bile iş alınmış sayılır, false dönme
+        }
       }
 
       return true;

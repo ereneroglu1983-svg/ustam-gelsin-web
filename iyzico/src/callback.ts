@@ -19,11 +19,10 @@ function createAuthHeader(apiKey: string, secretKey: string, randomStr: string, 
 }
 
 export const callback = onRequest(
-  { region: "europe-west3", secrets: [API_KEY, SECRET_KEY] },
+  { region: "europe-west3", secrets: [API_KEY, SECRET_KEY], timeoutSeconds: 60 },
   async (req, res) => {
     try {
       const token = (req.body?.token || req.query?.token || "") as string;
-      // ADIM 2 - REVİZE: Platform bilgisi
       const platformFromQuery = (req.query?.platform as string) || "";
       console.log("CALLBACK GELDI TOKEN:", token, "PLATFORM_Q:", platformFromQuery);
 
@@ -60,9 +59,19 @@ export const callback = onRequest(
 
       const apiKey = API_KEY.value()?.replace(/\s/g, "").trim() || "";
       const secretKey = SECRET_KEY.value()?.replace(/\s/g, "").trim() || "";
+      if (!apiKey || !secretKey) {
+        console.error("API KEY YOK");
+        throw new Error("API Key missing");
+      }
+
       const randomStr = `${Date.now()}${randomBytes(4).toString("hex")}`;
 
-      const payload = { locale: "tr", conversationId: `cb_${Date.now()}`, token };
+      // REVİZE 1: conversationId orjinal pending'den alınmalı, iyzico böyle sever
+      const payload = {
+        locale: "tr",
+        conversationId: pendingData.conversationId || `cb_${Date.now()}`,
+        token: token
+      };
       const authHeader = createAuthHeader(apiKey, secretKey, randomStr, payload);
 
       const iyzicoRes = await fetch(`${BASE_URL}/payment/iyzipos/checkoutform/auth/ecom/detail`, {
@@ -91,62 +100,94 @@ export const callback = onRequest(
           return;
         }
 
+        // REVİZE 2: Güvenlik - ödenen tutar beklenen tutardan az olmasın
+        const expectedAmount = parseFloat(pendingData.amount?.toString() || "0");
+        if (paidPrice < expectedAmount - 0.01) {
+          console.error(`TUTAR UYUSMUYOR beklenen:${expectedAmount} gelen:${paidPrice}`);
+        }
+
         const paymentRef = db.collection("payments").doc(paymentId);
         const walletRef = db.collection("wallets").doc(uid);
         const existing = await paymentRef.get();
 
         if (!existing.exists) {
-          await walletRef.set({
-            balance: admin.firestore.FieldValue.increment(paidPrice),
-            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
-          }, { merge: true });
+          // REVİZE 3: Transaction içinde atomik işlem - daha güvenli
+          await db.runTransaction(async (t) => {
+            const walletDoc = await t.get(walletRef);
+            // wallet yoksa oluştur, varsa artır
+            if (!walletDoc.exists) {
+              t.set(walletRef, {
+                balance: paidPrice,
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+              });
+            } else {
+              t.set(walletRef, {
+                balance: admin.firestore.FieldValue.increment(paidPrice),
+                lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+              }, { merge: true });
+            }
 
-          await walletRef.collection("transactions").doc(paymentId).set({
-            type: "topup",
-            amount: paidPrice,
-            paymentId: paymentId,
-            token: token,
-            provider: "iyzico",
-            status: "SUCCESS",
-            iyzicoConversationId: result.conversationId,
-            iyzicoBasketId: result.basketId,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            t.set(walletRef.collection("transactions").doc(paymentId), {
+              type: "topup",
+              amount: paidPrice,
+              expectedAmount: expectedAmount,
+              paymentId: paymentId,
+              token: token,
+              provider: "iyzico",
+              status: "SUCCESS",
+              platform: platform,
+              iyzicoConversationId: result.conversationId,
+              iyzicoBasketId: result.basketId,
+              iyzicoPrice: result.price,
+              iyzicoPaidPrice: result.paidPrice,
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+
+            t.set(paymentRef, {
+              uid,
+              amount: paidPrice,
+              expectedAmount: expectedAmount,
+              price: result.price,
+              paidPrice: result.paidPrice,
+              currency: result.currency || "TRY",
+              paymentId: result.paymentId,
+              token: token,
+              conversationId: result.conversationId,
+              basketId: result.basketId,
+              platform: platform,
+              status: "SUCCESS",
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+
+            t.update(db.collection("pending_payments").doc(token), {
+              status: "completed",
+              paidPrice: paidPrice,
+              paymentId: paymentId,
+              iyzicoResult: result,
+              completedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
           });
 
-          await paymentRef.set({
-            uid,
-            amount: paidPrice,
-            price: result.price,
-            paidPrice: result.paidPrice,
-            currency: result.currency || "TRY",
-            paymentId: result.paymentId,
-            token: token,
-            conversationId: result.conversationId,
-            basketId: result.basketId,
-            status: "SUCCESS",
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          });
-
+          console.log(`CÜZDAN YÜKLENDİ wallets/${uid} balance += ${paidPrice} platform=${platform}`);
+        } else {
+          console.log(`ODEME ZATEN ISLENMIS paymentId=${paymentId} - idempotent skip`);
+          // pending'i yine completed yap
           await db.collection("pending_payments").doc(token).update({
             status: "completed",
             paidPrice: paidPrice,
             paymentId: paymentId,
             completedAt: admin.firestore.FieldValue.serverTimestamp(),
-          });
-
-          console.log(`CÜZDAN YÜKLENDİ wallets/${uid} balance += ${paidPrice} platform=${platform}`);
-        } else {
-          console.log(`ODEME ZATEN ISLENMIS paymentId=${paymentId}`);
+          }).catch(() => {});
         }
 
-        // ADIM 2 - REVİZE: Web ise web sayfasına, mobil ise app'e
         if (platform === "web") {
-          res.redirect(302, `https://hemenustamgelsin.com/odeme-basarili?amount=${paidPrice}`);
+          res.redirect(302, `https://hemenustamgelsin.com/odeme-basarili?amount=${paidPrice}&paymentId=${paymentId}`);
         } else {
-          res.redirect(302, "hemenustam://payment-success");
+          res.redirect(302, `hemenustam://payment-success?amount=${paidPrice}&paymentId=${paymentId}`);
         }
       } else {
-        console.error("IYZICO BASARISIZ:", result.errorMessage);
+        console.error("IYZICO BASARISIZ:", result.errorMessage, result.errorCode);
         await db.collection("pending_payments").doc(token).update({
           status: "failed",
           error: result.errorMessage,
@@ -159,10 +200,9 @@ export const callback = onRequest(
           : `hemenustam://payment-fail?reason=${result.errorCode || "fail"}`;
         res.redirect(302, failUrl);
       }
-    } catch (e) {
-      console.error("CALLBACK HATA:", e);
-      // Hata durumunda da platform'a bakmaya çalış
-      const platformFallback = (req.query?.platform as string) || "mobile";
+    } catch (e: any) {
+      console.error("CALLBACK HATA:", e?.message || e, e?.stack);
+      const platformFallback = (req.query?.platform as string) || (req.body?.platform as string) || "mobile";
       const failUrl = platformFallback === "web"
         ? "https://hemenustamgelsin.com/odeme-basarisiz?reason=exception"
         : "hemenustam://payment-fail?reason=exception";
