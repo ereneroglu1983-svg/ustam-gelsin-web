@@ -201,7 +201,6 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
         title: Image.asset('assets/app_logo.png', height: 80, fit: BoxFit.contain),
-        // REVIZE 2: Dinamik sağ üst ikon
         actions: [
           if (_currentUser == null)
             IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none_rounded, color: Colors.black, size: 30))
@@ -296,7 +295,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(child: SizedBox(height: 58, child: OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePageAI())), icon: const Icon(Icons.calculate_outlined), label: Text("AI MALİYET HESAPLA", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: OutlinedButton.styleFrom(foregroundColor: Colors.black, side: const BorderSide(color: Colors.black, width: 1.3), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
                 ]),
                 const SizedBox(height: 20),
-                const InsaatRehberiSlider(),
+                // DÜZELTME: İnşaat rehberi widget'ı alttaki bar ile aynı yere gidiyor - InsaatRehberiScreen - Ekran kilitlenmesi düzeltildi
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const InsaatRehberiScreen()));
+                  },
+                  child: const InsaatRehberiSlider(),
+                ),
               ]),
             ),
             const SizedBox(height: 20),
@@ -308,7 +314,6 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 20),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Container(padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(.05), blurRadius: 10)]), child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [_buildStat(Icons.groups, "12.500+", "Tamamlanan İş"), _buildStat(Icons.verified_user, "3.200+", "Doğrulanmış Usta"), _buildStat(Icons.location_on, "81 İlde", "Hizmet")]))),
             const SizedBox(height: 30),
-            // REVIZE 1: Son ilanlar canlı ama müşteri için tıklanamaz
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: Row(
@@ -332,10 +337,14 @@ class _HomeScreenState extends State<HomeScreen> {
             _konumYukleniyor
                 ? const Center(child: CircularProgressIndicator())
                 : IgnorePointer(
-              ignoring: _normalizeRole(_userRole) == 'musteri',
+              ignoring: _currentUser!= null &&!_roleYukleniyor && _normalizeRole(_userRole) == 'musteri',
               child: Opacity(
-                opacity: 1.0, // HER ZAMAN CANLI
-                child: IlanAkisiSlider(ustaLat: _lat, ustaLng: _lng),
+                opacity: 1.0,
+                child: IlanAkisiSlider(
+                  key: ValueKey('ilan_slider_${_currentUser?.uid}_${_userRole}_$_roleYukleniyor'),
+                  ustaLat: _lat,
+                  ustaLng: _lng,
+                ),
               ),
             ),
             const SizedBox(height: 15),
