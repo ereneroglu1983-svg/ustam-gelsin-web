@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'odeme_sonuc_screen.dart';
 
 class BakiyeYukleScreen extends StatefulWidget {
   const BakiyeYukleScreen({super.key});
@@ -103,16 +105,15 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
       if (user == null) throw Exception('Kullanıcı girişi gerekli');
 
       final konum = await _konumCozumle();
-
       final functions = FirebaseFunctions.instanceFor(region: 'europe-west3');
       final callable = functions.httpsCallable('checkout');
 
-      // CANLI UYUMLU REQUEST
       final requestData = {
         'amount': _yuklenecekTutar,
         'city': konum['city'],
         'district': konum['district'],
         'address': konum['address'],
+        'platform': kIsWeb? 'web' : 'mobile',
       };
 
       final result = await callable.call(requestData);
@@ -125,6 +126,8 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
 
       if (!mounted) return;
 
+      final int gonderilenTutar = _yuklenecekTutar;
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -132,7 +135,6 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
             appBar: AppBar(backgroundColor: cardBg, title: const Text("Güvenli Ödeme", style: TextStyle(color: Colors.white))),
             body: InAppWebView(
               initialData: InAppWebViewInitialData(
-                // FIX: CANLI URL - SANDBOX SİLİNDİ!
                 baseUrl: WebUri("https://api.iyzipay.com"),
                 data: '''
                   <html>
@@ -154,21 +156,21 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
                 final url = navigationAction.request.url.toString();
                 debugPrint('[IYZICO_WEBVIEW] URL: $url');
 
-                if (url.contains('payment-success') || url.startsWith('hemenustam://payment-success')) {
+                if (url.contains('odeme-basarili') || url.contains('payment-success') || url.startsWith('hemenustam://payment-success')) {
                   if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('$_yuklenecekTutar TL başarıyla yüklendi!'), backgroundColor: Colors.green),
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => OdemeSonucScreen(isSuccess: true, message: "$gonderilenTutar TL", amount: gonderilenTutar)),
+                          (route) => route.isFirst,
                     );
                   }
                   return NavigationActionPolicy.CANCEL;
                 }
 
-                if (url.contains('payment-fail') || url.startsWith('hemenustam://payment-fail')) {
+                if (url.contains('odeme-basarisiz') || url.contains('payment-fail') || url.startsWith('hemenustam://payment-fail')) {
                   if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Ödeme başarısız'), backgroundColor: Colors.red),
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const OdemeSonucScreen(isSuccess: false, message: "Ödeme tamamlanamadı")),
+                          (route) => route.isFirst,
                     );
                   }
                   return NavigationActionPolicy.CANCEL;
@@ -187,7 +189,6 @@ class _BakiyeYukleScreenState extends State<BakiyeYukleScreen> {
     }
   }
 
-  //... geri kalan build kodların aynı kalabilir - dokunma
   Future<void> _dokumanGoster(String docId, String title) async {
     try {
       final doc = await FirebaseFirestore.instance.collection('config').doc(docId).get();

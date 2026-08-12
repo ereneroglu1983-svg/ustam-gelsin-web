@@ -23,26 +23,38 @@ export const callback = onRequest(
   async (req, res) => {
     try {
       const token = (req.body?.token || req.query?.token || "") as string;
-      console.log("CALLBACK GELDI TOKEN:", token);
+      // ADIM 2 - REVİZE: Platform bilgisi
+      const platformFromQuery = (req.query?.platform as string) || "";
+      console.log("CALLBACK GELDI TOKEN:", token, "PLATFORM_Q:", platformFromQuery);
 
       if (!token) {
-        res.redirect(302, "hemenustam://payment-fail?reason=no_token");
+        const failUrl = platformFromQuery === "web"
+          ? "https://hemenustamgelsin.com/odeme-basarisiz?reason=no_token"
+          : "hemenustam://payment-fail?reason=no_token";
+        res.redirect(302, failUrl);
         return;
       }
 
       const pendingSnap = await db.collection("pending_payments").doc(token).get();
       if (!pendingSnap.exists) {
         console.error("PENDING BULUNAMADI:", token);
-        res.redirect(302, "hemenustam://payment-fail?reason=no_pending");
+        const failUrl = platformFromQuery === "web"
+          ? "https://hemenustamgelsin.com/odeme-basarisiz?reason=no_pending"
+          : "hemenustam://payment-fail?reason=no_pending";
+        res.redirect(302, failUrl);
         return;
       }
 
       const pendingData = pendingSnap.data()!;
       const uid = pendingData.uid as string;
+      const platform = (pendingData.platform as string) || platformFromQuery || "mobile";
 
       if (!uid) {
         console.error("PENDING'DE UID YOK:", token);
-        res.redirect(302, "hemenustam://payment-fail?reason=no_uid");
+        const failUrl = platform === "web"
+          ? "https://hemenustamgelsin.com/odeme-basarisiz?reason=no_uid"
+          : "hemenustam://payment-fail?reason=no_uid";
+        res.redirect(302, failUrl);
         return;
       }
 
@@ -72,7 +84,10 @@ export const callback = onRequest(
 
         if (!paymentId) {
           console.error("MISSING paymentId", result);
-          res.redirect(302, "hemenustam://payment-fail?reason=missing_paymentId");
+          const failUrl = platform === "web"
+            ? "https://hemenustamgelsin.com/odeme-basarisiz?reason=missing_paymentId"
+            : "hemenustam://payment-fail?reason=missing_paymentId";
+          res.redirect(302, failUrl);
           return;
         }
 
@@ -81,14 +96,11 @@ export const callback = onRequest(
         const existing = await paymentRef.get();
 
         if (!existing.exists) {
-          // --- SENİN SİSTEMİNE GÖRE DÜZELTME ---
-          // 1. CÜZDAN BAKİYE ARTIR - wallets/{uid}.balance
           await walletRef.set({
             balance: admin.firestore.FieldValue.increment(paidPrice),
             lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
           }, { merge: true });
 
-          // 2. CÜZDAN TRANSACTION EKLE - wallets/{uid}/transactions/{paymentId}
           await walletRef.collection("transactions").doc(paymentId).set({
             type: "topup",
             amount: paidPrice,
@@ -101,7 +113,6 @@ export const callback = onRequest(
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
           });
 
-          // 3. GLOBAL ÖDEME KAYDI - payments/{paymentId}
           await paymentRef.set({
             uid,
             amount: paidPrice,
@@ -123,12 +134,17 @@ export const callback = onRequest(
             completedAt: admin.firestore.FieldValue.serverTimestamp(),
           });
 
-          console.log(`CÜZDAN YÜKLENDİ wallets/${uid} balance += ${paidPrice}`);
+          console.log(`CÜZDAN YÜKLENDİ wallets/${uid} balance += ${paidPrice} platform=${platform}`);
         } else {
           console.log(`ODEME ZATEN ISLENMIS paymentId=${paymentId}`);
         }
 
-        res.redirect(302, "hemenustam://payment-success");
+        // ADIM 2 - REVİZE: Web ise web sayfasına, mobil ise app'e
+        if (platform === "web") {
+          res.redirect(302, `https://hemenustamgelsin.com/odeme-basarili?amount=${paidPrice}`);
+        } else {
+          res.redirect(302, "hemenustam://payment-success");
+        }
       } else {
         console.error("IYZICO BASARISIZ:", result.errorMessage);
         await db.collection("pending_payments").doc(token).update({
@@ -138,11 +154,19 @@ export const callback = onRequest(
           fullResult: result,
           failedAt: admin.firestore.FieldValue.serverTimestamp(),
         });
-        res.redirect(302, `hemenustam://payment-fail?reason=${result.errorCode || "fail"}`);
+        const failUrl = platform === "web"
+          ? `https://hemenustamgelsin.com/odeme-basarisiz?reason=${result.errorCode || "fail"}`
+          : `hemenustam://payment-fail?reason=${result.errorCode || "fail"}`;
+        res.redirect(302, failUrl);
       }
     } catch (e) {
       console.error("CALLBACK HATA:", e);
-      res.redirect(302, "hemenustam://payment-fail?reason=exception");
+      // Hata durumunda da platform'a bakmaya çalış
+      const platformFallback = (req.query?.platform as string) || "mobile";
+      const failUrl = platformFallback === "web"
+        ? "https://hemenustamgelsin.com/odeme-basarisiz?reason=exception"
+        : "hemenustam://payment-fail?reason=exception";
+      res.redirect(302, failUrl);
     }
   }
 );

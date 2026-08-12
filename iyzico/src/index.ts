@@ -13,7 +13,6 @@ const SECRET_KEY = defineSecret("IYZICO_SECRET_KEY");
 
 // CANLI - ELLEME
 const BASE_URL = "https://api.iyzipay.com";
-const CALLBACK_URL = "https://europe-west3-device-streaming-6f29b03c.cloudfunctions.net/callback";
 
 // --- JSON DOSYALARI ---
 let cachedSehirler: any[] | null = null;
@@ -82,7 +81,7 @@ export const checkout = onCall(
     if (!request.auth) throw new HttpsError("unauthenticated", "Giris gerekli");
 
     const uid = request.auth.uid;
-    const { amount } = request.data as { amount: number };
+    const { amount, platform } = request.data as { amount: number; platform?: string };
 
     if (typeof amount!== "number" || amount < 10) {
       throw new HttpsError("invalid-argument", "Gecersiz tutar");
@@ -139,6 +138,11 @@ export const checkout = onCall(
     const createdAt = userData.createdAt?.toDate? userData.createdAt.toDate() : new Date("2023-01-01");
     const formatDate = (d: Date) => d.toISOString().slice(0, 19).replace("T", " ");
 
+    // ADIM 1 - REVİZE: Platforma göre callback URL
+    const incomingPlatform = (platform || "mobile").toString();
+    const baseCallback = "https://europe-west3-device-streaming-6f29b03c.cloudfunctions.net/callback";
+    const callbackUrl = `${baseCallback}?platform=${incomingPlatform}`;
+
     const payload = {
       locale: "tr",
       conversationId,
@@ -147,7 +151,7 @@ export const checkout = onCall(
       currency: "TRY",
       basketId,
       paymentGroup: "PRODUCT",
-      callbackUrl: CALLBACK_URL,
+      callbackUrl: callbackUrl,
       enabledInstallments: [1],
       buyer: {
         id: uid.substring(0, 30),
@@ -216,11 +220,11 @@ export const checkout = onCall(
       city,
       district,
       realIp,
+      platform: incomingPlatform,
       status: "initialized",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    // FLUTTER İLE TAM UYUMLU RETURN
     return {
       token: result.token,
       checkoutFormContent: result.checkoutFormContent,
