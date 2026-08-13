@@ -1,4 +1,4 @@
-// lib/main.dart - FINAL - BİLDİRİM TIKLAMA FIX + ACİL YÖNLENDİRME
+// lib/main.dart - FINAL - BEYAZ EKRAN FIX
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,8 +30,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await NotificationService().showLocalNotification(message);
 }
 
-// Global navigator key - Bildirimden yönlendirme için
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 final GoRouter _router = GoRouter(
   navigatorKey: navigatorKey,
   initialLocation: '/',
@@ -52,19 +52,13 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-// BİLDİRİM TIKLAMA YÖNLENDİRMESİ - EKSİK OLAN KISIM
 void _handleNotificationClick(RemoteMessage message) {
   debugPrint("Bildirime tıklandı: ${message.data}");
   final data = message.data;
   final type = data['type'] ?? data['tip'] ?? '';
-
-  // USTA için: acil çağrı bildirimi -> 7/24 acil ilanlar ekranına git
   if (type == 'acil_cagri' || type == 'acil_cagri_ustalar' || data['acilCagriId'] != null) {
     navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => AcilIlanlarSayfasi()));
-    // veya GoRouter ile: _router.go('/acil_ilanlar');
-  }
-  // MÜŞTERİ için: usta kabul etti bildirimi -> profiline git
-  else if (type == 'acil_kabul') {
+  } else if (type == 'acil_kabul') {
     navigatorKey.currentState?.push(MaterialPageRoute(builder: (_) => const MusteriProfilSayfasi()));
   }
 }
@@ -73,9 +67,10 @@ void main() async {
   if (kIsWeb) {
     usePathUrlStrategy();
   }
-
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  if (!kIsWeb) {
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  }
 
   try {
     await YorumService.loadData();
@@ -86,7 +81,6 @@ void main() async {
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     debugPrint("✅ Firebase başlatıldı");
-
     if (kIsWeb) {
       await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
     } else {
@@ -96,9 +90,7 @@ void main() async {
             androidProvider: AndroidProvider.playIntegrity,
             appleProvider: AppleProvider.appAttest,
           );
-        } catch (appCheckError) {
-          debugPrint("App Check Başlatma Hatası: $appCheckError");
-        }
+        } catch (_) {}
       }
     }
   } catch (e) {
@@ -110,28 +102,18 @@ void main() async {
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
       await NotificationService().initialize();
       await FirebaseMessaging.instance.subscribeToTopic('acil_cagri_ustalar').catchError((_) {});
-
-      // EKSİK OLAN 2 LİSTENER EKLENDİ
-      // 1. Uygulama kapalıyken bildirimden açılınca
       RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
       if (initialMessage != null) {
         Future.delayed(const Duration(seconds: 1), () => _handleNotificationClick(initialMessage));
       }
-
-      // 2. Uygulama arka plandayken bildirimden açılınca
       FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationClick);
-
-    } catch (notificationError) {
-      debugPrint("Bildirim Servisi Başlatma Hatası: $notificationError");
-    }
+    } catch (_) {}
   }
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<HesaplamaProvider>(
-          create: (_) => HesaplamaProvider(),
-        ),
+        ChangeNotifierProvider<HesaplamaProvider>(create: (_) => HesaplamaProvider()),
       ],
       child: const MyApp(),
     ),
@@ -167,11 +149,23 @@ class _SplashWrapperState extends State<SplashWrapper> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => FlutterNativeSplash.remove());
+    // ✅ WEBDE SPLASH'I BEKLEME, DİREKT KALDIR
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Webde native splash yok, direkt home'a git
+        if (mounted) context.go('/home');
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => FlutterNativeSplash.remove());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // ✅ WEBDE DİREKT HOME GÖSTER, SPLASH GÖSTERME
+    if (kIsWeb) {
+      return const AuthGate();
+    }
     return SplashScreen(onFinished: () {
       if (mounted) context.go('/home');
     });
@@ -188,22 +182,28 @@ class _AuthGateState extends State<AuthGate> {
   @override
   void initState() {
     super.initState();
-    FirebaseAuth.instance.authStateChanges().listen((user) async {
-      if (user != null && !kIsWeb) {
-        ChatService().yeniMesajlariDinle();
-      }
-    });
+    if (!kIsWeb) {
+      FirebaseAuth.instance.authStateChanges().listen((user) async {
+        if (user != null) {
+          ChatService().yeniMesajlariDinle();
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      // Webde auth bekleme, direkt göster
+      return const WebHomeScreen();
+    }
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
-        return kIsWeb ? const WebHomeScreen() : const HomeScreen();
+        return const HomeScreen();
       },
     );
   }

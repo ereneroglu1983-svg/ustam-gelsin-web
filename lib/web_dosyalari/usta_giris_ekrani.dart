@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/core/services/auth_service.dart';
-import 'package:ustam_gelsin/features/usta/screens/usta_profil_sayfasi.dart';
-import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
 
 class UstaGirisEkrani extends StatefulWidget {
   const UstaGirisEkrani({super.key});
@@ -69,45 +68,43 @@ class _UstaGirisEkraniState extends State<UstaGirisEkrani> {
         _passwordController.text.trim(),
       );
 
-      bool yetkiliMi = await _authService.isAdmin();
-      String? actualRole = await _authService.getUserRole();
+      await _bilgileriKaydet();
+
+      bool isAdminUser = false;
+      try {
+        isAdminUser = await _authService.isAdmin();
+      } catch (_) {
+        isAdminUser = false;
+      }
 
       if (!mounted) return;
 
-      if (yetkiliMi) {
-        await _bilgileriKaydet();
-        setState(() => _isLoading = false);
-        if (!mounted) return;
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const AdminDashboard()),
-              (route) => false,
-        );
-      } else if (actualRole == 'usta' || actualRole == 'master') {
-        await _bilgileriKaydet();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(isAdminUser ? '✅ Admin girişi başarılı! Panele yönlendiriliyorsunuz...' : '✅ Giriş başarılı! Ana sayfaya yönlendiriliyorsunuz...'),
+          backgroundColor: const Color(0xFF2DB34A),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
 
-        // ÖNCE YÜKLEMEYİ KAPAT, SONRA NAVIGATE ET
-        setState(() => _isLoading = false);
+      await Future.delayed(const Duration(milliseconds: 1500));
 
-        if (!mounted) return;
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const UstaProfilSayfasi()),
-              (route) => false,
-        );
-      } else if (actualRole == null) {
-        await _authService.signOut();
-        throw "Kullanıcı rolü doğrulanamadı. Lütfen tekrar deneyin.";
+      if (!mounted) return;
+
+      setState(() => _isLoading = false);
+
+      if (isAdminUser) {
+        context.go('/admin');
       } else {
-        await _authService.signOut();
-        throw "YETKİSİZ ERİŞİM: Bu hesap bir ${actualRole.toUpperCase()} hesabıdır.";
+        context.go('/home');
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
+            content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 4),
           ),
@@ -157,7 +154,7 @@ class _UstaGirisEkraniState extends State<UstaGirisEkrani> {
                     const Text("Usta Girişi", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => context.go('/home'),
                     ),
                   ],
                 ),
@@ -166,12 +163,16 @@ class _UstaGirisEkraniState extends State<UstaGirisEkrani> {
                 const SizedBox(height: 20),
                 _buildDarkTextField(_passwordController, "Şifre", obscure: true),
                 const SizedBox(height: 20),
-                CheckboxListTile(
-                  title: const Text("Beni Hatırla", style: TextStyle(color: Colors.white70)),
-                  value: _beniHatirla,
-                  onChanged: (v) => setState(() => _beniHatirla = v!),
-                  activeColor: const Color(0xFFDC143C),
-                  controlAffinity: ListTileControlAffinity.leading,
+                Material(
+                  color: Colors.transparent,
+                  child: CheckboxListTile(
+                    title: const Text("Beni Hatırla", style: TextStyle(color: Colors.white70)),
+                    value: _beniHatirla,
+                    onChanged: (v) => setState(() => _beniHatirla = v!),
+                    activeColor: const Color(0xFFDC143C),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
