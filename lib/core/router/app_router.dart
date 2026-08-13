@@ -7,40 +7,47 @@ import 'package:ustam_gelsin/features/rehber/screens/rehber_detay_screen.dart';
 final appRouter = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
-    GoRoute(path: '/rehber', builder: (context, state) => const InsaatRehberiScreen()),
-    GoRoute(path: '/rehber/:slug', builder: (context, state) {
-      final slug = state.pathParameters['slug']!;
-      return RehberDetayScreen(slug: slug);
-    }),
-    // --- İŞTE ÇÖZÜM - HAZIR WIDGET, YENİ DOSYA YOK ---
+    GoRoute(path: '/', builder: (c, s) => const HomeScreen()),
+    GoRoute(path: '/rehber', builder: (c, s) => const InsaatRehberiScreen()),
+    GoRoute(path: '/rehber/:slug', builder: (c, s) => RehberDetayScreen(slug: s.pathParameters['slug']!)),
     GoRoute(
       path: '/odeme-basarili',
       builder: (context, state) {
         final amount = state.uri.queryParameters['amount'] ?? '0';
         return Scaffold(
-          body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 100),
-            const SizedBox(height: 20),
-            Text('$amount TL Yüklendi!', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: () => context.go('/'), child: const Text('Ana Sayfaya Dön')),
-          ])),
+          backgroundColor: Colors.white,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.check_circle, color: Colors.green, size: 100),
+                const SizedBox(height: 20),
+                Text('$amount TL Yüklendi!', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                ElevatedButton(onPressed: () => context.go('/'), child: const Text('Ana Sayfaya Dön')),
+              ],
+            ),
+          ),
         );
       },
     ),
     GoRoute(
       path: '/odeme-basarisiz',
       builder: (context, state) {
-        final reason = state.uri.queryParameters['reason'] ?? 'İptal';
         return Scaffold(
-          body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.error, color: Colors.red, size: 100),
-            const SizedBox(height: 20),
-            Text('Ödeme Başarısız: $reason', style: const TextStyle(fontSize: 20)),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: () => context.go('/'), child: const Text('Tekrar Dene')),
-          ])),
+          backgroundColor: Colors.white,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error, color: Colors.red, size: 100),
+                const SizedBox(height: 20),
+                const Text('Ödeme Başarısız', style: TextStyle(fontSize: 28)),
+                const SizedBox(height: 20),
+                ElevatedButton(onPressed: () => context.go('/'), child: const Text('Ana Sayfaya Dön')),
+              ],
+            ),
+          ),
         );
       },
     ),
