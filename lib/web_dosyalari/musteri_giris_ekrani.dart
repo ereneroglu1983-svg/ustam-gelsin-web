@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/core/services/auth_service.dart';
-import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dart';
-import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
 
 class MusteriGirisEkrani extends StatefulWidget {
   const MusteriGirisEkrani({super.key});
@@ -55,8 +54,10 @@ class _MusteriGirisEkraniState extends State<MusteriGirisEkrani> {
     }
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text.trim());
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Şifre sıfırlama bağlantısı e-postanıza gönderildi.")));
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Hata: $e")));
     }
   }
@@ -71,34 +72,41 @@ class _MusteriGirisEkraniState extends State<MusteriGirisEkrani> {
 
     try {
       await _authService.signIn(_emailController.text.trim(), _passwordController.text.trim());
+      await _bilgileriKaydet();
 
-      bool yetkiliMi = await _authService.isAdmin();
-      String? actualRole = await _authService.getUserRole();
+      bool isAdminUser = false;
+      try {
+        isAdminUser = await _authService.isAdmin();
+      } catch (_) {
+        isAdminUser = false;
+      }
 
       if (!mounted) return;
 
-      if (yetkiliMi) {
-        await _bilgileriKaydet();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const AdminDashboard()),
-        );
-      } else if (actualRole == 'musteri' || actualRole == 'customer') {
-        await _bilgileriKaydet();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MusteriProfilSayfasi()),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(isAdminUser ? '✅ Admin girişi başarılı! Panele yönlendiriliyorsunuz...' : '✅ Giriş başarılı! Ana sayfaya yönlendiriliyorsunuz...'),
+          backgroundColor: const Color(0xFF2DB34A),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      await Future.delayed(const Duration(milliseconds: 1500));
+
+      if (!mounted) return;
+      setState(() => _yukleniyor = false);
+
+      if (isAdminUser) {
+        context.go('/admin');
       } else {
-        await _authService.signOut();
-        throw "YETKİSİZ ERİŞİM: Bu bir ${actualRole?.toUpperCase() ?? 'BİLİNMEYEN'} hesabıdır.";
+        context.go('/home');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
+        setState(() => _yukleniyor = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.red));
       }
-    } finally {
-      if (mounted) setState(() => _yukleniyor = false);
     }
   }
 
@@ -135,7 +143,17 @@ class _MusteriGirisEkraniState extends State<MusteriGirisEkrani> {
             ),
             child: Column(
               children: [
-                const Text("Müşteri Girişi", style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 48),
+                    const Text("Müşteri Girişi", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => context.go('/home'),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 40),
                 _buildDarkTextField(_emailController, "E-Mail"),
                 const SizedBox(height: 20),

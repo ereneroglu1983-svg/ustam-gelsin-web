@@ -22,7 +22,7 @@ exports.adminKritikAlarm = onDocumentCreated({ document: 'system_alerts/{alertId
     }
 });
 
-// 2. Acil Çağrı Bildirim
+// 2. Acil Çağrı Bildirim - Ustalara
 exports.acilUstaBildirimiGonder = onDocumentCreated({ document: 'acil_cagri/{cagriId}', region: 'europe-west3' }, async (event) => {
     const snapshot = event.data;
     if (!snapshot) return null;
@@ -134,39 +134,63 @@ exports.sendSupportNotification = onDocumentCreated({ document: 'admin_messages/
     }
 });
 
-// 8. Usta Kabul Edince Müşteriye Bildirim
+// 8. USTA KABUL EDINCE MUSTERIYE BILDIRIM - TAM FIXLENDI
 exports.ustaIsiKabulEdinceMusteriyeBildir = onDocumentUpdated({ document: 'acil_cagri/{cagriId}', region: 'europe-west3' }, async (event) => {
     const newData = event.data.after.data();
     const previousData = event.data.before.data();
+    const cagriId = event.params.cagriId;
+    console.log(`>>> [TETIKLENDI] ${cagriId} onceki:${previousData.durum} yeni:${newData.durum}`);
     if (previousData.durum === newData.durum) return null;
     if (newData.durum !== 'atandi') return null;
-    const customerId = newData.userId || newData.musteriId || newData.musteri_id || newData.olusturanId;
-    const ustaAd = newData.ustaAd || "Ustanız";
-    const ustaTel = newData.ustaTelefon || newData.ustaTel || "bilinmiyor";
-    if (!customerId) return null;
+
+    // FIX: musteri ID artik teknikDetaylar icinde de araniyor
+    const customerId = newData.userId || newData.teknikDetaylar?.userId || newData.musteriId || newData.musteri_id || newData.olusturanId || newData.createdBy || newData.ownerId;
+
+    const ustaAd = newData.ustaAd || newData.ustaName || "Ustanız";
+    const ustaTel = newData.ustaTelefon || newData.ustaTel || newData.ustaPhone || "bilinmiyor";
+
+    if (!customerId) {
+        console.error(`❌ MUSTERI ID BULUNAMADI cagriId:${cagriId} keys:`, Object.keys(newData));
+        return null;
+    }
+
+    console.log(`>>> MUSTERI ID BULUNDU: ${customerId}`);
+
     try {
       const userDoc = await admin.firestore().collection('users').doc(customerId).get();
-      if (!userDoc.exists) return null;
-      const fcmToken = userDoc.data().fcmToken || userDoc.data().fcm_token;
+      if (!userDoc.exists) {
+          console.error(`❌ USER DOC YOK: ${customerId}`);
+          return null;
+      }
+      const userData = userDoc.data();
+      const fcmToken = userData.fcmToken || userData.fcm_token || userData.token;
+      console.log(`>>> USER ${customerId} token var mi: ${!!fcmToken}`);
+
       await admin.firestore().collection('bildirimler').add({
         aliciId: customerId, receiverId: customerId, ustaAd, ustaTelefon: ustaTel,
         baslik: 'İlanınız Kabul Edildi!',
         mesaj: `İlanınız ${ustaAd} tarafından kabul edildi. Az sonra sizi ${ustaTel} numarasıyla arayacak.`,
-        tip: 'acil_kabul', type: 'acil_kabul', ilanId: event.params.cagriId,
+        tip: 'acil_kabul', type: 'acil_kabul', ilanId: cagriId,
         okundu: false, olusturulmaTarihi: admin.firestore.FieldValue.serverTimestamp()
       });
-      if (!fcmToken) return null;
+      console.log(`✅ bildirimler koleksiyonuna yazildi`);
+
+      if (!fcmToken) {
+          console.log(`>>> TOKEN YOK, PUSH ATLANIYOR AMA DB YAZILDI`);
+          return null;
+      }
+
       const message = {
         token: fcmToken,
         notification: { title: 'İlanınız Kabul Edildi!', body: `İlanınız ${ustaAd} tarafından kabul edildi. Az sonra sizi ${ustaTel} numarasıyla arayacak.` },
         android: { priority: 'high', notification: { channelId: 'high_importance_channel', clickAction: 'FLUTTER_NOTIFICATION_CLICK' } },
-        data: { type: 'acil_kabul', cagriId: event.params.cagriId, click_action: 'FLUTTER_NOTIFICATION_CLICK' }
+        data: { type: 'acil_kabul', cagriId: String(cagriId), click_action: 'FLUTTER_NOTIFICATION_CLICK' }
       };
       const res = await admin.messaging().send(message);
-      console.log(`✅ MÜŞTERİ BİLDİRİMİ GÖNDERİLDİ: ${res}`);
+      console.log(`✅ MUSTERI BILDIRIMI GONDERILDI: ${res}`);
       return res;
     } catch (e) {
-      console.error("❌ Müşteri bildirim hatası:", e);
+      console.error("❌ Musteri bildirim hatasi:", e);
       return null;
     }
 });
@@ -192,7 +216,7 @@ exports.adminBakiyeYukle = onCall({ region: "europe-west3" }, async (request) =>
   }
 });
 
-// 10. FİYAT HESAPLAMA MOTORU: GROQ LLAMA 3.1 8B - REGION EKLENDİ
+// 10. FIYAT HESAPLAMA MOTORU: GROQ LLAMA 3.1 8B - FULL PROMPTLU
 exports.hesaplaFiyat = onCall({
   region: "europe-west3",
   timeoutSeconds: 20,
@@ -201,7 +225,7 @@ exports.hesaplaFiyat = onCall({
   secrets: ["GROQ_API_KEY"]
 }, async (request) => {
   console.log(">>> [GROQ] hesaplaFiyat ÇAĞRILDI Data:", request.data);
-  const { isAdi, kategoriAdi, teknikDetaylar } = request.data || {};
+  const { isAdi, kategoriAdi, teknikDetaylar, ilId, ilceId, sehirIlce, kategoriId } = request.data || {};
   if (!isAdi || isAdi.trim().length < 2) {
     throw new HttpsError('invalid-argument', 'İş adı en az 2 karakter olmalı');
   }
@@ -210,13 +234,48 @@ exports.hesaplaFiyat = onCall({
     console.error(">>> GROQ_API_KEY tanımlı değil!");
     throw new HttpsError('internal', 'Sunucu yapılandırma hatası');
   }
-  const masterPrompt = `Sen artık Hemen Ustam Gelsin Yapay Zekâ Maliyet Motoru olarak görev yapıyorsun. İş: ${isAdi} Kategori: ${kategoriAdi} Teknik Detaylar: ${teknikDetaylar} - Sadece tek bir tamsayı fiyat döndür, açıklama yazma.`;
+
+  const detayString = typeof teknikDetaylar === 'string' ? teknikDetaylar : JSON.stringify(teknikDetaylar || {}, null, 2);
+
+  const masterPrompt = `
+Sen Türkiye'de inşaat, tadilat, elektrik, tesisat, kombi, klima ve tüm teknik hizmetlerin piyasa fiyatlarını bilen uzman bir maliyet analiz motorusun.
+Adın: Hemen Ustam Gelsin Yapay Zeka Maliyet Motoru.
+
+GÖREV:
+Aşağıdaki işe göre Türkiye 2026 güncel piyasa koşullarına göre tek bir gerçekçi ortalama fiyat hesapla.
+
+KATEGORİ ID: ${kategoriId || kategoriAdi || 'Belirtilmedi'}
+KATEGORİ ADI: ${kategoriAdi || 'Belirtilmedi'}
+İŞ ADI / BAŞLIK: ${isAdi}
+
+TEKNİK DETAYLAR (TÜMÜNÜ DİKKATE AL):
+${detayString}
+
+KONUM BİLGİSİ:
+İl ID: ${ilId || 'Belirtilmedi'}
+İlçe ID: ${ilceId || 'Belirtilmedi'}
+Bölge Metni: ${sehirIlce || 'Belirtilmedi'}
+
+KURALLAR:
+- Sadece Türkiye fiyatlarını kullan, USD/EUR kullanma.
+- Açıklama, gerekçe, metin, aralık, TL işareti yazma.
+- Sadece TEK bir tamsayı fiyat üret.
+- Fiyat 1000 ile 100000000 arasında olmalı.
+- Malzeme + işçilik dahil düşün, acil servis ise acil servis farkını ekle.
+- Şehir büyükşehir ise %10 artır.
+- Sadece rakam döndür, örnek: 65000
+`;
+
   try {
     const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
       model: "llama-3.1-8b-instant",
-      messages: [{ role: "user", content: masterPrompt }],
-      temperature: 0.2,
-      max_tokens: 20
+      messages: [
+        { role: "system", content: "Sen bir fiyat tahmin uzmanısın. Sadece tek bir sayı döndür, açıklama yazma." },
+        { role: "user", content: masterPrompt }
+      ],
+      temperature: 0.1,
+      max_tokens: 50,
+      stream: false
     }, {
       headers: { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
       timeout: 15000
@@ -235,7 +294,7 @@ exports.hesaplaFiyat = onCall({
   }
 });
 
-// 11. HAFTALIK FIYAT GUNCELLEME ROBOTU - REGION EKLENDİ - GROQ'A BAĞLI ÇALIŞIR
+// 11. HAFTALIK FIYAT GUNCELLEME ROBOTU - GROQ'A BAGLI
 exports.haftalikFiyatGuncelle = onSchedule({
   schedule: "every saturday 03:00",
   timeZone: "Europe/Istanbul",
