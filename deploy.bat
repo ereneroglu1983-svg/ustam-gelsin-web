@@ -15,7 +15,7 @@ echo [2/3] Cloudflare'e atiliyor (CANLI)...
 if exist functions (
   ren functions _functions_temp
 )
-call npx wrangler pages deploy build/web --project-name=ustam-web-deploy --branch=main --commit-dirty=true
+call npx wrangler pages deploy build/web --project-name=ustam-web-deploy --commit-dirty=true
 if exist _functions_temp (
   ren _functions_temp functions
 )
