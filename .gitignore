@@ -11,6 +11,12 @@ build/
 *.log
 *.lock
 
+# SEO - NEXT.JS (BUNLAR EKSİKTİ BOSS!)
+seo/node_modules/
+seo/.next/
+seo/out/
+seo/.vercel/
+
 # Firebase / Functions
 functions/node_modules/
 .firebase/
