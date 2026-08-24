@@ -12,7 +12,10 @@ export async function generateMetadata({params}:{params: Promise<{city:string}>}
   if(!city) return {}
   return {
     title: `${city.name} Ustaları - Hemen Ustam Gelsin | %0 Komisyon`,
-    description: `${city.name} bölgesinde komisyonsuz, kesintisiz 42 kategoride usta. Keşif + Fiyatlama Motoru ile %80 otomatik fiyat.`
+    description: `${city.name} bölgesinde komisyonsuz, kesintisiz 42 kategoride usta. Keşif + Fiyatlama Motoru ile %80 otomatik fiyat.`,
+    alternates: {
+      canonical: `https://hemenustamgelsin.com/${city.slug}`
+    }
   }
 }
 
@@ -21,8 +24,72 @@ export default async function CityPage({params}:{params: Promise<{city:string}>}
   const city = cities.find(c=>c.slug===citySlug)
   if(!city) return <div>Bulunamadı</div>
 
+  // --- SCHEMA.ORG - START BOSS ---
+  const pageUrl = `https://hemenustamgelsin.com/${city.slug}`
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Ana Sayfa",
+        "item": "https://hemenustamgelsin.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": `${city.name} Ustaları`,
+        "item": pageUrl
+      }
+    ]
+  }
+
+  const collectionSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": `${city.name} Ustaları - 42 Kategoride Usta`,
+    "description": `${city.name} bölgesinde komisyonsuz, kesintisiz 42 kategoride usta.`,
+    "url": pageUrl,
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Hemen Ustam Gelsin",
+      "url": "https://hemenustamgelsin.com"
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "name": `${city.name} Hizmetleri`,
+      "numberOfItems": jobs.length,
+      "itemListElement": jobs.map((job, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": `${city.name} ${job.name}`,
+        "url": `https://hemenustamgelsin.com/${city.slug}/${job.slug}`
+      }))
+    }
+  }
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Hemen Ustam Gelsin",
+    "url": "https://hemenustamgelsin.com",
+    "logo": "https://hemenustamgelsin.com/logo.png",
+    "description": "81 ilde komisyonsuz usta bulma platformu",
+    "areaServed": {
+      "@type": "Country",
+      "name": "Turkey"
+    }
+  }
+  // --- SCHEMA.ORG - END BOSS ---
+
   return (
     <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
+      {/* SCHEMA INJECTION */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
 
       {/* ===== PRO HERO - META SEVIYESI ===== */}
       <section style={{
@@ -127,13 +194,13 @@ export default async function CityPage({params}:{params: Promise<{city:string}>}
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(240px, 1fr))', gap:12}}>
           {jobs.map(j=>{
             const slug = j.slug.toLowerCase()
-            let icon = '🛠️'
+            let icon = '🛠'
             if(slug.includes('boya')) icon='🎨'
             if(slug.includes('elektrik')) icon='⚡'
             if(slug.includes('tesisat')||slug.includes('su')) icon='🚿'
             if(slug.includes('fayans')||slug.includes('seramik')) icon='🧱'
-            if(slug.includes('klima')) icon='❄️'
-            if(slug.includes('tavan')||slug.includes('alcipan')) icon='🏗️'
+            if(slug.includes('klima')) icon='❄'
+            if(slug.includes('tavan')||slug.includes('alcipan')) icon='🏗'
             return (
               <Link key={j.slug} href={`/${city.slug}/${j.slug}`} style={{
                 background:'white', border:'1px solid #e7e5e4', borderRadius:14, padding:14,
