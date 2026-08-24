@@ -1,6 +1,9 @@
 export const metadata = { 
   title: 'Hemen Ustam Gelsin - En Yakın Usta', 
-  description: '81 ilde 42 iş kolunda en yakın ustayı bul, Hemen Ustam Gelsin ile hemen teklif al' 
+  description: '81 ilde 42 iş kolunda en yakın ustayı bul, Hemen Ustam Gelsin ile hemen teklif al',
+  verification: {
+    yandex: '1992acbf758234c0'
+  }
 }
 
 export default function RootLayout({children}:{children:React.ReactNode}){
