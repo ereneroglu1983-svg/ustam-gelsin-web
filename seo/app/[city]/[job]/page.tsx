@@ -15,7 +15,10 @@ export async function generateMetadata({params}:{params: Promise<{city:string,jo
   if(!city||!job) return {}
   return {
     title: `${city.name} ${job.name} Ustası Bul - %0 Komisyon | Hemen Ustam Gelsin`,
-    description: `${city.name} ${job.name} için Keşif + Fiyatlama Motoru ile %80 otomatik fiyat. Kesinti yok, komisyon yok. 5 dakikada teklif al.`
+    description: `${city.name} ${job.name} için Keşif + Fiyatlama Motoru ile %80 otomatik fiyat. Kesinti yok, komisyon yok. 5 dakikada teklif al.`,
+    alternates: {
+      canonical: `https://hemenustamgelsin.com/${city.slug}/${job.slug}`
+    }
   }
 }
 
@@ -123,16 +126,105 @@ export default async function JobCityPage({params}:{params: Promise<{city:string
   if(!city||!job) return <div>Sayfa bulunamadı</div>
 
   const slug = job.slug.toLowerCase()
-  let icon = '🛠️', color = '#111'
+  let icon = '🛠', color = '#111'
   if(slug.includes('boya')) { icon='🎨'; color='#db2777' }
   if(slug.includes('elektrik')) { icon='⚡'; color='#f59e0b' }
   if(slug.includes('tesisat')||slug.includes('su')) { icon='🚿'; color='#0ea5e9' }
   if(slug.includes('fayans')) { icon='🧱'; color='#a16207' }
-  if(slug.includes('klima')) { icon='❄️'; color='#06b6d4' }
-  if(slug.includes('tavan')) { icon='🏗️'; color='#57534e' }
+  if(slug.includes('klima')) { icon='❄'; color='#06b6d4' }
+  if(slug.includes('tavan')) { icon='🏗'; color='#57534e' }
+
+  // --- SCHEMA.ORG - START BOSS ---
+  const pageUrl = `https://hemenustamgelsin.com/${city.slug}/${job.slug}`
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": `${city.name} ${job.name} Ustası`,
+    "serviceType": job.name,
+    "description": `${city.name} ${job.name} için Keşif + Fiyatlama Motoru ile %80 otomatik fiyat. Kesinti yok, komisyon yok.`,
+    "provider": {
+      "@type": "Organization",
+      "name": "Hemen Ustam Gelsin",
+      "url": "https://hemenustamgelsin.com",
+      "logo": "https://hemenustamgelsin.com/logo.png"
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": city.name
+    },
+    "url": pageUrl,
+    "offers": {
+      "@type": "Offer",
+      "availability": "https://schema.org/InStock",
+      "priceCurrency": "TRY",
+      "price": "0"
+    }
+  }
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Ana Sayfa",
+        "item": "https://hemenustamgelsin.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": `${city.name} Ustaları`,
+        "item": `https://hemenustamgelsin.com/${city.slug}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": `${city.name} ${job.name}`,
+        "item": pageUrl
+      }
+    ]
+  }
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `${city.name} ${job.name} fiyatı ne kadar?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${city.name} ${job.name} fiyatı yapılacak işe göre değişir. Hemen Ustam Gelsin'de %80 otomatik fiyatlama motoru ile 5 dakikada net fiyat alırsın, komisyon yok.`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `${city.name} ${job.name} ustası ne kadar sürede gelir?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `${city.name} içinde ortalama 5 dakikada usta eşleşir ve aynı gün içinde hizmet alabilirsin.`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `${job.name} hizmetinde garanti var mı?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Evet, Hemen Ustam Gelsin üzerinden gelen tüm ustalarda işçilik garantisi ve doğrulanmış usta sistemi vardır.`
+        }
+      }
+    ]
+  }
+  // --- SCHEMA.ORG - END BOSS ---
 
   return (
     <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
+      {/* SCHEMA INJECTION */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+
       <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}>
         <Link href={`/${city.slug}`} style={{color:'#78716c', textDecoration:'none'}}>{city.name} Ustaları</Link> <span> / </span> <b style={{color:'#111'}}>{job.name}</b>
       </div>
