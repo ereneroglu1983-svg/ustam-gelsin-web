@@ -6,6 +6,7 @@ import 'package:ustam_gelsin/env.dart';
 import 'package:slugify/slugify.dart';
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class BlogEkleScreen extends StatefulWidget {
   const BlogEkleScreen({super.key});
@@ -98,6 +99,20 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
         'tarih': FieldValue.serverTimestamp(),
         'seoUrl': 'https://hemenustamgelsin.com/rehber/$slug', // Google için hazır
       });
+
+      // 🚀 ANINDA CANLIYA AL - 5 SANİYEDE GOOGLE'DA (YENİ EKLENEN KISIM)
+      try {
+        await http.post(
+          Uri.parse('https://hemenustamgelsin.com/api/revalidate'),
+          headers: {
+            'Content-Type': 'application/json',
+            'x-secret-key': 'hemenustamgelsin-super-gizli-123',
+          },
+          body: jsonEncode({'slug': slug}),
+        );
+      } catch (_) {
+        // Hata olsa bile blog zaten kaydedildi, sorun yok
+      }
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
