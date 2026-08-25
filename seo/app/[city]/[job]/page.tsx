@@ -14,8 +14,8 @@ export async function generateMetadata({params}:{params: Promise<{city:string,jo
   const job = jobs.find(j=>j.slug===jobSlug)
   if(!city||!job) return {}
   return {
-    title: `${city.name} ${job.name} Ustası Bul - %0 Komisyon | Hemen Ustam Gelsin`,
-    description: `${city.name} ${job.name} için Keşif + Fiyatlama Motoru ile %80 otomatik fiyat. Kesinti yok, komisyon yok. 5 dakikada teklif al.`,
+    title: `${city.name} ${job.name} Ustası - Komisyonsuz | Hemen Ustam Gelsin`,
+    description: `${city.name} ${job.name} için akıllı fiyat tahmini ile doğrulanmış usta bul. Komisyon yok, kesinti yok. Hemen teklif al.`,
     alternates: {
       canonical: `https://hemenustamgelsin.com/${city.slug}/${job.slug}`
     }
@@ -134,14 +134,14 @@ export default async function JobCityPage({params}:{params: Promise<{city:string
   if(slug.includes('klima')) { icon='❄'; color='#06b6d4' }
   if(slug.includes('tavan')) { icon='🏗'; color='#57534e' }
 
-  // --- SCHEMA.ORG - START BOSS ---
+  // --- SCHEMA.ORG - GÜVENLİ VERSİYON ---
   const pageUrl = `https://hemenustamgelsin.com/${city.slug}/${job.slug}`
   const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
     "name": `${city.name} ${job.name} Ustası`,
     "serviceType": job.name,
-    "description": `${city.name} ${job.name} için Keşif + Fiyatlama Motoru ile %80 otomatik fiyat. Kesinti yok, komisyon yok.`,
+    "description": `${city.name} ${job.name} için akıllı fiyat tahmini ile doğrulanmış usta bulma hizmeti. Komisyon yok, kesinti yok.`,
     "provider": {
       "@type": "Organization",
       "name": "Hemen Ustam Gelsin",
@@ -165,24 +165,9 @@ export default async function JobCityPage({params}:{params: Promise<{city:string
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Ana Sayfa",
-        "item": "https://hemenustamgelsin.com"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": `${city.name} Ustaları`,
-        "item": `https://hemenustamgelsin.com/${city.slug}`
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": `${city.name} ${job.name}`,
-        "item": pageUrl
-      }
+      { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com" },
+      { "@type": "ListItem", "position": 2, "name": `${city.name} Ustaları`, "item": `https://hemenustamgelsin.com/${city.slug}` },
+      { "@type": "ListItem", "position": 3, "name": `${city.name} ${job.name}`, "item": pageUrl }
     ]
   }
 
@@ -195,7 +180,7 @@ export default async function JobCityPage({params}:{params: Promise<{city:string
         "name": `${city.name} ${job.name} fiyatı ne kadar?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `${city.name} ${job.name} fiyatı yapılacak işe göre değişir. Hemen Ustam Gelsin'de %80 otomatik fiyatlama motoru ile 5 dakikada net fiyat alırsın, komisyon yok.`
+          "text": `${city.name} ${job.name} fiyatı yapılacak işe göre değişir. Hemen Ustam Gelsin akıllı fiyat tahmini ile net fiyat alabilirsin, komisyon yok.`
         }
       },
       {
@@ -203,7 +188,7 @@ export default async function JobCityPage({params}:{params: Promise<{city:string
         "name": `${city.name} ${job.name} ustası ne kadar sürede gelir?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `${city.name} içinde ortalama 5 dakikada usta eşleşir ve aynı gün içinde hizmet alabilirsin.`
+          "text": `${city.name} içinde talebin doğrulanmış ustalara iletilir ve hızlıca eşleşme sağlanır, aynı gün içinde hizmet alabilirsin.`
         }
       },
       {
@@ -211,19 +196,31 @@ export default async function JobCityPage({params}:{params: Promise<{city:string
         "name": `${job.name} hizmetinde garanti var mı?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `Evet, Hemen Ustam Gelsin üzerinden gelen tüm ustalarda işçilik garantisi ve doğrulanmış usta sistemi vardır.`
+          "text": `Evet, Hemen Ustam Gelsin üzerinden gelen ustalarda doğrulanmış usta sistemi ve işçilik takibi vardır.`
         }
       }
     ]
   }
-  // --- SCHEMA.ORG - END BOSS ---
+  // --- SCHEMA END ---
 
   return (
     <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
-      {/* SCHEMA INJECTION */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+
+      <style>{`
+       .hero-grid { display:grid; grid-template-columns:1.15fr 0.85fr; gap:24px; align-items:center; }
+       .content-grid { display:grid; grid-template-columns:1.2fr 0.8fr; gap:18px; }
+       .cta-row { display:flex; gap:10px; flex-wrap:wrap; }
+        @media (max-width: 900px){
+         .hero-grid,.content-grid { grid-template-columns:1fr; }
+        }
+        @media (max-width: 600px){
+         .cta-row { flex-direction:column; }
+         .cta-row a { width:100%; justify-content:center; text-align:center; }
+        }
+      `}</style>
 
       <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}>
         <Link href={`/${city.slug}`} style={{color:'#78716c', textDecoration:'none'}}>{city.name} Ustaları</Link> <span> / </span> <b style={{color:'#111'}}>{job.name}</b>
@@ -233,24 +230,24 @@ export default async function JobCityPage({params}:{params: Promise<{city:string
         background: `radial-gradient(800px 400px at 15% 0%, ${color}15 0%, transparent 60%), radial-gradient(900px 500px at 85% -10%, #fef3c7 0%, transparent 60%), #FFFBF5`,
         padding:'26px 20px 28px'
       }}>
-        <div style={{maxWidth:1120, margin:'0 auto', display:'grid', gridTemplateColumns:'1.15fr 0.85fr', gap:24, alignItems:'center'}}>
+        <div style={{maxWidth:1120, margin:'0 auto'}} className="hero-grid">
           <div>
             <div style={{display:'inline-flex', gap:6, background:'white', border:'1px solid #e7e5e4', borderRadius:999, padding:'6px 10px', fontSize:11, fontWeight:800, marginBottom:14}}>
               <span style={{background:color, color:'white', borderRadius:999, padding:'2px 8px'}}>{icon} {job.name.toUpperCase()}</span>
-              <span style={{color:'#57534e'}}>{city.name.toUpperCase()} • %0 KOMİSYON</span>
+              <span style={{color:'#57534e'}}>{city.name.toUpperCase()} • KOMİSYON YOK</span>
             </div>
             <h1 style={{fontSize:'clamp(28px, 4vw, 48px)', fontWeight:900, lineHeight:0.92, letterSpacing:-1.2, margin:0, color:'#0f0f0f'}}>
-              {city.name} <span style={{color}}>{job.name}</span> Ustası<br/> 5 Dakikada Kapında
+              {city.name}'da <span style={{color}}>{job.name}</span> Ustası<br/> Doğrulanmış Ustalarla
             </h1>
-            <p style={{fontSize:16, color:'#44403c', lineHeight:1.5, marginTop:12, maxWidth:560}}>
-              {city.name} içinde <b>{job.name}</b> arıyorsan doğru yerdesin. Akıllı form + %80 otomatik fiyatlama ile talebin doğrudan doğrulanmış ustaya gider. Kazancının tamamı ustanın, komisyon yok.
+            <p style={{fontSize:'clamp(15px, 1.7vw, 17px)', color:'#44403c', lineHeight:1.5, marginTop:12, maxWidth:560}}>
+              {city.name}'da <b>{job.name}</b> arıyorsan doğru yerdesin. Akıllı form ile talebin doğrudan doğrulanmış ustaya gider. Kazancının tamamı ustanın, komisyon yok.
             </p>
-            <div style={{display:'flex', gap:10, marginTop:18, flexWrap:'wrap'}}>
+            <div className="cta-row" style={{marginTop:18}}>
               <a href="https://hemenustamgelsin.com" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none', display:'flex', alignItems:'center', gap:8, boxShadow:'0 10px 20px rgba(0,0,0,0.15)'}}>
                 HEMEN İLAN VER → <span style={{fontWeight:600, opacity:0.7, fontSize:12}}>{city.name} {job.name}</span>
               </a>
               <a href="https://hemenustamgelsin.com" style={{background:'white', color:'#111', padding:'14px 20px', borderRadius:12, fontWeight:800, textDecoration:'none', border:'1px solid #e7e5e4'}}>
-                USTA OL, {city.name.toUpperCase()}’DE İŞ AL
+                USTA OL, {city.name.toUpperCase()}'DA İŞ AL
               </a>
             </div>
           </div>
@@ -258,20 +255,24 @@ export default async function JobCityPage({params}:{params: Promise<{city:string
             <div style={{fontWeight:900, fontSize:14, marginBottom:12}}>NASIL ÇALIŞIR?</div>
             <div style={{display:'grid', gap:10}}>
               <div style={{display:'flex', gap:10, alignItems:'center', background:'#fafaf9', borderRadius:12, padding:10}}><div style={{width:32, height:32, borderRadius:10, background:'#e0f2fe', display:'grid', placeItems:'center', fontWeight:900}}>1</div><div><div style={{fontWeight:800, fontSize:13}}>İhtiyaç Analizi</div><div style={{fontSize:11, color:'#78716c'}}>Akıllı form</div></div></div>
-              <div style={{display:'flex', gap:10, alignItems:'center', background:'#fafaf9', borderRadius:12, padding:10}}><div style={{width:32, height:32, borderRadius:10, background:'#fef3c7', display:'grid', placeItems:'center', fontWeight:900}}>2</div><div><div style={{fontWeight:800, fontSize:13}}>%80 Otomatik Fiyat</div><div style={{fontSize:11, color:'#78716c'}}>Keşfe gerek yok</div></div></div>
+              <div style={{display:'flex', gap:10, alignItems:'center', background:'#fafaf9', borderRadius:12, padding:10}}><div style={{width:32, height:32, borderRadius:10, background:'#fef3c7', display:'grid', placeItems:'center', fontWeight:900}}>2</div><div><div style={{fontWeight:800, fontSize:13}}>Akıllı Fiyat Tahmini</div><div style={{fontSize:11, color:'#78716c'}}>Keşfe gerek yok</div></div></div>
               <div style={{display:'flex', gap:10, alignItems:'center', background:'#fafaf9', borderRadius:12, padding:10}}><div style={{width:32, height:32, borderRadius:10, background:'#dcfce7', display:'grid', placeItems:'center', fontWeight:900}}>3</div><div><div style={{fontWeight:800, fontSize:13}}>Doğru Usta Eşleşmesi</div><div style={{fontSize:11, color:'#78716c'}}>{city.name} ustası</div></div></div>
             </div>
           </div>
         </div>
       </section>
 
-      <section style={{maxWidth:1120, margin:'0 auto', padding:'18px 20px 60px', display:'grid', gridTemplateColumns:'1.2fr 0.8fr', gap:18}}>
+      <section style={{maxWidth:1120, margin:'0 auto', padding:'18px 20px 60px'}} className="content-grid">
         <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
-          <h3 style={{margin:'0 0 8px 0', fontWeight:900}}>✅ Neden {city.name} {job.name} için Hemen Ustam Gelsin?</h3>
+          <h3 style={{margin:'0 0 8px 0', fontWeight:900}}>✅ Neden {city.name}'da {job.name} için Hemen Ustam Gelsin?</h3>
           <ul style={{margin:0, paddingLeft:18, color:'#44403c', lineHeight:1.7, fontSize:14}}>
-            <li><b>81 ilde 42 iş kolu</b></li><li><b>Doğrulanan ustalar</b></li><li><b>Kesinti yok, komisyon %0</b></li><li><b>Yakıt masrafı yok</b></li><li><b>{city.name} için ortalama 5dk geri dönüş</b></li>
+            <li><b>81 ilde 42 iş kolu</b> - Türkiye geneli</li>
+            <li><b>Doğrulanmış ustalar</b> - Güvenli hizmet</li>
+            <li><b>Kesinti yok, komisyon %0</b> - Gerçek kazanç</li>
+            <li><b>Yakıt masrafı yok</b> - Akıllı eşleşme</li>
+            <li><b>Hızlı eşleşme</b> - Zaman kaybetme</li>
           </ul>
-          <div style={{display:'flex', gap:8, marginTop:14}}>
+          <div style={{display:'flex', gap:8, marginTop:14, flexWrap:'wrap'}}>
             <a href="https://hemenustamgelsin.com" style={{background:'#16a34a', color:'white', padding:'10px 16px', borderRadius:10, fontWeight:800, textDecoration:'none'}}>Hemen İlan Ver</a>
             <Link href={`/${city.slug}`} style={{background:'#f5f5f4', color:'#111', padding:'10px 16px', borderRadius:10, fontWeight:700, textDecoration:'none'}}>← {city.name} Tüm Ustalar</Link>
           </div>
@@ -285,7 +286,7 @@ export default async function JobCityPage({params}:{params: Promise<{city:string
               </Link>
             ))}
           </div>
-          <div style={{marginTop:10, fontSize:11, color:'#16a34a', fontWeight:700}}>📍 {city.name} ve çevresinde 5 dakikada usta bul • Komisyon %0</div>
+          <div style={{marginTop:10, fontSize:11, color:'#16a34a', fontWeight:700}}>📍 {city.name} ve çevresinde hızlı usta bul • Komisyon %0</div>
         </div>
       </section>
     </main>
