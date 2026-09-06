@@ -2,6 +2,6 @@
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
-  images: { unoptimized: true }
+  images: { unoptimized: true } // Cloudflare'de mecbur
 }
 module.exports = nextConfig
