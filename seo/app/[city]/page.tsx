@@ -1,21 +1,37 @@
 import { cities } from '../../data/cities'
 import { jobs } from '../../data/jobs'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 
-export function generateStaticParams(){ 
-  return cities.map(c=>({city:c.slug})) 
+export function generateStaticParams(){
+  return cities.map(c=>({city:c.slug}))
 }
 
-export async function generateMetadata({params}:{params: Promise<{city:string}>}){
+export async function generateMetadata({params}:{params: Promise<{city:string}>}): Promise<Metadata>{
   const { city: citySlug } = await params
   const city = cities.find(c=>c.slug===citySlug)
   if(!city) return {}
+  const canonical = `https://hemenustamgelsin.com/${city.slug}`
+  const title = `${city.name} Ustaları - Komisyonsuz | Hemen Ustam Gelsin`
+  const description = `${city.name} bölgesinde komisyonsuz, kesintisiz ${jobs.length} kategoride doğrulanmış usta. Akıllı fiyat tahmini ile hemen teklif al.`
   return {
-    title: `${city.name} Ustaları - Komisyonsuz | Hemen Ustam Gelsin`,
-    description: `${city.name} bölgesinde komisyonsuz, kesintisiz 42 kategoride doğrulanmış usta. Akıllı fiyat tahmini ile hemen teklif al.`,
-    alternates: {
-      canonical: `https://hemenustamgelsin.com/${city.slug}`
-    }
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: 'website',
+      locale: 'tr_TR',
+      siteName: 'Hemen Ustam Gelsin'
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description
+    },
+    robots: { index: true, follow: true }
   }
 }
 
@@ -38,8 +54,8 @@ export default async function CityPage({params}:{params: Promise<{city:string}>}
   const collectionSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": `${city.name} Ustaları - 42 Kategoride Usta`,
-    "description": `${city.name} bölgesinde komisyonsuz, kesintisiz 42 kategoride doğrulanmış usta.`,
+    "name": `${city.name} Ustaları - ${jobs.length} Kategoride Usta`,
+    "description": `${city.name} bölgesinde komisyonsuz, kesintisiz ${jobs.length} kategoride doğrulanmış usta.`,
     "url": pageUrl,
     "isPartOf": { "@type": "WebSite", "name": "Hemen Ustam Gelsin", "url": "https://hemenustamgelsin.com" },
     "mainEntity": {
@@ -61,8 +77,16 @@ export default async function CityPage({params}:{params: Promise<{city:string}>}
     "name": "Hemen Ustam Gelsin",
     "url": "https://hemenustamgelsin.com",
     "logo": "https://hemenustamgelsin.com/logo.png",
-    "description": "Türkiye'nin 81 ilinde 42 kategoride komisyonsuz usta bulma platformu.",
-    "areaServed": { "@type": "Country", "name": "Turkey" }
+    "description": `Türkiye'nin 81 ilinde ${jobs.length} kategoride komisyonsuz usta bulma platformu.`,
+    "areaServed": { "@type": "Country", "name": "Turkey" },
+    "sameAs": [
+      "https://www.linkedin.com/in/hemen-ustam-gelsin-2499b2415/",
+      "https://www.instagram.com/hemenustamgelsin/",
+      "https://www.facebook.com/profile.php?id=61591164702200",
+      "https://x.com/Hemenustamglsn",
+      "https://www.tiktok.com/@hemen_ustam_gelsin",
+      "https://www.youtube.com/@HemenUstamGelsin"
+    ]
   }
 
   return (
@@ -179,7 +203,7 @@ export default async function CityPage({params}:{params: Promise<{city:string}>}
             <h2 style={{fontSize:'clamp(18px, 2.5vw, 22px)', fontWeight:900, margin:0, letterSpacing:-0.5}}>{city.name}'da en çok aranan hizmetler</h2>
             <p style={{color:'#78716c', fontSize:14, margin:'4px 0 0 0'}}>İhtiyacını seç, {city.name} için doğrulanmış ustadan teklif al</p>
           </div>
-          <div style={{fontSize:12, color:'#a8a29e'}}>42 kategori • {city.name}</div>
+          <div style={{fontSize:12, color:'#a8a29e'}}>{jobs.length} kategori • {city.name}</div>
         </div>
 
         <div className="services-grid">

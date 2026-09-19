@@ -9,6 +9,12 @@ export const metadata = {
   }
 }
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+}
+
 export default function RootLayout({children}:{children:React.ReactNode}){
   // --- SCHEMA.ORG - SITE GENELI - START BOSS ---
   const websiteSchema = {
@@ -51,8 +57,12 @@ export default function RootLayout({children}:{children:React.ReactNode}){
       "name": "Turkey"
     },
     "sameAs": [
-      "https://www.instagram.com/hemenustamgelsin",
-      "https://www.facebook.com/hemenustamgelsin"
+      "https://www.linkedin.com/in/hemen-ustam-gelsin-2499b2415/",
+      "https://www.instagram.com/hemenustamgelsin/",
+      "https://www.facebook.com/profile.php?id=61591164702200",
+      "https://x.com/Hemenustamglsn",
+      "https://www.tiktok.com/@hemen_ustam_gelsin",
+      "https://www.youtube.com/@HemenUstamGelsin"
     ],
     "contactPoint": {
       "@type": "ContactPoint",

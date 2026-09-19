@@ -7,6 +7,9 @@ export default function robots() {
       allow: '/',
       disallow: ['/api/', '/_next/', '/admin'],
     },
-    sitemap: 'https://hemenustamgelsin.com/sitemap.xml',
+    sitemap: [
+      'https://hemenustamgelsin.com/sitemap.xml',
+      'https://hemenustamgelsin.com/usta-sitemap.xml',
+    ],
   }
 }
