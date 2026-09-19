@@ -5,16 +5,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ustam_gelsin/core/models/ilan_model.dart';
 import 'package:ustam_gelsin/core/services/ad_service.dart';
-import 'package:ustam_gelsin/core/constants/meslekler_data.dart'; // MesleklerData'yı import ettik
+import 'package:ustam_gelsin/core/constants/meslekler_data.dart';
 import 'package:ustam_gelsin/features/usta/screens/usta_auth_page.dart';
 
 class IlanAkisiSlider extends StatelessWidget {
-  final double ustaLat;
-  final double ustaLng;
+  final double? ustaLat;
+  final double? ustaLng;
 
-  const IlanAkisiSlider({super.key, required this.ustaLat, required this.ustaLng});
+  const IlanAkisiSlider({super.key, this.ustaLat, this.ustaLng});
 
-  // Artık manuel Map yok, MesleklerData'dan yardım alıyoruz
   String? _getKategoriResmi(String kategori) {
     try {
       final meslek = MesleklerData.hizmetlerDetayli.firstWhere(
@@ -30,10 +29,10 @@ class IlanAkisiSlider extends StatelessWidget {
     try {
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
       if (userDoc.exists) {
-        String ad = userDoc.get('firstName') ?? "";
-        String soyad = userDoc.get('lastName') ?? "";
+        String ad = userDoc.get('firstName')?? "";
+        String soyad = userDoc.get('lastName')?? "";
         if (ad.isEmpty) return "MÜŞTERİ";
-        String soyadHarf = soyad.isNotEmpty ? soyad[0].toUpperCase() : "";
+        String soyadHarf = soyad.isNotEmpty? soyad[0].toUpperCase() : "";
         return "${ad[0].toUpperCase()}${ad.substring(1).toLowerCase()} $soyadHarf.";
       }
     } catch (e) { return "MÜŞTERİ"; }
@@ -52,7 +51,7 @@ class IlanAkisiSlider extends StatelessWidget {
         List<IlanModel> ilanlar = snapshot.data!.where((i) {
           bool modelAcilMi = i.isAcil == true;
           bool detayAcilMi = i.teknikDetaylar['isAcil'] == true;
-          return !modelAcilMi && !detayAcilMi;
+          return!modelAcilMi &&!detayAcilMi;
         }).toList()
           ..sort((a, b) => b.tarih.compareTo(a.tarih));
 
@@ -72,7 +71,6 @@ class IlanAkisiSlider extends StatelessWidget {
   }
 
   Widget _ilanKarti(BuildContext context, IlanModel ilan) {
-    // MesleklerData'dan resim yolunu çek
     final String? kategoriResimYolu = _getKategoriResmi(ilan.kategori);
 
     return GestureDetector(
@@ -96,11 +94,11 @@ class IlanAkisiSlider extends StatelessWidget {
                     ? CachedNetworkImage(
                   imageUrl: ilan.resimler.first,
                   fit: BoxFit.cover,
-                  errorWidget: (context, url, error) => kategoriResimYolu != null
+                  errorWidget: (context, url, error) => kategoriResimYolu!= null
                       ? Image.asset(kategoriResimYolu, fit: BoxFit.cover)
                       : Container(color: Colors.grey[200], child: const Icon(Icons.build)),
                 )
-                    : (kategoriResimYolu != null
+                    : (kategoriResimYolu!= null
                     ? Image.asset(kategoriResimYolu, fit: BoxFit.cover)
                     : Container(color: Colors.grey[200], child: const Icon(Icons.build))),
               ),
@@ -113,7 +111,7 @@ class IlanAkisiSlider extends StatelessWidget {
                   FutureBuilder<String>(
                     future: _getMaskeliIsim(ilan.userId),
                     builder: (context, s) => Text(
-                      s.data ?? "MÜŞTERİ",
+                      s.data?? "MÜŞTERİ",
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ),
@@ -121,7 +119,7 @@ class IlanAkisiSlider extends StatelessWidget {
                   Row(children: [
                     const Icon(Icons.location_on, size: 12, color: Colors.red),
                     const SizedBox(width: 6),
-                    Text(ilan.sehirIlceMetni ?? "Konum yok", style: const TextStyle(fontSize: 11, color: Colors.grey))
+                    Text(ilan.sehirIlceMetni?? "Konum yok", style: const TextStyle(fontSize: 11, color: Colors.grey))
                   ]),
                   const SizedBox(height: 6),
                   Text(ilan.kategori, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
@@ -130,7 +128,7 @@ class IlanAkisiSlider extends StatelessWidget {
                     Wrap(
                       spacing: 4,
                       children: ilan.teknikDetaylar.values
-                          .where((e) => e != null && e.toString().isNotEmpty && e.toString() != "false")
+                          .where((e) => e!= null && e.toString().isNotEmpty && e.toString()!= "false")
                           .take(3)
                           .map((e) => Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
