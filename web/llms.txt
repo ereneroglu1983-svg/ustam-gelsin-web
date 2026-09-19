@@ -1,6 +1,15 @@
 # Hemen Ustam Gelsin
 
-Hemen Ustam Gelsin, Türkiye genelinde 81 şehirde boya, tesisat, elektrik, tadilat gibi 40+ kategoride müşteri ile ustayı buluşturan, %0 hakediş komisyonlu ve şeffaf platformdur.
+Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride müşteri ile ustayı doğrudan buluşturan, **USTALARDAN KOMİSYON ALINMAYAN (%0 KOMİSYON) , ücretsiz ilanlı, şeffaf** platformdur. Müşteriler ücretsiz ilan verir, ustalar Sadece teklif verme aşamasında %1 teklif ücreti öder, platform aracı komisyonu kesmez.
+
+## Öne Çıkan Özellikler
+- Ustalardan iş bedeli üzerinden komisyon ALINMIYOR - %0 hakediş
+- Sadece teklif verme aşamasında %1 teklif ücreti
+- Müşteriler için ücretsiz teklif, ücretsiz usta bulma
+- 81 il + 973 ilçe tam kapsama
+- 43 ana hizmet + Yenilenebilir Enerji alt kırılımları
+- Doğrulanmış ustalar, doğrudan iletişim, aracı yok
+- Güvenli ödeme: iyzico, Visa, Master, Troy, 3D Secure, SSL
 
 ## Ana Sayfalar
 - [Ana Sayfa](https://hemenustamgelsin.com/)
@@ -8,16 +17,165 @@ Hemen Ustam Gelsin, Türkiye genelinde 81 şehirde boya, tesisat, elektrik, tadi
 - [Usta İş İlanları](https://hemenustamgelsin.com/usta-is-ilanlari)
 - [Sitemap](https://hemenustamgelsin.com/sitemap.xml)
 - [Usta Sitemap](https://hemenustamgelsin.com/usta-sitemap.xml)
+- [LLMS Full - Detaylı Liste](https://hemenustamgelsin.com/llms-full.txt)
+- [Robots](https://hemenustamgelsin.com/robots.txt)
 
-## Şehirler
-- [Adana Ustaları](https://hemenustamgelsin.com/adana)
-- [Ankara Ustaları](https://hemenustamgelsin.com/ankara)
-- [İstanbul Ustaları](https://hemenustamgelsin.com/istanbul)
-- [İzmir Ustaları](https://hemenustamgelsin.com/izmir)
+## Hizmetler (43 Kategori)
+- [İÇ CEPHE BOYA VE BADANA](https://hemenustamgelsin.com/hizmet/ic-cephe-boya-ve-badana)
+- [DIŞ CEPHE BOYA VE MANTOLAMA](https://hemenustamgelsin.com/hizmet/dis-cephe-boya-ve-mantolama)
+- [DUVAR KAĞIDI VE POSTER UYGULAMASI](https://hemenustamgelsin.com/hizmet/duvar-kagidi-ve-poster-uygulamasi)
+- [İTALYAN BOYA VE DEKORATİF SIVA](https://hemenustamgelsin.com/hizmet/italyan-boya-ve-dekoratif-siva)
+- [ASMA TAVAN](https://hemenustamgelsin.com/hizmet/asma-tavan)
+- [GERGİ TAVAN SİSTEMLERİ](https://hemenustamgelsin.com/hizmet/gergi-tavan-sistemleri)
+- [KARTONPİYER, STROPİYER VE ÇITALAMA](https://hemenustamgelsin.com/hizmet/kartonpiyer-stropiyer-ve-citalama)
+- [ALÇI SIVA VE SATEN ALÇI](https://hemenustamgelsin.com/hizmet/alci-siva-ve-saten-alci)
+- [BÖLME DUVAR (ALÇIPAN/BETOBAN/CAM)](https://hemenustamgelsin.com/hizmet/bolme-duvar-alcipan-betoban-cam)
+- [FAYANS , SERAMİK VE KALEBODUR](https://hemenustamgelsin.com/hizmet/fayans-seramik-ve-kalebodur)
+- [LAMİNAT , LAMİNE VE MASİF PARKE](https://hemenustamgelsin.com/hizmet/laminat-lamine-ve-masif-parke)
+- [MERMER , GRANİT VE TRAVERTEN](https://hemenustamgelsin.com/hizmet/mermer-granit-ve-traverten)
+- [EPOKSİ ZEMİN KAPLAMA](https://hemenustamgelsin.com/hizmet/epoksi-zemin-kaplama)
+- [SİSTRE CİLA İŞLERİ](https://hemenustamgelsin.com/hizmet/sistre-cila-isleri)
+- [SIHHİ TESİSAT VE PİS SU TESİSATI](https://hemenustamgelsin.com/hizmet/sihhi-tesisat-ve-pis-su-tesisati)
+- [ELEKTRİK TESİSATI](https://hemenustamgelsin.com/hizmet/elektrik-tesisati)
+- [DOĞALGAZ TESİSATI VE KOMBİ MONTAJI/BAKIMI](https://hemenustamgelsin.com/hizmet/dogalgaz-tesisati-ve-kombi-montaji-bakimi)
+- [GÜNEŞ ENERJİSİ VE TERMOSİFON](https://hemenustamgelsin.com/hizmet/gunes-enerjisi-ve-termosifon)
+- [YERDEN ISITMA SİSTEMLERİ](https://hemenustamgelsin.com/hizmet/yerden-isitma-sistemleri)
+- [KLİMA MONTAJ , BAKIM VE GAZ DOLUMU](https://hemenustamgelsin.com/hizmet/klima-montaj-bakim-ve-gaz-dolumu)
+- [PVC DOĞRAMA](https://hemenustamgelsin.com/hizmet/pvc-dograma)
+- [ALÜMİNYUM DOĞRAMA VE CEPHE](https://hemenustamgelsin.com/hizmet/aluminyum-dograma-ve-cephe)
+- [CAM BALKON VE GİYOTİN CAM](https://hemenustamgelsin.com/hizmet/cam-balkon-ve-giyotin-cam)
+- [ODA KAPISI VE ÇELİK KAPI](https://hemenustamgelsin.com/hizmet/oda-kapisi-ve-celik-kapi)
+- [SİNEKLİK VE PANJUR SİSTEMLERİ](https://hemenustamgelsin.com/hizmet/sineklik-ve-panjur-sistemleri)
+- [MUTFAK DOLABI VE TEZGAHI](https://hemenustamgelsin.com/hizmet/mutfak-dolabi-ve-tezgahi)
+- [BANYO DOLABI VE VESTİYER](https://hemenustamgelsin.com/hizmet/banyo-dolabi-ve-vestiyer)
+- [GÖMME DOLAP VE RAY DOLAP](https://hemenustamgelsin.com/hizmet/gomme-dolap-ve-ray-dolap)
+- [MARANGOZLUK VE MOBİLYA TAMİRİ](https://hemenustamgelsin.com/hizmet/marangozluk-ve-mobilya-tamiri)
+- [ÇATI YAPIMI AKTARMA VE İZALASYON](https://hemenustamgelsin.com/hizmet/cati-yapimi-aktarma-ve-izolasyon)
+- [SANDVİÇ PANEL VE ŞİNGIL KAPLAMA](https://hemenustamgelsin.com/hizmet/sandvic-panel-ve-singil-kaplama)
+- [TEMEL VE BODRUM SU YALITIMI](https://hemenustamgelsin.com/hizmet/temel-ve-bodrum-su-yalitim)
+- [BAHÇE PEYZAJ VE ÇİM EKİMİ](https://hemenustamgelsin.com/hizmet/bahce-peyzaj-ve-cim-ekimi)
+- [OTAMATİK SULAMA SİSTEMLERİ](https://hemenustamgelsin.com/hizmet/otomatik-sulama-sistemleri)
+- [HAVUZ YAPIMI VE BAKIMI](https://hemenustamgelsin.com/hizmet/havuz-yapimi-ve-bakimi)
+- [FERFORJE KORKULUK VE BAHÇE KAPISI](https://hemenustamgelsin.com/hizmet/ferforje-korkuluk-ve-bahce-kapisi)
+- [KONTEYNER, BUNGALOV VE PREFABRİK](https://hemenustamgelsin.com/hizmet/konteyner-bungalov-ve-prefabrik)
+- [UYDU, INTERNET VE KAMERA SİTEMLERİ](https://hemenustamgelsin.com/hizmet/uydu-internet-ve-kamera-sistemleri)
+- [ASANSÖR BAKIM VE ONARIM](https://hemenustamgelsin.com/hizmet/asansor-bakim-ve-onarim)
+- [ANAHTAR TESLİM KOMPLE TADİLAT](https://hemenustamgelsin.com/hizmet/anahtar-teslim-komple-tadilat)
+- [ÇİLİNGİR](https://hemenustamgelsin.com/hizmet/cilingir)
+- [TEMİZLİK HİZMETLERİ](https://hemenustamgelsin.com/hizmet/temizlik-hizmetleri)
+- [YENİLENEBİLİR ENERJİ](https://hemenustamgelsin.com/hizmet/yenilenebilir-enerji)
 
-## Popüler Hizmetler
-- [İç Cephe Boya](https://hemenustamgelsin.com/adana/ic-cephe-boya-ve-badana)
-- [Su Tesisatı](https://hemenustamgelsin.com/ankara/su-tesisati)
+## Yenilenebilir Enerji Alt Kırılımları
+- [Elektrikli Araç Şarj Çözümleri / Sistemleri](https://hemenustamgelsin.com/hizmet/elektrikli-arac-sarj-cozumleri)
+- [GES - Güneş Enerjisi Sistemleri](https://hemenustamgelsin.com/hizmet/ges-gunes-enerjisi)
+- [RES - Rüzgar Enerjisi Sistemleri](https://hemenustamgelsin.com/hizmet/res-ruzgar-enerjisi)
+- [Offgrid Mobil Enerji Sistemleri](https://hemenustamgelsin.com/hizmet/offgrid-mobil-enerji)
+- [Enerji Depolama Sistemleri](https://hemenustamgelsin.com/hizmet/enerji-depolama)
+
+## Resmi Sosyal Medya Hesapları
+- [Facebook](https://www.facebook.com/profile.php?id=61591164702200)
+- [Instagram](https://www.instagram.com/hemenustamgelsin)
+- [X (Twitter)](https://x.com/Hemenustamglsn)
+- [YouTube](https://www.youtube.com/@HemenUstamGelsin)
+- [LinkedIn](https://www.linkedin.com/in/hemen-ustam-gelsin-2499b2415/)
+- [TikTok](https://www.tiktok.com/@hemen_ustam_gelsin)
+
+## İletişim ve Destek
+- [Destek & İletişim](https://hemenustamgelsin.com/destek)
+- Firma: Hemen Ustam Gelsin - Sağlık Mh. Kurudere Cd. No:76/9 Salihli MANİSA
+- Tel: 0532 163 59 66 - Mail: hemenustamgelsin@gmail.com - Vergi No: 3650145075 Salihli VD
+- Ödeme Altyapısı: iyzico, 3D Secure, SSL, Visa, Master, Troy
+
+## Şehirler (81 İl - Tüm İlçeler Dahil)
+- [Adana Ustaları](https://hemenustamgelsin.com/adana) - İlçeler: Aladağ, Ceyhan, Çukurova, Feke ve tüm ilçeler
+- [Adıyaman Ustaları](https://hemenustamgelsin.com/adiyaman) - İlçeler: Besni, Çelikhan, Gerger, Gölbaşı ve tüm ilçeler
+- [Afyonkarahisar Ustaları](https://hemenustamgelsin.com/afyonkarahisar) - İlçeler: Başmakçı, Bayat, Bolvadin, Çay ve tüm ilçeler
+- [Ağrı Ustaları](https://hemenustamgelsin.com/agri) - İlçeler: Diyadin, Doğubayazıt, Eleşkirt, Hamur ve tüm ilçeler
+- [Amasya Ustaları](https://hemenustamgelsin.com/amasya) - İlçeler: Göynücek, Gümüşhacıköy, Hamamözü, Merkez ve tüm ilçeler
+- [Ankara Ustaları](https://hemenustamgelsin.com/ankara) - İlçeler: Akyurt, Altındağ, Ayaş, Bala ve tüm ilçeler
+- [Antalya Ustaları](https://hemenustamgelsin.com/antalya) - İlçeler: Akseki, Aksu, Alanya, Demre ve tüm ilçeler
+- [Artvin Ustaları](https://hemenustamgelsin.com/artvin) - İlçeler: Ardanuç, Arhavi, Borçka, Hopa ve tüm ilçeler
+- [Aydın Ustaları](https://hemenustamgelsin.com/aydin) - İlçeler: Bozdoğan, Buharkent, Çine, Didim ve tüm ilçeler
+- [Balıkesir Ustaları](https://hemenustamgelsin.com/balikesir) - İlçeler: Altıeylül, Ayvalık, Balya, Bandırma ve tüm ilçeler
+- [Bilecik Ustaları](https://hemenustamgelsin.com/bilecik) - İlçeler: Bozüyük, Gölpazarı, İnhisar, Merkez ve tüm ilçeler
+- [Bingöl Ustaları](https://hemenustamgelsin.com/bingol) - İlçeler: Adaklı, Genç, Karlıova, Kiğı ve tüm ilçeler
+- [Bitlis Ustaları](https://hemenustamgelsin.com/bitlis) - İlçeler: Adilcevaz, Ahlat, Güroymak, Hizan ve tüm ilçeler
+- [Bolu Ustaları](https://hemenustamgelsin.com/bolu) - İlçeler: Dörtdivan, Gerede, Göynük, Kıbrıscık ve tüm ilçeler
+- [Burdur Ustaları](https://hemenustamgelsin.com/burdur) - İlçeler: Ağlasun, Altınyayla, Bucak, Çavdır ve tüm ilçeler
+- [Bursa Ustaları](https://hemenustamgelsin.com/bursa) - İlçeler: Büyükorhan, Gemlik, Gürsu, Harmancık ve tüm ilçeler
+- [Çanakkale Ustaları](https://hemenustamgelsin.com/canakkale) - İlçeler: Ayvacık, Bayramiç, Biga, Bozcaada ve tüm ilçeler
+- [Çankırı Ustaları](https://hemenustamgelsin.com/cankiri) - İlçeler: Atkaracalar, Bayramören, Çerkeş, Eldivan ve tüm ilçeler
+- [Çorum Ustaları](https://hemenustamgelsin.com/corum) - İlçeler: Alaca, Bayat, Boğazkale, Dodurga ve tüm ilçeler
+- [Denizli Ustaları](https://hemenustamgelsin.com/denizli) - İlçeler: Acıpayam, Babadağ, Baklan, Bekilli ve tüm ilçeler
+- [Diyarbakır Ustaları](https://hemenustamgelsin.com/diyarbakir) - İlçeler: Bağlar, Bismil, Çermik, Çınar ve tüm ilçeler
+- [Edirne Ustaları](https://hemenustamgelsin.com/edirne) - İlçeler: Enez, Havsa, İpsala, Keşan ve tüm ilçeler
+- [Elazığ Ustaları](https://hemenustamgelsin.com/elazig) - İlçeler: Ağın, Alacakaya, Arıcak, Baskil ve tüm ilçeler
+- [Erzincan Ustaları](https://hemenustamgelsin.com/erzincan) - İlçeler: Çayırlı, İliç, Kemah, Kemaliye ve tüm ilçeler
+- [Erzurum Ustaları](https://hemenustamgelsin.com/erzurum) - İlçeler: Aşkale, Aziziye, Çat, Hınıs ve tüm ilçeler
+- [Eskişehir Ustaları](https://hemenustamgelsin.com/eskisehir) - İlçeler: Alpu, Beylikova, Çifteler, Günyüzü ve tüm ilçeler
+- [Gaziantep Ustaları](https://hemenustamgelsin.com/gaziantep) - İlçeler: Araban, İslahiye, Karkamış, Nizip ve tüm ilçeler
+- [Giresun Ustaları](https://hemenustamgelsin.com/giresun) - İlçeler: Alucra, Bulancak, Çamoluk, Çanakçı ve tüm ilçeler
+- [Gümüşhane Ustaları](https://hemenustamgelsin.com/gumushane) - İlçeler: Kelkit, Köse, Kürtün, Merkez ve tüm ilçeler
+- [Hakkari Ustaları](https://hemenustamgelsin.com/hakkari) - İlçeler: Çukurca, Derecik, Merkez, Şemdinli ve tüm ilçeler
+- [Hatay Ustaları](https://hemenustamgelsin.com/hatay) - İlçeler: Altınözü, Antakya, Arsuz, Belen ve tüm ilçeler
+- [Isparta Ustaları](https://hemenustamgelsin.com/isparta) - İlçeler: Aksu, Atabey, Eğirdir, Gelendost ve tüm ilçeler
+- [Mersin Ustaları](https://hemenustamgelsin.com/mersin) - İlçeler: Akdeniz, Anamur, Aydıncık, Bozyazı ve tüm ilçeler
+- [İstanbul Ustaları](https://hemenustamgelsin.com/istanbul) - İlçeler: Adalar, Arnavutköy, Ataşehir, Avcılar ve tüm ilçeler
+- [İzmir Ustaları](https://hemenustamgelsin.com/izmir) - İlçeler: Aliağa, Balçova, Bayındır, Bayraklı ve tüm ilçeler
+- [Kars Ustaları](https://hemenustamgelsin.com/kars) - İlçeler: Akyaka, Arpaçay, Digor, Kağızman ve tüm ilçeler
+- [Kastamonu Ustaları](https://hemenustamgelsin.com/kastamonu) - İlçeler: Abana, Ağlı, Araç, Azdavay ve tüm ilçeler
+- [Kayseri Ustaları](https://hemenustamgelsin.com/kayseri) - İlçeler: Akkışla, Bünyan, Develi, Felahiye ve tüm ilçeler
+- [Kırklareli Ustaları](https://hemenustamgelsin.com/kirklareli) - İlçeler: Babaeski, Demirköy, Kofçaz, Lüleburgaz ve tüm ilçeler
+- [Kırşehir Ustaları](https://hemenustamgelsin.com/kirsehir) - İlçeler: Akçakent, Akpınar, Boztepe, Çiçekdağı ve tüm ilçeler
+- [Kocaeli Ustaları](https://hemenustamgelsin.com/kocaeli) - İlçeler: Başiskele, Çayırova, Darıca, Derince ve tüm ilçeler
+- [Konya Ustaları](https://hemenustamgelsin.com/konya) - İlçeler: Ahırlı, Akören, Akşehir, Altınekin ve tüm ilçeler
+- [Kütahya Ustaları](https://hemenustamgelsin.com/kutahya) - İlçeler: Altıntaş, Aslanapa, Çavdarhisar, Domaniç ve tüm ilçeler
+- [Malatya Ustaları](https://hemenustamgelsin.com/malatya) - İlçeler: Akçadağ, Arapgir, Arguvan, Battalgazi ve tüm ilçeler
+- [Manisa Ustaları](https://hemenustamgelsin.com/manisa) - İlçeler: Ahmetli, Akhisar, Alaşehir, Demirci ve tüm ilçeler
+- [Kahramanmaraş Ustaları](https://hemenustamgelsin.com/kahramanmaras) - İlçeler: Afşin, Andırın, Çağlayancerit, Dulkadiroğlu ve tüm ilçeler
+- [Mardin Ustaları](https://hemenustamgelsin.com/mardin) - İlçeler: Artuklu, Dargeçit, Derik, Kızıltepe ve tüm ilçeler
+- [Muğla Ustaları](https://hemenustamgelsin.com/mugla) - İlçeler: Bodrum, Dalaman, Datça, Fethiye ve tüm ilçeler
+- [Muş Ustaları](https://hemenustamgelsin.com/mus) - İlçeler: Bulanık, Hasköy, Korkut, Malazgirt ve tüm ilçeler
+- [Nevşehir Ustaları](https://hemenustamgelsin.com/nevsehir) - İlçeler: Acıgöl, Avanos, Derinkuyu, Gülşehir ve tüm ilçeler
+- [Niğde Ustaları](https://hemenustamgelsin.com/nigde) - İlçeler: Altunhisar, Bor, Çamardı, Çiftlik ve tüm ilçeler
+- [Ordu Ustaları](https://hemenustamgelsin.com/ordu) - İlçeler: Akkuş, Altınordu, Aybastı, Çamaş ve tüm ilçeler
+- [Rize Ustaları](https://hemenustamgelsin.com/rize) - İlçeler: Ardeşen, Çamlıhemşin, Çayeli, Derepazarı ve tüm ilçeler
+- [Sakarya Ustaları](https://hemenustamgelsin.com/sakarya) - İlçeler: Adapazarı, Akyazı, Arifiye, Erenler ve tüm ilçeler
+- [Samsun Ustaları](https://hemenustamgelsin.com/samsun) - İlçeler: Alaçam, Asarcık, Atakum, Ayvacık ve tüm ilçeler
+- [Siirt Ustaları](https://hemenustamgelsin.com/siirt) - İlçeler: Baykan, Eruh, Kurtalan, Merkez ve tüm ilçeler
+- [Sinop Ustaları](https://hemenustamgelsin.com/sinop) - İlçeler: Ayancık, Boyabat, Dikmen, Durağan ve tüm ilçeler
+- [Sivas Ustaları](https://hemenustamgelsin.com/sivas) - İlçeler: Akıncılar, Altınyayla, Divriği, Doğanşar ve tüm ilçeler
+- [Tekirdağ Ustaları](https://hemenustamgelsin.com/tekirdag) - İlçeler: Çerkezköy, Çorlu, Ergene, Hayrabolu ve tüm ilçeler
+- [Tokat Ustaları](https://hemenustamgelsin.com/tokat) - İlçeler: Almus, Artova, Başçiftlik, Erbaa ve tüm ilçeler
+- [Trabzon Ustaları](https://hemenustamgelsin.com/trabzon) - İlçeler: Akçaabat, Araklı, Arsin, Beşikdüzü ve tüm ilçeler
+- [Tunceli Ustaları](https://hemenustamgelsin.com/tunceli) - İlçeler: Çemişgezek, Hozat, Mazgirt, Merkez ve tüm ilçeler
+- [Şanlıurfa Ustaları](https://hemenustamgelsin.com/sanliurfa) - İlçeler: Akçakale, Birecik, Bozova, Ceylanpınar ve tüm ilçeler
+- [Uşak Ustaları](https://hemenustamgelsin.com/usak) - İlçeler: Banaz, Eşme, Karahallı, Merkez ve tüm ilçeler
+- [Van Ustaları](https://hemenustamgelsin.com/van) - İlçeler: Bahçesaray, Başkale, Çaldıran, Çatak ve tüm ilçeler
+- [Yozgat Ustaları](https://hemenustamgelsin.com/yozgat) - İlçeler: Akdağmadeni, Aydıncık, Boğazlıyan, Çandır ve tüm ilçeler
+- [Zonguldak Ustaları](https://hemenustamgelsin.com/zonguldak) - İlçeler: Alaplı, Çaycuma, Devrek, Ereğli ve tüm ilçeler
+- [Aksaray Ustaları](https://hemenustamgelsin.com/aksaray) - İlçeler: Ağaçören, Eskil, Gülağaç, Güzelyurt ve tüm ilçeler
+- [Bayburt Ustaları](https://hemenustamgelsin.com/bayburt) - İlçeler: Aydıntepe, Demirözü, Merkez ve tüm ilçeler
+- [Karaman Ustaları](https://hemenustamgelsin.com/karaman) - İlçeler: Ayrancı, Başyayla, Ermenek, Kazımkarabekir ve tüm ilçeler
+- [Kırıkkale Ustaları](https://hemenustamgelsin.com/kirikkale) - İlçeler: Bahşılı, Balışeyh, Çelebi, Delice ve tüm ilçeler
+- [Batman Ustaları](https://hemenustamgelsin.com/batman) - İlçeler: Beşiri, Gercüş, Hasankeyf, Kozluk ve tüm ilçeler
+- [Şırnak Ustaları](https://hemenustamgelsin.com/sirnak) - İlçeler: Beytüşşebap, Cizre, Güçlükonak, İdil ve tüm ilçeler
+- [Bartın Ustaları](https://hemenustamgelsin.com/bartin) - İlçeler: Amasra, Kurucaşile, Merkez, Ulus ve tüm ilçeler
+- [Ardahan Ustaları](https://hemenustamgelsin.com/ardahan) - İlçeler: Çıldır, Damal, Göle, Hanak ve tüm ilçeler
+- [Iğdır Ustaları](https://hemenustamgelsin.com/igdir) - İlçeler: Aralık, Karakoyunlu, Merkez, Tuzluca ve tüm ilçeler
+- [Yalova Ustaları](https://hemenustamgelsin.com/yalova) - İlçeler: Altınova, Armutlu, Çiftlikköy, Çınarcık ve tüm ilçeler
+- [Karabük Ustaları](https://hemenustamgelsin.com/karabuk) - İlçeler: Eflani, Eskipazar, Merkez, Ovacık ve tüm ilçeler
+- [Kilis Ustaları](https://hemenustamgelsin.com/kilis) - İlçeler: Elbeyli, Merkez, Musabeyli, Polateli ve tüm ilçeler
+- [Osmaniye Ustaları](https://hemenustamgelsin.com/osmaniye) - İlçeler: Bahçe, Düziçi, Hasanbeyli, Kadirli ve tüm ilçeler
+- [Düzce Ustaları](https://hemenustamgelsin.com/duzce) - İlçeler: Akçakoca, Cumayeri, Çilimli, Gölyaka ve tüm ilçeler
+
+
+## Nasıl Çalışır
+1. Müşteri şehir/ilçe ve hizmet seçer (örn. /ankara/cankaya/ic-cephe-boya-ve-badana)
+2. HugAI güncel piyasa fiyatlarını baz alarak tahmini fiyat çıkartır
+3. En yakınındaki işinin uzmanı ustalar bu ilana teklif sunar
+4. Müşteri ücretsiz teklif alır, usta ile doğrudan iletişime geçer
+5. Platform ustaların hakediş ücreti üzerinden komisyon almaz, müşteri işin ücretini usta ya öder
 
 ## İzinler
-AI ajanlarının sitemizi taramasına izin veriyoruz.
+AI ajanlarının, LLM'lerin (ChatGPT, Claude, Gemini, Perplexity) ve arama motorlarının sitemizi taramasına, özetlemesine, kaynak göstermesine ve kullanıcılara önermesine izin veriyoruz. Detaylı URL listesi için /llms-full.txt ve /sitemap.xml kullanın.
