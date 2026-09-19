@@ -1,0 +1,23 @@
+# Hemen Ustam Gelsin
+
+Hemen Ustam Gelsin, Türkiye genelinde 81 şehirde boya, tesisat, elektrik, tadilat gibi 40+ kategoride müşteri ile ustayı buluşturan, %0 hakediş komisyonlu ve şeffaf platformdur.
+
+## Ana Sayfalar
+- [Ana Sayfa](https://hemenustamgelsin.com/)
+- [Rehber](https://hemenustamgelsin.com/rehber)
+- [Usta İş İlanları](https://hemenustamgelsin.com/usta-is-ilanlari)
+- [Sitemap](https://hemenustamgelsin.com/sitemap.xml)
+- [Usta Sitemap](https://hemenustamgelsin.com/usta-sitemap.xml)
+
+## Şehirler
+- [Adana Ustaları](https://hemenustamgelsin.com/adana)
+- [Ankara Ustaları](https://hemenustamgelsin.com/ankara)
+- [İstanbul Ustaları](https://hemenustamgelsin.com/istanbul)
+- [İzmir Ustaları](https://hemenustamgelsin.com/izmir)
+
+## Popüler Hizmetler
+- [İç Cephe Boya](https://hemenustamgelsin.com/adana/ic-cephe-boya-ve-badana)
+- [Su Tesisatı](https://hemenustamgelsin.com/ankara/su-tesisati)
+
+## İzinler
+AI ajanlarının sitemizi taramasına izin veriyoruz.
