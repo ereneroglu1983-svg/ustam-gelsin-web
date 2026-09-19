@@ -22,19 +22,23 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
   XFile? secilenResim;
   bool yukleniyor = false;
 
-  // R2'ye resim yükle (YÜKLEME İÇİN S3 API)
-  Future<String?> resimYukle(String slug) async {
-    if (secilenResim == null) return null;
-
-    final minio = Minio(
-      endPoint: 'ustam-gelsin-medya.${Env.r2FlutterEndpoint.replaceAll('https://', '')}',
+  Minio _minioClient() {
+    final endpoint = Env.r2FlutterEndpoint;
+    final host = endpoint.replaceAll('https://', '').replaceAll('http://', '').split('/').first.trim();
+    return Minio(
+      endPoint: host,
       accessKey: Env.r2FlutterAccessKey,
       secretKey: Env.r2FlutterSecretKey,
       useSSL: true,
       region: 'auto',
     );
+  }
 
-    final bytes = await secilenResim!.readAsBytes();
+  // R2'ye resim yükle - FIXLENDİ
+  Future<String?> resimYukle(String slug) async {
+    if (secilenResim == null) return null;
+    final minio = _minioClient();
+    final bytes = await secilenResim!.readAsBytes(); // Uint8List
     final dosyaAdi = '$slug-${DateTime.now().millisecondsSinceEpoch}.webp';
     final yol = 'images/$dosyaAdi';
 
@@ -42,37 +46,37 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
       'ustam-gelsin-medya',
       yol,
       Stream.value(bytes),
+      size: bytes.length, // FIX: size şart!
       metadata: {'Content-Type': 'image/webp'},
     );
-
-    return yol; // SADECE PATH DÖN
+    print('✅ Resim yüklendi: $yol - ${bytes.length} bytes');
+    return yol;
   }
 
-  // R2'ye metin yükle (YÜKLEME İÇİN S3 API)
+  // R2'ye metin yükle - ASIL BOMBA BURADAYDI - FIXLENDİ
   Future<String?> metinYukle(String slug) async {
-    final minio = Minio(
-      endPoint: 'ustam-gelsin-medya.${Env.r2FlutterEndpoint.replaceAll('https://', '')}',
-      accessKey: Env.r2FlutterAccessKey,
-      secretKey: Env.r2FlutterSecretKey,
-      useSSL: true,
-      region: 'auto',
-    );
+    if (icerikController.text.trim().isEmpty) return null;
+    final minio = _minioClient();
 
-    final bytes = utf8.encode(icerikController.text);
+    // FIX: List<int> değil Uint8List yap!
+    final bytes = Uint8List.fromList(utf8.encode(icerikController.text));
     final dosyaAdi = '$slug-${DateTime.now().millisecondsSinceEpoch}.txt';
     final yol = 'posts/$dosyaAdi';
+
+    print('📝 Metin yükleniyor: $yol - ${bytes.length} bytes');
 
     await minio.putObject(
       'ustam-gelsin-medya',
       yol,
       Stream.value(bytes),
-      metadata: {'Content-Type': 'text/plain'},
+      size: bytes.length, // FIX: size şart!
+      metadata: {'Content-Type': 'text/plain; charset=utf-8'},
     );
 
-    return yol; // SADECE PATH DÖN
+    print('✅ Metin yüklendi: $yol');
+    return yol;
   }
 
-  // Firebase'e kaydet - REVIZE EDİLDİ ADIM 1
   Future<void> blogKaydet() async {
     if (baslikController.text.isEmpty || secilenResim == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -81,26 +85,43 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
       return;
     }
 
+    if (icerikController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('İçerik boş olamaz!')),
+      );
+      return;
+    }
+
     setState(() => yukleniyor = true);
 
     try {
       final slug = slugify(baslikController.text, lowercase: true, delimiter: '-');
-      final imagePath = await resimYukle(slug);
-      final contentPath = await metinYukle(slug);
 
-      // DÜZELTİLDİ: Hem doc ID hem de içinde slug alanı var - SEO için şart
+      // Sırayla yükle ve logla
+      final imagePath = await resimYukle(slug);
+      print('imagePath: $imagePath');
+
+      final contentPath = await metinYukle(slug);
+      print('contentPath: $contentPath');
+
+      if (contentPath == null) {
+        throw Exception('Metin R2\'ye yüklenemedi! Bucket public mi? posts/ klasörü var mı?');
+      }
+
       await FirebaseFirestore.instance.collection('icerikler').doc(slug).set({
         'baslik': baslikController.text,
-        'slug': slug, // <-- ADIM 1'İN EN ÖNEMLİ SATIRI BU
-        'imagePath': imagePath, // SADECE PATH: images/dosya.webp
-        'contentPath': contentPath, // SADECE PATH: posts/dosya.txt
+        'slug': slug,
+        'imagePath': imagePath,
+        'contentPath': contentPath,
         'youtubeId': youtubeController.text,
         'kategori': 'Tadilat',
         'tarih': FieldValue.serverTimestamp(),
-        'seoUrl': 'https://hemenustamgelsin.com/rehber/$slug', // Google için hazır
+        'seoUrl': 'https://hemenustamgelsin.com/rehber/$slug',
       });
 
-      // 🚀 ANINDA CANLIYA AL - 5 SANİYEDE GOOGLE'DA (YENİ EKLENEN KISIM)
+      print('✅ Firebase yazıldı: $slug');
+
+      // Revalidate
       try {
         await http.post(
           Uri.parse('https://hemenustamgelsin.com/api/revalidate'),
@@ -110,13 +131,11 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
           },
           body: jsonEncode({'slug': slug}),
         );
-      } catch (_) {
-        // Hata olsa bile blog zaten kaydedildi, sorun yok
-      }
+      } catch (_) {}
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('YAYINDA: $slug')),
+        SnackBar(content: Text('YAYINDA: $slug - Resim+Text OK')),
       );
 
       baslikController.clear();
@@ -124,10 +143,12 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
       icerikController.clear();
       setState(() => secilenResim = null);
 
-    } catch (e) {
+    } catch (e, stack) {
+      print('❌ HATA: $e');
+      print(stack);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Hata: $e')),
+        SnackBar(content: Text('Hata: $e'), duration: Duration(seconds: 5)),
       );
     }
 
@@ -139,15 +160,12 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Rehber Ekle - Admin')),
+      appBar: AppBar(title: const Text('Rehber Ekle - Admin FIXLENDİ')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(
-              controller: baslikController,
-              decoration: const InputDecoration(labelText: 'Blog Başlığı'),
-            ),
+            TextField(controller: baslikController, decoration: const InputDecoration(labelText: 'Blog Başlığı')),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
@@ -157,25 +175,13 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
               child: Text(secilenResim == null ? 'Kapak Resmi Seç' : 'Resim Seçildi ✓'),
             ),
             const SizedBox(height: 16),
-            TextField(
-              controller: youtubeController,
-              decoration: const InputDecoration(labelText: 'YouTube Video ID (opsiyonel)'),
-            ),
+            TextField(controller: youtubeController, decoration: const InputDecoration(labelText: 'YouTube Video ID (opsiyonel)')),
             const SizedBox(height: 16),
-            TextField(
-              controller: icerikController,
-              decoration: const InputDecoration(labelText: 'Blog İçeriği'),
-              maxLines: 10,
-            ),
+            TextField(controller: icerikController, decoration: const InputDecoration(labelText: 'Blog İçeriği'), maxLines: 10),
             const SizedBox(height: 24),
-            yukleniyor
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
+            yukleniyor ? const CircularProgressIndicator() : ElevatedButton(
               onPressed: blogKaydet,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                minimumSize: const Size(double.infinity, 50),
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, minimumSize: const Size(double.infinity, 50)),
               child: const Text('YAYINLA', style: TextStyle(fontSize: 18)),
             ),
           ],

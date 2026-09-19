@@ -2,6 +2,7 @@
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
-  images: { unoptimized: true } // Cloudflare'de mecbur
+  images: { unoptimized: true },
+  outputFileTracingRoot: __dirname,
 }
 module.exports = nextConfig
