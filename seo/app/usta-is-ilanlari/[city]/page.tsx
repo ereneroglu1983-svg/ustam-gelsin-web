@@ -1,8 +1,9 @@
-// app/usta-is-ilanlari/[city]/page.tsx - ŞEHİR SAYFASI - CTA'LI SAĞLIKLI VERSİYON
+// app/usta-is-ilanlari/[city]/page.tsx - FINAL - notFound
 import { cities } from '../../../data/cities'
 import { jobs } from '../../../data/jobs'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 
 export function generateStaticParams(){
   return cities.map(c=>({city:c.slug}))
@@ -31,7 +32,7 @@ export async function generateMetadata({params}:{params: Promise<{city:string}>}
 export default async function UstaCityPage({params}:{params: Promise<{city:string}>}){
   const { city: citySlug } = await params
   const city = cities.find(c=>c.slug===citySlug)
-  if(!city) return <div style={{padding:20}}>Bulunamadı</div>
+  if(!city) notFound()
 
   const pageUrl = `https://hemenustamgelsin.com/usta-is-ilanlari/${city.slug}`
 

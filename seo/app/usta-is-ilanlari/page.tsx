@@ -1,4 +1,4 @@
-// app/usta-is-ilanlari/page.tsx - HUB - CTA'LI SAĞLIKLI VERSİYON
+// app/usta-is-ilanlari/page.tsx - FINAL - SAHTE SAYI IDDIASI KALDIRILDI
 import { cities } from '../../data/cities'
 import { jobs } from '../../data/jobs'
 import Link from 'next/link'
@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: `Usta İş İlanları - 81 İlde ${jobs.length} Kategoride Komisyonsuz İş Bul | Hemen Ustam Gelsin`,
-  description: `81 ilde ${jobs.length} kategoride usta iş ilanları. Komisyon yok, hakediş %100 senin. ${cities.length * jobs.length}+ güncel iş ilanı.`,
+  description: `81 ilde ${jobs.length} kategoride usta iş ilanları. Komisyon yok, hakediş %100 senin. Şehrini ve uzmanlık alanını seç, uygun iş ilanlarını keşfet.`,
   alternates: { canonical: 'https://hemenustamgelsin.com/usta-is-ilanlari' },
   openGraph: {
     title: `Usta İş İlanları - 81 İlde İş Bul`,
