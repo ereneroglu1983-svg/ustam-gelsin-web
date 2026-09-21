@@ -1,7 +1,3 @@
-# --- Agora SDK Kuralları ---
--keep class io.agora.**{*;}
--dontwarn io.agora.**
-
 # --- Flutter Native Kanal (Pigeon) Kuralları ---
 # Bu kısım url_launcher ve benzeri eklentilerin haberleşme kanallarının 
 # ProGuard tarafından silinmesini engeller.

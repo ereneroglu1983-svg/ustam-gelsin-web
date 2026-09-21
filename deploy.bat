@@ -1,43 +1,41 @@
+```bat
 @echo off
-echo ======================================
-echo USTAM WEB DEPLOY - FINAL - AGORA YOK - WASM YOK
-echo ======================================
+setlocal
 
-echo [0/5] Temizlik...
-if exist "functions\node_modules" (
-  echo   - Agora node_modules siliniyor...
-  rmdir /S /Q "functions\node_modules"
-)
-if exist "functions\package-lock.json" del /Q "functions\package-lock.json"
-if exist "functions\package.json" del /Q "functions\package.json"
-if exist "functions\index.js" del /Q "functions\index.js"
-if exist "seo\app\api" (
-  echo   - Bozuk seo/app/api siliniyor...
-  rmdir /S /Q "seo\app\api"
-)
-if exist "seo\.next" rmdir /S /Q "seo\.next"
-if exist "seo\out" rmdir /S /Q "seo\out"
-echo Temizlik bitti.
+echo ======================================
+echo USTAM WEB DEPLOY - FINAL
+echo AGORA YOK - DART2JS - FIREBASE FUNCTIONS KORUNUYOR
+echo ======================================
+echo.
+
+echo [0/5] Temizlik atlandi - HICBIR DOSYA SILINMIYOR.
+echo Mevcut functions ve diger dosyalar korunuyor.
+echo.
 
 echo [1/5] SEO Build aliniyor (7052 sayfa)...
 cd seo
 call npm run build
 if %errorlevel% neq 0 (
+  echo.
   echo SEO BUILD PATLADI!
   cd ..
   pause
-  exit /b
+  exit /b 1
 )
 cd ..
 echo SEO bitti.
+echo.
 
-echo [2/5] Flutter Build - CLASSIC STABIL ^(WASM KAPALI^)...
+echo [2/5] Flutter Build - CLASSIC STABIL (DART2JS)...
 call flutter build web --release --tree-shake-icons
 if %errorlevel% neq 0 (
+  echo.
   echo FLUTTER BUILD PATLADI!
   pause
-  exit /b
+  exit /b 1
 )
+echo Flutter bitti.
+echo.
 
 echo [2.5/5] Cache fix...
 (
@@ -56,7 +54,8 @@ echo   Cache-Control: public, max-age=3600
 echo /*.html
 echo   Cache-Control: public, max-age=0, must-revalidate
 ) > "build\web\_headers"
-echo _headers olustu.
+echo _headers olusturuldu.
+echo.
 
 echo [3/5] SEO gomuluyor...
 for /D %%i in ("seo\out\*") do (
@@ -68,28 +67,142 @@ for /D %%i in ("seo\out\*") do (
     )
   )
 )
-if exist "seo\out\sitemap.xml" xcopy "seo\out\sitemap.xml" "build\web\" /Y >nul
-if exist "seo\out\usta-sitemap.xml" xcopy "seo\out\usta-sitemap.xml" "build\web\" /Y >nul
-if exist "seo\out\robots.txt" xcopy "seo\out\robots.txt" "build\web\" /Y >nul
-echo SEO gomuldu.
 
-echo [4/5] Cloudflare'e atiliyor...
-call npx wrangler pages deploy build/web --project-name=ustam-web-deploy --commit-dirty=true
-if %errorlevel% neq 0 (
-  echo CLOUDFLARE PATLADI!
-  pause
-  exit /b
+if exist "seo\out\sitemap.xml" (
+  xcopy "seo\out\sitemap.xml" "build\web\" /Y >nul
 )
 
-echo [5/5] GitHub'a yedekleniyor...
-call git add .
-call git commit -m "deploy: %date% %time% - FINAL agora yok wasm yok" --allow-empty
-call git pull --rebase origin main
-call git push origin main
+if exist "seo\out\usta-sitemap.xml" (
+  xcopy "seo\out\usta-sitemap.xml" "build\web\" /Y >nul
+)
+
+if exist "seo\out\robots.txt" (
+  xcopy "seo\out\robots.txt" "build\web\" /Y >nul
+)
+
+echo SEO gomuldu.
+echo.
+
+echo [4/5] Cloudflare'e direkt deploy ediliyor...
+echo.
+
+REM ============================================================
+REM CLOUDFLARE, ROOT'TAKI "functions" KLASORUNU PAGES FUNCTIONS
+REM OLARAK ALGILIYOR.
+REM BU KLASOR ASLINDA FIREBASE FUNCTIONS.
+REM DEPLOY SIRASINDA SADECE GECICI OLARAK ADINI DEGISTIRIYORUZ.
+REM HICBIR DOSYA SILINMIYOR.
+REM ============================================================
+
+if exist "functions_firebase" (
+  echo HATA: functions_firebase zaten mevcut!
+  echo Guvenlik nedeniyle deploy durduruldu.
+  pause
+  exit /b 1
+)
+
+if not exist "functions" (
+  echo HATA: functions klasoru bulunamadi!
+  pause
+  exit /b 1
+)
+
+echo Firebase functions gecici olarak gizleniyor...
+ren "functions" "functions_firebase"
+
+if %errorlevel% neq 0 (
+  echo.
+  echo FUNCTIONS KLASORU YENIDEN ADLANDIRILAMADI!
+  pause
+  exit /b 1
+)
+
+echo functions -> functions_firebase
+echo Cloudflare deploy basliyor...
+echo.
+
+call npx wrangler pages deploy build/web --project-name=ustam-web-deploy --commit-dirty=true
+
+set "WRANGLER_ERROR=%errorlevel%"
+
+echo.
+echo Cloudflare deploy islemi tamamlandi.
+echo.
+
+REM ============================================================
+REM NE OLURSA OLSUN FIREBASE FUNCTIONS GERI GETIRILIYOR
+REM ============================================================
+
+echo Firebase functions geri getiriliyor...
+ren "functions_firebase" "functions"
+
+if %errorlevel% neq 0 (
+  echo.
+  echo KRITIK HATA: functions klasoru geri getirilemedi!
+  echo Manuel olarak:
+  echo ren functions_firebase functions
+  echo komutunu calistir.
+  pause
+  exit /b 1
+)
+
+echo functions_firebase -> functions
+echo.
+
+if not "%WRANGLER_ERROR%"=="0" (
+  echo ======================================
+  echo CLOUDFLARE DEPLOY PATLADI!
+  echo ======================================
+  echo.
+  echo Firebase functions klasoru KORUNDU.
+  pause
+  exit /b 1
+)
 
 echo ======================================
-echo BİTTİ!
+echo CLOUDFLARE DEPLOY TAMAMLANDI!
+echo ======================================
+echo.
+
+echo [5/5] GitHub'a commit ve push yapiliyor...
+echo.
+
+call git add .
+if %errorlevel% neq 0 (
+  echo GIT ADD PATLADI!
+  pause
+  exit /b 1
+)
+
+call git commit -m "deploy: %date% %time% - FINAL" --allow-empty
+if %errorlevel% neq 0 (
+  echo GIT COMMIT PATLADI!
+  pause
+  exit /b 1
+)
+
+call git pull --rebase origin main
+if %errorlevel% neq 0 (
+  echo GIT PULL --REBASE PATLADI!
+  pause
+  exit /b 1
+)
+
+call git push origin main
+if %errorlevel% neq 0 (
+  echo GIT PUSH PATLADI!
+  pause
+  exit /b 1
+)
+
+echo.
+echo ======================================
+echo BITTI!
+echo ======================================
 echo https://hemenustamgelsin.com
 echo https://hemenustamgelsin.com/api/revalidate
 echo ======================================
 pause
+
+endlocal
+```
