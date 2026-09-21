@@ -26,7 +26,7 @@ function generateUstaSeoTitle(city: City, job: Job): string {
 function generateUstaSeoDescription(city: City, job: Job, ilceler: string[]): string {
   const ilce1 = ilceler[0] || "Merkez";
   const ilce2 = ilceler[1] || ilce1;
-  return `${city.name}'de ${job.name.toLowerCase()}ysan yeni müşterilere ulaş. Hemen Ustam Gelsin'de hakedişinden komisyon kesilmez. Teklif vermek için AI tahmini iş bedelinin %1'i kadar teklif ücreti uygulanır. HugAI ile analiz edilen talepleri incele, teklifini ver. ${ilce1}, ${ilce2} ve tüm ${city.name}.`;
+  return `${city.name}'de ${job.name.toLowerCase()} ustasıysan yeni müşterilere ulaş. Hemen Ustam Gelsin'de hakedişinden komisyon kesilmez. Teklif vermek için AI tahmini iş bedelinin %1'i kadar teklif ücreti uygulanır. HugAI ile analiz edilen talepleri incele, teklifini ver. ${ilce1}, ${ilce2} ve tüm ${city.name}.`;
 }
 
 function generateUstaRichData(city: City, job: Job) {
@@ -37,7 +37,7 @@ function generateUstaRichData(city: City, job: Job) {
 
   const h1 = `${city.name} ${job.name} - Müşterini Bul, Teklifini Ver, Kazancını Koru`;
 
-  const intro = `${city.name}'de ${job.name.toLowerCase()}ysan sana olduğundan büyük bir şey anlatmayacağız. Hemen Ustam Gelsin yeni bir platform ve ${city.name}'deki usta ağımızı büyütüyoruz. Henüz her ilçede yüzlerce ilan varmış gibi göstermiyoruz; gerçek müşteriler geldikçe gerçek talepleri ustalarla buluşturmak istiyoruz.
+  const intro = `${city.name}'de ${job.name.toLowerCase()} ustasıysan sana olduğundan büyük bir şey anlatmayacağız. Hemen Ustam Gelsin yeni bir platform ve ${city.name}'deki usta ağımızı büyütüyoruz. Henüz her ilçede yüzlerce ilan varmış gibi göstermiyoruz; gerçek müşteriler geldikçe gerçek talepleri ustalarla buluşturmak istiyoruz.
 
 Müşteri talebini ve fotoğraflarını gönderiyor. HugAI bu bilgileri analiz ederek işin kapsamını ve tahmini bedelini daha anlaşılır hale getiriyor. Sen ilgilendiğin talebi inceleyip teklifini veriyorsun.
 
@@ -76,7 +76,7 @@ export function getAllUstaCityJobCombos(){
       city, job, citySlug: city.slug, jobSlug: job.slug,
       url: `/usta-is-ilanlari/${city.slug}/${job.slug}`,
       seoTitle, seoDescription, metaTitle: seoTitle, metaDescription: seoDescription,
-     ...rich
+    ...rich
     }
   }));
 }
@@ -91,7 +91,7 @@ export function getUstaCityJob(citySlug: string, jobSlug: string){
   return {
     city, job, citySlug, jobSlug, url: `/usta-is-ilanlari/${citySlug}/${jobSlug}`,
     seoTitle, seoDescription, metaTitle: seoTitle, metaDescription: seoDescription,
-   ...rich
+  ...rich
   };
 }
 export const getUstaCityJobData = getUstaCityJob;

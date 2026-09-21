@@ -1,4 +1,4 @@
-// app/rehber/page.tsx - SEO TAM - İÇ LİNK CANAVARI
+// app/rehber/page.tsx - FINAL - ITEMLIST + LINK + SLUG STANDARDI
 import { collection, getDocs, orderBy, query } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import Link from 'next/link'
@@ -26,7 +26,7 @@ async function getBlogs(){
   try {
     const q = query(collection(db, 'icerikler'), orderBy('tarih', 'desc'))
     const snap = await getDocs(q)
-    return snap.docs.map(d => d.data() as any)
+    return snap.docs.map(d => ({ id: d.id, ...(d.data() as any) }))
   } catch {
     return []
   }
@@ -34,6 +34,7 @@ async function getBlogs(){
 
 export default async function RehberHub(){
   const blogs = await getBlogs()
+  const listCount = Math.min(blogs.length, 50)
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -52,12 +53,12 @@ export default async function RehberHub(){
     "url": "https://hemenustamgelsin.com/rehber",
     "mainEntity": {
       "@type": "ItemList",
-      "numberOfItems": blogs.length,
+      "numberOfItems": listCount,
       "itemListElement": blogs.slice(0, 50).map((b:any, i:number) => ({
         "@type": "ListItem",
         "position": i+1,
         "name": b.baslik,
-        "url": `https://hemenustamgelsin.com/rehber/${b.slug}`
+        "url": `https://hemenustamgelsin.com/rehber/${b.slug || b.id}`
       }))
     }
   }
@@ -67,7 +68,6 @@ export default async function RehberHub(){
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
 
-      {/* CTA - DÖNÜŞÜM */}
       <section style={{background:'#111', color:'white', padding:'36px 20px', textAlign:'center'}}>
         <h1 style={{fontSize:'clamp(28px, 4vw, 42px)', fontWeight:900, margin:0}}>İnşaat Rehberi - Usta Tavsiyeleri</h1>
         <p style={{color:'#a8a29e', marginTop:8, maxWidth:600, margin:'8px auto 0'}}>Boya, elektrik, tesisat ve {jobs.length} kategoride m2 fiyatları, püf noktaları ve usta tavsiyeleri.</p>
@@ -77,10 +77,9 @@ export default async function RehberHub(){
       </section>
 
       <div style={{maxWidth:1120, margin:'0 auto', padding:'24px 20px 60px'}}>
-        {/* BLOG GRID */}
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))', gap:14}}>
           {blogs.map((b:any)=>(
-            <Link key={b.slug} href={`/rehber/${b.slug}`} style={{background:'white', border:'1px solid #e7e5e4', borderRadius:14, padding:16, textDecoration:'none', color:'#111'}}>
+            <Link key={b.id} href={`/rehber/${b.slug || b.id}`} style={{background:'white', border:'1px solid #e7e5e4', borderRadius:14, padding:16, textDecoration:'none', color:'#111'}}>
               <div style={{fontSize:11, fontWeight:700, color:'#16a34a', textTransform:'uppercase'}}>{b.kategori}</div>
               <div style={{fontWeight:800, marginTop:4, lineHeight:1.3}}>{b.baslik}</div>
               <div style={{fontSize:12, color:'#78716c', marginTop:8}}>Oku →</div>
@@ -88,7 +87,6 @@ export default async function RehberHub(){
           ))}
         </div>
 
-        {/* İÇ LİNK BOMBASI - BUNU EKLEMEZSEN REHBER GÜCÜ ŞEHİRLERE AKMAZ */}
         <div style={{marginTop:40, background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:20}}>
           <div style={{fontWeight:900, fontSize:14, marginBottom:12}}>POPÜLER HİZMETLER - HEMEN USTA BUL</div>
           <div style={{display:'flex', flexWrap:'wrap', gap:8}}>
@@ -97,7 +95,7 @@ export default async function RehberHub(){
                 İstanbul {j.name}
               </Link>
             ))}
-            <Link href="/ankara" style={{fontSize:12, background:'#111', color:'white', padding:'8px 12px', borderRadius:999, textDecoration:'none'}}>Tüm Şehirler →</Link>
+            <Link href="/#sehirler" style={{fontSize:12, background:'#111', color:'white', padding:'8px 12px', borderRadius:999, textDecoration:'none'}}>Tüm Şehirler →</Link>
           </div>
         </div>
       </div>

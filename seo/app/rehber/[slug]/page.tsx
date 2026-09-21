@@ -1,13 +1,22 @@
-// app/rehber/[slug]/page.tsx - CLOUDFLARE FINAL - SEO TAM
+// app/rehber/[slug]/page.tsx - FINAL v2 - R2 GUARD + res.ok KONTROLU
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore'
 import { db } from '../../../lib/firebase'
 import Link from 'next/link'
 import { cache } from 'react'
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 
 const R2_PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
 
 export const dynamic = 'force-static'
+
+function toISOStringSafe(value: any): string | undefined {
+  if (!value) return undefined
+  if (value?.toDate) {
+    try { return value.toDate().toISOString() } catch {}
+  }
+  try { return new Date(value).toISOString() } catch { return undefined }
+}
 
 const getIcerik = cache(async (slug: string) => {
   try {
@@ -19,66 +28,76 @@ const getIcerik = cache(async (slug: string) => {
   }
 })
 
-export async function generateStaticParams(){
+export async function generateStaticParams() {
   try {
     const snap = await getDocs(collection(db, 'icerikler'))
     return snap.docs.map(d => ({ slug: d.id }))
   } catch { return [] }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{slug:string}> }): Promise<Metadata>{
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const b = await getIcerik(slug)
-  if(!b) return {}
+  if (!b) return {}
   const canonical = `https://hemenustamgelsin.com/rehber/${slug}`
   const imageUrl = b.imagePath? `${R2_PUBLIC_URL}/${b.imagePath}` : 'https://hemenustamgelsin.com/logo.png'
+  const publishedDate = toISOStringSafe(b.tarih)
   return {
     title: `${b.baslik} | Hemen Ustam Gelsin`,
-    description: b.aciklama || b.baslik.slice(0,155),
+    description: b.aciklama || b.baslik.slice(0, 155),
     alternates: { canonical },
     openGraph: {
       title: b.baslik,
-      description: b.aciklama || b.baslik.slice(0,155),
+      description: b.aciklama || b.baslik.slice(0, 155),
       url: canonical,
       type: 'article',
       images: [{ url: imageUrl }],
-      publishedTime: b.tarih,
+      publishedTime: publishedDate,
       authors: ['Hemen Ustam Gelsin']
     },
     twitter: {
       card: 'summary_large_image',
       title: b.baslik,
-      description: b.aciklama || b.baslik.slice(0,155),
+      description: b.aciklama || b.baslik.slice(0, 155),
       images: [imageUrl]
     },
     robots: { index: true, follow: true }
   }
 }
 
-function otomatikFaqOlustur(baslik: string, kategori: string){
+function otomatikFaqOlustur(baslik: string, kategori: string) {
   return [
     { soru: `${baslik} ne kadar tutar?`, cevap: `${kategori} işleri evin metrekaresine ve malzemeye göre değişir. Hemen Ustam Gelsin'den ücretsiz teklif alın.` },
-    { soru: `En iyi ${kategori} ustasını nasıl bulurum?`, cevap: `Hemen Usta Gelsin'e ilan bırakın, doğrulanmış ustalar 15 dk içinde ulaşsın.` },
+    { soru: `En iyi ${kategori} ustasını nasıl bulurum?`, cevap: `Hemen Ustam Gelsin'e ilan bırakın; işinizin detaylarını paylaşarak uygun ustalardan teklif alabilirsiniz.` },
     { soru: `${baslik} için dikkat edilmesi gerekenler neler?`, cevap: `İşçilik kalitesi, malzeme seçimi ve zamanında teslim en önemli 3 kriterdir.` }
   ]
 }
 
-export default async function RehberDetay({ params }: { params: Promise<{slug:string}> }){
+export default async function RehberDetay({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const blog = await getIcerik(slug)
-  if(!blog) return <div className="p-10 text-center">Blog bulunamadı BOSS!</div>
+  if (!blog) notFound()
 
   let contentText = ''
-  try {
-    // force-static'te no-store build'i patlatır, cache kullan
-    const res = await fetch(`${R2_PUBLIC_URL}/${blog.contentPath}`, { next: { revalidate: 3600 } })
-    contentText = await res.text()
-  } catch { contentText = 'İçerik yüklenemedi' }
+  if (!R2_PUBLIC_URL ||!blog.contentPath) {
+    contentText = 'İçerik yüklenemedi'
+  } else {
+    try {
+      const res = await fetch(`${R2_PUBLIC_URL}/${blog.contentPath}`, { next: { revalidate: 3600 } })
+      if (!res.ok) throw new Error(`Content fetch failed: ${res.status}`)
+      contentText = await res.text()
+    } catch {
+      contentText = 'İçerik yüklenemedi'
+    }
+  }
 
-  const imageUrl = `${R2_PUBLIC_URL}/${blog.imagePath}`
-  const optimizedImageUrl = `https://hemenustamgelsin.com/cdn-cgi/image/width=800,quality=75,format=auto/${imageUrl}`
+  const imageUrl = blog.imagePath? `${R2_PUBLIC_URL}/${blog.imagePath}` : 'https://hemenustamgelsin.com/logo.png'
+  const optimizedImageUrl = blog.imagePath
+  ? `https://hemenustamgelsin.com/cdn-cgi/image/width=800,quality=75,format=auto/${imageUrl}`
+    : imageUrl
+
   const canonical = `https://hemenustamgelsin.com/rehber/${slug}`
-
+  const publishedDate = toISOStringSafe(blog.tarih)
   const faqs = blog.faqs?.length > 0? blog.faqs : otomatikFaqOlustur(blog.baslik, blog.kategori || 'tadilat')
 
   const articleSchema = {
@@ -101,7 +120,7 @@ export default async function RehberDetay({ params }: { params: Promise<{slug:st
         "https://www.youtube.com/@HemenUstamGelsin"
       ]
     },
-    "datePublished": blog.tarih,
+    "datePublished": publishedDate,
     "mainEntityOfPage": canonical
   }
 
@@ -134,16 +153,10 @@ export default async function RehberDetay({ params }: { params: Promise<{slug:st
 
       <Link href="/rehber" className="text-sm text-gray-500 hover:text-black">← Rehbere Dön</Link>
       <h1 className="text-4xl font-bold leading-tight mt-4">{blog.baslik}</h1>
-      <p className="text-sm text-gray-500 mt-2">{blog.kategori} • {blog.tarih? new Date(blog.tarih).toLocaleDateString('tr-TR') : ''}</p>
+      <p className="text-sm text-gray-500 mt-2">{blog.kategori} • {publishedDate? new Date(publishedDate).toLocaleDateString('tr-TR') : ''}</p>
 
-      <img
-        src={optimizedImageUrl}
-        alt={blog.baslik}
-        loading="lazy"
-        className="my-6 w-full rounded-xl object-cover aspect-[16/9] bg-gray-100"
-      />
+      <img src={optimizedImageUrl} alt={blog.baslik} loading="lazy" className="my-6 w-full rounded-xl object-cover aspect-[16/9] bg-gray-100" />
 
-      {/* DÜZELTME: HTML ise html olarak bas, düz metin ise pre-wrap */}
       {isHtml? (
         <div className="prose prose-neutral max-w-none leading-relaxed" dangerouslySetInnerHTML={{ __html: contentText }} />
       ) : (
@@ -152,7 +165,7 @@ export default async function RehberDetay({ params }: { params: Promise<{slug:st
 
       <div className="mt-12 p-6 bg-white border rounded-xl">
         <h2 className="text-xl font-bold mb-4">Sıkça Sorulanlar</h2>
-        {faqs.map((f:any,i:number)=>(
+        {faqs.map((f: any, i: number) => (
           <div key={i} className="mb-4 border-b pb-4 last:border-0">
             <h3 className="font-semibold">{f.soru}</h3>
             <p className="text-gray-600 mt-1 text-sm">{f.cevap}</p>
@@ -166,12 +179,7 @@ export default async function RehberDetay({ params }: { params: Promise<{slug:st
       </div>
 
       {blog.youtubeId && (
-        <iframe
-          className="mt-8 w-full aspect-video rounded-xl"
-          src={`https://www.youtube.com/embed/${blog.youtubeId}`}
-          loading="lazy"
-          allowFullScreen
-        />
+        <iframe className="mt-8 w-full aspect-video rounded-xl" src={`https://www.youtube.com/embed/${blog.youtubeId}`} loading="lazy" allowFullScreen />
       )}
     </main>
   )

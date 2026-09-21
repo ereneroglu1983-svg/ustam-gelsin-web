@@ -117,9 +117,11 @@ class _UstaIsDetaySayfasiState extends State<UstaIsDetaySayfasi> {
       bool basarili = await _adService.teklifVerVeBakiyeDus(
         ilanId: widget.ilan.id,
         ustaId: ustaId,
+        kategoriId: widget.ilan.kategoriId,
         teklifFiyat: price,
-        mesaj: _notController.text, // Ustanın notu
+        mesaj: _notController.text,
         komisyonTutari: _hesaplananKomisyon,
+        sehir: widget.ilan.sehirIlceMetni ?? widget.ilan.konumMetin,
       );
       if (mounted) {
         if (basarili) {
