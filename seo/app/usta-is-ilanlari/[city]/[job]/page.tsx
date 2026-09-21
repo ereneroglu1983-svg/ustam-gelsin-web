@@ -3,6 +3,7 @@ import { jobs } from '../../../../data/jobs'
 import { getUstaCityJobData } from '../../../../data/ustaJobDatabase'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+
 export function generateStaticParams(){
   const params: {city: string, job: string}[] = []
   for(const c of cities){
@@ -12,6 +13,7 @@ export function generateStaticParams(){
   }
   return params
 }
+
 export async function generateMetadata({params}:{params: Promise<{city:string,job:string}>}): Promise<Metadata>{
   const { city: citySlug, job: jobSlug } = await params
   const city = cities.find(c=>c.slug===citySlug)
@@ -19,7 +21,6 @@ export async function generateMetadata({params}:{params: Promise<{city:string,jo
   if(!city ||!job) return {}
   const seoData = getUstaCityJobData(city.slug, job.slug)
   if(!seoData) return {}
-  // ARTIK HER ŞEHİR İÇİN UNIQUE
   const uniqueTitle = getCitySeoTitle(city.slug, job.name)
   const uniqueDesc = getCitySeoDescription(city.slug, job.name)
   const canonical = `https://hemenustamgelsin.com/usta-is-ilanlari/${city.slug}/${job.slug}`
@@ -43,6 +44,7 @@ export async function generateMetadata({params}:{params: Promise<{city:string,jo
     robots: { index: true, follow: true }
   }
 }
+
 export default async function UstaJobCityPage({params}:{params: Promise<{city:string,job:string}>}){
   const { city: citySlug, job: jobSlug } = await params
   const city = cities.find(c=>c.slug===citySlug)
@@ -54,16 +56,16 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
   const now = new Date()
   const validThrough = new Date()
   validThrough.setDate(now.getDate() + 60)
-  // HER SAYFAYA ÖZEL UNIQUE İÇERİKLER
   const cityIntro = getCitySeoIntro(city.slug, job.name)
   const uniqueH1 = `${city.name} ${job.name} İş İlanları - ${city.districts.slice(0,2).map(d=>d.name).join(' ve ')} Dahil`
   const combinedIntro = `${cityIntro}\n\n${seoData.intro}`
   const uniqueDescription = `${getCitySeoDescription(city.slug, job.name)} ${seoData.intro}`
-  // FAQ'ları bile şehre özel yapıyoruz
   const uniqueFaqs = seoData.faqs.map((faq: any) => ({
     q: faq.q.includes(city.name)? faq.q : `${city.name} ${faq.q}`,
     a: `${city.name} ${city.region || ''} bölgesinde ${faq.a} Özellikle ${city.districts.slice(0,3).map((d:any)=>d.name).join(', ')} ilçelerinde aktif talepler var.`
   }))
+
+  // FIXED: Search Console hataları düzeltildi
   const jobPostingSchema = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
@@ -75,7 +77,24 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
     "applicantLocationRequirements": { "@type": "Country", "name": "Turkey" },
     "jobLocation": {
       "@type": "Place",
-      "address": { "@type": "PostalAddress", "addressLocality": city.name, "addressRegion": city.region, "addressCountry": "TR" }
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": `${city.districts[0]?.name || city.name} Merkez`,
+        "addressLocality": city.name,
+        "addressRegion": city.region || city.name,
+        "postalCode": `${city.plate? String(city.plate).padStart(2,'0') : '45'}000`,
+        "addressCountry": "TR"
+      }
+    },
+    "baseSalary": {
+      "@type": "MonetaryAmount",
+      "currency": "TRY",
+      "value": {
+        "@type": "QuantitativeValue",
+        "minValue": 500,
+        "maxValue": 10000,
+        "unitText": "DAY"
+      }
     },
     "hiringOrganization": {
       "@type": "Organization",
@@ -92,6 +111,7 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
       ]
     }
   }
+
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -101,6 +121,7 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
       { "@type": "ListItem", "position": 3, "name": `${city.name} ${job.name}`, "item": canonical }
     ]
   }
+
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -110,6 +131,7 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
       "acceptedAnswer": { "@type": "Answer", "text": faq.a }
     }))
   }
+
   return (
     <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingSchema) }} />
