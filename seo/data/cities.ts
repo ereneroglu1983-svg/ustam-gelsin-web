@@ -1,4 +1,4 @@
-// data/cities.ts - FINAL v6 - SERT TİP + ÇİFT YÖNLÜ VALIDATION + SEO TEMİZLİĞİ
+// data/cities.ts - FINAL v7 - SERT TİP + ÇİFT YÖNLÜ VALIDATION + SEO TEMİZLİĞİ + getCityLocative
 
 export type District = {
   name: string;
@@ -15,15 +15,15 @@ export type City = {
 
 const slugify = (text: string) =>
   text
-   .toLowerCase()
-   .replace(/ğ/g, 'g')
-   .replace(/ü/g, 'u')
-   .replace(/ş/g, 's')
-   .replace(/ı/g, 'i')
-   .replace(/ö/g, 'o')
-   .replace(/ç/g, 'c')
-   .replace(/[^a-z0-9]+/g, '-')
-   .replace(/^-|-$/g, '');
+  .toLowerCase()
+  .replace(/ğ/g, 'g')
+  .replace(/ü/g, 'u')
+  .replace(/ş/g, 's')
+  .replace(/ı/g, 'i')
+  .replace(/ö/g, 'o')
+  .replace(/ç/g, 'c')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '');
 
 const regionMap: Record<string, string> = {
   adana: "Akdeniz", adiyaman: "Güneydoğu Anadolu", afyonkarahisar: "Ege", agri: "Doğu Anadolu", amasya: "Karadeniz",
@@ -241,3 +241,31 @@ export const getCitySeoDescription = (citySlug: string, jobLabel: string) => {
   const districts = city.districts.slice(0, 4).map(d => d.name).join(", ");
   return `${city.name} ${jobLabel} işleri için ${districts} başta olmak üzere ${city.districts.length} ilçede usta eşleştirme ve teklif alma. Ustanın hakedişinden başarı komisyonu alınmaz. HugAI destekli keşif ve fiyat tahmini ile şeffaf teklif al.`;
 };
+
+// --- BUILD FIX: getCityLocative - v7 EKLENDİ - usta-is-ilanlari sayfası için gerekli ---
+export function getCityLocative(cityName: string): string {
+  const map: Record<string, string> = {
+    'Adana': "Adana'da", 'Adıyaman': "Adıyaman'da", 'Afyonkarahisar': "Afyonkarahisar'da",
+    'Ağrı': "Ağrı'da", 'Amasya': "Amasya'da", 'Ankara': "Ankara'da", 'Antalya': "Antalya'da",
+    'Artvin': "Artvin'de", 'Aydın': "Aydın'da", 'Balıkesir': "Balıkesir'de", 'Bilecik': "Bilecik'te",
+    'Bingöl': "Bingöl'de", 'Bitlis': "Bitlis'te", 'Bolu': "Bolu'da", 'Burdur': "Burdur'da",
+    'Bursa': "Bursa'da", 'Çanakkale': "Çanakkale'de", 'Çankırı': "Çankırı'da", 'Çorum': "Çorum'da",
+    'Denizli': "Denizli'de", 'Diyarbakır': "Diyarbakır'da", 'Edirne': "Edirne'de", 'Elazığ': "Elazığ'da",
+    'Erzincan': "Erzincan'da", 'Erzurum': "Erzurum'da", 'Eskişehir': "Eskişehir'de", 'Gaziantep': "Gaziantep'te",
+    'Giresun': "Giresun'da", 'Gümüşhane': "Gümüşhane'de", 'Hakkari': "Hakkari'de", 'Hatay': "Hatay'da",
+    'Isparta': "Isparta'da", 'Mersin': "Mersin'de", 'İstanbul': "İstanbul'da", 'İzmir': "İzmir'de",
+    'Kars': "Kars'ta", 'Kastamonu': "Kastamonu'da", 'Kayseri': "Kayseri'de", 'Kırklareli': "Kırklareli'de",
+    'Kırşehir': "Kırşehir'de", 'Kocaeli': "Kocaeli'de", 'Konya': "Konya'da", 'Kütahya': "Kütahya'da",
+    'Malatya': "Malatya'da", 'Manisa': "Manisa'da", 'Kahramanmaraş': "Kahramanmaraş'ta",
+    'Mardin': "Mardin'de", 'Muğla': "Muğla'da", 'Muş': "Muş'ta", 'Nevşehir': "Nevşehir'de",
+    'Niğde': "Niğde'de", 'Ordu': "Ordu'da", 'Rize': "Rize'de", 'Sakarya': "Sakarya'da",
+    'Samsun': "Samsun'da", 'Siirt': "Siirt'te", 'Sinop': "Sinop'ta", 'Sivas': "Sivas'ta",
+    'Tekirdağ': "Tekirdağ'da", 'Tokat': "Tokat'ta", 'Trabzon': "Trabzon'da", 'Tunceli': "Tunceli'de",
+    'Şanlıurfa': "Şanlıurfa'da", 'Uşak': "Uşak'ta", 'Van': "Van'da", 'Yozgat': "Yozgat'ta",
+    'Zonguldak': "Zonguldak'ta", 'Aksaray': "Aksaray'da", 'Bayburt': "Bayburt'ta", 'Karaman': "Karaman'da",
+    'Kırıkkale': "Kırıkkale'de", 'Batman': "Batman'da", 'Şırnak': "Şırnak'ta", 'Bartın': "Bartın'da",
+    'Ardahan': "Ardahan'da", 'Iğdır': "Iğdır'da", 'Yalova': "Yalova'da", 'Karabük': "Karabük'te",
+    'Kilis': "Kilis'te", 'Osmaniye': "Osmaniye'de", 'Düzce': "Düzce'de"
+  }
+  return map[cityName] || `${cityName}'da`
+}
