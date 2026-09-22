@@ -10,35 +10,20 @@ import 'dart:convert';
 class InsaatRehberiScreen extends StatelessWidget {
   const InsaatRehberiScreen({super.key});
 
-  // [REVIZE] Yeni bucket yapına göre - sadece images/ ve posts/
   String _fixUrl(String path) {
     path = path.trim();
     if (path.isEmpty) return path;
     const String cdnBase = "https://cdn.hemenustamgelsin.com";
     const String oldR2 = "https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev";
 
-    if (path.contains('pub-27a42c3abc764860b54d06b5cf79567f.r2.dev')) {
-      path = path.replaceAll(oldR2, cdnBase);
-    }
-
-    // Eski prefix'leri temizle
+    path = path.replaceAll(oldR2, cdnBase);
+    path = path.replaceAll('$cdnBase/ustam-gelsin-medya/', '$cdnBase/');
     path = path.replaceAll('/ustam-gelsin-medya/', '/');
-    if (path.endsWith('/ustam-gelsin-medya')) {
-      path = path.substring(0, path.length - '/ustam-gelsin-medya'.length);
-    }
     path = path.replaceAll('ustam-gelsin-medya/', '');
-    path = path.replaceAll('/medya/', '/');
-    path = path.replaceAll('medya/', '');
 
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-      path = path.replaceAll(RegExp(r'(?<!:)/{2,}'), '/');
-      path = path.replaceAll('https:/', 'https://');
-      path = path.replaceAll('http:/', 'http://');
-      return path;
-    }
-
-    final cleanPath = path.startsWith('/')? path.substring(1) : path;
-    return "$cdnBase/$cleanPath";
+    if (path.startsWith('http')) return path;
+    if (path.startsWith('/')) return '$cdnBase$path';
+    return '$cdnBase/$path';
   }
 
   @override

@@ -1,4 +1,3 @@
-```bat
 @echo off
 setlocal
 
@@ -11,6 +10,17 @@ echo.
 echo [0/5] Temizlik atlandi - HICBIR DOSYA SILINMIYOR.
 echo Mevcut functions ve diger dosyalar korunuyor.
 echo.
+
+echo ===============================
+choice /M "SEO dosyalarini deploy etmek istiyor musun"
+if errorlevel 2 (
+  echo.
+  echo SEO ATLANDI - N dedin
+  echo.
+  set "SEO_SKIP=1"
+  goto FLUTTER_BUILD
+)
+set "SEO_SKIP=0"
 
 echo [1/5] SEO Build aliniyor (7052 sayfa)...
 cd seo
@@ -26,6 +36,7 @@ cd ..
 echo SEO bitti.
 echo.
 
+:FLUTTER_BUILD
 echo [2/5] Flutter Build - CLASSIC STABIL (DART2JS)...
 call flutter build web --release --tree-shake-icons
 if %errorlevel% neq 0 (
@@ -57,6 +68,8 @@ echo   Cache-Control: public, max-age=0, must-revalidate
 echo _headers olusturuldu.
 echo.
 
+if "%SEO_SKIP%"=="1" goto SEO_GOMME_ATLA
+
 echo [3/5] SEO gomuluyor...
 for /D %%i in ("seo\out\*") do (
   if /I not "%%~nxi"=="_next" (
@@ -82,6 +95,13 @@ if exist "seo\out\robots.txt" (
 
 echo SEO gomuldu.
 echo.
+goto SEO_GOMME_BITTI
+
+:SEO_GOMME_ATLA
+echo [3/5] SEO gomuluyor... ATLANDI
+echo.
+
+:SEO_GOMME_BITTI
 
 echo [4/5] Cloudflare'e direkt deploy ediliyor...
 echo.
@@ -205,4 +225,3 @@ echo ======================================
 pause
 
 endlocal
-```
