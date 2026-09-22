@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -22,6 +23,8 @@ class InsaatRehberiScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isWeb = kIsWeb || MediaQuery.of(context).size.width > 700;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBF5),
       appBar: AppBar(
@@ -61,19 +64,19 @@ class InsaatRehberiScreen extends StatelessWidget {
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: isWeb ? 24 : 16, vertical: 16),
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
                     var doc = docs[index];
                     final data = doc.data() as Map<String, dynamic>;
                     return _RehberCompactCard(
-                      baslik: data['baslik']?? 'Başlıksız',
-                      kategori: data['kategori']?? 'TADİLAT',
-                      tarih: data['tarih'] is Timestamp? data['tarih'] as Timestamp : null,
-                      imagePath: _fixUrl(data['imagePath']?? data['resim']?? ''),
-                      contentPath: _fixUrl(data['contentPath']?? ''),
-                      youtubeId: data['youtubeId']?? '',
-                      slug: data['slug']?? doc.id,
+                      baslik: data['baslik'] ?? 'Başlıksız',
+                      kategori: data['kategori'] ?? 'TADİLAT',
+                      tarih: data['tarih'] is Timestamp ? data['tarih'] as Timestamp : null,
+                      imagePath: _fixUrl(data['imagePath'] ?? data['resim'] ?? ''),
+                      contentPath: _fixUrl(data['contentPath'] ?? ''),
+                      youtubeId: data['youtubeId'] ?? '',
+                      slug: data['slug'] ?? doc.id,
                     );
                   },
                 );
@@ -97,39 +100,56 @@ class InsaatRehberiScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                      child: Text("Yeni Katılan Ustalar (${docs.length})", style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 16)),
+                      padding: EdgeInsets.fromLTRB(isWeb ? 24 : 16, 8, isWeb ? 24 : 16, 8),
+                      child: Text("Yeni Katılan Ustalar (${docs.length})", style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: isWeb ? 14 : 16)),
                     ),
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.75, crossAxisSpacing: 12, mainAxisSpacing: 12),
-                      itemCount: docs.length,
-                      itemBuilder: (context, i) {
-                        final d = docs[i].data() as Map<String, dynamic>;
-                        final img = _fixUrl(d['imagePath']?? d['image']?? d['resim']?? d['photoURL']?? '');
-                        return Container(
-                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                Image.network(img, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade100, child: const Icon(Icons.person))),
-                                Positioned(
-                                  bottom: 0, left: 0, right: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black87])),
-                                    child: Text(d['baslik']?? d['adSoyad']?? d['displayName']?? 'Usta', style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
-                                  ),
-                                ),
-                              ],
-                            ),
+                    Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: isWeb ? 1200 : double.infinity),
+                        child: GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.symmetric(horizontal: isWeb ? 24 : 16),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: isWeb ? 6 : 2,
+                            childAspectRatio: 0.75,
+                            crossAxisSpacing: isWeb ? 8 : 12,
+                            mainAxisSpacing: isWeb ? 8 : 12,
                           ),
-                        );
-                      },
+                          itemCount: docs.length,
+                          itemBuilder: (context, i) {
+                            final d = docs[i].data() as Map<String, dynamic>;
+                            final img = _fixUrl(d['imagePath'] ?? d['image'] ?? d['resim'] ?? d['photoURL'] ?? '');
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(isWeb ? 8 : 12),
+                                border: Border.all(color: Colors.grey.shade200),
+                                boxShadow: isWeb ? [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))] : null,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(isWeb ? 8 : 12),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    Image.network(img, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade100, child: const Icon(Icons.person))),
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: Container(
+                                        padding: EdgeInsets.all(isWeb ? 5 : 8),
+                                        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black87])),
+                                        child: Text(d['baslik'] ?? d['adSoyad'] ?? d['displayName'] ?? 'Usta', style: GoogleFonts.poppins(color: Colors.white, fontSize: isWeb ? 9 : 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ],
                 );
@@ -148,18 +168,25 @@ class InsaatRehberiScreen extends StatelessWidget {
                     spacing: 6,
                     runSpacing: 6,
                     children: [
-                      'Tadilat Rehberi','Dekorasyon Fikirleri','Mutfak Tadilatı','Banyo Yenileme',
-                      'Elektrik Tesisatı','Su Tesisatı','Boya Badana','Isı Yalıtım',
-                      'Çatı Tamiri','Fayans Döşeme','Parke Döşeme','Alçıpan İşleri'
-                    ].map((k) => Container(
+                      'Tadilat Rehberi',
+                      'Dekorasyon Fikirleri',
+                      'Mutfak Tadilatı',
+                      'Banyo Yenileme',
+                      'Elektrik Tesisatı',
+                      'Su Tesisatı',
+                      'Boya Badana',
+                      'Isı Yalıtım',
+                      'Çatı Tamiri',
+                      'Fayans Döşeme',
+                      'Parke Döşeme',
+                      'Alçıpan İşleri'
+                    ]
+                        .map((k) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                          color: const Color(0xFFF5F5F4),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: const Color(0xFFE7E5E4))
-                      ),
+                      decoration: BoxDecoration(color: const Color(0xFFF5F5F4), borderRadius: BorderRadius.circular(6), border: Border.all(color: const Color(0xFFE7E5E4))),
                       child: Text(k, style: GoogleFonts.poppins(fontSize: 9, fontWeight: FontWeight.w500, color: const Color(0xFF78716C))),
-                    )).toList(),
+                    ))
+                        .toList(),
                   ),
                 ],
               ),
@@ -220,7 +247,7 @@ class _RehberCompactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tarihStr = tarih!= null? "${tarih!.toDate().day} ${_ayAdi(tarih!.toDate().month)} ${tarih!.toDate().year}" : "31 Ağustos 2026";
+    final tarihStr = tarih != null ? "${tarih!.toDate().day} ${_ayAdi(tarih!.toDate().month)} ${tarih!.toDate().year}" : "31 Ağustos 2026";
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFFE7E5E4))),
@@ -232,12 +259,17 @@ class _RehberCompactCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
-                children: [
-                  ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network(imagePath, width: 110, height: 82, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(width: 110, height: 82, color: Colors.grey.shade100, child: const Icon(Icons.broken_image)))),
-                  Positioned(top: 6, left: 6, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: const Color(0xFFFF6B00), borderRadius: BorderRadius.circular(4)), child: Text(kategori.toUpperCase(), style: GoogleFonts.poppins(fontSize: 8, fontWeight: FontWeight.w800, color: Colors.white)))),
-                ],
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  imagePath,
+                  width: 110,
+                  height: 110,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(width: 110, height: 110, color: Colors.grey.shade100, child: const Icon(Icons.broken_image)),
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -245,9 +277,14 @@ class _RehberCompactCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("📅 $tarihStr", style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey)),
-                    const SizedBox(height: 4),
-                    Text(baslik, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13, height: 1.3, color: Colors.black87), maxLines: 2, overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
+                    Text(
+                      baslik,
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13.5, height: 1.35, color: Colors.black87),
+                      maxLines: 4,
+                      overflow: TextOverflow.visible,
+                    ),
+                    const SizedBox(height: 10),
                     Text("Devamını oku →", style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF2563EB))),
                   ],
                 ),

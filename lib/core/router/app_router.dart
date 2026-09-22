@@ -8,6 +8,19 @@ final appRouter = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (c, s) => const HomeScreen()),
+
+    // ESKİ /home KALINTISINI ANA SAYFAYA AT
+    GoRoute(
+      path: '/home',
+      redirect: (c, s) => '/',
+    ),
+
+    // /insaat-rehberi yazan da /rehber'e gitsin, tek yerden yönetilsin
+    GoRoute(
+      path: '/insaat-rehberi',
+      redirect: (c, s) => '/rehber',
+    ),
+
     GoRoute(
       path: '/rehber',
       builder: (c, s) => const InsaatRehberiScreen(),
