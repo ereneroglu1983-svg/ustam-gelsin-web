@@ -8,8 +8,16 @@ final appRouter = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (c, s) => const HomeScreen()),
-    GoRoute(path: '/rehber', builder: (c, s) => const InsaatRehberiScreen()),
-    GoRoute(path: '/rehber/:slug', builder: (c, s) => RehberDetayScreen(slug: s.pathParameters['slug']!)),
+    GoRoute(
+      path: '/rehber',
+      builder: (c, s) => const InsaatRehberiScreen(),
+      routes: [
+        GoRoute(
+          path: ':slug',
+          builder: (c, s) => RehberDetayScreen(slug: s.pathParameters['slug']!),
+        ),
+      ],
+    ),
     GoRoute(
       path: '/odeme-basarili',
       builder: (context, state) {

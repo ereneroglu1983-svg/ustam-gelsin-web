@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:go_router/go_router.dart';
 
 class InsaatRehberiScreen extends StatelessWidget {
   const InsaatRehberiScreen({super.key});
@@ -43,27 +41,8 @@ class InsaatRehberiScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // INAKTIF SEO CHIPLER - WEB ILE AYNI
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  'Tadilat Rehberi','Dekorasyon Fikirleri','Mutfak Tadilatı','Banyo Yenileme',
-                  'Elektrik Tesisatı','Su Tesisatı','Boya Badana','Isı Yalıtım',
-                  'Çatı Tamiri','Fayans Döşeme','Parke Döşeme','Alçıpan İşleri'
-                ].map((k) => Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999), border: Border.all(color: Colors.grey.shade200)),
-                  child: Text(k, style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w500, color: const Color(0xFF57534E))),
-                )).toList(),
-              ),
-            ),
-
-            // REHBER LISTESI - KOMPAKT YATAY KARTLAR
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('icerikler').orderBy('tarih', descending: true).snapshots(),
+              stream: FirebaseFirestore.instance.collection('icerikler').snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF0f2233))));
@@ -71,19 +50,27 @@ class InsaatRehberiScreen extends StatelessWidget {
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Padding(padding: const EdgeInsets.all(24), child: Center(child: Text("Henüz içerik eklenmemiş.", style: GoogleFonts.poppins())));
                 }
+                final docs = List.from(snapshot.data!.docs);
+                docs.sort((a, b) {
+                  final da = (a.data() as Map<String, dynamic>);
+                  final db = (b.data() as Map<String, dynamic>);
+                  final ta = da['tarih'] is Timestamp? (da['tarih'] as Timestamp).toDate().millisecondsSinceEpoch : 0;
+                  final tb = db['tarih'] is Timestamp? (db['tarih'] as Timestamp).toDate().millisecondsSinceEpoch : 0;
+                  return tb.compareTo(ta);
+                });
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  itemCount: snapshot.data!.docs.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  itemCount: docs.length,
                   itemBuilder: (context, index) {
-                    var doc = snapshot.data!.docs[index];
+                    var doc = docs[index];
                     final data = doc.data() as Map<String, dynamic>;
                     return _RehberCompactCard(
                       baslik: data['baslik']?? 'Başlıksız',
                       kategori: data['kategori']?? 'TADİLAT',
-                      tarih: data['tarih'] as Timestamp?,
-                      imagePath: _fixUrl(data['imagePath']?? ''),
+                      tarih: data['tarih'] is Timestamp? data['tarih'] as Timestamp : null,
+                      imagePath: _fixUrl(data['imagePath']?? data['resim']?? ''),
                       contentPath: _fixUrl(data['contentPath']?? ''),
                       youtubeId: data['youtubeId']?? '',
                       slug: data['slug']?? doc.id,
@@ -92,42 +79,119 @@ class InsaatRehberiScreen extends StatelessWidget {
                 );
               },
             ),
-
-            // YENI KATILAN USTALAR - SABIT GRID - WEB ILE AYNI
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-              child: Text("Yeni Katılan Ustalar", style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 16)),
-            ),
             StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('karisik_slider').orderBy('tarih', descending: true).limit(8).snapshots(),
+              stream: FirebaseFirestore.instance.collection('karisik_slider').snapshots(),
               builder: (context, snap) {
-                if (!snap.hasData) return const SizedBox();
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.75, crossAxisSpacing: 12, mainAxisSpacing: 12),
-                  itemCount: snap.data!.docs.length,
-                  itemBuilder: (context, i) {
-                    final d = snap.data!.docs[i].data() as Map<String, dynamic>;
-                    return Container(
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Image.network(_fixUrl(d['imagePath']?? ''), fit: BoxFit.cover, errorBuilder: (_,__,___)=> Container(color: Colors.grey.shade100, child: const Icon(Icons.person))),
-                            Positioned(bottom: 0, left: 0, right: 0, child: Container(padding: const EdgeInsets.all(8), decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black87])), child: Text(d['baslik']?? '', style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis))),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+                if (!snap.hasData || snap.data!.docs.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                final docs = List.from(snap.data!.docs);
+                docs.sort((a, b) {
+                  final da = (a.data() as Map<String, dynamic>);
+                  final db = (b.data() as Map<String, dynamic>);
+                  final ta = da['tarih'] is Timestamp? (da['tarih'] as Timestamp).toDate().millisecondsSinceEpoch : 0;
+                  final tb = db['tarih'] is Timestamp? (db['tarih'] as Timestamp).toDate().millisecondsSinceEpoch : 0;
+                  return tb.compareTo(ta);
+                });
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      child: Text("Yeni Katılan Ustalar (${docs.length})", style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 16)),
+                    ),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.75, crossAxisSpacing: 12, mainAxisSpacing: 12),
+                      itemCount: docs.length,
+                      itemBuilder: (context, i) {
+                        final d = docs[i].data() as Map<String, dynamic>;
+                        final img = _fixUrl(d['imagePath']?? d['image']?? d['resim']?? d['photoURL']?? '');
+                        return Container(
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.network(img, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade100, child: const Icon(Icons.person))),
+                                Positioned(
+                                  bottom: 0, left: 0, right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black87])),
+                                    child: Text(d['baslik']?? d['adSoyad']?? d['displayName']?? 'Usta', style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 );
               },
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
+            const Divider(height: 1, color: Color(0xFFE7E5E4)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Popüler Konular", style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.grey.shade500)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      'Tadilat Rehberi','Dekorasyon Fikirleri','Mutfak Tadilatı','Banyo Yenileme',
+                      'Elektrik Tesisatı','Su Tesisatı','Boya Badana','Isı Yalıtım',
+                      'Çatı Tamiri','Fayans Döşeme','Parke Döşeme','Alçıpan İşleri'
+                    ].map((k) => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F4),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: const Color(0xFFE7E5E4))
+                      ),
+                      child: Text(k, style: GoogleFonts.poppins(fontSize: 9, fontWeight: FontWeight.w500, color: const Color(0xFF78716C))),
+                    )).toList(),
+                  ),
+                ],
+              ),
+            ),
+            // FOOTER - KIRMIZI LEGO KALDIRILDI + NAV TUŞU FIX
+            Container(
+              width: double.infinity,
+              color: const Color(0xFF0f2233),
+              padding: EdgeInsets.fromLTRB(24, 28, 24, 28 + MediaQuery.of(context).padding.bottom),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  children: [
+                    Text("HEMEN USTAM GELSİN", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: 0.5)),
+                    const SizedBox(height: 12),
+                    Text(
+                      "İnşaat, tadilat ve dekorasyonda\ngüvenilir ustanın adresi",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(color: Colors.white54, fontSize: 11, height: 1.4),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(height: 1, color: Colors.white10),
+                    const SizedBox(height: 16),
+                    Text(
+                      "© 2026 Hemen Ustam Gelsin\nHer Hakkı Saklıdır",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(color: Colors.white38, fontSize: 10, height: 1.5, fontWeight: FontWeight.w400),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -156,14 +220,14 @@ class _RehberCompactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tarihStr = tarih!= null? "${tarih!.toDate().day} ${_ayAdi(tarih!.toDate().month)} ${tarih!.toDate().year}" : "12 Nisan 2025";
+    final tarihStr = tarih!= null? "${tarih!.toDate().day} ${_ayAdi(tarih!.toDate().month)} ${tarih!.toDate().year}" : "31 Ağustos 2026";
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFFE7E5E4))),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => RehberDetayScreen(baslik: baslik, contentUrl: contentPath, resimUrl: imagePath, youtubeId: youtubeId)));
+          context.push('/rehber/$slug');
         },
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -171,7 +235,7 @@ class _RehberCompactCard extends StatelessWidget {
             children: [
               Stack(
                 children: [
-                  ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network(imagePath, width: 110, height: 82, fit: BoxFit.cover, errorBuilder: (_,__,___)=> Container(width: 110, height: 82, color: Colors.grey.shade100, child: const Icon(Icons.broken_image)))),
+                  ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network(imagePath, width: 110, height: 82, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(width: 110, height: 82, color: Colors.grey.shade100, child: const Icon(Icons.broken_image)))),
                   Positioned(top: 6, left: 6, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: const Color(0xFFFF6B00), borderRadius: BorderRadius.circular(4)), child: Text(kategori.toUpperCase(), style: GoogleFonts.poppins(fontSize: 8, fontWeight: FontWeight.w800, color: Colors.white)))),
                 ],
               ),
@@ -196,68 +260,7 @@ class _RehberCompactCard extends StatelessWidget {
   }
 
   String _ayAdi(int ay) {
-    const aylar = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
-    return aylar[ay-1];
-  }
-}
-
-// DETAY SAYFASI - ICERIK + YOUTUBE
-class RehberDetayScreen extends StatefulWidget {
-  final String baslik;
-  final String contentUrl;
-  final String resimUrl;
-  final String youtubeId;
-  const RehberDetayScreen({super.key, required this.baslik, required this.contentUrl, required this.resimUrl, required this.youtubeId});
-
-  @override
-  State<RehberDetayScreen> createState() => _RehberDetayScreenState();
-}
-
-class _RehberDetayScreenState extends State<RehberDetayScreen> {
-  String _icerik = "";
-  bool _loading = true;
-  YoutubePlayerController? _ytController;
-
-  @override
-  void initState() {
-    super.initState();
-    _getir();
-    if (widget.youtubeId.isNotEmpty) {
-      _ytController = YoutubePlayerController.fromVideoId(videoId: widget.youtubeId, autoPlay: false, params: const YoutubePlayerParams(showControls: true, showFullscreenButton: true));
-    }
-  }
-
-  Future<void> _getir() async {
-    if (widget.contentUrl.isEmpty) { setState(() => _loading = false); return; }
-    try {
-      final r = await http.get(Uri.parse(widget.contentUrl));
-      if (r.statusCode == 200) setState(() { _icerik = utf8.decode(r.bodyBytes); _loading = false; });
-      else setState(() { _icerik = "İçerik yüklenemedi"; _loading = false; });
-    } catch (_) { setState(() { _icerik = "Hata oluştu"; _loading = false; }); }
-  }
-
-  @override
-  void dispose() { _ytController?.close(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(backgroundColor: Colors.white, title: Text(widget.baslik, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black)), iconTheme: const IconThemeData(color: Colors.black)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.network(widget.resimUrl, width: double.infinity, fit: BoxFit.cover)),
-            const SizedBox(height: 16),
-            Text(widget.baslik, style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 16),
-            if (_loading) const Center(child: CircularProgressIndicator()) else Text(_icerik, style: GoogleFonts.poppins(fontSize: 14.5, height: 1.6)),
-            if (_ytController!= null)...[const SizedBox(height: 24), ClipRRect(borderRadius: BorderRadius.circular(12), child: YoutubePlayer(controller: _ytController!, aspectRatio: 16/9))],
-          ],
-        ),
-      ),
-    );
+    const aylar = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+    return aylar[ay - 1];
   }
 }
