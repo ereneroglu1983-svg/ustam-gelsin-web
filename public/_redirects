@@ -1,12 +1,12 @@
-# GOOGLE INDEX FIX - DYNAMIC - 4 TYPO x 2 = 8 rules - LIMIT SAFE
-/usta-is-ilanlari/:city/otamatik-sulama-sistemleri /usta-is-ilanlari/:city/otomatik-sulama-sistemleri 301
-/usta-is-ilanlari/:city/otamatik-sulama-sistemleri/ /usta-is-ilanlari/:city/otomatik-sulama-sistemleri/ 301
-/usta-is-ilanlari/:city/boya-badana /usta-is-ilanlari/:city/ic-cephe-boya-ve-badana 301
-/usta-is-ilanlari/:city/boya-badana/ /usta-is-ilanlari/:city/ic-cephe-boya-ve-badana/ 301
-/usta-is-ilanlari/:city/cati-yapimi-aktarma-ve-izalasyon /usta-is-ilanlari/:city/cati-aktarma-ve-izolasyon 301
-/usta-is-ilanlari/:city/cati-yapimi-aktarma-ve-izalasyon/ /usta-is-ilanlari/:city/cati-aktarma-ve-izolasyon/ 301
-/usta-is-ilanlari/:city/uydu-internet-ve-kamera-sitemleri /usta-is-ilanlari/:city/uydu-ve-kamera-sistemleri 301
-/usta-is-ilanlari/:city/uydu-internet-ve-kamera-sitemleri/ /usta-is-ilanlari/:city/uydu-ve-kamera-sistemleri/ 301
+# GOOGLE INDEX FIX - SPLAT VERSION - 8 rules - GARANTILI
+/usta-is-ilanlari/*/otamatik-sulama-sistemleri /usta-is-ilanlari/:splat/otomatik-sulama-sistemleri 301
+/usta-is-ilanlari/*/otamatik-sulama-sistemleri/ /usta-is-ilanlari/:splat/otomatik-sulama-sistemleri/ 301
+/usta-is-ilanlari/*/boya-badana /usta-is-ilanlari/:splat/ic-cephe-boya-ve-badana 301
+/usta-is-ilanlari/*/boya-badana/ /usta-is-ilanlari/:splat/ic-cephe-boya-ve-badana/ 301
+/usta-is-ilanlari/*/cati-yapimi-aktarma-ve-izalasyon /usta-is-ilanlari/:splat/cati-aktarma-ve-izolasyon 301
+/usta-is-ilanlari/*/cati-yapimi-aktarma-ve-izalasyon/ /usta-is-ilanlari/:splat/cati-aktarma-ve-izolasyon/ 301
+/usta-is-ilanlari/*/uydu-internet-ve-kamera-sitemleri /usta-is-ilanlari/:splat/uydu-ve-kamera-sistemleri 301
+/usta-is-ilanlari/*/uydu-internet-ve-kamera-sitemleri/ /usta-is-ilanlari/:splat/uydu-ve-kamera-sistemleri/ 301
 
 # HOME FIX
 /home / 302
@@ -19,5 +19,5 @@
 /sitemap.xml /sitemap.xml 200
 /usta-sitemap.xml /usta-sitemap.xml 200
 
-# FLUTTER SPA FALLBACK - EN SONDA OLMALI
+# FLUTTER SPA FALLBACK - EN SONDA
 /* /index.html 200
