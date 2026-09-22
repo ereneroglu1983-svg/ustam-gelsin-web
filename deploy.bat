@@ -184,6 +184,14 @@ echo CLOUDFLARE DEPLOY TAMAMLANDI!
 echo ======================================
 echo.
 
+REM ===== OTOMATIK REVALIDATE - SADECE E DEDIYSEN =====
+if "%SEO_SKIP%"=="0" (
+  echo [4.5/5] Revalidate otomatik tetikleniyor...
+  curl -s https://hemenustamgelsin.com/api/revalidate >nul
+  echo Revalidate cakildi.
+  echo.
+)
+
 echo [5/5] GitHub'a commit ve push yapiliyor...
 echo.
 
