@@ -128,18 +128,7 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
         const SizedBox(height: 12),
         InkWell(
           onTap: () {
-            if (_sliderRehberler.isNotEmpty) {
-              try {
-                final doc = _sliderRehberler[_currentIndex];
-                final data = doc.data() as Map<String, dynamic>;
-                final slug = data.containsKey('slug')? data['slug'] as String : doc.id;
-                context.go('/rehber/$slug');
-              } catch (_) {
-                context.go('/rehber/${_sliderRehberler[_currentIndex].id}');
-              }
-            } else {
-              context.go('/rehber');
-            }
+            context.go('/rehber');
           },
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 800),
