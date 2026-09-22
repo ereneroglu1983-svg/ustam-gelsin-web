@@ -21,6 +21,7 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
   final icerikController = TextEditingController();
   XFile? secilenResim;
   bool yukleniyor = false;
+  bool isUstaPosteri = false; // YENİ - REHBER / USTA SWITCH
 
   Minio _minioClient() {
     final endpoint = Env.r2FlutterEndpoint;
@@ -34,31 +35,29 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
     );
   }
 
-  // R2'ye resim yükle - FIXLENDİ
+  // R2'ye resim yükle - REVİZE EDİLDİ (klasör ayrımı)
   Future<String?> resimYukle(String slug) async {
     if (secilenResim == null) return null;
     final minio = _minioClient();
-    final bytes = await secilenResim!.readAsBytes(); // Uint8List
+    final bytes = await secilenResim!.readAsBytes();
     final dosyaAdi = '$slug-${DateTime.now().millisecondsSinceEpoch}.webp';
-    final yol = 'images/$dosyaAdi';
+    final yol = isUstaPosteri ? 'images/ustalar/$dosyaAdi' : 'images/$dosyaAdi';
 
     await minio.putObject(
       'ustam-gelsin-medya',
       yol,
       Stream.value(bytes),
-      size: bytes.length, // FIX: size şart!
+      size: bytes.length,
       metadata: {'Content-Type': 'image/webp'},
     );
     print('✅ Resim yüklendi: $yol - ${bytes.length} bytes');
     return yol;
   }
 
-  // R2'ye metin yükle - ASIL BOMBA BURADAYDI - FIXLENDİ
+  // R2'ye metin yükle - AYNI KALIYOR
   Future<String?> metinYukle(String slug) async {
     if (icerikController.text.trim().isEmpty) return null;
     final minio = _minioClient();
-
-    // FIX: List<int> değil Uint8List yap!
     final bytes = Uint8List.fromList(utf8.encode(icerikController.text));
     final dosyaAdi = '$slug-${DateTime.now().millisecondsSinceEpoch}.txt';
     final yol = 'posts/$dosyaAdi';
@@ -69,7 +68,7 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
       'ustam-gelsin-medya',
       yol,
       Stream.value(bytes),
-      size: bytes.length, // FIX: size şart!
+      size: bytes.length,
       metadata: {'Content-Type': 'text/plain; charset=utf-8'},
     );
 
@@ -85,7 +84,8 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
       return;
     }
 
-    if (icerikController.text.trim().isEmpty) {
+    // USTA POSTERİ İSE İÇERİK ZORUNLU DEĞİL
+    if (!isUstaPosteri && icerikController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('İçerik boş olamaz!')),
       );
@@ -97,45 +97,56 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
     try {
       final slug = slugify(baslikController.text, lowercase: true, delimiter: '-');
 
-      // Sırayla yükle ve logla
       final imagePath = await resimYukle(slug);
       print('imagePath: $imagePath');
 
-      final contentPath = await metinYukle(slug);
-      print('contentPath: $contentPath');
+      if (isUstaPosteri) {
+        // SADECE USTA POSTERİ - YAZISIZ
+        await FirebaseFirestore.instance.collection('karisik_slider').doc(slug).set({
+          'tip': 'usta',
+          'baslik': baslikController.text,
+          'slug': slug,
+          'imagePath': imagePath,
+          'tarih': FieldValue.serverTimestamp(),
+        });
+        print('✅ Firebase yazıldı (USTA): $slug');
+      } else {
+        // REHBER - ESKİ MANTIK
+        final contentPath = await metinYukle(slug);
+        print('contentPath: $contentPath');
 
-      if (contentPath == null) {
-        throw Exception('Metin R2\'ye yüklenemedi! Bucket public mi? posts/ klasörü var mı?');
+        if (contentPath == null) {
+          throw Exception('Metin R2\'ye yüklenemedi! Bucket public mi? posts/ klasörü var mı?');
+        }
+
+        await FirebaseFirestore.instance.collection('icerikler').doc(slug).set({
+          'baslik': baslikController.text,
+          'slug': slug,
+          'imagePath': imagePath,
+          'contentPath': contentPath,
+          'youtubeId': youtubeController.text,
+          'kategori': 'Tadilat',
+          'tarih': FieldValue.serverTimestamp(),
+          'seoUrl': 'https://hemenustamgelsin.com/rehber/$slug',
+        });
+        print('✅ Firebase yazıldı (REHBER): $slug');
+
+        // Revalidate sadece rehber için
+        try {
+          await http.post(
+            Uri.parse('https://hemenustamgelsin.com/api/revalidate'),
+            headers: {
+              'Content-Type': 'application/json',
+              'x-secret-key': 'hemenustamgelsin-super-gizli-123',
+            },
+            body: jsonEncode({'slug': slug}),
+          );
+        } catch (_) {}
       }
-
-      await FirebaseFirestore.instance.collection('icerikler').doc(slug).set({
-        'baslik': baslikController.text,
-        'slug': slug,
-        'imagePath': imagePath,
-        'contentPath': contentPath,
-        'youtubeId': youtubeController.text,
-        'kategori': 'Tadilat',
-        'tarih': FieldValue.serverTimestamp(),
-        'seoUrl': 'https://hemenustamgelsin.com/rehber/$slug',
-      });
-
-      print('✅ Firebase yazıldı: $slug');
-
-      // Revalidate
-      try {
-        await http.post(
-          Uri.parse('https://hemenustamgelsin.com/api/revalidate'),
-          headers: {
-            'Content-Type': 'application/json',
-            'x-secret-key': 'hemenustamgelsin-super-gizli-123',
-          },
-          body: jsonEncode({'slug': slug}),
-        );
-      } catch (_) {}
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('YAYINDA: $slug - Resim+Text OK')),
+        SnackBar(content: Text('YAYINDA: $slug - ${isUstaPosteri ? "USTA POSTERİ" : "REHBER"} OK')),
       );
 
       baslikController.clear();
@@ -160,29 +171,43 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Rehber Ekle - Admin FIXLENDİ')),
+      appBar: AppBar(title: Text(isUstaPosteri ? 'Usta Posteri Ekle' : 'Rehber Ekle - Admin FIXLENDİ')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(controller: baslikController, decoration: const InputDecoration(labelText: 'Blog Başlığı')),
+            // YENİ SWITCH
+            SwitchListTile(
+              title: Text(isUstaPosteri ? 'Mod: USTA POSTERİ (Yazısız)' : 'Mod: İNŞAAT REHBERİ (Yazılı)'),
+              subtitle: Text(isUstaPosteri ? 'Sadece resim yüklenecek' : 'Resim + Yazı yüklenecek'),
+              value: isUstaPosteri,
+              onChanged: (v) => setState(() => isUstaPosteri = v),
+            ),
+            const SizedBox(height: 16),
+            TextField(controller: baslikController, decoration: InputDecoration(labelText: isUstaPosteri ? 'Usta Adı (örn: Ahmet Usta - Boyacı)' : 'Blog Başlığı')),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
                 final resim = await ImagePicker().pickImage(source: ImageSource.gallery);
                 if (resim != null) setState(() => secilenResim = resim);
               },
-              child: Text(secilenResim == null ? 'Kapak Resmi Seç' : 'Resim Seçildi ✓'),
+              child: Text(secilenResim == null ? 'Kapak Resmi / Poster Seç' : 'Resim Seçildi ✓'),
             ),
             const SizedBox(height: 16),
-            TextField(controller: youtubeController, decoration: const InputDecoration(labelText: 'YouTube Video ID (opsiyonel)')),
-            const SizedBox(height: 16),
-            TextField(controller: icerikController, decoration: const InputDecoration(labelText: 'Blog İçeriği'), maxLines: 10),
-            const SizedBox(height: 24),
+            if (!isUstaPosteri) ...[
+              TextField(controller: youtubeController, decoration: const InputDecoration(labelText: 'YouTube Video ID (opsiyonel)')),
+              const SizedBox(height: 16),
+              TextField(controller: icerikController, decoration: const InputDecoration(labelText: 'Blog İçeriği'), maxLines: 10),
+              const SizedBox(height: 24),
+            ] else ...[
+              const SizedBox(height: 8),
+              const Text('Usta posteri için sadece resim yeterli, yazı alanları gizli.', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 24),
+            ],
             yukleniyor ? const CircularProgressIndicator() : ElevatedButton(
               onPressed: blogKaydet,
               style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, minimumSize: const Size(double.infinity, 50)),
-              child: const Text('YAYINLA', style: TextStyle(fontSize: 18)),
+              child: Text(isUstaPosteri ? 'USTA POSTERİNİ YAYINLA' : 'REHBERİ YAYINLA', style: const TextStyle(fontSize: 18)),
             ),
           ],
         ),
