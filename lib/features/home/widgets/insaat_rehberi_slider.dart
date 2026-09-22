@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
+import 'dart:ui';
 
 class InsaatRehberiSlider extends StatefulWidget {
   const InsaatRehberiSlider({super.key});
@@ -13,7 +14,7 @@ class InsaatRehberiSlider extends StatefulWidget {
 }
 
 class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
-  List<QueryDocumentSnapshot> _sliderRehberler = [];
+  List<Map<String, dynamic>> _karisikListe = [];
   int _currentIndex = 0;
   Timer? _timer;
   bool _yukleniyor = true;
@@ -43,16 +44,36 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
 
   Future<void> _verileriGetir() async {
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('icerikler').limit(3).get();
+      final rehberSnap = await FirebaseFirestore.instance.collection('icerikler').orderBy('tarih', descending: true).limit(50).get();
+      final ustaSnap = await FirebaseFirestore.instance.collection('karisik_slider').orderBy('tarih', descending: true).limit(100).get();
+
+      final rehberler = rehberSnap.docs.map((d) => {'tip': 'rehber', 'doc': d}).toList();
+      final ustalar = ustaSnap.docs.map((d) => {'tip': 'usta', 'doc': d}).toList();
+
+      List<Map<String, dynamic>> karisik = [];
+      int r = 0, u = 0;
+      bool siraRehber = true;
+      while (r < rehberler.length || u < ustalar.length) {
+        if (siraRehber && r < rehberler.length) {
+          karisik.add(rehberler[r++]);
+        } else if (!siraRehber && u < ustalar.length) {
+          karisik.add(ustalar[u++]);
+        } else {
+          if (r < rehberler.length) karisik.add(rehberler[r++]);
+          if (u < ustalar.length) karisik.add(ustalar[u++]);
+        }
+        siraRehber =!siraRehber;
+      }
+
       if (mounted) {
         setState(() {
-          _sliderRehberler = snapshot.docs;
+          _karisikListe = karisik;
           _yukleniyor = false;
-          if (snapshot.docs.isEmpty) {
-            _hata = "Gösterilecek rehber bulunamadı.";
+          if (karisik.isEmpty) {
+            _hata = "Gösterilecek içerik bulunamadı.";
           }
         });
-        if (_sliderRehberler.isNotEmpty) _baslatSlider();
+        if (_karisikListe.isNotEmpty) _baslatSlider();
       }
     } catch (e) {
       if (mounted) {
@@ -61,16 +82,16 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
           _hata = "Veri çekilemedi: $e";
         });
       }
-      print("İNŞAAT REHBERİ VERİ HATASI: $e");
+      print("KARIŞIK SLIDER HATASI: $e");
     }
   }
 
   void _baslatSlider() {
     _timer?.cancel();
-    if (_sliderRehberler.length <= 1) return;
+    if (_karisikListe.length <= 1) return;
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (mounted && _sliderRehberler.isNotEmpty) {
-        setState(() => _currentIndex = (_currentIndex + 1) % _sliderRehberler.length);
+      if (mounted && _karisikListe.isNotEmpty) {
+        setState(() => _currentIndex = (_currentIndex + 1) % _karisikListe.length);
       }
     });
   }
@@ -128,6 +149,7 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
         const SizedBox(height: 12),
         InkWell(
           onTap: () {
+            // TEK GİDECEĞİ YER: İNŞAAT REHBERİ SAYFASI
             context.go('/rehber');
           },
           child: AnimatedSwitcher(
@@ -171,6 +193,13 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
       );
     }
 
+    final current = _karisikListe[_currentIndex];
+    final doc = current['doc'] as QueryDocumentSnapshot;
+    final String tip = current['tip'];
+    final bool isUsta = tip == 'usta';
+    final String imagePath = _fixR2Url(doc.get('imagePath').toString());
+    final String baslik = doc.get('baslik')?? "";
+
     return Container(
       key: ValueKey(_currentIndex),
       width: double.infinity,
@@ -185,32 +214,53 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Container(
-              color: Colors.white,
-              child: Image.network(
-                _fixR2Url(_sliderRehberler[_currentIndex].get('imagePath').toString()),
-                fit: BoxFit.contain,
-                alignment: Alignment.center,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                      color: Colors.grey.shade100,
-                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC143C))));
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  final url = _sliderRehberler[_currentIndex].get('imagePath');
-                  print("GÖRSEL YÜKLEME HATASI: $error URL: $url -> DÜZELTİLMİŞ: ${_fixR2Url(url.toString())}");
-                  return Container(
-                    color: Colors.grey[200],
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      const Icon(Icons.broken_image_outlined, size: 48, color: Colors.grey),
-                      const SizedBox(height: 8),
-                      Text("Görsel yüklenemedi", style: GoogleFonts.poppins(color: Colors.grey.shade600)),
-                    ]),
-                  );
-                },
+            if (isUsta)
+              Stack(
+                fit: StackFit.expand,
+                children: [
+                  ImageFiltered(
+                    imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    child: Image.network(imagePath, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey[200])),
+                  ),
+                  Container(color: Colors.black.withOpacity(0.2)),
+                  Center(
+                    child: Image.network(
+                      imagePath,
+                      fit: BoxFit.contain,
+                      alignment: Alignment.center,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.broken_image_outlined, size: 48, color: Colors.grey),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            else
+              Container(
+                color: Colors.white,
+                child: Image.network(
+                  imagePath,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                        color: Colors.grey.shade100,
+                        child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC143C))));
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[200],
+                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        const Icon(Icons.broken_image_outlined, size: 48, color: Colors.grey),
+                        const SizedBox(height: 8),
+                        Text("Görsel yüklenemedi", style: GoogleFonts.poppins(color: Colors.grey.shade600)),
+                      ]),
+                    );
+                  },
+                ),
               ),
-            ),
             Positioned(
               left: 0,
               right: 0,
@@ -227,12 +277,13 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(6)),
-                    child: Text("YENİ",
+                    decoration: BoxDecoration(
+                        color: isUsta? const Color(0xFF00C853) : const Color(0xFFDC143C), borderRadius: BorderRadius.circular(6)),
+                    child: Text(isUsta? "YENİ USTA" : "YENİ",
                         style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
                   ),
                   const SizedBox(height: 10),
-                  Text(_sliderRehberler[_currentIndex].get('baslik')?? "",
+                  Text(baslik,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.poppins(

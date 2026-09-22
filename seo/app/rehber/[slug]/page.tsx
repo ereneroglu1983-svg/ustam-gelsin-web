@@ -1,14 +1,28 @@
-// app/rehber/[slug]/page.tsx - FINAL v2 - R2 GUARD + res.ok KONTROLU
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore'
+// app/rehber/[slug]/page.tsx - FINAL v3 - FIXR2 + SLUG/ID UYUMLU + R2 GUARD
+import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../../../lib/firebase'
 import Link from 'next/link'
 import { cache } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-const R2_PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
-
 export const dynamic = 'force-static'
+export const revalidate = 3600
+
+// SENIN R2 FIX'IN - WEB + FLUTTER ILE BIREBIR AYNI - BURAYA DA EKLENDI
+function fixR2Url(path: string) {
+  if (!path) return "";
+  path = path.trim();
+  const cdnBase = "https://cdn.hemenustamgelsin.com";
+  const oldR2 = "https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev";
+  path = path.replaceAll(oldR2, cdnBase);
+  path = path.replaceAll(`${cdnBase}/ustam-gelsin-medya/`, `${cdnBase}/`);
+  path = path.replaceAll("/ustam-gelsin-medya/", "/");
+  path = path.replaceAll("ustam-gelsin-medya/", "");
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/")) return `${cdnBase}${path}`;
+  return `${cdnBase}/${path}`;
+}
 
 function toISOStringSafe(value: any): string | undefined {
   if (!value) return undefined
@@ -20,9 +34,18 @@ function toISOStringSafe(value: any): string | undefined {
 
 const getIcerik = cache(async (slug: string) => {
   try {
-    const snap = await getDoc(doc(db, 'icerikler', slug))
-    if (!snap.exists()) return null
-    return snap.data() as any
+    // 1. Once direkt id ile dene (senin eski sistem)
+    const directSnap = await getDoc(doc(db, 'icerikler', slug))
+    if (directSnap.exists()) return { id: directSnap.id,...(directSnap.data() as any) }
+
+    // 2. Yoksa slug alanina gore ara (yeni sistem)
+    const q = query(collection(db, 'icerikler'), where('slug', '==', slug))
+    const qsnap = await getDocs(q)
+    if (!qsnap.empty) {
+      const d = qsnap.docs[0]
+      return { id: d.id,...(d.data() as any) }
+    }
+    return null
   } catch {
     return null
   }
@@ -31,7 +54,11 @@ const getIcerik = cache(async (slug: string) => {
 export async function generateStaticParams() {
   try {
     const snap = await getDocs(collection(db, 'icerikler'))
-    return snap.docs.map(d => ({ slug: d.id }))
+    // FIX: id degil, slug varsa slug'i kullan, yoksa id'yi
+    return snap.docs.map(d => {
+      const data = d.data() as any
+      return { slug: data.slug || d.id }
+    })
   } catch { return [] }
 }
 
@@ -39,8 +66,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const b = await getIcerik(slug)
   if (!b) return {}
-  const canonical = `https://hemenustamgelsin.com/rehber/${slug}`
-  const imageUrl = b.imagePath? `${R2_PUBLIC_URL}/${b.imagePath}` : 'https://hemenustamgelsin.com/logo.png'
+  const canonical = `https://hemenustamgelsin.com/rehber/${b.slug || slug}`
+  const imageUrl = b.imagePath? fixR2Url(b.imagePath) : 'https://hemenustamgelsin.com/logo.png'
   const publishedDate = toISOStringSafe(b.tarih)
   return {
     title: `${b.baslik} | Hemen Ustam Gelsin`,
@@ -78,12 +105,15 @@ export default async function RehberDetay({ params }: { params: Promise<{ slug: 
   const blog = await getIcerik(slug)
   if (!blog) notFound()
 
+  // FIX: contentPath ve imagePath artik fixR2Url ile duzgun geliyor
   let contentText = ''
-  if (!R2_PUBLIC_URL ||!blog.contentPath) {
+  const fixedContentUrl = blog.contentPath? fixR2Url(blog.contentPath) : ''
+
+  if (!fixedContentUrl) {
     contentText = 'İçerik yüklenemedi'
   } else {
     try {
-      const res = await fetch(`${R2_PUBLIC_URL}/${blog.contentPath}`, { next: { revalidate: 3600 } })
+      const res = await fetch(fixedContentUrl, { next: { revalidate: 3600 } })
       if (!res.ok) throw new Error(`Content fetch failed: ${res.status}`)
       contentText = await res.text()
     } catch {
@@ -91,12 +121,9 @@ export default async function RehberDetay({ params }: { params: Promise<{ slug: 
     }
   }
 
-  const imageUrl = blog.imagePath? `${R2_PUBLIC_URL}/${blog.imagePath}` : 'https://hemenustamgelsin.com/logo.png'
-  const optimizedImageUrl = blog.imagePath
-  ? `https://hemenustamgelsin.com/cdn-cgi/image/width=800,quality=75,format=auto/${imageUrl}`
-    : imageUrl
-
-  const canonical = `https://hemenustamgelsin.com/rehber/${slug}`
+  const imageUrl = blog.imagePath? fixR2Url(blog.imagePath) : 'https://hemenustamgelsin.com/logo.png'
+  const optimizedImageUrl = `https://hemenustamgelsin.com/cdn-cgi/image/width=800,quality=75,format=auto/${imageUrl}`
+  const canonical = `https://hemenustamgelsin.com/rehber/${blog.slug || slug}`
   const publishedDate = toISOStringSafe(blog.tarih)
   const faqs = blog.faqs?.length > 0? blog.faqs : otomatikFaqOlustur(blog.baslik, blog.kategori || 'tadilat')
 
@@ -143,44 +170,49 @@ export default async function RehberDetay({ params }: { params: Promise<{ slug: 
     }))
   }
 
-  const isHtml = contentText.includes('<') && contentText.includes('>')
+  // Biraz daha guvenli HTML kontrolu
+  const isHtml = contentText.trim().startsWith('<') && (contentText.includes('<p') || contentText.includes('<h') || contentText.includes('<div'))
 
   return (
-    <main className="p-6 max-w-3xl mx-auto">
+    <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <Link href="/rehber" className="text-sm text-gray-500 hover:text-black">← Rehbere Dön</Link>
-      <h1 className="text-4xl font-bold leading-tight mt-4">{blog.baslik}</h1>
-      <p className="text-sm text-gray-500 mt-2">{blog.kategori} • {publishedDate? new Date(publishedDate).toLocaleDateString('tr-TR') : ''}</p>
+      <div style={{maxWidth:800, margin:'0 auto', padding:'24px 20px 60px'}}>
+        <Link href="/rehber" style={{fontSize:13, color:'#78716c', textDecoration:'none'}}>← Rehbere Dön</Link>
+        <h1 style={{fontSize:'clamp(24px, 4vw, 32px)', fontWeight:900, lineHeight:1.2, marginTop:12}}>{blog.baslik}</h1>
+        <p style={{fontSize:12, color:'#a8a29e', marginTop:8}}>{blog.kategori} • {publishedDate? new Date(publishedDate).toLocaleDateString('tr-TR') : ''}</p>
 
-      <img src={optimizedImageUrl} alt={blog.baslik} loading="lazy" className="my-6 w-full rounded-xl object-cover aspect-[16/9] bg-gray-100" />
+        <img src={optimizedImageUrl} alt={blog.baslik} loading="lazy" style={{marginTop:20, width:'100%', borderRadius:16, objectFit:'cover', aspectRatio:'16/9', background:'#f5f5f4'}} />
 
-      {isHtml? (
-        <div className="prose prose-neutral max-w-none leading-relaxed" dangerouslySetInnerHTML={{ __html: contentText }} />
-      ) : (
-        <div className="whitespace-pre-wrap leading-relaxed">{contentText}</div>
-      )}
+        <div style={{marginTop:24, background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:20}}>
+          {isHtml? (
+            <div style={{lineHeight:1.7}} dangerouslySetInnerHTML={{ __html: contentText }} />
+          ) : (
+            <div style={{whiteSpace:'pre-wrap', lineHeight:1.7}}>{contentText}</div>
+          )}
+        </div>
 
-      <div className="mt-12 p-6 bg-white border rounded-xl">
-        <h2 className="text-xl font-bold mb-4">Sıkça Sorulanlar</h2>
-        {faqs.map((f: any, i: number) => (
-          <div key={i} className="mb-4 border-b pb-4 last:border-0">
-            <h3 className="font-semibold">{f.soru}</h3>
-            <p className="text-gray-600 mt-1 text-sm">{f.cevap}</p>
-          </div>
-        ))}
+        <div style={{marginTop:24, background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:20}}>
+          <div style={{fontWeight:800, fontSize:16, marginBottom:12}}>Sıkça Sorulanlar</div>
+          {faqs.map((f: any, i: number) => (
+            <div key={i} style={{marginBottom:16, borderBottom: i === faqs.length-1? '0' : '1px solid #f5f5f4', paddingBottom:16}}>
+              <div style={{fontWeight:600, fontSize:14}}>{f.soru}</div>
+              <div style={{color:'#57534e', marginTop:4, fontSize:13}}>{f.cevap}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{marginTop:24, display:'grid', gridTemplateColumns:'1fr 1fr', gap:12}}>
+          <a href="https://hemenustamgelsin.com?utm_source=seo&utm_medium=rehber_detay" style={{padding:14, background:'#111', color:'white', borderRadius:12, textAlign:'center', fontWeight:800, textDecoration:'none'}}>Hemen İlan Ver</a>
+          <Link href="/rehber" style={{padding:14, background:'white', border:'1px solid #e7e5e4', borderRadius:12, textAlign:'center', fontWeight:800, textDecoration:'none', color:'#111'}}>Diğer Yazılar</Link>
+        </div>
+
+        {blog.youtubeId && (
+          <iframe style={{marginTop:24, width:'100%', aspectRatio:'16/9', borderRadius:16, border:'0'}} src={`https://www.youtube.com/embed/${blog.youtubeId}`} loading="lazy" allowFullScreen />
+        )}
       </div>
-
-      <div className="mt-8 grid grid-cols-2 gap-3">
-        <a href="https://hemenustamgelsin.com?utm_source=seo&utm_medium=rehber_detay&utm_campaign=ilan_ver" className="p-4 bg-black text-white rounded-xl text-center font-bold">Hemen İlan Ver</a>
-        <Link href="/rehber" className="p-4 bg-white border rounded-xl text-center font-bold">Diğer Yazılar</Link>
-      </div>
-
-      {blog.youtubeId && (
-        <iframe className="mt-8 w-full aspect-video rounded-xl" src={`https://www.youtube.com/embed/${blog.youtubeId}`} loading="lazy" allowFullScreen />
-      )}
     </main>
   )
 }
