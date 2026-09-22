@@ -1,4 +1,4 @@
-// app/rehber/[slug]/page.tsx - FINAL v3 - FIXR2 + SLUG/ID UYUMLU + R2 GUARD
+// app/rehber/[slug]/page.tsx - FINAL v4 - TUM FIXLER + INTERNAL LINK + IMAGE FIX
 import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../../../lib/firebase'
 import Link from 'next/link'
@@ -9,7 +9,6 @@ import { notFound } from 'next/navigation'
 export const dynamic = 'force-static'
 export const revalidate = 3600
 
-// SENIN R2 FIX'IN - WEB + FLUTTER ILE BIREBIR AYNI - BURAYA DA EKLENDI
 function fixR2Url(path: string) {
   if (!path) return "";
   path = path.trim();
@@ -24,6 +23,16 @@ function fixR2Url(path: string) {
   return `${cdnBase}/${path}`;
 }
 
+// RESIM OPTIMIZASYON FIX - SENIN BUG BURADAYDI
+function getOptimizedR2Url(url: string) {
+  if (!url) return "";
+  const cdnBase = "https://cdn.hemenustamgelsin.com";
+  if (!url.startsWith(cdnBase)) return url;
+  const path = url.replace(`${cdnBase}/`, '');
+  // Dogru format: cdnBase/cdn-cgi/image/width=800/ + path
+  return `${cdnBase}/cdn-cgi/image/width=800,quality=75,format=auto/${path}`;
+}
+
 function toISOStringSafe(value: any): string | undefined {
   if (!value) return undefined
   if (value?.toDate) {
@@ -34,16 +43,13 @@ function toISOStringSafe(value: any): string | undefined {
 
 const getIcerik = cache(async (slug: string) => {
   try {
-    // 1. Once direkt id ile dene (senin eski sistem)
     const directSnap = await getDoc(doc(db, 'icerikler', slug))
-    if (directSnap.exists()) return { id: directSnap.id,...(directSnap.data() as any) }
-
-    // 2. Yoksa slug alanina gore ara (yeni sistem)
+    if (directSnap.exists()) return { id: directSnap.id, ...(directSnap.data() as any) }
     const q = query(collection(db, 'icerikler'), where('slug', '==', slug))
     const qsnap = await getDocs(q)
     if (!qsnap.empty) {
       const d = qsnap.docs[0]
-      return { id: d.id,...(d.data() as any) }
+      return { id: d.id, ...(d.data() as any) }
     }
     return null
   } catch {
@@ -54,7 +60,6 @@ const getIcerik = cache(async (slug: string) => {
 export async function generateStaticParams() {
   try {
     const snap = await getDocs(collection(db, 'icerikler'))
-    // FIX: id degil, slug varsa slug'i kullan, yoksa id'yi
     return snap.docs.map(d => {
       const data = d.data() as any
       return { slug: data.slug || d.id }
@@ -67,7 +72,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const b = await getIcerik(slug)
   if (!b) return {}
   const canonical = `https://hemenustamgelsin.com/rehber/${b.slug || slug}`
-  const imageUrl = b.imagePath? fixR2Url(b.imagePath) : 'https://hemenustamgelsin.com/logo.png'
+  const imageUrl = b.imagePath ? fixR2Url(b.imagePath) : 'https://hemenustamgelsin.com/logo.png'
   const publishedDate = toISOStringSafe(b.tarih)
   return {
     title: `${b.baslik} | Hemen Ustam Gelsin`,
@@ -105,27 +110,25 @@ export default async function RehberDetay({ params }: { params: Promise<{ slug: 
   const blog = await getIcerik(slug)
   if (!blog) notFound()
 
-  // FIX: contentPath ve imagePath artik fixR2Url ile duzgun geliyor
   let contentText = ''
-  const fixedContentUrl = blog.contentPath? fixR2Url(blog.contentPath) : ''
-
-  if (!fixedContentUrl) {
-    contentText = 'İçerik yüklenemedi'
-  } else {
+  const fixedContentUrl = blog.contentPath ? fixR2Url(blog.contentPath) : ''
+  if (fixedContentUrl) {
     try {
       const res = await fetch(fixedContentUrl, { next: { revalidate: 3600 } })
-      if (!res.ok) throw new Error(`Content fetch failed: ${res.status}`)
-      contentText = await res.text()
+      if (res.ok) contentText = await res.text()
     } catch {
       contentText = 'İçerik yüklenemedi'
     }
   }
 
-  const imageUrl = blog.imagePath? fixR2Url(blog.imagePath) : 'https://hemenustamgelsin.com/logo.png'
-  const optimizedImageUrl = `https://hemenustamgelsin.com/cdn-cgi/image/width=800,quality=75,format=auto/${imageUrl}`
+  const imageUrl = blog.imagePath ? fixR2Url(blog.imagePath) : 'https://hemenustamgelsin.com/logo.png'
+  const optimizedImageUrl = getOptimizedR2Url(imageUrl)
   const canonical = `https://hemenustamgelsin.com/rehber/${blog.slug || slug}`
   const publishedDate = toISOStringSafe(blog.tarih)
-  const faqs = blog.faqs?.length > 0? blog.faqs : otomatikFaqOlustur(blog.baslik, blog.kategori || 'tadilat')
+  const faqs = blog.faqs?.length > 0 ? blog.faqs : otomatikFaqOlustur(blog.baslik, blog.kategori || 'tadilat')
+
+  // INTERNAL LINK ICIN KATEGORI SLUG
+  const kategoriSlug = (blog.kategori || 'tadilat').toLowerCase().replaceAll('ı','i').replaceAll('ş','s').replaceAll('ğ','g').replaceAll('ü','u').replaceAll('ö','o').replaceAll('ç','c').trim().replace(/\s+/g, '-')
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -148,6 +151,7 @@ export default async function RehberDetay({ params }: { params: Promise<{ slug: 
       ]
     },
     "datePublished": publishedDate,
+    "dateModified": publishedDate,
     "mainEntityOfPage": canonical
   }
 
@@ -170,7 +174,6 @@ export default async function RehberDetay({ params }: { params: Promise<{ slug: 
     }))
   }
 
-  // Biraz daha guvenli HTML kontrolu
   const isHtml = contentText.trim().startsWith('<') && (contentText.includes('<p') || contentText.includes('<h') || contentText.includes('<div'))
 
   return (
@@ -182,22 +185,32 @@ export default async function RehberDetay({ params }: { params: Promise<{ slug: 
       <div style={{maxWidth:800, margin:'0 auto', padding:'24px 20px 60px'}}>
         <Link href="/rehber" style={{fontSize:13, color:'#78716c', textDecoration:'none'}}>← Rehbere Dön</Link>
         <h1 style={{fontSize:'clamp(24px, 4vw, 32px)', fontWeight:900, lineHeight:1.2, marginTop:12}}>{blog.baslik}</h1>
-        <p style={{fontSize:12, color:'#a8a29e', marginTop:8}}>{blog.kategori} • {publishedDate? new Date(publishedDate).toLocaleDateString('tr-TR') : ''}</p>
+        <p style={{fontSize:12, color:'#a8a29e', marginTop:8}}>{blog.kategori} • {publishedDate ? new Date(publishedDate).toLocaleDateString('tr-TR') : ''}</p>
 
         <img src={optimizedImageUrl} alt={blog.baslik} loading="lazy" style={{marginTop:20, width:'100%', borderRadius:16, objectFit:'cover', aspectRatio:'16/9', background:'#f5f5f4'}} />
 
         <div style={{marginTop:24, background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:20}}>
-          {isHtml? (
+          {isHtml ? (
             <div style={{lineHeight:1.7}} dangerouslySetInnerHTML={{ __html: contentText }} />
           ) : (
             <div style={{whiteSpace:'pre-wrap', lineHeight:1.7}}>{contentText}</div>
           )}
+
+          {/* INTERNAL LINK CANAVARI - ORGANIK MUSTERI ICIN */}
+          <div style={{marginTop:24, padding:16, background:'#FFF7ED', border:'1px solid #FFEDD5', borderRadius:12}}>
+            <div style={{fontWeight:700, fontSize:14, marginBottom:8}}>💡 Bu iş için usta mı arıyorsun?</div>
+            <div style={{display:'flex', flexWrap:'wrap', gap:8}}>
+              <Link href={`/ustalar/${kategoriSlug}`} style={{fontSize:13, background:'#111', color:'white', padding:'8px 12px', borderRadius:8, textDecoration:'none'}}>{blog.kategori} Ustaları</Link>
+              <Link href="/rehber" style={{fontSize:13, background:'white', border:'1px solid #e7e5e4', padding:'8px 12px', borderRadius:8, textDecoration:'none', color:'#111'}}>Tüm Rehberler</Link>
+              <a href={`https://hemenustamgelsin.com/ustalar/${kategoriSlug}`} style={{fontSize:13, background:'white', border:'1px solid #e7e5e4', padding:'8px 12px', borderRadius:8, textDecoration:'none', color:'#111'}}>Ücretsiz Teklif Al</a>
+            </div>
+          </div>
         </div>
 
         <div style={{marginTop:24, background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:20}}>
           <div style={{fontWeight:800, fontSize:16, marginBottom:12}}>Sıkça Sorulanlar</div>
           {faqs.map((f: any, i: number) => (
-            <div key={i} style={{marginBottom:16, borderBottom: i === faqs.length-1? '0' : '1px solid #f5f5f4', paddingBottom:16}}>
+            <div key={i} style={{marginBottom:16, borderBottom: i === faqs.length-1 ? '0' : '1px solid #f5f5f4', paddingBottom:16}}>
               <div style={{fontWeight:600, fontSize:14}}>{f.soru}</div>
               <div style={{color:'#57534e', marginTop:4, fontSize:13}}>{f.cevap}</div>
             </div>
