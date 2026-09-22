@@ -19,44 +19,20 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
   bool _yukleniyor = true;
   String? _hata;
 
-  String _fixR2Url(String url) {
-    url = url.trim();
-    if (url.isEmpty) return url;
-    const String cdnBase = 'https://cdn.hemenustamgelsin.com';
-    const String oldR2 = 'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev';
+  String _fixR2Url(String path) {
+    path = path.trim();
+    if (path.isEmpty) return path;
+    const cdnBase = 'https://cdn.hemenustamgelsin.com';
+    const oldR2 = 'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev';
 
-    if (url.contains('pub-27a42c3abc764860b54d06b5cf79567f.r2.dev')) {
-      url = url.replaceAll(oldR2, cdnBase);
-    }
+    path = path.replaceAll(oldR2, cdnBase);
+    path = path.replaceAll('$cdnBase/ustam-gelsin-medya/', '$cdnBase/');
+    path = path.replaceAll('/ustam-gelsin-medya/', '/');
+    path = path.replaceAll('ustam-gelsin-medya/', '');
 
-    url = url.replaceAll('/ustam-gelsin-medya/', '/');
-    if (url.endsWith('/ustam-gelsin-medya')) {
-      url = url.substring(0, url.length - '/ustam-gelsin-medya'.length);
-    }
-    url = url.replaceAll('ustam-gelsin-medya/', '');
-    url = url.replaceAll('/medya/', '/');
-    url = url.replaceAll('medya/', '');
-
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      url = url.replaceAll(RegExp(r'(?<!:)/{2,}'), '/');
-      url = url.replaceAll('https:/', 'https://');
-      url = url.replaceAll('http:/', 'http://');
-      return url;
-    }
-
-    if (url.startsWith('images/') || url.startsWith('posts/')) {
-      return '$cdnBase/$url';
-    }
-    if (url.startsWith('/images/') || url.startsWith('/posts/')) {
-      return '$cdnBase$url';
-    }
-    if (!url.contains('/')) {
-      return '$cdnBase/images/$url';
-    }
-    if (url.startsWith('/')) {
-      return '$cdnBase$url';
-    }
-    return '$cdnBase/$url';
+    if (path.startsWith('http')) return path;
+    if (path.startsWith('/')) return '$cdnBase$path';
+    return '$cdnBase/$path';
   }
 
   @override
@@ -150,7 +126,6 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
           ],
         ),
         const SizedBox(height: 12),
-        // --- SEO FIX BURADA ---
         InkWell(
           onTap: () {
             if (_sliderRehberler.isNotEmpty) {
