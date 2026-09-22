@@ -22,20 +22,41 @@ class _InsaatRehberiSliderState extends State<InsaatRehberiSlider> {
   String _fixR2Url(String url) {
     url = url.trim();
     if (url.isEmpty) return url;
+    const String cdnBase = 'https://cdn.hemenustamgelsin.com';
+    const String oldR2 = 'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev';
+
+    if (url.contains('pub-27a42c3abc764860b54d06b5cf79567f.r2.dev')) {
+      url = url.replaceAll(oldR2, cdnBase);
+    }
+
+    url = url.replaceAll('/ustam-gelsin-medya/', '/');
+    if (url.endsWith('/ustam-gelsin-medya')) {
+      url = url.substring(0, url.length - '/ustam-gelsin-medya'.length);
+    }
+    url = url.replaceAll('ustam-gelsin-medya/', '');
+    url = url.replaceAll('/medya/', '/');
+    url = url.replaceAll('medya/', '');
+
     if (url.startsWith('http://') || url.startsWith('https://')) {
-      if (url.contains('pub-27a42c3abc764860b54d06b5cf79567f.r2.dev')) {
-        return url.replaceAll(
-          'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev',
-          'https://cdn.hemenustamgelsin.com/ustam-gelsin-medya',
-        );
-      }
+      url = url.replaceAll(RegExp(r'(?<!:)/{2,}'), '/');
+      url = url.replaceAll('https:/', 'https://');
+      url = url.replaceAll('http:/', 'http://');
       return url;
     }
-    const String cdnBase = 'https://cdn.hemenustamgelsin.com/ustam-gelsin-medya';
-    if (url.startsWith('images/')) return '$cdnBase/$url';
-    if (url.startsWith('/images/')) return '$cdnBase$url';
-    if (!url.contains('/')) return '$cdnBase/images/$url';
-    return url;
+
+    if (url.startsWith('images/') || url.startsWith('posts/')) {
+      return '$cdnBase/$url';
+    }
+    if (url.startsWith('/images/') || url.startsWith('/posts/')) {
+      return '$cdnBase$url';
+    }
+    if (!url.contains('/')) {
+      return '$cdnBase/images/$url';
+    }
+    if (url.startsWith('/')) {
+      return '$cdnBase$url';
+    }
+    return '$cdnBase/$url';
   }
 
   @override

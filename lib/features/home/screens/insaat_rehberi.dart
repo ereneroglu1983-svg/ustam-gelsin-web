@@ -10,27 +10,35 @@ import 'dart:convert';
 class InsaatRehberiScreen extends StatelessWidget {
   const InsaatRehberiScreen({super.key});
 
-  // [REVIZE] Merkezi CDN URL düzeltici - hem pub- hem relative path'i kapsar
+  // [REVIZE] Yeni bucket yapına göre - sadece images/ ve posts/
   String _fixUrl(String path) {
-    const String r2PublicUrl = "https://cdn.hemenustamgelsin.com/ustam-gelsin-medya";
     path = path.trim();
     if (path.isEmpty) return path;
+    const String cdnBase = "https://cdn.hemenustamgelsin.com";
+    const String oldR2 = "https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev";
 
-    // Tam URL ise
-    if (path.startsWith('http')) {
-      // Eski R2 public URL'i yeni CDN'e çevir
-      if (path.contains('pub-27a42c3abc764860b54d06b5cf79567f.r2.dev')) {
-        return path.replaceAll(
-          'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev',
-          r2PublicUrl,
-        );
-      }
+    if (path.contains('pub-27a42c3abc764860b54d06b5cf79567f.r2.dev')) {
+      path = path.replaceAll(oldR2, cdnBase);
+    }
+
+    // Eski prefix'leri temizle
+    path = path.replaceAll('/ustam-gelsin-medya/', '/');
+    if (path.endsWith('/ustam-gelsin-medya')) {
+      path = path.substring(0, path.length - '/ustam-gelsin-medya'.length);
+    }
+    path = path.replaceAll('ustam-gelsin-medya/', '');
+    path = path.replaceAll('/medya/', '/');
+    path = path.replaceAll('medya/', '');
+
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      path = path.replaceAll(RegExp(r'(?<!:)/{2,}'), '/');
+      path = path.replaceAll('https:/', 'https://');
+      path = path.replaceAll('http:/', 'http://');
       return path;
     }
 
-    // Relative ise (images/xxx.webp veya /images/xxx.webp)
     final cleanPath = path.startsWith('/')? path.substring(1) : path;
-    return "$r2PublicUrl/$cleanPath";
+    return "$cdnBase/$cleanPath";
   }
 
   @override
@@ -74,7 +82,6 @@ class InsaatRehberiScreen extends StatelessWidget {
               String contentPath = data['contentPath']?? '';
               String youtubeId = data['youtubeId']?? '';
 
-              // [REVIZE EDİLDİ] Tek yerden fix
               String resimUrl = _fixUrl(imagePath);
               String icerikUrl = _fixUrl(contentPath);
 
@@ -153,7 +160,7 @@ class _RehberPostCardState extends State<RehberPostCard> {
       } else {
         if (mounted) {
           setState(() {
-            _icerikMetni = "İçerik yüklenemedi.";
+            _icerikMetni = "İçerik yüklenemedi. (${response.statusCode})";
             _isLoading = false;
           });
         }
@@ -190,7 +197,6 @@ class _RehberPostCardState extends State<RehberPostCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ÜST BİLGİ
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
@@ -228,8 +234,6 @@ class _RehberPostCardState extends State<RehberPostCard> {
                   ],
                 ),
               ),
-
-              // BAŞLIK
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -241,10 +245,7 @@ class _RehberPostCardState extends State<RehberPostCard> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 8),
-
-              // RESİM
               Container(
                 width: double.infinity,
                 constraints: const BoxConstraints(maxHeight: 520),
@@ -269,8 +270,6 @@ class _RehberPostCardState extends State<RehberPostCard> {
                   },
                 ),
               ),
-
-              // İÇERİK METNİ
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: _isLoading
@@ -289,8 +288,6 @@ class _RehberPostCardState extends State<RehberPostCard> {
                   ),
                 ),
               ),
-
-              // DEVAMINI GÖR
               if (!_isExpanded && _icerikMetni.length > 120)
                 Padding(
                   padding: const EdgeInsets.only(left: 16, bottom: 12),
@@ -302,8 +299,6 @@ class _RehberPostCardState extends State<RehberPostCard> {
                     ),
                   ),
                 ),
-
-              // YOUTUBE VİDEO
               if (_isExpanded && widget.youtubeId.isNotEmpty && _ytController!= null)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
@@ -312,7 +307,6 @@ class _RehberPostCardState extends State<RehberPostCard> {
                     child: YoutubePlayer(controller: _ytController!, aspectRatio: 16 / 9),
                   ),
                 ),
-
               const SizedBox(height: 8),
             ],
           ),
