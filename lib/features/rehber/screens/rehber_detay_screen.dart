@@ -7,13 +7,20 @@ class RehberDetayScreen extends StatelessWidget {
   const RehberDetayScreen({super.key, required this.slug});
 
   String _fixR2Url(String url) {
-    const cdnBase = 'https://cdn.hemenustamgelsin.com/ustam-gelsin-medya';
-    if (url.startsWith('http')) {
-      return url.replaceAll(
-          'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev', cdnBase);
-    }
-    if (url.startsWith('images/')) return '$cdnBase/$url';
-    return url;
+    if (url.trim().isEmpty) return url;
+    const cdnBase = 'https://cdn.hemenustamgelsin.com';
+    const oldR2 = 'https://pub-27a42c3abc764860b54d06b5cf79567f.r2.dev';
+
+    // Senin mantığın aynı, sadece cdnBase'i doğru yaptım ki /ustam-gelsin-medya/ iki kere eklenmesin
+    String fixed = url.replaceAll(oldR2, cdnBase);
+    fixed = fixed.replaceAll('$cdnBase/ustam-gelsin-medya/', '$cdnBase/');
+    fixed = fixed.replaceAll('/ustam-gelsin-medya/', '/');
+    fixed = fixed.replaceAll('ustam-gelsin-medya/', '');
+
+    if (fixed.startsWith('http')) return fixed;
+    if (fixed.startsWith('images/')) return '$cdnBase/$fixed';
+    if (fixed.startsWith('/')) return '$cdnBase$fixed';
+    return fixed;
   }
 
   @override
@@ -21,8 +28,7 @@ class RehberDetayScreen extends StatelessWidget {
     final displayTitle = slug.replaceAll('-', ' ');
 
     return FutureBuilder<DocumentSnapshot>(
-      future:
-      FirebaseFirestore.instance.collection('icerikler').doc(slug).get(),
+      future: FirebaseFirestore.instance.collection('icerikler').doc(slug).get(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Scaffold(
@@ -55,16 +61,12 @@ class RehberDetayScreen extends StatelessWidget {
                   if (imagePath.isNotEmpty)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(_fixR2Url(imagePath),
-                          fit: BoxFit.contain),
+                      child: Image.network(_fixR2Url(imagePath), fit: BoxFit.contain),
                     ),
                   const SizedBox(height: 16),
-                  Text(baslik,
-                      style: GoogleFonts.poppins(
-                          fontSize: 22, fontWeight: FontWeight.w700)),
+                  Text(baslik, style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 12),
-                  Text("URL: hemenustamgelsin.com/rehber/$slug",
-                      style: const TextStyle(color: Colors.green)),
+                  Text("URL: hemenustamgelsin.com/rehber/$slug", style: const TextStyle(color: Colors.green)),
                 ],
               ),
             ),

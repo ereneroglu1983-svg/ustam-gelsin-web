@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:ustam_gelsin/features/wallet/screens/odeme_sonuc_screen.dart';
 import 'iyzico_config.dart';
-import 'dart:html' as html;
+// FIX: dart:html direkt import kaldirildi, conditional import yapildi
+import 'web_redirect_stub.dart' if (dart.library.html) 'web_redirect_web.dart' as web_redirect;
 
 class WebviewPaymentScreen extends StatefulWidget {
   final String? paymentUrl;
@@ -61,8 +62,8 @@ class _WebviewPaymentScreenState extends State<WebviewPaymentScreen> {
     debugPrint("REDIRECTING TO = $redirectUrl");
     debugPrint("======================================");
 
-    // Tarayiciyi direkt Iyzico odeme sayfasina yonlendir
-    html.window.location.href = redirectUrl;
+    // FIX: Tarayiciyi direkt Iyzico odeme sayfasina yonlendir - conditional wrapper ile
+    web_redirect.redirectTo(redirectUrl);
   }
 
   void _initWebViewMobile() {
