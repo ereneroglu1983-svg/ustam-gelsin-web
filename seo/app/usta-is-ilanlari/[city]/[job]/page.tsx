@@ -121,7 +121,7 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
             <h2 style={{fontSize:16, fontWeight:700, color:'#44403c', marginTop:12}}>{uniqueH2}</h2>
             <p style={{fontSize:15, color:'#44403c', marginTop:12, whiteSpace:'pre-line', lineHeight:1.6}}>{ustaIntro}</p>
             <div style={{marginTop:18, display:'flex', gap:10, flexWrap:'wrap'}}>
-              <Link href="/usta-kayit" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>ÜCRETSİZ KAYIT OL, İŞ AL →</Link>
+              <Link href="/home" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>ÜCRETSİZ KAYIT OL, İŞ AL →</Link>
             </div>
             <div style={{marginTop:20, background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
               <div style={{fontWeight:900, marginBottom:10}}>✅ {city.name} {job.name} Ustası İşi Nasıl Bulunur?</div>
@@ -162,7 +162,7 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
           </div>
         </div>
         <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
-          <div style={{fontWeight:800, fontSize:13, marginBottom:12}}>🛠️ {city.name} Diğer Usta İş İlanları</div>
+          <div style={{fontWeight:800, fontSize:13, marginBottom:12}}>🛠 {city.name} Diğer Usta İş İlanları</div>
           <div style={{display:'flex', flexWrap:'wrap', gap:6}}>
             {relatedJobs.map(rj=>(<Link key={rj.slug} href={`/usta-is-ilanlari/${city.slug}/${rj.slug}`} style={{fontSize:12, padding:'7px 12px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:999, textDecoration:'none', color:'#444'}}>{city.name} {rj.name} Ustası İş İlanları</Link>))}
           </div>
