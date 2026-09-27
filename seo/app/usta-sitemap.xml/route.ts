@@ -1,3 +1,4 @@
+// app/usta-sitemap.xml/route.ts
 export const dynamic = 'force-static'
 
 import { cities } from '../../data/cities'
@@ -14,6 +15,9 @@ export async function GET() {
     urls.push(`${base}/usta-is-ilanlari/${c.slug}`)
     for (const j of jobs) {
       urls.push(`${base}/usta-is-ilanlari/${c.slug}/${j.slug}`)
+    }
+    for (const d of c.districts) {
+      urls.push(`${base}/usta-is-ilanlari/${c.slug}/${d.slug}`)
     }
   }
 

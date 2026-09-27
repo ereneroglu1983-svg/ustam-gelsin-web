@@ -64,7 +64,7 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
       size: bytes.length,
       metadata: {'Content-Type': 'text/plain; charset=utf-8'},
     );
-    return yol;
+    return 'https://cdn.hemenustamgelsin.com/$yol';
   }
 
   Future<void> blogKaydet() async {
