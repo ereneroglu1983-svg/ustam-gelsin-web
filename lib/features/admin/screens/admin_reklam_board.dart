@@ -28,11 +28,11 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
     return Minio(endPoint: host, accessKey: Env.r2FlutterAccessKey, secretKey: Env.r2FlutterSecretKey, useSSL: true, region: 'auto');
   }
 
-  Future<String?> resimYukle(String slug, int ts) async {
+  Future<String?> resimYukle(String baseSlug, int ts) async {
     if (secilenResim == null) return null;
     final minio = _minioClient();
     final bytes = await secilenResim!.readAsBytes();
-    final dosyaAdi = '$slug-$ts.webp';
+    final dosyaAdi = '$baseSlug-$ts.webp'; // SADECE 1 TANE TIMESTAMP
     final yol = 'images/reklam_board/$dosyaAdi';
     await minio.putObject('ustam-gelsin-medya', yol, Stream.value(bytes), size: bytes.length, metadata: {'Content-Type': 'image/webp'});
     return yol;
@@ -45,10 +45,11 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
     }
     setState(() => yukleniyor = true);
     try {
-      final rawBaslik = baslikController.text.trim().isEmpty? 'reklam-${DateTime.now().millisecondsSinceEpoch}' : baslikController.text.trim();
-      final slug = slugify(rawBaslik, lowercase: true, delimiter: '-') + '-${DateTime.now().millisecondsSinceEpoch}';
-      final ts = DateTime.now().millisecondsSinceEpoch;
-      final imagePath = await resimYukle(slug, ts);
+      final ts = DateTime.now().millisecondsSinceEpoch; // SADECE 1 KERE
+      final rawBaslik = baslikController.text.trim().isEmpty? 'reklam' : baslikController.text.trim();
+      final baseSlug = slugify(rawBaslik, lowercase: true, delimiter: '-');
+      final slug = '$baseSlug-$ts'; // TEK ID
+      final imagePath = await resimYukle(baseSlug, ts);
       if (imagePath == null) throw Exception('Resim yuklenemedi');
 
       await FirebaseFirestore.instance.collection('reklam_board').doc(slug).set({
@@ -58,8 +59,10 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
         'imageUrl': 'https://cdn.hemenustamgelsin.com/$imagePath',
         'link': linkController.text.trim(),
         'sira': int.tryParse(siraController.text)?? 0,
+        'order': int.tryParse(siraController.text)?? 0,
         'sure': 5,
         'aktif': aktif,
+        'isActive': aktif,
         'tarih': FieldValue.serverTimestamp(),
         'tiklama': 0,
       });
@@ -78,7 +81,7 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
   }
 
   Future<void> toggleAktif(String docId, bool current) async {
-    await FirebaseFirestore.instance.collection('reklam_board').doc(docId).update({'aktif':!current});
+    await FirebaseFirestore.instance.collection('reklam_board').doc(docId).update({'aktif':!current, 'isActive':!current});
   }
 
   Future<void> silReklam(String docId) async {
