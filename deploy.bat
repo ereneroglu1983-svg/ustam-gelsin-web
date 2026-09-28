@@ -148,6 +148,7 @@ echo.
 echo # HUG MARKET FIX
 echo /hug-market /index.html 200
 echo /hug-market/ /index.html 200
+echo /hug-market/* /index.html 200
 echo.
 echo # FLUTTER SPA FALLBACK - EN SONDA KALMALI
 echo /* /index.html 200

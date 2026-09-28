@@ -34,8 +34,8 @@ Future<void> showSozlesmeDialog(BuildContext context, String documentId, String 
       return;
     }
     final data = doc.data()!;
-    final String baslik = data['baslik'] ?? defaultBaslik;
-    final String metin = data['metin'] ?? 'İçerik yüklenemedi.';
+    final String baslik = data['baslik']?? defaultBaslik;
+    final String metin = data['metin']?? 'İçerik yüklenemedi.';
     if (context.mounted) {
       showDialog(context: context, builder: (_) => AlertDialog(
         title: Text(baslik, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -235,20 +235,20 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     final bannerInner = Container(decoration: BoxDecoration(color: const Color(0xFFFAFAF8), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFF3F4F6), width:1)),
         child: ClipRRect(borderRadius: BorderRadius.circular(20), child: isMobile? Column(children: [
           Padding(padding: const EdgeInsets.fromLTRB(20,20,20,16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Image.asset('assets/hug_market/hug_logo.png', height:44, fit: BoxFit.contain),
+            Image.asset('assets/hug_market/hug_logo.png', height:44, fit: BoxFit.contain, errorBuilder: (c,e,s)=> Container(height:44, width:100, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.store_outlined, color: Colors.grey))),
             const SizedBox(height:14), Text("Büyüyen Yapı Ekosisteminde Yerinizi Alın.", style: GoogleFonts.poppins(fontSize:20, fontWeight: FontWeight.w800, color: Colors.black87, height:1.15)),
             const SizedBox(height:10), Text("Markanızı, gerçek ihtiyacın doğduğu anda müşterinizle buluşturalım.", style: GoogleFonts.poppins(fontSize:13, fontWeight: FontWeight.w400, color: Color(0xFF6B7280), height:1.5)),
             const SizedBox(height:16), SizedBox(width: double.infinity, child: ElevatedButton(onPressed: goToHugMarket, style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical:14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text("Marketi Keşfet →", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w700, fontSize:14))))
           ])),
-          Image.asset('assets/hug_market/hugmarket.png', fit: BoxFit.contain, width: double.infinity)
+          Image.asset('assets/hug_market/hugmarket.png', fit: BoxFit.contain, width: double.infinity, errorBuilder: (c,e,s)=> Container(width: double.infinity, height:180, color: Colors.grey[100], child: const Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.grey, size:40))))
         ]) : Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
           Expanded(flex:4, child: Padding(padding: EdgeInsets.fromLTRB(isDesktop?32:24,28,isDesktop?20:16,28), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Image.asset('assets/hug_market/hug_logo.png', height: isDesktop?52:44, fit: BoxFit.contain),
+            Image.asset('assets/hug_market/hug_logo.png', height: isDesktop?52:44, fit: BoxFit.contain, errorBuilder: (c,e,s)=> Container(height: isDesktop?52:44, width:120, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.store_outlined, color: Colors.grey))),
             const SizedBox(height:16), Text("Büyüyen Yapı Ekosisteminde Yerinizi Alın.", style: GoogleFonts.poppins(fontSize: isDesktop?26:20, fontWeight: FontWeight.w800, color: Colors.black87, height:1.15)),
             const SizedBox(height:10), Text("Markanızı, gerçek ihtiyacın doğduğu anda müşterinizle buluşturalım.", style: GoogleFonts.poppins(fontSize: isDesktop?14:13, fontWeight: FontWeight.w400, color: const Color(0xFF6B7280), height:1.5)),
             const SizedBox(height:20), ElevatedButton(onPressed: goToHugMarket, style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: EdgeInsets.symmetric(horizontal: isDesktop?22:18, vertical:12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text("Marketi Keşfet →", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w700, fontSize: isDesktop?14:13)))
           ]))),
-          Expanded(flex:6, child: Padding(padding: const EdgeInsets.fromLTRB(0,12,12,12), child: ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.asset('assets/hug_market/hugmarket.png', fit: BoxFit.contain, height: isDesktop?320:240))))
+          Expanded(flex:6, child: Padding(padding: const EdgeInsets.fromLTRB(0,12,12,12), child: ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.asset('assets/hug_market/hugmarket.png', fit: BoxFit.contain, height: isDesktop?320:240, errorBuilder: (c,e,s)=> Container(height: isDesktop?320:240, color: Colors.grey[100], child: const Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.grey, size:40)))))))
         ])));
     return Container(margin: EdgeInsets.fromLTRB(hMargin,0,hMargin,20), child: Material(color: Colors.transparent, child: InkWell(onTap: goToHugMarket, borderRadius: BorderRadius.circular(20), child: bannerInner)));
   }
@@ -316,8 +316,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       Text("GÜVENLİ ÖDEME", style: GoogleFonts.poppins(color: Colors.white, fontSize:16, fontWeight: FontWeight.bold)),
       const SizedBox(height:8),
       Wrap(spacing:10, runSpacing:8, crossAxisAlignment: WrapCrossAlignment.center, children: [
-        Image.asset('assets/visa.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("VISA")),
-        Image.asset('assets/master.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("Mastercard")),
+        Image.asset('assets/【entity-visa¦canonical_name=VISA】.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("【entity-VISA¦canonical_name=VISA】")),
+        Image.asset('assets/master.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("【entity-Mastercard¦canonical_name=Mastercard】")),
         Image.asset('assets/troy.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("TROY")),
         Image.asset('assets/iyzico.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("Iyzico")),
         Image.asset('assets/3D_secure.png', height:50, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("3D Secure"))

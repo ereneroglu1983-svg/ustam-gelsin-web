@@ -15,6 +15,22 @@ import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
 import 'package:ustam_gelsin/features/usta/screens/usta_profil_sayfasi.dart';
 import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dart';
 
+// KATEGORİ İMPORTLARI - 14 ADET - KILAVUZ KOD İÇİN
+import 'package:ustam_gelsin/features/hug_market/kategoriler/mutfak_banyo.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/temizlik.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/elektrik.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/hirdavat.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/peyzaj.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/su_tesisat.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/yapi_malzemeleri.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/boya.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/cati.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/havuz.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/iklimlendirme.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/seramik.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/yalitim.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/yenilenebilir.dart';
+
 class HugMarketHomepage extends StatefulWidget {
   const HugMarketHomepage({super.key});
   @override State<HugMarketHomepage> createState() => _HugMarketHomepageState();
@@ -26,7 +42,7 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> with SingleTicker
   late Animation<double> _pulseAnimation;
   final TextEditingController _searchCtrl = TextEditingController();
   String _searchQuery = '';
-  int _sepetCount = 2;
+  int _sepetCount = 0;
 
   @override void initState() {
     super.initState();
@@ -72,6 +88,27 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> with SingleTicker
   void _goSiparisTakip() {
     if (_authService.currentUser == null) { _showLoginDialog(); return; }
     Navigator.push(context, MaterialPageRoute(builder: (_) => const SiparisTakipSayfasi()));
+  }
+
+  void _goKategori(String file) {
+    Widget? page;
+    switch(file){
+      case 'banyo_mutfak.webp': page = const MutfakBanyoKategoriPage(); break;
+      case 'temizlik.webp': page = const TemizlikKategoriPage(); break;
+      case 'elektrik.webp': page = const ElektrikKategoriPage(); break;
+      case 'hirdavat.webp': page = const HirdavatKategoriPage(); break;
+      case 'peyzaj.webp': page = const PeyzajKategoriPage(); break;
+      case 'tesisat_su.webp': page = const TesisatKategoriPage(); break;
+      case 'yapi_malzemeleri.webp': page = const YapiMalzemeleriKategoriPage(); break;
+      case 'boya_dekarasyon.webp': page = const BoyaDekorasyonKategoriPage(); break;
+      case 'cati.webp': page = const CatiCepheKategoriPage(); break;
+      case 'havuz_spa.webp': page = const HavuzSpaKategoriPage(); break;
+      case 'iklimlendirme.webp': page = const IsitmaSogutmaKategoriPage(); break;
+      case 'seramik_fayans.webp': page = const SeramikFayansKategoriPage(); break;
+      case 'yalitim.webp': page = const YalitimIzolasyonKategoriPage(); break;
+      case 'yenilenebilir.webp': page = const YenilenebilirEnerjiKategoriPage(); break;
+    }
+    if(page!=null) Navigator.push(context, MaterialPageRoute(builder: (_)=> page!));
   }
 
   @override Widget build(BuildContext context) {
@@ -266,19 +303,6 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> with SingleTicker
     );
   }
 
-  Widget _topActionChip({required IconData icon, required String label, String? badge, Color bgColor = const Color(0xFFF1F5F9), bool isPrimary = false, required VoidCallback onTap}) {
-    return InkWell(onTap: onTap, borderRadius: BorderRadius.circular(10), child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFE2E8F0))),
-      child: Row(children: [
-        Icon(icon, size: 16, color: Colors.black87),
-        const SizedBox(width: 6),
-        Text(label, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87)),
-        if (badge!= null)...[const SizedBox(width: 6), Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(10)), child: Text(badge, style: GoogleFonts.poppins(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)))],
-      ]),
-    ));
-  }
-
   Widget _buildHero({required bool isMobile, required bool isTablet, required bool isDesktop}) {
     final heroText = Column(crossAxisAlignment: isMobile? CrossAxisAlignment.center : CrossAxisAlignment.start, children: [
       Wrap(spacing: 8, alignment: isMobile? WrapAlignment.center : WrapAlignment.start, children: [Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(20)), child: Text('ŞANTİYEYE TESLİM • 3 İŞ GÜNÜ', style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700))), Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(border: Border.all(color: Colors.white24), borderRadius: BorderRadius.circular(20)), child: Text('81 il 973 ilçeye', style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11)))]),
@@ -309,7 +333,6 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> with SingleTicker
   );
 
   Widget _buildCategories({required bool isMobile, required bool isTablet, required bool isDesktop}) {
-    // 14 kategori - resim üzerinde yazı olduğu için Text eklemiyoruz, sadece resmi kaplatıyoruz
     final allCats = [
       {'name': 'banyo mutfak', 'file': 'banyo_mutfak.webp'},
       {'name': 'temizlik', 'file': 'temizlik.webp'},
@@ -339,26 +362,29 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> with SingleTicker
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: isMobile? 2 : isTablet? 3 : 4,
-              childAspectRatio: 2.0, // 600x300 oran
+              childAspectRatio: 2.0,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12
           ),
           itemCount: filtered.length,
           itemBuilder: (_, i) {
             final file = filtered[i]['file'] as String;
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Image.asset(
-                'assets/hug_market/kategori/$file',
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
-                errorBuilder: (c, e, s) => Container(color: Colors.white, child: Center(child: Text(filtered[i]['name'] as String, style: GoogleFonts.poppins(fontSize: 11)))),
+            return InkWell(
+              onTap: ()=> _goKategori(file),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(
+                  'assets/hug_market/kategori/$file',
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (c, e, s) => Container(color: Colors.white, child: Center(child: Text(filtered[i]['name'] as String, style: GoogleFonts.poppins(fontSize: 11)))),
+                ),
               ),
             );
           },
