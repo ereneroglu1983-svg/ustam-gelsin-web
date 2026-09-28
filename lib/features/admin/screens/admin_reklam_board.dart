@@ -3,11 +3,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:minio/minio.dart';
 import 'package:ustam_gelsin/env.dart';
-import 'package:slugify/slugify.dart';
 
 // lib/features/admin/screens/admin_reklam_board.dart
-// Admin -> Reklam Board (HUG MARKET sag taraf icin) - FINAL
-// Sadece resim, 5sn arayla reklam_board_slider.dart'ta doner
+// ORİJİNAL İSİMLE KAYDEDEN VERSİYON - ismi değiştirmiyor
 
 class AdminReklamBoardScreen extends StatefulWidget {
   const AdminReklamBoardScreen({super.key});
@@ -28,13 +26,14 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
     return Minio(endPoint: host, accessKey: Env.r2FlutterAccessKey, secretKey: Env.r2FlutterSecretKey, useSSL: true, region: 'auto');
   }
 
-  Future<String?> resimYukle(String baseSlug, int ts) async {
+  Future<String?> resimYukle() async {
     if (secilenResim == null) return null;
     final minio = _minioClient();
     final bytes = await secilenResim!.readAsBytes();
-    final dosyaAdi = '$baseSlug-$ts.webp'; // SADECE 1 TANE TIMESTAMP
-    final yol = 'images/reklam_board/$dosyaAdi';
-    await minio.putObject('ustam-gelsin-medya', yol, Stream.value(bytes), size: bytes.length, metadata: {'Content-Type': 'image/webp'});
+    // ORİJİNAL İSİM - ne seçtiysen o
+    final orijinalIsim = secilenResim!.name; // örn: filli-boya-kampanya.jpg
+    final yol = 'images/reklam_board/$orijinalIsim';
+    await minio.putObject('ustam-gelsin-medya', yol, Stream.value(bytes), size: bytes.length);
     return yol;
   }
 
@@ -45,22 +44,22 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
     }
     setState(() => yukleniyor = true);
     try {
-      final ts = DateTime.now().millisecondsSinceEpoch; // SADECE 1 KERE
-      final rawBaslik = baslikController.text.trim().isEmpty? 'reklam' : baslikController.text.trim();
-      final baseSlug = slugify(rawBaslik, lowercase: true, delimiter: '-');
-      final slug = '$baseSlug-$ts'; // TEK ID
-      final imagePath = await resimYukle(baseSlug, ts);
+      final rawBaslik = baslikController.text.trim().isEmpty? secilenResim!.name : baslikController.text.trim();
+      final orijinalIsim = secilenResim!.name;
+      // Doc ID olarak da orijinal isim + küçük rastgelelik (aynı isimle 2. kez atılırsa ezilmesin)
+      final docId = orijinalIsim.replaceAll(RegExp(r'[^a-zA-Z0-9-_\.]'), '-');
+
+      final imagePath = await resimYukle();
       if (imagePath == null) throw Exception('Resim yuklenemedi');
 
-      await FirebaseFirestore.instance.collection('reklam_board').doc(slug).set({
+      await FirebaseFirestore.instance.collection('reklam_board').doc(docId).set({
         'baslik': rawBaslik,
-        'slug': slug,
+        'slug': docId,
         'imagePath': imagePath,
-        'imageUrl': 'https://cdn.hemenustamgelsin.com/$imagePath',
+        'imageUrl': 'https://cdn.hemenustamgelsin.com/$imagePath', // orijinal isimle
         'link': linkController.text.trim(),
         'sira': int.tryParse(siraController.text)?? 0,
         'order': int.tryParse(siraController.text)?? 0,
-        'sure': 5,
         'aktif': aktif,
         'isActive': aktif,
         'tarih': FieldValue.serverTimestamp(),
@@ -68,7 +67,7 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
       });
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('YAYINDA: $slug OK')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('YAYINDA: $orijinalIsim OK')));
       baslikController.clear();
       linkController.clear();
       siraController.text = "1";
@@ -132,7 +131,7 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
             return Container(decoration: BoxDecoration(color: d['aktif'] == true? Colors.white : Colors.grey.shade200, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)), child: ListTile(
               leading: ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(d['imageUrl']?? 'https://cdn.hemenustamgelsin.com/${d['imagePath']}', width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.broken_image))),
               title: Text(d['baslik']?? '', style: TextStyle(fontWeight: FontWeight.bold, color: d['aktif'] == true? Colors.black : Colors.grey)),
-              subtitle: Text('Sira: ${d['sira']} | Link: ${d['link']?? '-'}'),
+              subtitle: Text('Sira: ${d['sira']} | Link: ${d['link']?? '-'} | Dosya: ${d['imagePath']}'),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 IconButton(icon: Icon(d['aktif'] == true? Icons.visibility : Icons.visibility_off, color: d['aktif'] == true? Colors.green : Colors.grey), onPressed: () => toggleAktif(id, d['aktif'] == true)),
                 IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => silReklam(id)),
