@@ -12,69 +12,73 @@ class ReklamBoardSlider extends StatefulWidget {
 }
 
 class _ReklamBoardSliderState extends State<ReklamBoardSlider> {
-  final PageController _controller = PageController();
+  List<QueryDocumentSnapshot> _liste = [];
+  int _currentIndex = 0;
   Timer? _timer;
-  int _current = 0;
+  bool _yukleniyor = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _verileriGetir();
+  }
+
+  Future<void> _verileriGetir() async {
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('reklam_board')
+          .orderBy('sira')
+          .get();
+
+      final filtered = snap.docs.where((d) {
+        final data = d.data() as Map<String, dynamic>;
+        final isAktif = (data['aktif'] == true) || (data['isActive'] == true);
+        final url = (data['imageUrl'] ?? '').toString().trim();
+        final path = (data['imagePath'] ?? '').toString().trim();
+        return isAktif && (url.isNotEmpty || path.isNotEmpty);
+      }).toList();
+
+      if (mounted) {
+        setState(() {
+          _liste = filtered;
+          _yukleniyor = false;
+        });
+        if (_liste.isNotEmpty) _baslatSlider();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _yukleniyor = false;
+          _liste = [];
+        });
+      }
+    }
+  }
+
+  void _baslatSlider() {
+    _timer?.cancel();
+    if (_liste.length <= 1) return;
+    _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (mounted && _liste.isNotEmpty) {
+        setState(() => _currentIndex = (_currentIndex + 1) % _liste.length);
+      }
+    });
+  }
 
   @override
   void dispose() {
     _timer?.cancel();
-    _controller.dispose();
     super.dispose();
-  }
-
-  void _startAutoPlay(int count) {
-    _timer?.cancel();
-    if (count <= 1) return;
-    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted) return;
-      if (!_controller.hasClients) return;
-      final next = (_current + 1) % count;
-      _controller.animateToPage(
-        next,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      );
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // DÜZELTME: where + orderBy index istemesin diye client-side filtre
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('reklam_board')
-          .orderBy('sira')
-          .snapshots(),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) return _loading();
-        if (!snap.hasData) return _fallback();
-
-        // Client'ta aktif olanları filtrele (hem aktif hem isActive kontrol)
-        final docs = snap.data!.docs.where((d) {
-          final data = d.data() as Map<String, dynamic>;
-          final isAktif = (data['aktif'] == true) || (data['isActive'] == true);
-          final url = (data['imageUrl']?? '').toString().trim();
-          final path = (data['imagePath']?? '').toString().trim();
-          return isAktif && (url.isNotEmpty || path.isNotEmpty);
-        }).toList();
-
-        if (docs.isEmpty) return _fallback();
-        return _buildSlider(docs);
-      },
-    );
-  }
-
-  Widget _buildSlider(List<QueryDocumentSnapshot> docs) {
-    // Timer'ı her data değişiminde yeniden başlat
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startAutoPlay(docs.length);
-    });
+    if (_yukleniyor == false && _liste.isEmpty) return const SizedBox.shrink();
 
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isTablet = screenWidth >= 600 && screenWidth < 1100;
-    final h = isMobile? 260.0 : isTablet? 320.0 : 380.0;
+    final h = isMobile ? 260.0 : isTablet ? 320.0 : 380.0;
 
     return Container(
       width: double.infinity,
@@ -86,80 +90,89 @@ class _ReklamBoardSliderState extends State<ReklamBoardSlider> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          children: [
-            PageView.builder(
-              controller: _controller,
-              onPageChanged: (i) => setState(() => _current = i),
-              itemCount: docs.length,
-              itemBuilder: (ctx, i) {
-                var data = docs[i].data() as Map<String, dynamic>;
-                String img = (data['imageUrl']?? '').toString().trim();
-                if (img.isEmpty) {
-                  img = 'https://cdn.hemenustamgelsin.com/${data['imagePath']}';
-                }
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ImageFiltered(
-                      imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                      child: CachedNetworkImage(
-                        imageUrl: img,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ),
-                    Container(color: Colors.black.withOpacity(0.2)),
-                    Center(
-                      child: CachedNetworkImage(
-                        imageUrl: img,
-                        fit: BoxFit.contain,
-                        memCacheWidth: 1920,
-                        filterQuality: FilterQuality.high,
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-            if (docs.length > 1)
-              Positioned(
-                bottom: 10,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    docs.length,
-                        (idx) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      width: _current == idx? 18 : 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: _current == idx? HugMarketTheme.primary : Colors.white.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 800),
+          transitionBuilder: (child, animation) => FadeTransition(opacity: animation, child: child),
+          child: _buildContent(isMobile, isTablet),
         ),
       ),
     );
   }
 
-  Widget _loading() {
-    final w = MediaQuery.of(context).size.width;
-    final h = w < 600? 260.0 : w < 1100? 320.0 : 380.0;
-    return Container(width: double.infinity, height: h, decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(16)), child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC143C))));
-  }
+  Widget _buildContent(bool isMobile, bool isTablet) {
+    if (_yukleniyor) {
+      return Container(
+        key: const ValueKey('loading'),
+        width: double.infinity,
+        height: isMobile ? 260 : 380,
+        decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(16)),
+        child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFDC143C))),
+      );
+    }
+    if (_liste.isEmpty) {
+      return const SizedBox.shrink(key: ValueKey('empty'));
+    }
 
-  Widget _fallback() {
-    final w = MediaQuery.of(context).size.width;
-    final h = w < 600? 260.0 : w < 1100? 320.0 : 380.0;
-    return Container(width: double.infinity, height: h, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)), child: ClipRRect(borderRadius: BorderRadius.circular(16), child: Image.asset('assets/hug_market/hugmarket.png', fit: BoxFit.contain)));
+    final doc = _liste[_currentIndex];
+    final data = doc.data() as Map<String, dynamic>;
+    String img = (data['imageUrl'] ?? '').toString().trim();
+    if (img.isEmpty) {
+      img = 'https://cdn.hemenustamgelsin.com/${data['imagePath']}';
+    }
+
+    return Container(
+      key: ValueKey(_currentIndex),
+      width: double.infinity,
+      height: double.infinity,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // 1. Blur arka plan
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: CachedNetworkImage(
+              imageUrl: img,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
+          ),
+          // 2. Karartma
+          Container(color: Colors.black.withOpacity(0.2)),
+          // 3. Ortada contain
+          Center(
+            child: CachedNetworkImage(
+              imageUrl: img,
+              fit: BoxFit.contain,
+              memCacheWidth: 1920,
+              filterQuality: FilterQuality.high,
+            ),
+          ),
+          // 4. Noktalar
+          if (_liste.length > 1)
+            Positioned(
+              bottom: 10,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  _liste.length,
+                      (idx) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: _currentIndex == idx ? 18 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: _currentIndex == idx ? HugMarketTheme.primary : Colors.white.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
