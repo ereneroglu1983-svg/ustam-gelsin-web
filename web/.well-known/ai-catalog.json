@@ -1,0 +1,30 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Hemen Ustam Gelsin",
+    "identifier": "hemenustamgelsin.com"
+  },
+  "entries": [
+    {
+      "identifier": "urn:ai:hemenustamgelsin.com:service:usta-bul",
+      "displayName": "Usta Bul ve Teklif Al",
+      "type": "text/html",
+      "url": "https://hemenustamgelsin.com",
+      "description": "Insaat, tadilat, dekorasyon ve yenilenebilir enerji icin dogru ustayi bulma ve teklif alma platformu"
+    },
+    {
+      "identifier": "urn:ai:hemenustamgelsin.com:market:search",
+      "displayName": "Hug Market Yapi Market",
+      "type": "text/html",
+      "url": "https://hemenustamgelsin.com/hug-market",
+      "description": "Insaat malzemeleri, santiye ekipmanlari ve yapi urunleri icin online yapi market"
+    },
+    {
+      "identifier": "urn:ai:hemenustamgelsin.com:content:rehber",
+      "displayName": "Insaat Rehberi",
+      "type": "text/html",
+      "url": "https://hemenustamgelsin.com/insaat-rehberi",
+      "description": "Insaat, tadilat ve dekorasyon rehberleri, nasil yapilir icerikleri"
+    }
+  ]
+}
