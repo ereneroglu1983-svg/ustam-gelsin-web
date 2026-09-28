@@ -93,7 +93,30 @@
         "**/.*",
         "**/node_modules/**"
       ],
+      "headers": [
+        {
+          "source": "/.well-known/ai-catalog.json",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=3600"
+            }
+          ]
+        }
+      ],
       "rewrites": [
+        {
+          "source": "/.well-known/ai-catalog.json",
+          "destination": "/.well-known/ai-catalog.json"
+        },
         {
           "source": "/rehber/**",
           "destination": "/index.html"
