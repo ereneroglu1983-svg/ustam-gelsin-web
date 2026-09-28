@@ -4,12 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:minio/minio.dart';
 import 'package:ustam_gelsin/env.dart';
 
-// lib/features/admin/screens/admin_reklam_board.dart
-// ORİJİNAL İSİMLE KAYDEDEN VERSİYON - ismi değiştirmiyor
-
 class AdminReklamBoardScreen extends StatefulWidget {
   const AdminReklamBoardScreen({super.key});
-  @override State<AdminReklamBoardScreen> createState() => _AdminReklamBoardScreenState();
+  @override
+  State<AdminReklamBoardScreen> createState() => _AdminReklamBoardScreenState();
 }
 
 class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
@@ -20,20 +18,52 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
   bool yukleniyor = false;
   bool aktif = true;
 
+  @override
+  void dispose() {
+    baslikController.dispose();
+    linkController.dispose();
+    siraController.dispose();
+    super.dispose();
+  }
+
   Minio _minioClient() {
     final endpoint = Env.r2FlutterEndpoint;
     final host = endpoint.replaceAll('https://', '').replaceAll('http://', '').split('/').first.trim();
-    return Minio(endPoint: host, accessKey: Env.r2FlutterAccessKey, secretKey: Env.r2FlutterSecretKey, useSSL: true, region: 'auto');
+    return Minio(
+      endPoint: host,
+      accessKey: Env.r2FlutterAccessKey,
+      secretKey: Env.r2FlutterSecretKey,
+      useSSL: true,
+      region: 'auto',
+    );
   }
 
-  Future<String?> resimYukle() async {
-    if (secilenResim == null) return null;
+  String _contentType(String fileName) {
+    final ext = fileName.toLowerCase().split('.').last;
+    switch (ext) {
+      case 'png': return 'image/png';
+      case 'webp': return 'image/webp';
+      case 'gif': return 'image/gif';
+      case 'jpg':
+      case 'jpeg':
+      default:
+        return 'image/jpeg';
+    }
+  }
+
+  Future<String> resimYukle() async {
     final minio = _minioClient();
     final bytes = await secilenResim!.readAsBytes();
-    // ORİJİNAL İSİM - ne seçtiysen o
-    final orijinalIsim = secilenResim!.name; // örn: filli-boya-kampanya.jpg
+    final orijinalIsim = secilenResim!.name.trim().replaceAll('/', '-');
     final yol = 'images/reklam_board/$orijinalIsim';
-    await minio.putObject('ustam-gelsin-medya', yol, Stream.value(bytes), size: bytes.length);
+
+    await minio.putObject(
+      'ustam-gelsin-medya',
+      yol,
+      Stream.value(bytes),
+      size: bytes.length,
+      metadata: {'Content-Type': _contentType(orijinalIsim)},
+    );
     return yol;
   }
 
@@ -44,19 +74,27 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
     }
     setState(() => yukleniyor = true);
     try {
-      final rawBaslik = baslikController.text.trim().isEmpty? secilenResim!.name : baslikController.text.trim();
-      final orijinalIsim = secilenResim!.name;
-      // Doc ID olarak da orijinal isim + küçük rastgelelik (aynı isimle 2. kez atılırsa ezilmesin)
-      final docId = orijinalIsim.replaceAll(RegExp(r'[^a-zA-Z0-9-_\.]'), '-');
-
+      final orijinalIsim = secilenResim!.name.trim().replaceAll('/', '-');
       final imagePath = await resimYukle();
-      if (imagePath == null) throw Exception('Resim yuklenemedi');
+
+      String docId = orijinalIsim;
+      final ref = FirebaseFirestore.instance.collection('reklam_board').doc(docId);
+      final exists = await ref.get();
+      if (exists.exists) {
+        final dot = orijinalIsim.lastIndexOf('.');
+        final base = dot!= -1? orijinalIsim.substring(0, dot) : orijinalIsim;
+        final ext = dot!= -1? orijinalIsim.substring(dot + 1) : '';
+        docId = ext.isNotEmpty
+            ? '${base}_${DateTime.now().millisecondsSinceEpoch}.$ext'
+            : '${base}_${DateTime.now().millisecondsSinceEpoch}';
+      }
 
       await FirebaseFirestore.instance.collection('reklam_board').doc(docId).set({
-        'baslik': rawBaslik,
+        'baslik': baslikController.text.trim().isEmpty? orijinalIsim : baslikController.text.trim(),
         'slug': docId,
+        'orijinalAd': orijinalIsim,
         'imagePath': imagePath,
-        'imageUrl': 'https://cdn.hemenustamgelsin.com/$imagePath', // orijinal isimle
+        'imageUrl': 'https://cdn.hemenustamgelsin.com/$imagePath',
         'link': linkController.text.trim(),
         'sira': int.tryParse(siraController.text)?? 0,
         'order': int.tryParse(siraController.text)?? 0,
@@ -73,73 +111,114 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
       siraController.text = "1";
       setState(() => secilenResim = null);
     } catch (e, s) {
-      print('❌ REKLAM HATA: $e $s');
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e'), duration: const Duration(seconds: 5)));
+      print('REKLAM HATA: $e $s');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+      }
     }
     if (mounted) setState(() => yukleniyor = false);
   }
 
   Future<void> toggleAktif(String docId, bool current) async {
-    await FirebaseFirestore.instance.collection('reklam_board').doc(docId).update({'aktif':!current, 'isActive':!current});
+    await FirebaseFirestore.instance.collection('reklam_board').doc(docId).update({
+      'aktif':!current,
+      'isActive':!current,
+    });
   }
 
   Future<void> silReklam(String docId) async {
-    final confirm = await showDialog<bool>(context: context, builder: (_) => AlertDialog(title: const Text('Silinsin mi?'), content: const Text('Bu reklam silinecek'), actions: [TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Iptal')), FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Sil'))]));
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Silinsin mi?'),
+        content: const Text('Bu reklam silinecek'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Iptal')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Sil')),
+        ],
+      ),
+    );
     if (confirm!= true) return;
     await FirebaseFirestore.instance.collection('reklam_board').doc(docId).delete();
-    if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Silindi')));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Reklam Board - Admin'), backgroundColor: Colors.black, foregroundColor: Colors.white),
-      body: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)), child: Column(children: [
-          const Text('Yeni Reklam Ekle (Sadece Resim)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 12),
-          TextField(controller: baslikController, decoration: const InputDecoration(labelText: 'Reklam Adi (admin icin)', border: OutlineInputBorder())),
-          const SizedBox(height: 12),
-          TextField(controller: linkController, decoration: const InputDecoration(labelText: 'Tiklayinca Gidecek Link (opsiyonel)', hintText: '/kategori/boya veya https://...', border: OutlineInputBorder())),
-          const SizedBox(height: 12),
-          Row(children: [
-            Expanded(child: TextField(controller: siraController, decoration: const InputDecoration(labelText: 'Sira', border: OutlineInputBorder()), keyboardType: TextInputType.number)),
-            const SizedBox(width: 12),
-            Expanded(child: SwitchListTile(title: const Text('Aktif'), value: aktif, onChanged: (v) => setState(() => aktif = v))),
-          ]),
-          const SizedBox(height: 12),
-          Row(children: [
-            ElevatedButton.icon(onPressed: () async { final r = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85); if (r!= null) setState(() => secilenResim = r); }, icon: const Icon(Icons.image), label: Text(secilenResim == null? 'Resim Sec' : 'Resim Secildi ✓')),
-            const SizedBox(width: 12),
-            if (secilenResim!= null) Expanded(child: Text(secilenResim!.name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12))),
-          ]),
-          const SizedBox(height: 16),
-          yukleniyor? const CircularProgressIndicator() : SizedBox(width: double.infinity, child: ElevatedButton(onPressed: reklamKaydet, style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, minimumSize: const Size(double.infinity, 48)), child: const Text('REKLAMI YAYINLA', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)))),
-        ])),
-        const SizedBox(height: 24),
-        const Divider(),
-        const SizedBox(height: 12),
-        const Text('Mevcut Reklamlar (5sn arayla doner)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        const SizedBox(height: 12),
-        StreamBuilder<QuerySnapshot>(stream: FirebaseFirestore.instance.collection('reklam_board').orderBy('sira').snapshots(), builder: (context, snap) {
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
-          final docs = snap.data!.docs;
-          if (docs.isEmpty) return const Text('Henuz reklam yok');
-          return ListView.separated(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: docs.length, separatorBuilder: (_, __) => const SizedBox(height: 8), itemBuilder: (context, i) {
-            final d = docs[i].data() as Map<String, dynamic>;
-            final id = docs[i].id;
-            return Container(decoration: BoxDecoration(color: d['aktif'] == true? Colors.white : Colors.grey.shade200, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)), child: ListTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(d['imageUrl']?? 'https://cdn.hemenustamgelsin.com/${d['imagePath']}', width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.broken_image))),
-              title: Text(d['baslik']?? '', style: TextStyle(fontWeight: FontWeight.bold, color: d['aktif'] == true? Colors.black : Colors.grey)),
-              subtitle: Text('Sira: ${d['sira']} | Link: ${d['link']?? '-'} | Dosya: ${d['imagePath']}'),
-              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                IconButton(icon: Icon(d['aktif'] == true? Icons.visibility : Icons.visibility_off, color: d['aktif'] == true? Colors.green : Colors.grey), onPressed: () => toggleAktif(id, d['aktif'] == true)),
-                IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => silReklam(id)),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+            child: Column(children: [
+              const Text('Yeni Reklam Ekle (Sadece Resim)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 12),
+              TextField(controller: baslikController, decoration: const InputDecoration(labelText: 'Reklam Adi (admin icin)', border: OutlineInputBorder())),
+              const SizedBox(height: 12),
+              TextField(controller: linkController, decoration: const InputDecoration(labelText: 'Tiklayinca Gidecek Link (opsiyonel)', border: OutlineInputBorder())),
+              const SizedBox(height: 12),
+              Row(children: [
+                Expanded(child: TextField(controller: siraController, decoration: const InputDecoration(labelText: 'Sira', border: OutlineInputBorder()), keyboardType: TextInputType.number)),
+                const SizedBox(width: 12),
+                Expanded(child: SwitchListTile(title: const Text('Aktif'), value: aktif, onChanged: (v) => setState(() => aktif = v))),
               ]),
-            ));
-          });
-        }),
-      ])),
+              const SizedBox(height: 12),
+              Row(children: [
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final r = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 90);
+                    if (r!= null) setState(() => secilenResim = r);
+                  },
+                  icon: const Icon(Icons.image),
+                  label: Text(secilenResim == null? 'Resim Sec' : 'Secildi ✓'),
+                ),
+                const SizedBox(width: 12),
+                if (secilenResim!= null) Expanded(child: Text(secilenResim!.name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12))),
+              ]),
+              const SizedBox(height: 16),
+              yukleniyor
+                  ? const CircularProgressIndicator()
+                  : SizedBox(width: double.infinity, child: ElevatedButton(onPressed: reklamKaydet, style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, minimumSize: const Size(double.infinity, 48)), child: const Text('REKLAMI YAYINLA', style: TextStyle(fontWeight: FontWeight.bold)))),
+            ]),
+          ),
+          const SizedBox(height: 24),
+          const Divider(),
+          const Text('Mevcut Reklamlar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 12),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('reklam_board').orderBy('sira').snapshots(),
+            builder: (context, snap) {
+              if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+              final docs = snap.data!.docs;
+              if (docs.isEmpty) return const Text('Henuz reklam yok');
+              return ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: docs.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                itemBuilder: (context, i) {
+                  final d = docs[i].data() as Map<String, dynamic>;
+                  final id = docs[i].id;
+                  return Container(
+                    decoration: BoxDecoration(color: d['aktif'] == true? Colors.white : Colors.grey.shade200, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+                    child: ListTile(
+                      leading: ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(d['imageUrl']?? 'https://cdn.hemenustamgelsin.com/${d['imagePath']}', width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.broken_image))),
+                      title: Text(d['baslik']?? ''),
+                      subtitle: Text('Dosya: ${d['orijinalAd']?? d['imagePath']} | Sira: ${d['sira']}'),
+                      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                        IconButton(icon: Icon(d['aktif'] == true? Icons.visibility : Icons.visibility_off, color: d['aktif'] == true? Colors.green : Colors.grey), onPressed: () => toggleAktif(id, d['aktif'] == true)),
+                        IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => silReklam(id)),
+                      ]),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ]),
+      ),
     );
   }
 }
