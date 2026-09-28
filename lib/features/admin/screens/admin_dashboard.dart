@@ -10,6 +10,8 @@ import 'robot_view.dart';
 import 'content_view.dart';
 // YENİ EKLENEN IMPORT: Blog ekleme ekranı
 import 'blog_ekle_screen.dart';
+// YENİ EKLENEN IMPORT: Reklam Board
+import 'admin_reklam_board.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -51,6 +53,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       ModerasyonView(),
                       // YENİ EKLENEN SAYFA: Blog Ekle ekranı
                       const BlogEkleScreen(),
+                      // YENİ EKLENEN SAYFA: Reklam Board (HUG MARKET sağ taraf)
+                      const AdminReklamBoardScreen(),
                     ],
                   ),
                 ),
@@ -81,8 +85,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
         NavigationRailDestination(icon: Icon(Icons.article_outlined), label: Text("İçerik")),
         NavigationRailDestination(icon: Icon(Icons.account_balance_wallet_outlined), label: Text("Finans")),
         NavigationRailDestination(icon: Icon(Icons.admin_panel_settings_outlined), label: Text("Modere")),
-        // YENİ EKLENEN BUTON: Modere'nin altına Blog butonu
+        // YENİ EKLENEN BUTON: Blog butonu
         NavigationRailDestination(icon: Icon(Icons.post_add_outlined), label: Text("Blog")),
+        // YENİ EKLENEN BUTON: Reklam Board - HUG MARKET
+        NavigationRailDestination(icon: Icon(Icons.campaign_outlined), label: Text("Reklam")),
       ],
     );
   }
