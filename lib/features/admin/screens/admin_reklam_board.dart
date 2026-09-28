@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -51,18 +52,27 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
     }
   }
 
-  Future<String> resimYukle() async {
+  // YENİ: Temiz isim üreteci - amk isim sorununu bitiren yer
+  String _temizDosyaAdiUret(String orijinalAd) {
+    final ext = orijinalAd.toLowerCase().split('.').last;
+    final temizExt = ['jpg','jpeg','png','webp','gif'].contains(ext) ? ext : 'webp';
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final random = Random().nextInt(9000) + 1000; // 1000-9999
+    // Sonuç: reklam-173269...-4832.webp gibi tek ve temiz
+    return 'reklam-$timestamp-$random.$temizExt';
+  }
+
+  Future<String> resimYukle(String yeniDosyaAdi) async {
     final minio = _minioClient();
     final bytes = await secilenResim!.readAsBytes();
-    final orijinalIsim = secilenResim!.name.trim().replaceAll('/', '-');
-    final yol = 'images/reklam_board/$orijinalIsim';
+    final yol = 'images/reklam_board/$yeniDosyaAdi';
 
     await minio.putObject(
       'ustam-gelsin-medya',
       yol,
       Stream.value(bytes),
       size: bytes.length,
-      metadata: {'Content-Type': _contentType(orijinalIsim)},
+      metadata: {'Content-Type': _contentType(yeniDosyaAdi)},
     );
     return yol;
   }
@@ -74,30 +84,22 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
     }
     setState(() => yukleniyor = true);
     try {
-      final orijinalIsim = secilenResim!.name.trim().replaceAll('/', '-');
-      final imagePath = await resimYukle();
+      final orijinalAd = secilenResim!.name;
+      final yeniDosyaAdi = _temizDosyaAdiUret(orijinalAd);
+      final imagePath = await resimYukle(yeniDosyaAdi);
 
-      String docId = orijinalIsim;
-      final ref = FirebaseFirestore.instance.collection('reklam_board').doc(docId);
-      final exists = await ref.get();
-      if (exists.exists) {
-        final dot = orijinalIsim.lastIndexOf('.');
-        final base = dot!= -1? orijinalIsim.substring(0, dot) : orijinalIsim;
-        final ext = dot!= -1? orijinalIsim.substring(dot + 1) : '';
-        docId = ext.isNotEmpty
-            ? '${base}_${DateTime.now().millisecondsSinceEpoch}.$ext'
-            : '${base}_${DateTime.now().millisecondsSinceEpoch}';
-      }
+      // docId artık temiz dosya adından
+      final docId = yeniDosyaAdi;
 
       await FirebaseFirestore.instance.collection('reklam_board').doc(docId).set({
-        'baslik': baslikController.text.trim().isEmpty? orijinalIsim : baslikController.text.trim(),
+        'baslik': baslikController.text.trim().isEmpty ? yeniDosyaAdi : baslikController.text.trim(),
         'slug': docId,
-        'orijinalAd': orijinalIsim,
+        'orijinalAd': orijinalAd, // eski adı sadece bilgi için sakla
         'imagePath': imagePath,
         'imageUrl': 'https://cdn.hemenustamgelsin.com/$imagePath',
         'link': linkController.text.trim(),
-        'sira': int.tryParse(siraController.text)?? 0,
-        'order': int.tryParse(siraController.text)?? 0,
+        'sira': int.tryParse(siraController.text) ?? 0,
+        'order': int.tryParse(siraController.text) ?? 0,
         'aktif': aktif,
         'isActive': aktif,
         'tarih': FieldValue.serverTimestamp(),
@@ -105,7 +107,7 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
       });
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('YAYINDA: $orijinalIsim OK')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('YAYINDA: $yeniDosyaAdi OK')));
       baslikController.clear();
       linkController.clear();
       siraController.text = "1";
@@ -121,8 +123,8 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
 
   Future<void> toggleAktif(String docId, bool current) async {
     await FirebaseFirestore.instance.collection('reklam_board').doc(docId).update({
-      'aktif':!current,
-      'isActive':!current,
+      'aktif': !current,
+      'isActive': !current,
     });
   }
 
@@ -138,7 +140,7 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
         ],
       ),
     );
-    if (confirm!= true) return;
+    if (confirm != true) return;
     await FirebaseFirestore.instance.collection('reklam_board').doc(docId).delete();
   }
 
@@ -169,13 +171,13 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
                 ElevatedButton.icon(
                   onPressed: () async {
                     final r = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 90);
-                    if (r!= null) setState(() => secilenResim = r);
+                    if (r != null) setState(() => secilenResim = r);
                   },
                   icon: const Icon(Icons.image),
-                  label: Text(secilenResim == null? 'Resim Sec' : 'Secildi ✓'),
+                  label: Text(secilenResim == null ? 'Resim Sec' : 'Secildi ✓'),
                 ),
                 const SizedBox(width: 12),
-                if (secilenResim!= null) Expanded(child: Text(secilenResim!.name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12))),
+                if (secilenResim != null) Expanded(child: Text(secilenResim!.name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12))),
               ]),
               const SizedBox(height: 16),
               yukleniyor
@@ -202,13 +204,13 @@ class _AdminReklamBoardScreenState extends State<AdminReklamBoardScreen> {
                   final d = docs[i].data() as Map<String, dynamic>;
                   final id = docs[i].id;
                   return Container(
-                    decoration: BoxDecoration(color: d['aktif'] == true? Colors.white : Colors.grey.shade200, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
+                    decoration: BoxDecoration(color: d['aktif'] == true ? Colors.white : Colors.grey.shade200, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade300)),
                     child: ListTile(
-                      leading: ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(d['imageUrl']?? 'https://cdn.hemenustamgelsin.com/${d['imagePath']}', width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.broken_image))),
-                      title: Text(d['baslik']?? ''),
-                      subtitle: Text('Dosya: ${d['orijinalAd']?? d['imagePath']} | Sira: ${d['sira']}'),
+                      leading: ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.network(d['imageUrl'] ?? 'https://cdn.hemenustamgelsin.com/${d['imagePath']}', width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.broken_image))),
+                      title: Text(d['baslik'] ?? ''),
+                      subtitle: Text('Dosya: ${d['orijinalAd'] ?? d['imagePath']} | Sira: ${d['sira']}'),
                       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                        IconButton(icon: Icon(d['aktif'] == true? Icons.visibility : Icons.visibility_off, color: d['aktif'] == true? Colors.green : Colors.grey), onPressed: () => toggleAktif(id, d['aktif'] == true)),
+                        IconButton(icon: Icon(d['aktif'] == true ? Icons.visibility : Icons.visibility_off, color: d['aktif'] == true ? Colors.green : Colors.grey), onPressed: () => toggleAktif(id, d['aktif'] == true)),
                         IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => silReklam(id)),
                       ]),
                     ),
