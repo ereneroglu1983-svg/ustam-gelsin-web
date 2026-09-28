@@ -1,4 +1,3 @@
-```bat
 @echo off
 setlocal
 
@@ -23,7 +22,6 @@ if errorlevel 1 (
 
 echo Temizlik bitti.
 echo.
-
 
 REM ============================================================
 REM [1/5] SEO SECIMI
@@ -53,7 +51,6 @@ echo.
 echo HATA: Lutfen sadece Y veya N gir.
 goto SEO_SECIM
 
-
 REM ============================================================
 REM [1/5] SEO BUILD
 REM ============================================================
@@ -80,7 +77,6 @@ cd ..
 echo SEO bitti.
 echo.
 
-
 REM ============================================================
 REM [2/5] FLUTTER BUILD
 REM ============================================================
@@ -100,7 +96,6 @@ if errorlevel 1 (
 
 echo Flutter bitti.
 echo.
-
 
 REM ============================================================
 REM [2.5/5] CACHE HEADERS
@@ -134,9 +129,39 @@ if errorlevel 1 (
     exit /b 1
 )
 
+REM --- _redirects GARANTI OLUSTUR ---
+(
+echo # GOOGLE INDEX FIX - YANLIS YAZIMLAR 301
+echo /usta-is-ilanlari/*/otamatik-sulama-sistemleri /usta-is-ilanlari/:splat/otomatik-sulama-sistemleri 301!
+echo /usta-is-ilanlari/*/otamatik-sulama-sistemleri/ /usta-is-ilanlari/:splat/otomatik-sulama-sistemleri/ 301!
+echo /usta-is-ilanlari/*/boya-badana /usta-is-ilanlari/:splat/ic-cephe-boya-ve-badana 301!
+echo /usta-is-ilanlari/*/boya-badana/ /usta-is-ilanlari/:splat/ic-cephe-boya-ve-badana/ 301!
+echo /usta-is-ilanlari/*/cati-yapimi-aktarma-ve-izalasyon /usta-is-ilanlari/:splat/cati-aktarma-ve-izolasyon 301!
+echo /usta-is-ilanlari/*/cati-yapimi-aktarma-ve-izalasyon/ /usta-is-ilanlari/:splat/cati-aktarma-ve-izolasyon/ 301!
+echo /usta-is-ilanlari/*/uydu-internet-ve-kamera-sitemleri /usta-is-ilanlari/:splat/uydu-ve-kamera-sistemleri 301!
+echo /usta-is-ilanlari/*/uydu-internet-ve-kamera-sitemleri/ /usta-is-ilanlari/:splat/uydu-ve-kamera-sistemleri/ 301!
+echo.
+echo # HOME FIX - 301 KALICI
+echo /home / 301!
+echo /home/ / 301!
+echo.
+echo # HUG MARKET FIX
+echo /hug-market /index.html 200
+echo /hug-market/ /index.html 200
+echo.
+echo # FLUTTER SPA FALLBACK - EN SONDA KALMALI
+echo /* /index.html 200
+) > "build\web\_redirects"
+
+if errorlevel 1 (
+    echo.
+    echo HATA: _redirects DOSYASI OLUSTURULAMADI!
+    pause
+    exit /b 1
+)
+
 echo Cache ayarlari tamam.
 echo.
-
 
 REM ============================================================
 REM [3/5] SEO'YU FLUTTER BUILD'E GOM
@@ -146,7 +171,6 @@ if "%SEO_SKIP%"=="1" goto SEO_GOMME_ATLA
 
 echo [3/5] SEO gomuluyor...
 echo.
-
 
 REM ------------------------------------------------------------
 REM SEO KLASORLERI
@@ -171,7 +195,6 @@ for /D %%i in ("seo\out\*") do (
         )
     )
 )
-
 
 REM ------------------------------------------------------------
 REM SEO ROOT DOSYALARI
@@ -201,12 +224,16 @@ for %%F in ("seo\out\*") do (
     )
 )
 
+REM --- 404 TEMIZLIGI - FLUTTER SPA'YI BOZMASIN ---
+echo 404 temizleniyor...
+if exist "build\web\404.html" del /Q "build\web\404.html" >nul 2>&1
+if exist "build\web\404" rmdir /S /Q "build\web\404" >nul 2>&1
+
 echo.
 echo SEO gomuldu.
 echo.
 
 goto SEO_GOMME_BITTI
-
 
 REM ============================================================
 REM SEO ATLANDI
@@ -217,7 +244,6 @@ REM ============================================================
 echo [3/5] SEO ATLANDI.
 echo.
 
-
 REM ============================================================
 REM [4/5] CLOUDFLARE DEPLOY
 REM ============================================================
@@ -226,7 +252,6 @@ REM ============================================================
 
 echo [4/5] Cloudflare deploy...
 echo.
-
 
 REM ------------------------------------------------------------
 REM FUNCTIONS KONTROL
@@ -248,7 +273,6 @@ if not exist "functions" (
     exit /b 1
 )
 
-
 REM ------------------------------------------------------------
 REM FUNCTIONS GIZLE
 REM ------------------------------------------------------------
@@ -265,7 +289,6 @@ if errorlevel 1 (
 echo functions gizlendi.
 echo.
 
-
 REM ------------------------------------------------------------
 REM WRANGLER
 REM
@@ -279,7 +302,6 @@ echo.
 call npx wrangler pages deploy build/web --project-name=ustam-web-deploy --commit-dirty=true
 
 set "WRANGLER_ERROR=%ERRORLEVEL%"
-
 
 REM ------------------------------------------------------------
 REM FUNCTIONS GERI GETIR
@@ -309,7 +331,6 @@ if errorlevel 1 (
 echo functions geri geldi.
 echo.
 
-
 REM ------------------------------------------------------------
 REM WRANGLER SONUCU
 REM ------------------------------------------------------------
@@ -333,7 +354,6 @@ echo ======================================
 echo CLOUDFLARE DEPLOY TAMAM!
 echo ======================================
 echo.
-
 
 REM ============================================================
 REM REVALIDATE
@@ -360,14 +380,12 @@ if "%SEO_SKIP%"=="0" (
     echo.
 )
 
-
 REM ============================================================
 REM [5/5] GIT
 REM ============================================================
 
 echo [5/5] Git push...
 echo.
-
 
 REM ------------------------------------------------------------
 REM GIT ADD
@@ -382,7 +400,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-
 REM ------------------------------------------------------------
 REM GIT COMMIT
 REM ------------------------------------------------------------
@@ -395,7 +412,6 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-
 
 REM ------------------------------------------------------------
 REM GIT PULL
@@ -412,7 +428,6 @@ if errorlevel 1 (
     exit /b 1
 )
 
-
 REM ------------------------------------------------------------
 REM GIT PUSH
 REM ------------------------------------------------------------
@@ -425,7 +440,6 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-
 
 REM ============================================================
 REM TAMAMLANDI
@@ -441,4 +455,3 @@ echo.
 
 pause
 endlocal
-```
