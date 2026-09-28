@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/features/home/screens/home_screen.dart';
 import 'package:ustam_gelsin/features/home/screens/insaat_rehberi.dart';
 import 'package:ustam_gelsin/features/rehber/screens/rehber_detay_screen.dart';
+import 'package:ustam_gelsin/features/hug_market/hug_market_homepage.dart';
+import 'package:ustam_gelsin/features/hug_market/sepet_sayfasi.dart';
+import 'package:ustam_gelsin/features/hug_market/siparis_takip_sayfasi.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -15,7 +18,7 @@ final appRouter = GoRouter(
       redirect: (c, s) => '/',
     ),
 
-    // /insaat-rehberi yazan da /rehber'e gitsin, tek yerden yönetilsin
+    // /insaat-rehberi yazan da /rehber'e gitsin
     GoRoute(
       path: '/insaat-rehberi',
       redirect: (c, s) => '/rehber',
@@ -31,6 +34,23 @@ final appRouter = GoRouter(
         ),
       ],
     ),
+
+    // HUG MARKET - YENİ
+    GoRoute(
+      path: '/hug-market',
+      builder: (c, s) => const HugMarketHomepage(),
+      routes: [
+        GoRoute(
+          path: 'sepet',
+          builder: (c, s) => const SepetSayfasi(),
+        ),
+        GoRoute(
+          path: 'siparis-takip',
+          builder: (c, s) => const SiparisTakipSayfasi(),
+        ),
+      ],
+    ),
+
     GoRoute(
       path: '/odeme-basarili',
       builder: (context, state) {
