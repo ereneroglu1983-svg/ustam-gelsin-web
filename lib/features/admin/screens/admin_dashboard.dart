@@ -52,9 +52,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       FinansView(),
                       ModerasyonView(),
                       // YENİ EKLENEN SAYFA: Blog Ekle ekranı
-                      const BlogEkleScreen(),
+                      BlogEkleScreen(),
                       // YENİ EKLENEN SAYFA: Reklam Board (HUG MARKET sağ taraf)
-                      const AdminReklamBoardScreen(),
+                      AdminReklamBoardScreen(),
                     ],
                   ),
                 ),

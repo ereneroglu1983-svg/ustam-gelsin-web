@@ -40,7 +40,7 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
     final minio = _minioClient();
     final bytes = await secilenResim!.readAsBytes();
     final dosyaAdi = '$slug-$ts.webp';
-    final yol = isUstaPosteri ? 'images/ustalar/$dosyaAdi' : 'images/$dosyaAdi';
+    final yol = isUstaPosteri ? 'images/ustalar/$dosyaAdi' : 'images/insaat_rehberi/$dosyaAdi';
     await minio.putObject(
       'ustam-gelsin-medya',
       yol,
