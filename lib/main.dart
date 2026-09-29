@@ -1,4 +1,5 @@
-// lib/main.dart - FINAL - BEYAZ EKRAN FIX
+// lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -63,6 +64,42 @@ void _handleNotificationClick(RemoteMessage message) {
   }
 }
 
+// --- YENİ: runApp SONRASI ARKA PLANDA ÇALIŞACAK AĞIR İŞLER ---
+Future<void> _initializeServicesInBackground() async {
+  // 1. Yorumları arka planda yükle, ana thread'i kitlemeden
+  try {
+    await YorumService.loadData();
+  } catch (e) {
+    debugPrint("YorumService yükleme hatası: $e");
+  }
+
+  if (kIsWeb) return;
+
+  // 2. AppCheck'i arka planda aktive et, bekletme
+  if (!kDebugMode) {
+    try {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.appAttest,
+      );
+    } catch (_) {}
+  }
+
+  // 3. Bildirim servisleri
+  try {
+    await NotificationService().initialize();
+    await FirebaseMessaging.instance.subscribeToTopic('acil_cagri_ustalar').catchError((_) {});
+
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      Future.delayed(const Duration(seconds: 1), () => _handleNotificationClick(initialMessage));
+    }
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationClick);
+  } catch (e) {
+    debugPrint("Bildirim init hatası: $e");
+  }
+}
+
 void main() async {
   if (kIsWeb) {
     usePathUrlStrategy();
@@ -72,44 +109,22 @@ void main() async {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
 
-  try {
-    await YorumService.loadData();
-  } catch (e) {
-    debugPrint("YorumService yükleme hatası: $e");
-  }
-
+  // SADECE Firebase'i bekle, gerisini bekleme! Bu 300ms sürer.
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     debugPrint("✅ Firebase başlatıldı");
     if (kIsWeb) {
       await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
-    } else {
-      if (!kDebugMode) {
-        try {
-          await FirebaseAppCheck.instance.activate(
-            androidProvider: AndroidProvider.playIntegrity,
-            appleProvider: AppleProvider.appAttest,
-          );
-        } catch (_) {}
-      }
+    }
+    // Background handler'ı erken set et, hafiftir
+    if (!kIsWeb) {
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     }
   } catch (e) {
     debugPrint("Firebase Hatası: $e");
   }
 
-  if (!kIsWeb) {
-    try {
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-      await NotificationService().initialize();
-      await FirebaseMessaging.instance.subscribeToTopic('acil_cagri_ustalar').catchError((_) {});
-      RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-      if (initialMessage != null) {
-        Future.delayed(const Duration(seconds: 1), () => _handleNotificationClick(initialMessage));
-      }
-      FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationClick);
-    } catch (_) {}
-  }
-
+  // HEMEN EKRANI ÇİZ - 7 tane await'i beklemeden runApp!
   runApp(
     MultiProvider(
       providers: [
@@ -118,6 +133,9 @@ void main() async {
       child: const MyApp(),
     ),
   );
+
+  // Ağır işleri runApp'ten SONRA arka planda başlat
+  unawaited(_initializeServicesInBackground());
 }
 
 class MyApp extends StatelessWidget {
@@ -149,20 +167,20 @@ class _SplashWrapperState extends State<SplashWrapper> {
   @override
   void initState() {
     super.initState();
-    // ✅ WEBDE SPLASH'I BEKLEME, DİREKT KALDIR
     if (kIsWeb) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Webde native splash yok, direkt home'a git
         if (mounted) context.go('/home');
       });
     } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) => FlutterNativeSplash.remove());
+      // İlk frame çizildikten SONRA splash'i kaldır - beyaz ekranı bitirir
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FlutterNativeSplash.remove();
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // ✅ WEBDE DİREKT HOME GÖSTER, SPLASH GÖSTERME
     if (kIsWeb) {
       return const AuthGate();
     }
@@ -185,7 +203,8 @@ class _AuthGateState extends State<AuthGate> {
     if (!kIsWeb) {
       FirebaseAuth.instance.authStateChanges().listen((user) async {
         if (user != null) {
-          ChatService().yeniMesajlariDinle();
+          // Mesaj dinlemeyi de gecikmeli başlat
+          Future.microtask(() => ChatService().yeniMesajlariDinle());
         }
       });
     }
@@ -194,7 +213,6 @@ class _AuthGateState extends State<AuthGate> {
   @override
   Widget build(BuildContext context) {
     if (kIsWeb) {
-      // Webde auth bekleme, direkt göster
       return const WebHomeScreen();
     }
     return StreamBuilder<User?>(
