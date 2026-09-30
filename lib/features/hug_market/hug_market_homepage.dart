@@ -9,8 +9,6 @@ import 'package:ustam_gelsin/features/hug_market/widgets/hug_market_footer.dart'
 import 'package:ustam_gelsin/features/hug_market/widgets/reklam_board_slider.dart';
 import 'package:ustam_gelsin/features/hug_market/sepet_sayfasi.dart';
 import 'package:ustam_gelsin/features/hug_market/siparis_takip_sayfasi.dart';
-import 'package:ustam_gelsin/features/musteri/screens/musteri_login.dart';
-import 'package:ustam_gelsin/features/usta/screens/usta_login.dart';
 import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
 import 'package:ustam_gelsin/features/usta/screens/usta_profil_sayfasi.dart';
 import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dart';
@@ -29,6 +27,10 @@ import 'package:ustam_gelsin/features/hug_market/kategoriler/seramik.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/yalitim.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/yenilenebilir.dart';
 import 'package:ustam_gelsin/features/hug_market/cozum_ortagi_page.dart';
+import 'package:ustam_gelsin/web_dosyalari/musteri_kayit_ekrani.dart';
+import 'package:ustam_gelsin/web_dosyalari/usta_kayit_ekrani.dart';
+import 'package:ustam_gelsin/web_dosyalari/musteri_giris_ekrani.dart';
+import 'package:ustam_gelsin/web_dosyalari/usta_giris_ekrani.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HugMarketHomepage extends StatefulWidget {
@@ -41,6 +43,7 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
   final AuthService _authService = AuthService();
   final TextEditingController _searchCtrl = TextEditingController();
   String _searchQuery = '';
+  bool _isProfileLoading = false;
 
   @override
   void initState() {
@@ -58,12 +61,13 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
     super.dispose();
   }
 
-  void _showLoginDialog() {
+  // WEBHOMESCREEN İLE AYNI - KİLİTLİ SİSTEM
+  void _showSelectionDialog(BuildContext context, bool isRegister) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Nasıl devam edelim?', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 16)),
+        title: Text(isRegister? "Üyelik Tipi Seçin" : "Giriş Tipi Seçin", style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -73,11 +77,11 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
                 decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(10)),
                 child: const Icon(Icons.person_outline, color: Colors.blue),
               ),
-              title: Text('Müşteri Olarak', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-              subtitle: Text('Alışveriş yap, sipariş ver', style: GoogleFonts.poppins(fontSize: 11)),
+              title: Text("Müşteri Olarak", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+              subtitle: Text(isRegister? "Hemen alışverişe başla" : "Alışveriş yap, sipariş ver", style: GoogleFonts.poppins(fontSize: 11)),
               onTap: () {
                 Navigator.pop(ctx);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const MusteriLoginPage(targetRole: 'musteri')));
+                Navigator.push(context, MaterialPageRoute(builder: (_)=> isRegister? MusteriKayitEkrani() : MusteriGirisEkrani()));
               },
             ),
             const SizedBox(height: 8),
@@ -87,11 +91,11 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
                 decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: BorderRadius.circular(10)),
                 child: const Icon(Icons.handyman_outlined, color: Colors.orange),
               ),
-              title: Text('Usta Olarak', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-              subtitle: Text('Sepette %5 indirim kazan', style: GoogleFonts.poppins(fontSize: 11)),
+              title: Text("Usta Olarak", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+              subtitle: Text("Sepette %5 indirim kazan", style: GoogleFonts.poppins(fontSize: 11)),
               onTap: () {
                 Navigator.pop(ctx);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const UstaLoginPage(targetRole: 'usta')));
+                Navigator.push(context, MaterialPageRoute(builder: (_)=> isRegister? UstaKayitEkrani() : UstaGirisEkrani()));
               },
             ),
           ],
@@ -101,9 +105,11 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
   }
 
   Future<void> _goProfil() async {
+    setState(()=> _isProfileLoading = true);
     bool adminMi = await _authService.isAdmin();
     String? role = await _authService.getUserRole();
     if (!mounted) return;
+    setState(()=> _isProfileLoading = false);
     if (adminMi) {
       Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboard()));
     } else if (role == 'usta' || role == 'master') {
@@ -117,7 +123,7 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
 
   void _goSiparisTakip() {
     if (_authService.currentUser == null) {
-      _showLoginDialog();
+      _showSelectionDialog(context, false);
       return;
     }
     Navigator.push(context, MaterialPageRoute(builder: (_) => const SiparisTakipSayfasi()));
@@ -248,9 +254,7 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
                     hintText: '🔍 Ara... boya, fayans, tesisat',
                     hintStyle: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
                     prefixIcon: const Icon(Icons.search, size: 18, color: Color(0xFF64748B)),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(icon: const Icon(Icons.clear, size: 16), onPressed: () => _searchCtrl.clear())
-                        : null,
+                    suffixIcon: _searchQuery.isNotEmpty? IconButton(icon: const Icon(Icons.clear, size: 16), onPressed: () => _searchCtrl.clear()) : null,
                     filled: true,
                     fillColor: const Color(0xFFF1F5F9),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -279,30 +283,25 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: isDesktop? 6 : 8),
               decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE2E8F0))),
-              child: Row(
+              child: isLoggedIn
+                  ? Row(
                 children: [
-                  Expanded(
-                    child: InkWell(
-                      onTap: _goSiparisTakip,
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: isDesktop? 8 : 10),
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFE2E8F0))),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.inventory_2_rounded, size: isDesktop? 16 : 18, color: const Color(0xFF0F172A)),
-                            const SizedBox(width: 6),
-                            Text('Siparişlerim', style: GoogleFonts.poppins(fontSize: isDesktop? 10.5 : 11, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A))),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                  Expanded(child: InkWell(onTap: _goSiparisTakip, borderRadius: BorderRadius.circular(8), child: Container(padding: EdgeInsets.symmetric(vertical: isDesktop? 8 : 10), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFE2E8F0))), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.inventory_2_rounded, size: isDesktop? 16 : 18, color: const Color(0xFF0F172A)), const SizedBox(width: 6), Text('Siparişlerim', style: GoogleFonts.poppins(fontSize: isDesktop? 10.5 : 11, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)))])))),
                   const SizedBox(width: 8),
                   Expanded(child: _buildSepetAction(uid, isDesktop: isDesktop)),
                   const SizedBox(width: 8),
-                  Expanded(child: _buildProfilAction(isLoggedIn, displayName, isDesktop: isDesktop)),
+                  Expanded(child: _buildProfilActionLoggedIn(displayName, isDesktop: isDesktop)),
+                ],
+              )
+                  : Row(
+                children: [
+                  Expanded(child: InkWell(onTap: _goSiparisTakip, borderRadius: BorderRadius.circular(8), child: Container(padding: EdgeInsets.symmetric(vertical: isDesktop? 8 : 10), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFE2E8F0))), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.inventory_2_rounded, size: isDesktop? 16 : 18, color: const Color(0xFF0F172A)), const SizedBox(width: 6), Text('Siparişlerim', style: GoogleFonts.poppins(fontSize: isDesktop? 10.5 : 11, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)))])))),
+                  const SizedBox(width: 8),
+                  Expanded(child: _buildSepetAction(uid, isDesktop: isDesktop)),
+                  const SizedBox(width: 8),
+                  Expanded(child: InkWell(onTap: ()=> _showSelectionDialog(context, true), borderRadius: BorderRadius.circular(8), child: Container(padding: EdgeInsets.symmetric(vertical: isDesktop? 8 : 10), decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)), child: Center(child: Text('Üye Ol', style: GoogleFonts.poppins(fontSize: isDesktop? 10.5 : 11, fontWeight: FontWeight.w700, color: Colors.white)))))),
+                  const SizedBox(width: 8),
+                  Expanded(child: InkWell(onTap: ()=> _showSelectionDialog(context, false), borderRadius: BorderRadius.circular(8), child: Container(padding: EdgeInsets.symmetric(vertical: isDesktop? 8 : 10), decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(8)), child: Center(child: Text('GİRİŞ YAP', style: GoogleFonts.poppins(fontSize: isDesktop? 10.5 : 11, fontWeight: FontWeight.w700, color: Colors.white)))))),
                 ],
               ),
             ),
@@ -329,9 +328,7 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
                   hintText: '🔍 Ara... boya, fayans, tesisat',
                   hintStyle: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
                   prefixIcon: const Icon(Icons.search, size: 18, color: Color(0xFF64748B)),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () => _searchCtrl.clear())
-                      : null,
+                  suffixIcon: _searchQuery.isNotEmpty? IconButton(icon: const Icon(Icons.clear, size: 18), onPressed: () => _searchCtrl.clear()) : null,
                   filled: true,
                   fillColor: const Color(0xFFF1F5F9),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -350,123 +347,51 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
     final vPad = isDesktop? 8.0 : 10.0;
     final fSize = isDesktop? 10.5 : 11.0;
     if (uid == null) {
-      return InkWell(
-        onTap: _goSepet,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: vPad),
-          decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(8)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.shopping_cart_rounded, size: isDesktop? 16 : 18, color: Colors.white),
-              const SizedBox(width: 6),
-              Text('Sepet', style: GoogleFonts.poppins(fontSize: fSize, fontWeight: FontWeight.w700, color: Colors.white)),
-            ],
-          ),
-        ),
-      );
+      return InkWell(onTap: _goSepet, borderRadius: BorderRadius.circular(8), child: Container(padding: EdgeInsets.symmetric(vertical: vPad), decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(8)), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.shopping_cart_rounded, size: isDesktop? 16 : 18, color: Colors.white), const SizedBox(width: 6), Text('Sepet', style: GoogleFonts.poppins(fontSize: fSize, fontWeight: FontWeight.w700, color: Colors.white))])));
     }
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance.collection('sepet').where('userId', isEqualTo: uid).snapshots(),
       builder: (context, snap) {
         int count = 0;
         if (snap.hasData) count = snap.data!.docs.length;
-        return InkWell(
-          onTap: _goSepet,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: vPad),
-            decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(8)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.shopping_cart_rounded, size: isDesktop? 16 : 18, color: Colors.white),
-                const SizedBox(width: 6),
-                Text('Sepet', style: GoogleFonts.poppins(fontSize: fSize, fontWeight: FontWeight.w700, color: Colors.white)),
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(20)),
-                  child: Text('$count', style: GoogleFonts.poppins(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800)),
-                ),
-              ],
-            ),
-          ),
-        );
+        return InkWell(onTap: _goSepet, borderRadius: BorderRadius.circular(8), child: Container(padding: EdgeInsets.symmetric(vertical: vPad), decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(8)), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.shopping_cart_rounded, size: isDesktop? 16 : 18, color: Colors.white), const SizedBox(width: 6), Text('Sepet', style: GoogleFonts.poppins(fontSize: fSize, fontWeight: FontWeight.w700, color: Colors.white)), const SizedBox(width: 6), Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(20)), child: Text('$count', style: GoogleFonts.poppins(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800)))])));
       },
     );
   }
 
-  Widget _buildProfilAction(bool isLoggedIn, String displayName, {required bool isDesktop}) {
+  Widget _buildProfilActionLoggedIn(String displayName, {required bool isDesktop}) {
     final vPad = isDesktop? 8.0 : 10.0;
     final fSize = isDesktop? 10.5 : 11.0;
-    if (isLoggedIn) {
-      return InkWell(
-        onTap: _goProfil,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: vPad),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFF0F172A))),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.account_circle_rounded, size: isDesktop? 16 : 18, color: const Color(0xFF0F172A)),
-              const SizedBox(width: 4),
-              Flexible(child: Text(displayName, overflow: TextOverflow.ellipsis, style: GoogleFonts.poppins(fontSize: fSize, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)))),
-            ],
-          ),
+    return InkWell(
+      onTap: _isProfileLoading? null : _goProfil,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: vPad),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFF0F172A))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_isProfileLoading) const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+            else Icon(Icons.account_circle_rounded, size: isDesktop? 16 : 18, color: const Color(0xFF0F172A)),
+            const SizedBox(width: 4),
+            Flexible(child: Text(_isProfileLoading? "..." : displayName, overflow: TextOverflow.ellipsis, style: GoogleFonts.poppins(fontSize: fSize, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)))),
+          ],
         ),
-      );
-    } else {
-      return InkWell(
-        onTap: _showLoginDialog,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: vPad),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFF0F172A))),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.login_rounded, size: isDesktop? 16 : 18, color: const Color(0xFF0F172A)),
-              const SizedBox(width: 6),
-              Text('Giriş Yap', style: GoogleFonts.poppins(fontSize: fSize, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A))),
-            ],
-          ),
-        ),
-      );
-    }
+      ),
+    );
   }
 
   Widget _buildHero({required bool isDesktop, required bool isMobile, required bool isTablet}) {
-    final textPart = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('İşin İçin Ne\nLazımsa,\nŞantiyene Gelsin.', style: GoogleFonts.poppins(color: Colors.white, fontSize: isDesktop? 36 : isMobile? 28 : 32, fontWeight: FontWeight.w900, height: 0.95)),
-        const SizedBox(height: 10),
-        Text('Yapı malzemelerinde yeni nesil satın alma.', style: GoogleFonts.poppins(color: Colors.white70, fontSize: isDesktop? 13 : 12)),
-      ],
-    );
+    final textPart = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('İşin İçin Ne\nLazımsa,\nŞantiyene Gelsin.', style: GoogleFonts.poppins(color: Colors.white, fontSize: isDesktop? 36 : isMobile? 28 : 32, fontWeight: FontWeight.w900, height: 0.95)), const SizedBox(height: 10), Text('Yapı malzemelerinde yeni nesil satın alma.', style: GoogleFonts.poppins(color: Colors.white70, fontSize: isDesktop? 13 : 12))]);
     final slider = Container(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)), clipBehavior: Clip.antiAlias, child: const ReklamBoardSlider());
     if (isDesktop) {
-      return Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF0F172A), Color(0xFF1E293B)])),
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
-        child: Row(children: [Expanded(flex: 5, child: textPart), const SizedBox(width: 28), Expanded(flex: 7, child: ConstrainedBox(constraints: const BoxConstraints(maxHeight: 320), child: slider))]),
-      );
+      return Container(width: double.infinity, decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF0F172A), Color(0xFF1E293B)])), padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28), child: Row(children: [Expanded(flex: 5, child: textPart), const SizedBox(width: 28), Expanded(flex: 7, child: ConstrainedBox(constraints: const BoxConstraints(maxHeight: 320), child: slider))]));
     }
     return Column(children: [Container(width: double.infinity, decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF0F172A), Color(0xFF1E293B)])), padding: const EdgeInsets.all(20), child: textPart), Container(color: const Color(0xFFF1F5F9), padding: const EdgeInsets.all(16), child: slider)]);
   }
 
   Widget _buildKategoriBaslikCubugu({required bool isDesktop}) {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.fromLTRB(isDesktop? 32 : 16, 12, isDesktop? 32 : 16, 0),
-      height: isDesktop? 28 : 32,
-      decoration: BoxDecoration(color: const Color(0xFFB91C1C), borderRadius: BorderRadius.circular(8)),
-      child: Center(child: Text('KATEGORİLER', style: GoogleFonts.poppins(color: const Color(0xFF0A0A0A), fontSize: isDesktop? 11 : 12, fontWeight: FontWeight.w800, letterSpacing: 1.0))),
-    );
+    return Container(width: double.infinity, margin: EdgeInsets.fromLTRB(isDesktop? 32 : 16, 12, isDesktop? 32 : 16, 0), height: isDesktop? 28 : 32, decoration: BoxDecoration(color: const Color(0xFFB91C1C), borderRadius: BorderRadius.circular(8)), child: Center(child: Text('KATEGORİLER', style: GoogleFonts.poppins(color: const Color(0xFF0A0A0A), fontSize: isDesktop? 11 : 12, fontWeight: FontWeight.w800, letterSpacing: 1.0))));
   }
 
   Widget _buildCategories({required bool isDesktop, required bool isTablet, required bool isMobile}) {
@@ -486,39 +411,14 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
       {'name': 'yalitim', 'file': 'yalitim.webp'},
       {'name': 'yenilenebilir', 'file': 'yenilenebilir.webp'},
     ];
-
     final filtered = _searchQuery.isEmpty? allCats : allCats.where((c) => (c['name'] as String).toLowerCase().contains(_searchQuery)).toList();
     final cross = isDesktop? 4 : isTablet? 3 : 2;
     final aspect = isDesktop? 2.55 : isTablet? 2.45 : 2.35;
     final pad = isDesktop? 32.0 : 16.0;
-
-    return Padding(
-      padding: EdgeInsets.all(pad),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: cross, childAspectRatio: aspect, crossAxisSpacing: 14, mainAxisSpacing: 14),
-        itemCount: filtered.length,
-        itemBuilder: (_, i) {
-          final file = filtered[i]['file'] as String;
-          return InkWell(
-            onTap: () => _goKategori(file),
-            borderRadius: BorderRadius.circular(12),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/hug_market/kategori/$file',
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
-                alignment: Alignment.center,
-                errorBuilder: (c, e, s) => Container(color: Colors.white, child: Center(child: Text(filtered[i]['name'] as String, style: GoogleFonts.poppins(fontSize: 11)))),
-              ),
-            ),
-          );
-        },
-      ),
-    );
+    return Padding(padding: EdgeInsets.all(pad), child: GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: cross, childAspectRatio: aspect, crossAxisSpacing: 14, mainAxisSpacing: 14), itemCount: filtered.length, itemBuilder: (_, i) {
+      final file = filtered[i]['file'] as String;
+      return InkWell(onTap: () => _goKategori(file), borderRadius: BorderRadius.circular(12), child: ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.asset('assets/hug_market/kategori/$file', fit: BoxFit.cover, width: double.infinity, height: double.infinity, alignment: Alignment.center, errorBuilder: (c, e, s) => Container(color: Colors.white, child: Center(child: Text(filtered[i]['name'] as String, style: GoogleFonts.poppins(fontSize: 11)))))));
+    }));
   }
 
   Widget _buildCozumOrtagiBanner({required bool isDesktop}) {
@@ -529,16 +429,7 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
         borderRadius: BorderRadius.circular(16),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
-          child: Image.asset(
-            'assets/hug_market/cozum_ortagi.png',
-            width: double.infinity,
-            fit: BoxFit.fitWidth,
-            errorBuilder: (c, e, s) => Container(
-              height: 110,
-              decoration: BoxDecoration(color: const Color(0xFFFFF5D6), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE8DCC0))),
-              child: Center(child: Text('assets/hug_market/cozum_ortagi.png bulunamadı', style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54))),
-            ),
-          ),
+          child: Image.asset('assets/hug_market/cozum_ortagi.png', width: double.infinity, fit: BoxFit.fitWidth, errorBuilder: (c, e, s) => Container(height: 110, decoration: BoxDecoration(color: const Color(0xFFFFF5D6), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE8DCC0))), child: Center(child: Text('assets/hug_market/cozum_ortagi.png bulunamadı', style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54))))),
         ),
       ),
     );

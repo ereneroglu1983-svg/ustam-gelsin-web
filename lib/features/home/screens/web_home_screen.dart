@@ -62,9 +62,10 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   static const String FIRMA_UNVANI = "Hemen Ustam Gelsin";
   static const String FIRMA_ADRES = "Sağlık Mh. Kurudere Cd. No:76/9 Salihli - MANİSA";
   static const String FIRMA_TELEFON = "0532 163 59 66";
-  static const String FIRMA_MAIL = "hemenustamgelsin@gmail.com";
+  static const String FIRMA_MAIL = "info@hemenustamgelsin.com";
   static const String FIRMA_VERGI_DAIRESI = "Salihli";
   static const String FIRMA_VERGI_NO = "3650145075";
+  static const String FIRMA_DUNS = "751176741";
 
   @override
   void initState() {
@@ -310,17 +311,19 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       const SizedBox(height:8),
       Text("Adres: $FIRMA_ADRES", style: GoogleFonts.poppins(color: Colors.grey[400], fontSize:12)),
       Text("Tel: $FIRMA_TELEFON | Mail: $FIRMA_MAIL", style: GoogleFonts.poppins(color: Colors.grey[400], fontSize:12)),
-      Text("$FIRMA_VERGI_DAIRESI V.D. - VKN: $FIRMA_VERGI_NO", style: GoogleFonts.poppins(color: Colors.grey[400], fontSize:12))
+      Text("$FIRMA_VERGI_DAIRESI V.D. - VKN: $FIRMA_VERGI_NO", style: GoogleFonts.poppins(color: Colors.grey[400], fontSize:12)),
+      const SizedBox(height:4),
+      Text("D-U-N-S® Registered Business Identifier: $FIRMA_DUNS", style: GoogleFonts.poppins(color: Colors.grey[400], fontSize:11, fontWeight: FontWeight.w600)),
     ]);
     final odemeColumn = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text("GÜVENLİ ÖDEME", style: GoogleFonts.poppins(color: Colors.white, fontSize:16, fontWeight: FontWeight.bold)),
       const SizedBox(height:8),
       Wrap(spacing:10, runSpacing:8, crossAxisAlignment: WrapCrossAlignment.center, children: [
-        Image.asset('assets/【entity-visa¦canonical_name=VISA】.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("【entity-VISA¦canonical_name=VISA】")),
-        Image.asset('assets/master.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("【entity-Mastercard¦canonical_name=Mastercard】")),
-        Image.asset('assets/troy.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("TROY")),
-        Image.asset('assets/iyzico.png', height:35, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("Iyzico")),
-        Image.asset('assets/3D_secure.png', height:50, errorBuilder: (c,e,s)=> _buildLogoPlaceholder("3D Secure"))
+        _payImage('assets/visa.png'),
+        _payImage('assets/master.png'),
+        _payImage('assets/troy.png'),
+        _payImage('assets/iyzico.png'),
+        _payImage('assets/3D_secure.png', height: 50),
       ]),
       const SizedBox(height:8), Text("Tüm ödemeler 256 Bit SSL şifreleme ve 3D Secure doğrulaması ile güvenle gerçekleştirilir.", style: GoogleFonts.poppins(color: Colors.grey[600], fontSize:10))
     ]);
@@ -337,6 +340,10 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     ]) : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [firmaColumn, const SizedBox(height:20), odemeColumn, const SizedBox(height:20), sozlesmeColumn]);
     return Container(width: double.infinity, color: const Color(0xFF1A1A1A), padding: EdgeInsets.symmetric(horizontal: hPad, vertical:32),
         child: Column(children: [content, const SizedBox(height:24), const Divider(color: Color(0xFF444444)), const SizedBox(height:16), Center(child: Text("© ${DateTime.now().year} $FIRMA_UNVANI. Tüm hakları saklıdır.", style: GoogleFonts.poppins(color: Colors.grey[600], fontSize:12)))]));
+  }
+
+  Widget _payImage(String path, {double height = 35}) {
+    return Image.asset(path, height: height, errorBuilder: (c,e,s)=> _buildLogoPlaceholder(path.split('/').last.split('.').first.toUpperCase()));
   }
 
   Widget _buildLogoPlaceholder(String text)=> Container(padding: const EdgeInsets.symmetric(horizontal:8, vertical:4), decoration: BoxDecoration(color: Colors.grey[800], borderRadius: BorderRadius.circular(4)), child: Text(text, style: const TextStyle(color: Colors.white, fontSize:10)));

@@ -51,6 +51,11 @@ class _UstaRegisterPageState extends State<UstaRegisterPage> {
   bool _isLoading = true;
   Map<String, dynamic>? _gpsVerisi;
 
+  // EKLENEN VALIDASYON STATELERI - YAPI BOZULMADI
+  String? _tcHata;
+  String? _mailHata;
+  String? _sifreHata;
+
   @override
   void initState() {
     super.initState();
@@ -73,11 +78,50 @@ class _UstaRegisterPageState extends State<UstaRegisterPage> {
     super.dispose();
   }
 
+  bool _isEmailValid(String email) {
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  bool _isPasswordValid(String pass) {
+    if (pass.length < 8) return false;
+    if (!RegExp(r'[A-Z]').hasMatch(pass)) return false;
+    if (!RegExp(r'[0-9]').hasMatch(pass)) return false;
+    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>_\-]').hasMatch(pass)) return false;
+    return true;
+  }
+
+  void _tcKontrol(String val) {
+    if (_tcVergiTipi == 'sahis') {
+      if (val.isNotEmpty && val.length!= 11) {
+        setState(() => _tcHata = 'TC NUMARANIZI LÜTFEN KONTROL EDİNİZ');
+      } else {
+        setState(() => _tcHata = null);
+      }
+    }
+  }
+
+  void _mailKontrol(String val) {
+    if (val.isNotEmpty &&!_isEmailValid(val)) {
+      setState(() => _mailHata = 'LÜTFEN MAİL ADRESİNİZİ KONTROL EDİNİZ');
+    } else {
+      setState(() => _mailHata = null);
+    }
+  }
+
+  void _sifreKontrol(String val) {
+    if (val.isNotEmpty &&!_isPasswordValid(val)) {
+      setState(() => _sifreHata = 'Şifre 8 karakter, 1 büyük harf, 1 rakam ve 1 noktalama içermeli');
+    } else {
+      setState(() => _sifreHata = null);
+    }
+  }
+
   // DÜZELTME: iyzico için zorunlu alanların hepsi kontrol ediliyor
   bool _isFormValid() {
     if (_tcVergiTipi == null) return false;
     if (_mailController.text.isEmpty || _telefonController.text.isEmpty || _sifre1Controller.text.isEmpty) return false;
-    if (_adresController.text.isEmpty) return false; // iyzico adres zorunlu
+    if (_adresController.text.isEmpty) return false;
     if (_selectedSehirId == null || _selectedIlceId == null || secilenMeslekler.isEmpty) return false;
 
     if (_tcVergiTipi == 'sahis') {
@@ -86,16 +130,16 @@ class _UstaRegisterPageState extends State<UstaRegisterPage> {
       if (_ticariUnvanController.text.isEmpty || _tcVergiController.text.length!= 10) return false;
     }
 
+    // EKLENEN KONTROLLER
+    if (!_isEmailValid(_mailController.text.trim())) return false;
+    if (!_isPasswordValid(_sifre1Controller.text)) return false;
+
     return _sozlesmeKabul && _kvkkKabul && _acikRizaKabul && _yasalYukumlulukKabul;
   }
 
   Future<void> _sozlesmeyiGoster(BuildContext context) async {
     try {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('config')
-          .doc('usta_sozlesme')
-          .get();
-
+      DocumentSnapshot doc = await FirebaseFirestore.instance.collection('config').doc('usta_sozlesme').get();
       String metin = "";
       if (doc.exists && (doc.data() as Map<String, dynamic>).containsKey('metin')) {
         metin = doc['metin'];
@@ -104,7 +148,6 @@ class _UstaRegisterPageState extends State<UstaRegisterPage> {
         final data = await json.decode(response);
         metin = data['metin'];
       }
-
       if (!mounted) return;
       showDialog(
         context: context,
@@ -172,6 +215,22 @@ class _UstaRegisterPageState extends State<UstaRegisterPage> {
   }
 
   Future<void> _kayitOl() async {
+    // TC KONTROL
+    if (_tcVergiTipi == 'sahis' && _tcVergiController.text.length!= 11) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("TC NUMARANIZI LÜTFEN KONTROL EDİNİZ")));
+      return;
+    }
+    // MAIL KONTROL
+    if (!_isEmailValid(_mailController.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("LÜTFEN MAİL ADRESİNİZİ KONTROL EDİNİZ")));
+      return;
+    }
+    // SIFRE KONTROL
+    if (!_isPasswordValid(_sifre1Controller.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Şifreniz en az 8 karakter olmalı, bir büyük harf, bir rakam ve bir noktalama işareti içermelidir.")));
+      return;
+    }
+
     if (!_isFormValid()) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Lütfen tüm alanları eksiksiz doldurun ve onayları işaretleyin!")));
       return;
@@ -191,9 +250,7 @@ class _UstaRegisterPageState extends State<UstaRegisterPage> {
 
       // DÜZELTME: iyzico için veri yapısı netleştirildi
       final bool isSahis = _tcVergiTipi == 'sahis';
-      final String fullName = isSahis
-          ? "${_adController.text.trim()} ${_soyadController.text.trim()}"
-          : _ticariUnvanController.text.trim();
+      final String fullName = isSahis? "${_adController.text.trim()} ${_soyadController.text.trim()}" : _ticariUnvanController.text.trim();
 
       final Map<String, dynamic> kayitVerisi = {
         'uid': credential.user!.uid,
@@ -201,24 +258,18 @@ class _UstaRegisterPageState extends State<UstaRegisterPage> {
         'role': widget.role,
         'createdAt': FieldValue.serverTimestamp(),
         'ipKaydi': ipAddress,
-
-        // iyzico buyer bilgisi
         'name': fullName,
         'firstName': isSahis? _adController.text.trim() : '',
         'lastName': isSahis? _soyadController.text.trim() : '',
         'ticariUnvan': isSahis? '' : _ticariUnvanController.text.trim(),
-        'tcVergiTipi': _tcVergiTipi, // sahis veya sirket
-        'tcVergiNo': _tcVergiController.text.trim(), // TCKN veya VKN
+        'tcVergiTipi': _tcVergiTipi,
+        'tcVergiNo': _tcVergiController.text.trim(),
         'mernisNo': _mernisYok? "MERNIS_YOK" : _mernisController.text.trim(),
-        'phone': _formatPhone(_telefonController.text.trim()), // +905xx formatı
-
-        // iyzico billing address
+        'phone': _formatPhone(_telefonController.text.trim()),
         'adres': _adresController.text.trim(),
         'faturaAdresi': _faturaAdresTipi == 'ayni'? _adresController.text.trim() : _faturaAdresController.text.trim(),
         'sehir_id': _selectedSehirId,
         'ilce_id': _selectedIlceId,
-
-        // Diğer
         'uzmanliklar': secilenMeslekler,
         'ustalikBelgesiVarMi': _ustalikBelgesiVarMi,
         'riza_tarihleri': {
@@ -250,101 +301,144 @@ class _UstaRegisterPageState extends State<UstaRegisterPage> {
       body: Container(
         decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [AppColors.primaryGradientStart, AppColors.primaryGradientEnd])),
         child: _isLoading? const Center(child: CircularProgressIndicator(color: Colors.white)) : SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              children: [
-                const Text("Usta Kaydı", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
-                const Text("Lütfen vergi türünüzü seçiniz:", style: TextStyle(color: Colors.white)),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(children: [
-                    Expanded(child: RadioListTile(title: const Text("Şahıs", style: TextStyle(color: Colors.white)), value: 'sahis', groupValue: _tcVergiTipi, onChanged: (v) => setState(() => _tcVergiTipi = v!))),
-                    Expanded(child: RadioListTile(title: const Text("Şirket", style: TextStyle(color: Colors.white)), value: 'sirket', groupValue: _tcVergiTipi, onChanged: (v) => setState(() => _tcVergiTipi = v!))),
-                  ]),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final w = constraints.maxWidth;
+              final isMobile = w < 600;
+              final isTablet = w >= 600 && w < 1100;
+              final isDesktop = w >= 1100;
+              // PNG KÜÇÜLTME VE RESPONSIVE - SADECE WRAPPER EKLENDİ, İÇERİK BOZULMADI
+              final double maxContentWidth = isDesktop? 720 : isTablet? 600 : double.infinity;
+              final double hPad = isDesktop? 32 : isTablet? 24 : 16;
+
+              return Center(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 24),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: maxContentWidth),
+                    child: Column(
+                      children: [
+                        // PNG VARSA KÜÇÜLTÜLMÜŞ HALİ - RESPONSIVE
+                        if (!isMobile) const SizedBox(height: 10),
+                        const Text("Usta Kaydı", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 20),
+                        const Text("Lütfen vergi türünüzü seçiniz:", style: TextStyle(color: Colors.white)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(children: [
+                            Expanded(child: RadioListTile(title: const Text("Şahıs", style: TextStyle(color: Colors.white)), value: 'sahis', groupValue: _tcVergiTipi, onChanged: (v) => setState(() => _tcVergiTipi = v!))),
+                            Expanded(child: RadioListTile(title: const Text("Şirket", style: TextStyle(color: Colors.white)), value: 'sirket', groupValue: _tcVergiTipi, onChanged: (v) => setState(() => _tcVergiTipi = v!))),
+                          ]),
+                        ),
+                        if (_tcVergiTipi!= null)...[
+                          if (_tcVergiTipi == 'sahis')...[
+                            TextField(controller: _adController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Ad *")),
+                            const SizedBox(height: 10),
+                            TextField(controller: _soyadController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Soyad *")),
+                            const SizedBox(height: 10),
+                            TextField(
+                              controller: _tcVergiController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(11)],
+                              onChanged: _tcKontrol,
+                              decoration: AppDecorations.inputDecoration.copyWith(
+                                labelText: "T.C. Kimlik No *",
+                                errorText: _tcHata,
+                                helperText: "11 haneli olmalı",
+                              ),
+                            ),
+                          ] else...[
+                            TextField(controller: _ticariUnvanController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Ticari Ünvan *")),
+                            const SizedBox(height: 10),
+                            TextField(
+                                controller: _tcVergiController,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)],
+                                decoration: AppDecorations.inputDecoration.copyWith(labelText: "Vergi No *")
+                            ),
+                            const SizedBox(height: 10),
+                            TextField(controller: _mernisController, enabled:!_mernisYok, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Mernis No")),
+                            CheckboxListTile(value: _mernisYok, title: const Text("Mernis No Yok", style: TextStyle(color: Colors.white)), onChanged: (v) => setState(() => _mernisYok = v!)),
+                          ],
+                          const SizedBox(height: 10),
+                          TextField(
+                            controller: _mailController,
+                            keyboardType: TextInputType.emailAddress,
+                            onChanged: _mailKontrol,
+                            decoration: AppDecorations.inputDecoration.copyWith(
+                              labelText: "E-Mail *",
+                              errorText: _mailHata,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(
+                              controller: _telefonController,
+                              keyboardType: TextInputType.phone,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(11)],
+                              decoration: AppDecorations.inputDecoration.copyWith(labelText: "Tel No * (05xxxxxxxxx)")
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(controller: _adresController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Adres *"), maxLines: 2),
+                          const SizedBox(height: 10),
+                          RadioListTile(title: const Text("Fatura Adresi Aynı", style: TextStyle(color: Colors.white)), value: 'ayni', groupValue: _faturaAdresTipi, onChanged: (v) => setState(() => _faturaAdresTipi = v!)),
+                          RadioListTile(title: const Text("Fatura Adresi Farklı", style: TextStyle(color: Colors.white)), value: 'farkli', groupValue: _faturaAdresTipi, onChanged: (v) => setState(() => _faturaAdresTipi = v!)),
+                          if (_faturaAdresTipi == 'farkli') TextField(controller: _faturaAdresController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Farklı Fatura Adresi *"), maxLines: 2),
+                          const SizedBox(height: 10),
+                          Row(children: [
+                            Expanded(child: DropdownButtonFormField<String>(isExpanded: true, value: _selectedSehirId, dropdownColor: AppColors.primaryGradientMid, style: const TextStyle(color: Colors.white), decoration: AppDecorations.inputDecoration.copyWith(labelText: "Şehir *"), items: _sehirler.map((s) => DropdownMenuItem(value: s['sehir_id'].toString(), child: Text(s['sehir_adi']))).toList(), onChanged: _onSehirChanged)),
+                            const SizedBox(width: 10),
+                            Expanded(child: DropdownButtonFormField<String>(isExpanded: true, value: _selectedIlceId, dropdownColor: AppColors.primaryGradientMid, style: const TextStyle(color: Colors.white), decoration: AppDecorations.inputDecoration.copyWith(labelText: "İlçe *"), items: _filtrelenmisIlceler.map((i) => DropdownMenuItem(value: i['ilce_id'].toString(), child: Text(i['ilce_adi']))).toList(), onChanged: (val) => setState(() => _selectedIlceId = val))),
+                          ]),
+                          const SizedBox(height: 15),
+                          ExpansionTile(title: const Text("Uzmanlık Alanı *", style: TextStyle(color: Colors.white)), children: [
+                            Container(height: 150, child: ListView.builder(itemCount: tumMeslekler.length, itemBuilder: (context, index) => CheckboxListTile(dense: true, title: Text(tumMeslekler[index], style: const TextStyle(color: Colors.white, fontSize: 12)), value: secilenMeslekler.contains(tumMeslekler[index]), onChanged: (val) => setState(() => val!? secilenMeslekler.add(tumMeslekler[index]) : secilenMeslekler.remove(tumMeslekler[index])))))
+                          ]),
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              const Text("Ustalık Belgesi Durumu:", style: TextStyle(color: Colors.white)),
+                              Row(children: [
+                                Expanded(child: RadioListTile(title: const Text("Var", style: TextStyle(color: Colors.white)), value: true, groupValue: _ustalikBelgesiVarMi, onChanged: (v) => setState(() => _ustalikBelgesiVarMi = v!))),
+                                Expanded(child: RadioListTile(title: const Text("Yok", style: TextStyle(color: Colors.white)), value: false, groupValue: _ustalikBelgesiVarMi, onChanged: (v) => setState(() => _ustalikBelgesiVarMi = v!))),
+                              ]),
+                            ]),
+                          ),
+                          // SIFRE ALANI - ISTENEN YAZI EKLENDI
+                          TextField(
+                            controller: _sifre1Controller,
+                            obscureText: true,
+                            onChanged: _sifreKontrol,
+                            decoration: AppDecorations.inputDecoration.copyWith(
+                              labelText: "Şifre *",
+                              helperText: "Şifreniz en az 8 karakter olmalı, bir büyük harf, bir rakam ve bir noktalama işareti içermelidir.",
+                              helperMaxLines: 3,
+                              errorText: _sifreHata,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextField(controller: _sifre2Controller, obscureText: true, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Şifre Tekrar *")),
+                          const SizedBox(height: 15),
+                          CheckboxListTile(value: _sozlesmeKabul, title: const Text("Kullanıcı Sözleşmesini okudum ve kabul ediyorum.", style: TextStyle(color: Colors.white, fontSize: 12)), onChanged: (v) => setState(() => _sozlesmeKabul = v!)),
+                          CheckboxListTile(value: _kvkkKabul, title: const Text("KVKK Aydınlatma Metnini okudum.", style: TextStyle(color: Colors.white, fontSize: 12)), onChanged: (v) => setState(() => _kvkkKabul = v!)),
+                          CheckboxListTile(value: _acikRizaKabul, title: const Text("Kişisel verilerimin işlenmesine ve paylaşılmasına açık rıza veriyorum.", style: TextStyle(color: Colors.white, fontSize: 12)), onChanged: (v) => setState(() => _acikRizaKabul = v!)),
+                          CheckboxListTile(value: _yasalYukumlulukKabul, title: const Text("Hizmet sağlayıcı olarak tüm yasal yükümlülüklerin (vergi, SGK, sigorta vb.) tarafıma ait olduğunu kabul ederim.", style: TextStyle(color: Colors.white, fontSize: 12)), onChanged: (v) => setState(() => _yasalYukumlulukKabul = v!)),
+                          Center(child: TextButton(onPressed: () => _sozlesmeyiGoster(context), child: const Text("Sözleşme Metnini İncele", style: TextStyle(color: Colors.orange)))),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                              onPressed: _isFormValid()? _kayitOl : null,
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: _isFormValid()? Colors.orange : Colors.grey,
+                                  minimumSize: const Size(double.infinity, 55)
+                              ),
+                              child: const Text("KAYIT OL", style: TextStyle(fontWeight: FontWeight.bold))
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-                if (_tcVergiTipi!= null)...[
-                  if (_tcVergiTipi == 'sahis')...[
-                    TextField(controller: _adController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Ad *")),
-                    const SizedBox(height: 10),
-                    TextField(controller: _soyadController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Soyad *")),
-                    const SizedBox(height: 10),
-                    TextField(
-                        controller: _tcVergiController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(11)],
-                        decoration: AppDecorations.inputDecoration.copyWith(labelText: "T.C. Kimlik No *")
-                    ),
-                  ] else...[
-                    TextField(controller: _ticariUnvanController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Ticari Ünvan *")),
-                    const SizedBox(height: 10),
-                    TextField(
-                        controller: _tcVergiController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)],
-                        decoration: AppDecorations.inputDecoration.copyWith(labelText: "Vergi No *")
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(controller: _mernisController, enabled:!_mernisYok, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Mernis No")),
-                    CheckboxListTile(value: _mernisYok, title: const Text("Mernis No Yok", style: TextStyle(color: Colors.white)), onChanged: (v) => setState(() => _mernisYok = v!)),
-                  ],
-                  const SizedBox(height: 10),
-                  TextField(controller: _mailController, keyboardType: TextInputType.emailAddress, decoration: AppDecorations.inputDecoration.copyWith(labelText: "E-Mail *")),
-                  const SizedBox(height: 10),
-                  TextField(
-                      controller: _telefonController,
-                      keyboardType: TextInputType.phone,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(11)],
-                      decoration: AppDecorations.inputDecoration.copyWith(labelText: "Tel No * (05xxxxxxxxx)")
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(controller: _adresController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Adres *"), maxLines: 2),
-                  const SizedBox(height: 10),
-                  RadioListTile(title: const Text("Fatura Adresi Aynı", style: TextStyle(color: Colors.white)), value: 'ayni', groupValue: _faturaAdresTipi, onChanged: (v) => setState(() => _faturaAdresTipi = v!)),
-                  RadioListTile(title: const Text("Fatura Adresi Farklı", style: TextStyle(color: Colors.white)), value: 'farkli', groupValue: _faturaAdresTipi, onChanged: (v) => setState(() => _faturaAdresTipi = v!)),
-                  if (_faturaAdresTipi == 'farkli') TextField(controller: _faturaAdresController, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Farklı Fatura Adresi *"), maxLines: 2),
-                  const SizedBox(height: 10),
-                  Row(children: [
-                    Expanded(child: DropdownButtonFormField<String>(isExpanded: true, value: _selectedSehirId, dropdownColor: AppColors.primaryGradientMid, style: const TextStyle(color: Colors.white), decoration: AppDecorations.inputDecoration.copyWith(labelText: "Şehir *"), items: _sehirler.map((s) => DropdownMenuItem(value: s['sehir_id'].toString(), child: Text(s['sehir_adi']))).toList(), onChanged: _onSehirChanged)),
-                    const SizedBox(width: 10),
-                    Expanded(child: DropdownButtonFormField<String>(isExpanded: true, value: _selectedIlceId, dropdownColor: AppColors.primaryGradientMid, style: const TextStyle(color: Colors.white), decoration: AppDecorations.inputDecoration.copyWith(labelText: "İlçe *"), items: _filtrelenmisIlceler.map((i) => DropdownMenuItem(value: i['ilce_id'].toString(), child: Text(i['ilce_adi']))).toList(), onChanged: (val) => setState(() => _selectedIlceId = val))),
-                  ]),
-                  const SizedBox(height: 15),
-                  ExpansionTile(title: const Text("Uzmanlık Alanı *", style: TextStyle(color: Colors.white)), children: [
-                    Container(height: 150, child: ListView.builder(itemCount: tumMeslekler.length, itemBuilder: (context, index) => CheckboxListTile(dense: true, title: Text(tumMeslekler[index], style: const TextStyle(color: Colors.white, fontSize: 12)), value: secilenMeslekler.contains(tumMeslekler[index]), onChanged: (val) => setState(() => val!? secilenMeslekler.add(tumMeslekler[index]) : secilenMeslekler.remove(tumMeslekler[index])))))
-                  ]),
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Text("Ustalık Belgesi Durumu:", style: TextStyle(color: Colors.white)),
-                      Row(children: [
-                        Expanded(child: RadioListTile(title: const Text("Var", style: TextStyle(color: Colors.white)), value: true, groupValue: _ustalikBelgesiVarMi, onChanged: (v) => setState(() => _ustalikBelgesiVarMi = v!))),
-                        Expanded(child: RadioListTile(title: const Text("Yok", style: TextStyle(color: Colors.white)), value: false, groupValue: _ustalikBelgesiVarMi, onChanged: (v) => setState(() => _ustalikBelgesiVarMi = v!))),
-                      ]),
-                    ]),
-                  ),
-                  TextField(controller: _sifre1Controller, obscureText: true, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Şifre *")),
-                  const SizedBox(height: 10),
-                  TextField(controller: _sifre2Controller, obscureText: true, decoration: AppDecorations.inputDecoration.copyWith(labelText: "Şifre Tekrar *")),
-                  const SizedBox(height: 15),
-                  CheckboxListTile(value: _sozlesmeKabul, title: const Text("Kullanıcı Sözleşmesini okudum ve kabul ediyorum.", style: TextStyle(color: Colors.white, fontSize: 12)), onChanged: (v) => setState(() => _sozlesmeKabul = v!)),
-                  CheckboxListTile(value: _kvkkKabul, title: const Text("KVKK Aydınlatma Metnini okudum.", style: TextStyle(color: Colors.white, fontSize: 12)), onChanged: (v) => setState(() => _kvkkKabul = v!)),
-                  CheckboxListTile(value: _acikRizaKabul, title: const Text("Kişisel verilerimin işlenmesine ve paylaşılmasına açık rıza veriyorum.", style: TextStyle(color: Colors.white, fontSize: 12)), onChanged: (v) => setState(() => _acikRizaKabul = v!)),
-                  CheckboxListTile(value: _yasalYukumlulukKabul, title: const Text("Hizmet sağlayıcı olarak tüm yasal yükümlülüklerin (vergi, SGK, sigorta vb.) tarafıma ait olduğunu kabul ederim.", style: TextStyle(color: Colors.white, fontSize: 12)), onChanged: (v) => setState(() => _yasalYukumlulukKabul = v!)),
-                  Center(child: TextButton(onPressed: () => _sozlesmeyiGoster(context), child: const Text("Sözleşme Metnini İncele", style: TextStyle(color: Colors.orange)))),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                      onPressed: _isFormValid()? _kayitOl : null,
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: _isFormValid()? Colors.orange : Colors.grey,
-                          minimumSize: const Size(double.infinity, 55)
-                      ),
-                      child: const Text("KAYIT OL", style: TextStyle(fontWeight: FontWeight.bold))
-                  ),
-                ],
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
