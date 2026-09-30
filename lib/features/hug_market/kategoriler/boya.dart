@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../cozum_ortagi_page.dart';
+import '../sepet_sayfasi.dart';
 
 class BoyaDekorasyonKategoriPage extends StatefulWidget {
   const BoyaDekorasyonKategoriPage({super.key});
@@ -65,6 +66,12 @@ class _BoyaDekorasyonKategoriPageState extends State<BoyaDekorasyonKategoriPage>
     Navigator.of(context).pop();
   }
 
+  void _goSepet() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const SepetSayfasi()),
+    );
+  }
+
   void _goCozumOrtagi() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const CozumOrtagiPage()),
@@ -88,7 +95,8 @@ class _BoyaDekorasyonKategoriPageState extends State<BoyaDekorasyonKategoriPage>
             padding: EdgeInsets.symmetric(horizontal: w < 600? 12 : 24, vertical: 8),
             sliver: SliverToBoxAdapter(child: _isDesktop(w)? _buildDesktopContent(w) : _buildProductGrid(w)),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+          SliverToBoxAdapter(child: _buildFooter()),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
         ],
       ),
     );
@@ -120,8 +128,7 @@ class _BoyaDekorasyonKategoriPageState extends State<BoyaDekorasyonKategoriPage>
         Row(children: [
           IconButton(onPressed: _goBack, icon: const Icon(Icons.arrow_back_ios_new, size: 20)),
           const Spacer(),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.shopping_cart_outlined))
+          IconButton(onPressed: _goSepet, icon: const Icon(Icons.shopping_cart_outlined))
         ]),
         InkWell(onTap: _goBack, child: _realLogo(height: 46)),
       ]),
@@ -137,8 +144,7 @@ class _BoyaDekorasyonKategoriPageState extends State<BoyaDekorasyonKategoriPage>
       title: _realLogo(height: 38),
       centerTitle: true,
       actions: [
-        IconButton(onPressed: () {}, icon: const Icon(Icons.search, color: Colors.black87)),
-        IconButton(onPressed: () {}, icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black87)),
+        IconButton(onPressed: _goSepet, icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black87)),
         const SizedBox(width: 4)
       ],
     );
@@ -551,6 +557,26 @@ class _BoyaDekorasyonKategoriPageState extends State<BoyaDekorasyonKategoriPage>
           ),
         );
       },
+    );
+  }
+
+  Widget _buildFooter() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(12, 24, 12, 12),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: const Center(
+        child: Text(
+          'Hemen Ustam Gelsin Her Hakkı Saklıdır © 2026',
+          style: TextStyle(color: Colors.black54, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.3),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

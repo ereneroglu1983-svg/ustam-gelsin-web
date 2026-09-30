@@ -27,6 +27,7 @@ import 'package:ustam_gelsin/features/hug_market/kategoriler/iklimlendirme.dart'
 import 'package:ustam_gelsin/features/hug_market/kategoriler/seramik.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/yalitim.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/yenilenebilir.dart';
+import 'package:ustam_gelsin/features/hug_market/cozum_ortagi_page.dart';
 
 class HugMarketAppHomepage extends StatefulWidget {
   const HugMarketAppHomepage({super.key});
@@ -36,20 +37,6 @@ class HugMarketAppHomepage extends StatefulWidget {
 
 class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
   final AuthService _authService = AuthService();
-  final TextEditingController _searchCtrl = TextEditingController();
-  String _searchQuery = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _searchCtrl.addListener(() => setState(() => _searchQuery = _searchCtrl.text.toLowerCase()));
-  }
-
-  @override
-  void dispose() {
-    _searchCtrl.dispose();
-    super.dispose();
-  }
 
   void _showLoginDialog() {
     showDialog(
@@ -105,6 +92,10 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
     Navigator.push(context, MaterialPageRoute(builder: (_) => const SiparisTakipSayfasi()));
   }
 
+  void _goCozumOrtagi() {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const CozumOrtagiPage()));
+  }
+
   void _goKategori(String file) {
     Widget? page;
     switch (file) {
@@ -145,10 +136,9 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
                 child: Column(
                   children: [
                     _buildHero(),
-                    _buildTrustStrip(),
-                    _buildLiveStats(),
+                    _buildKategoriBaslikCubugu(),
                     _buildCategories(),
-                    _buildSponsorBanner(),
+                    _buildCozumOrtagiBanner(),
                     const HugMarketFooter(),
                   ],
                 ),
@@ -167,32 +157,34 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
       backgroundColor: Colors.white,
       elevation: 0,
       toolbarHeight: 72,
-      titleSpacing: 12,
-      title: Row(
-        children: [
-          Image.asset('assets/hug_market/hug_logo.png', height: 56, fit: BoxFit.contain),
-          const SizedBox(width: 12),
-          Expanded(
-            child: SizedBox(
+      leadingWidth: 72,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 12),
+        child: Center(
+          child: InkWell(
+            onTap: () {
+              if (Navigator.canPop(context)) Navigator.pop(context);
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: 44,
               height: 44,
-              child: TextField(
-                controller: _searchCtrl,
-                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500, color: const Color(0xFF0F172A)),
-                decoration: InputDecoration(
-                  hintText: 'Ara...',
-                  hintStyle: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[600]),
-                  prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF64748B)),
-                  filled: true,
-                  fillColor: const Color(0xFFF1F5F9),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF0F172A), width: 1.2)),
-                ),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF5D6),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE8DCC0), width: 1),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 8, offset: const Offset(0, 2))],
               ),
+              child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF0F172A)),
             ),
           ),
-        ],
+        ),
       ),
+      title: Center(
+        child: Image.asset('assets/hug_market/hug_logo.png', height: 48, fit: BoxFit.contain),
+      ),
+      centerTitle: true,
+      actions: const [SizedBox(width: 72)],
     );
   }
 
@@ -320,10 +312,6 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
           decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFF0F172A), Color(0xFF1E293B)])),
           padding: const EdgeInsets.all(20),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Wrap(spacing: 8, children: [
-              Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(20)), child: Text('ŞANTİYEYE TESLİM • 3 İŞ GÜNÜ', style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700))),
-            ]),
-            const SizedBox(height: 14),
             Text('İşin İçin Ne\nLazımsa,\nŞantiyene Gelsin.', style: GoogleFonts.poppins(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900, height: 0.95)),
             const SizedBox(height: 8),
             Text('Yapı malzemelerinde yeni nesil satın alma.', style: GoogleFonts.poppins(color: Colors.white70, fontSize: 12)),
@@ -338,35 +326,30 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
     );
   }
 
-  Widget _buildTrustStrip() => Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    padding: const EdgeInsets.symmetric(vertical: 12),
-    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFFE2E8F0))),
-    child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-      _trustItem(Icons.local_shipping_rounded, 'Şantiyeye Teslim', '3 iş günü'),
-      _trustItem(Icons.local_offer_rounded, '%5 İndirim', 'Ustalara özel'),
-    ]),
-  );
-
-  Widget _trustItem(IconData i, String t, String d) => Column(children: [
-    Icon(i, color: const Color(0xFFDC143C), size: 20),
-    const SizedBox(height: 4),
-    Text(t, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 11)),
-    Text(d, style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey)),
-  ]);
-
-  Widget _buildLiveStats() => Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE2E8F0))),
-    child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-      Row(children: [const Icon(Icons.public_rounded, size: 14, color: Color(0xFF0F172A)), const SizedBox(width: 4), Text('81 İl', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 11))]),
-      Container(width: 1, height: 16, color: const Color(0xFFE2E8F0)),
-      Row(children: [const Icon(Icons.verified_rounded, size: 14, color: Color(0xFF0F172A)), const SizedBox(width: 4), Text('Faturalı', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 11))]),
-      Container(width: 1, height: 16, color: const Color(0xFFE2E8F0)),
-      Row(children: [const Icon(Icons.bolt_rounded, size: 14, color: Color(0xFFDC143C)), const SizedBox(width: 4), Text('3 Günde Teslim', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 11, color: Color(0xFFDC143C)))]),
-    ]),
-  );
+  // KÜÇÜLTÜLMÜŞ - BORDOYA KAÇAN KIRMIZI - PİYANO SİYAHI YAZI
+  Widget _buildKategoriBaslikCubugu() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+      height: 32,
+      decoration: BoxDecoration(
+        color: const Color(0xFFB91C1C),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [BoxShadow(color: const Color(0xFFB91C1C).withOpacity(0.18), blurRadius: 6, offset: const Offset(0, 2))],
+      ),
+      child: Center(
+        child: Text(
+          'KATEGORİLER',
+          style: GoogleFonts.poppins(
+            color: const Color(0xFF0A0A0A),
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.0,
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildCategories() {
     final allCats = [
@@ -386,46 +369,53 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
       {'name': 'yenilenebilir', 'file': 'yenilenebilir.webp'},
     ];
 
-    final filtered = _searchQuery.isEmpty? allCats : allCats.where((c) => (c['name'] as String).toLowerCase().contains(_searchQuery)).toList();
-
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Kategoriler${_searchQuery.isEmpty? '' : ' • "$_searchQuery"'}', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 12),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 2.1, crossAxisSpacing: 12, mainAxisSpacing: 12),
-          itemCount: filtered.length,
-          itemBuilder: (_, i) {
-            final file = filtered[i]['file'] as String;
-            return InkWell(
-              onTap: () => _goKategori(file),
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE2E8F0))),
-                clipBehavior: Clip.antiAlias,
-                child: Image.asset(
-                  'assets/hug_market/kategori/$file',
-                  fit: BoxFit.cover,
-                  errorBuilder: (c, e, s) => Container(color: Colors.white, child: Center(child: Text(filtered[i]['name'] as String, style: GoogleFonts.poppins(fontSize: 11)))),
-                ),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 2.1, crossAxisSpacing: 12, mainAxisSpacing: 12),
+        itemCount: allCats.length,
+        itemBuilder: (_, i) {
+          final file = allCats[i]['file'] as String;
+          return InkWell(
+            onTap: () => _goKategori(file),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE2E8F0))),
+              clipBehavior: Clip.antiAlias,
+              child: Image.asset(
+                'assets/hug_market/kategori/$file',
+                fit: BoxFit.cover,
+                errorBuilder: (c, e, s) => Container(color: Colors.white, child: Center(child: Text(allCats[i]['name'] as String, style: GoogleFonts.poppins(fontSize: 11)))),
               ),
-            );
-          },
-        ),
-      ]),
+            ),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildSponsorBanner() => Container(
-    margin: const EdgeInsets.all(16),
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF0F172A), Color(0xFF1E293B)]), borderRadius: BorderRadius.circular(16)),
-    child: Row(children: [
-      Expanded(child: Text('Markanız Burada Yer Alabilir', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800))),
-      FilledButton(style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black), onPressed: () {}, child: const Text('Sponsor Ol')),
-    ]),
-  );
+  Widget _buildCozumOrtagiBanner() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      child: InkWell(
+        onTap: _goCozumOrtagi,
+        borderRadius: BorderRadius.circular(16),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.asset(
+            'assets/hug_market/cozum_ortagi.png',
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (c, e, s) => Container(
+              height: 110,
+              decoration: BoxDecoration(color: const Color(0xFFFFF5D6), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFE8DCC0))),
+              child: Center(child: Text('assets/hug_market/cozum_ortagi.png bulunamadı', style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54))),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

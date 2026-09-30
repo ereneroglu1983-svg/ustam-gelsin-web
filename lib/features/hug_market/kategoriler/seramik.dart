@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import '../cozum_ortagi_page.dart';
+import '../sepet_sayfasi.dart';
 
-// lib/features/hug_market/kategoriler/seramik_fayans.dart - TAM HALİ - 0 HATA
+// lib/features/hug_market/kategoriler/seramik_fayans.dart - BOYA İSKELETİ - SERAMİK FAYANS & ZEMİN
 
 class SeramikFayansKategoriPage extends StatefulWidget {
   const SeramikFayansKategoriPage({super.key});
@@ -13,8 +14,9 @@ class SeramikFayansKategoriPage extends StatefulWidget {
 class _SeramikFayansKategoriPageState extends State<SeramikFayansKategoriPage> {
   static const Color kCategoryColor = Color(0xFF8C6B4A);
   static const Color kCategoryLight = Color(0xFFF5EFE6);
-  static const Color kCategoryGradientStart = Color(0xFF8C6B4A);
-  static const Color kCategoryGradientEnd = Color(0xFFC4A882);
+
+  bool _isUrunTipiOpen = true;
+  bool _isHacimOpen = true;
 
   final List<String> _altKategoriler = [
     'Seramik & Fayans',
@@ -27,174 +29,202 @@ class _SeramikFayansKategoriPageState extends State<SeramikFayansKategoriPage> {
     'Dış Mekân Zeminleri',
   ];
 
+  final Map<String, List<String>> _kategoriHacimMap = {
+    'Seramik & Fayans': ['30x30', '45x45', '60x60 Parlak', '60x120'],
+    'Porselen Seramik': ['60x60', '80x80 Mat Full Body', '60x120', '120x120'],
+    'Doğal Taş': ['30x60 Traverten Eskitme', '40x60 Mermer', '30x30 Kayrak', 'Serbest Boy'],
+    'Laminat & Parke': ['8mm Meşe AC4 2.1m²', '10mm Ceviz', '12mm', 'Laminat Süpürgelik'],
+    'Vinil & PVC Zemin': ['2mm Klik Ahşap Desen', '3mm LVT', '4mm SPC', 'Rulo 2m En'],
+    'Halı & Halıfleks': ['4m En Otel Tipi', 'Duvardan Duvara', 'Karo Halı 50x50', 'Çim Halı'],
+    'Endüstriyel Zemin Sistemleri': ['Epoksi 20kg', 'Poliüretan 20kg', 'Self Levelling', 'Antistatik'],
+    'Dış Mekân Zeminleri': ['30x30 Kaymaz R11', '40x40 Kaymaz', '60x60 Dış Mekân', 'Bordür'],
+  };
+
   final Set<String> _seciliTipler = {'Seramik & Fayans'};
   final Set<String> _seciliHacim = {'Standart'};
 
+  List<String> get _aktifHacimListesi {
+    if (_seciliTipler.isEmpty) return ['60x60', '80x80', '30x60', '8mm'];
+    final Set<String> all = {};
+    for (var tip in _seciliTipler) {
+      all.addAll(_kategoriHacimMap[tip]?? []);
+    }
+    return all.toList();
+  }
+
   final List<Map<String, dynamic>> _urunler = [
-    {
-      'ad': 'HUG Seramik 60x60 Parlak Beyaz',
-      'detay': 'Seramik & Fayans • 60x60 • Parlak • 1.44m²',
-      'fiyat': 185,
-      'ikon': Icons.grid_on_outlined,
-    },
-    {
-      'ad': 'HUG Porselen 80x80 Mat Bej',
-      'detay': 'Porselen Seramik • 80x80 • Mat • Full Body',
-      'fiyat': 320,
-      'ikon': Icons.crop_square_outlined,
-    },
-    {
-      'ad': 'HUG Doğal Taş Traverten 30x60',
-      'detay': 'Doğal Taş • 30x60 • Traverten • Eskitme',
-      'fiyat': 450,
-      'ikon': Icons.landscape_outlined,
-    },
-    {
-      'ad': 'HUG Laminat Parke 8mm Meşe',
-      'detay': 'Laminat & Parke • 8mm • Meşe • AC4 • 2.1m²',
-      'fiyat': 185,
-      'ikon': Icons.view_module_outlined,
-    },
-    {
-      'ad': 'HUG Vinil Zemin 2mm Ahşap Desen',
-      'detay': 'Vinil & PVC Zemin • 2mm • Ahşap Desen • Klik',
-      'fiyat': 125,
-      'ikon': Icons.layers_outlined,
-    },
-    {
-      'ad': 'HUG Halıfleks Otel Tipi Kırmızı',
-      'detay': 'Halı & Halıfleks • Otel Tipi • 4m En • Kırmızı',
-      'fiyat': 85,
-      'ikon': Icons.weekend_outlined,
-    },
-    {
-      'ad': 'HUG Epoksi Zemin Kaplama 20kg',
-      'detay': 'Endüstriyel Zemin • 20kg • Epoksi • Gri',
-      'fiyat': 1250,
-      'ikon': Icons.construction_outlined,
-    },
-    {
-      'ad': 'HUG Dış Mekân Kaymaz Seramik 30x30',
-      'detay': 'Dış Mekân Zeminleri • 30x30 • Kaymaz • R11',
-      'fiyat': 145,
-      'ikon': Icons.park_outlined,
-    },
+    {'ad': 'HUG Seramik 60x60 Parlak Beyaz', 'detay': 'Seramik & Fayans • 60x60 • Parlak • 1.44m²', 'fiyat': 185},
+    {'ad': 'HUG Porselen 80x80 Mat Bej', 'detay': 'Porselen Seramik • 80x80 • Mat • Full Body', 'fiyat': 320},
+    {'ad': 'HUG Doğal Taş Traverten 30x60', 'detay': 'Doğal Taş • 30x60 • Traverten • Eskitme', 'fiyat': 450},
+    {'ad': 'HUG Laminat Parke 8mm Meşe', 'detay': 'Laminat & Parke • 8mm • Meşe • AC4 • 2.1m²', 'fiyat': 185},
+    {'ad': 'HUG Vinil Zemin 2mm Ahşap Desen', 'detay': 'Vinil & PVC Zemin • 2mm • Ahşap Desen • Klik', 'fiyat': 125},
+    {'ad': 'HUG Halıfleks Otel Tipi Kırmızı', 'detay': 'Halı & Halıfleks • Otel Tipi • 4m En • Kırmızı', 'fiyat': 85},
+    {'ad': 'HUG Epoksi Zemin Kaplama 20kg', 'detay': 'Endüstriyel Zemin • 20kg • Epoksi • Gri', 'fiyat': 1250},
+    {'ad': 'HUG Dış Mekân Kaymaz Seramik 30x30', 'detay': 'Dış Mekân Zeminleri • 30x30 • Kaymaz • R11', 'fiyat': 145},
   ];
+
+  bool _isMobile(double w) => w < 600;
+  bool _isDesktop(double w) => w >= 1100;
+  int _gridCount(double w) => w < 600? 2 : w < 1100? 3 : 4;
+
+  void _goBack() => Navigator.of(context).pop();
+  void _goSepet() => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SepetSayfasi()));
+  void _goCozumOrtagi() => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CozumOrtagiPage()));
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 900;
+    final w = MediaQuery.of(context).size.width;
+    final isMobile = _isMobile(w);
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F8),
+      appBar: isMobile? _mobileAppBar() : null,
       body: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(
-            child: Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              child: Row(
-                children: [
-                  Image.asset('assets/hug_market/hug_logo.png', height: 42, errorBuilder: (c, e, s) => Row(children: [Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFF0B3D91), borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.home, color: Colors.white)), const SizedBox(width: 8), const Text('HUG\nMARKET', style: TextStyle(fontWeight: FontWeight.w900, height: 0.9, color: Color(0xFF0B3D91)))],)),
-                  const SizedBox(width: 32),
-                  if (!isMobile) ...[
-                    _navItem('Ana Sayfa', false, () => context.go('/')),
-                    _navItem('Seramik, Fayans & Zemin', true, null),
-                    _navItem('Kategoriler', false, () => context.go('/hug-market')),
-                    _navItem('Projeleriniz', false, null),
-                    _navItem('Destek', false, null),
-                  ],
-                  const Spacer(),
-                  IconButton(onPressed: () {}, icon: const Icon(Icons.search)),
-                  const SizedBox(width: 4),
-                  Stack(children: [IconButton(onPressed: () => context.go('/hug-market/sepet'), icon: const Icon(Icons.shopping_cart_outlined)), Positioned(right: 4, top: 4, child: Container(padding: const EdgeInsets.all(3), decoration: const BoxDecoration(color: kCategoryColor, shape: BoxShape.circle), child: const Text('0', style: TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.bold))))]),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.account_circle_outlined),
-                  if (!isMobile) ...[const SizedBox(width: 6), const Text('Hesabım', style: TextStyle(fontWeight: FontWeight.w600))]
-                ],
-              ),
-            ),
+          if (!isMobile) SliverToBoxAdapter(child: _topNav()),
+          SliverToBoxAdapter(child: _buildTopBreadcrumb(w)),
+          SliverToBoxAdapter(child: _cozumOrtagiBanner()),
+          SliverToBoxAdapter(child: _breadcrumbAndFilterBar(w)),
+          SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: w < 600? 12 : 24, vertical: 8),
+            sliver: SliverToBoxAdapter(child: _isDesktop(w)? _buildDesktopContent(w) : _buildProductGrid(w)),
           ),
-          SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.only(top: 1),
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-              decoration: const BoxDecoration(gradient: LinearGradient(colors: [Color(0xFFF5EFE6), Color(0xFFE0D0B8), Color(0xFFF5EFE6)], begin: Alignment.topLeft, end: Alignment.bottomRight)),
-              child: Row(
-                children: [
-                  Container(width: 64, height: 64, decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, border: Border.all(color: kCategoryColor, width: 2)), child: const Icon(Icons.handshake_outlined, color: kCategoryColor, size: 32)),
-                  const SizedBox(width: 20),
-                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [RichText(text: const TextSpan(style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0B1E42)), children: [TextSpan(text: 'HUG MARKET '), TextSpan(text: 'Çözüm Ortağı', style: TextStyle(color: kCategoryColor)), TextSpan(text: ' Olmak İster Misiniz?')])), const SizedBox(height: 4), const Text('Ürünlerinizi doğru projelerle buluşturalım, ustanın sahadaki gerçek ihtiyacına birlikte cevap verelim.', style: TextStyle(fontSize: 14, color: Color(0xFF334155), fontWeight: FontWeight.w500))])),
-                  const SizedBox(width: 20),
-                  ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: kCategoryColor, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), elevation: 0), child: const Row(mainAxisSize: MainAxisSize.min, children: [Text('Çözüm Ortağı Ol', style: TextStyle(fontWeight: FontWeight.bold)), SizedBox(width: 8), Icon(Icons.arrow_forward, size: 18)])),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
-              child: Row(
-                children: [
-                  const Text('Ana Sayfa › Yapı Market › Seramik, Fayans & Zemin', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                  const Spacer(),
-                  Text('${_urunler.length} ürün bulundu', style: const TextStyle(fontWeight: FontWeight.w600)),
-                  const SizedBox(width: 16),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade300)), child: const Row(children: [Text('Sırala: Önerilen ', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), Icon(Icons.keyboard_arrow_down, size: 18)])),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: isMobile ? _buildMobileContent() : _buildDesktopContent())),
-          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+          SliverToBoxAdapter(child: _buildFooter()),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
         ],
       ),
     );
   }
 
-  Widget _navItem(String label, bool active, VoidCallback? onTap) => Padding(padding: const EdgeInsets.only(right: 24), child: InkWell(onTap: onTap, child: Text(label, style: TextStyle(fontWeight: active ? FontWeight.bold : FontWeight.w600, color: active ? kCategoryColor : Colors.black87, decoration: active ? TextDecoration.underline : null, decorationColor: kCategoryColor, decorationThickness: 2))));
-
-  Widget _buildDesktopContent() => Row(crossAxisAlignment: CrossAxisAlignment.start, children: [SizedBox(width: 280, child: _buildFilters()), const SizedBox(width: 20), Expanded(child: _buildProductGrid())]);
-  Widget _buildMobileContent() => Column(children: [_buildFilters(), const SizedBox(height: 16), _buildProductGrid()]);
-
-  Widget _buildFilters() {
+  Widget _buildTopBreadcrumb(double w) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)]),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Filtreler', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)), TextButton(onPressed: () => setState(() { _seciliTipler.clear(); _seciliHacim.clear(); }), child: const Text('Temizle', style: TextStyle(color: kCategoryColor)))]),
-        const Divider(),
-        const Text('Ürün Tipi', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        ..._altKategoriler.map((k) => CheckboxListTile(dense: true, contentPadding: EdgeInsets.zero, title: Text(k, style: const TextStyle(fontSize: 13)), value: _seciliTipler.contains(k), activeColor: kCategoryColor, onChanged: (v) => setState(() { if (v == true) _seciliTipler.add(k); else _seciliTipler.remove(k); }))),
-        const SizedBox(height: 12),
-        const Text('Ölçü / Hacim', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        Wrap(spacing: 8, children: ['60x60', '80x80', '30x60', '8mm', '2mm'].map((e) { final sel = _seciliHacim.contains(e); return ChoiceChip(label: Text(e, style: TextStyle(fontSize: 12, color: sel ? Colors.white : Colors.black87)), selected: sel, selectedColor: kCategoryColor, onSelected: (v) => setState(() { if (v) _seciliHacim.add(e); else _seciliHacim.remove(e); })); }).toList()),
-        const SizedBox(height: 16),
-        const Text('Fiyat', style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        RangeSlider(min: 10, max: 15000, divisions: 20, activeColor: kCategoryColor, values: const RangeValues(50, 5000), labels: const RangeLabels('50 TL', '5000 TL'), onChanged: (v) {}),
-        SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: kCategoryColor, foregroundColor: Colors.white), child: const Text('Uygula'))),
+      padding: EdgeInsets.fromLTRB(w < 600? 12 : 24, 12, w < 600? 12 : 24, 4),
+      child: const Text('ANA SAYFA > YAPI MARKET > SERAMİK, FAYANS & ZEMİN',
+          style: TextStyle(color: Colors.black, fontSize: 13.5, fontWeight: FontWeight.w700, letterSpacing: 0.2)),
+    );
+  }
+
+  Widget _realLogo({double height = 44}) {
+    return Image.asset('assets/hug_market/hug_logo.png',
+        height: height,
+        fit: BoxFit.contain,
+        errorBuilder: (c, e, s) => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(color: const Color(0xFF0B3D91), borderRadius: BorderRadius.circular(8)),
+            child: const Text('HUG MARKET', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900))));
+  }
+
+  Widget _topNav() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: Stack(alignment: Alignment.center, children: [
+        Row(children: [
+          IconButton(onPressed: _goBack, icon: const Icon(Icons.arrow_back_ios_new, size: 20)),
+          const Spacer(),
+          IconButton(onPressed: _goSepet, icon: const Icon(Icons.shopping_cart_outlined))
+        ]),
+        InkWell(onTap: _goBack, child: _realLogo(height: 46)),
       ]),
     );
   }
 
-  Widget _buildProductGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, childAspectRatio: 0.68, crossAxisSpacing: 14, mainAxisSpacing: 14),
-      itemCount: _urunler.length,
-      itemBuilder: (context, i) {
-        final u = _urunler[i];
-        return Container(
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8)]),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Expanded(flex: 3, child: Container(decoration: BoxDecoration(color: kCategoryLight, borderRadius: const BorderRadius.vertical(top: Radius.circular(12))), child: Stack(children: [Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Container(width: 72, height: 72, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: kCategoryColor.withOpacity(0.15), blurRadius: 12)]), child: Icon(u['ikon'] as IconData, size: 36, color: kCategoryColor)), const SizedBox(height: 8), Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 8, height: 8, decoration: const BoxDecoration(color: kCategoryColor, shape: BoxShape.circle)), const SizedBox(width: 4), const Text('HUG', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Color(0xFF0B3D91)))])),])), Positioned(top: 10, right: 10, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: kCategoryColor, borderRadius: BorderRadius.circular(6)), child: const Text('YENİ', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold))))]))),
-            Expanded(flex: 2, child: Padding(padding: const EdgeInsets.all(10), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(u['ad'] as String, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)), const SizedBox(height: 2), Text(u['detay'] as String, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: Colors.grey.shade600)), const Spacer(), Text('${(u['fiyat'] as int).toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')},00 TL', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF0B1E42))), const SizedBox(height: 6), SizedBox(width: double.infinity, height: 34, child: ElevatedButton(onPressed: () => context.go('/hug-market/sepet'), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0B3D91), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: EdgeInsets.zero, elevation: 0), child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Sepete Ekle', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)), SizedBox(width: 4), Icon(Icons.shopping_cart_outlined, size: 14)])))]))),
-          ]),
-        );
-      },
+  AppBar _mobileAppBar() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 1,
+      leading: IconButton(onPressed: _goBack, icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20)),
+      title: _realLogo(height: 38),
+      centerTitle: true,
+      actions: [
+        IconButton(onPressed: _goSepet, icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black87)),
+        const SizedBox(width: 4)
+      ],
     );
+  }
+
+  Widget _cozumOrtagiBanner() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      child: InkWell(
+        onTap: _goCozumOrtagi,
+        borderRadius: BorderRadius.circular(12),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.asset('assets/hug_market/cozum_ortagi.png', width: double.infinity, fit: BoxFit.cover,
+            errorBuilder: (c, e, s) => Container(height: 100, decoration: BoxDecoration(color: kCategoryLight, borderRadius: BorderRadius.circular(12)), child: const Center(child: Text('cozum_ortagi.png bulunamadı', style: TextStyle(color: Colors.black54)))),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _breadcrumbAndFilterBar(double w) {
+    final isMobile = _isMobile(w);
+    final filterCount = _seciliTipler.length + _seciliHacim.length;
+    return Container(
+      padding: EdgeInsets.fromLTRB(w < 600? 12 : 24, 12, w < 600? 12 : 24, 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Wrap(spacing: 8, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
+          if (isMobile) SizedBox(height: 32, child: OutlinedButton.icon(onPressed: _openFilterSheet, icon: const Icon(Icons.tune, size: 14, color: Colors.black87), label: Text(filterCount > 0? 'Filtrele ($filterCount)' : 'Filtrele', style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 11)), style: OutlinedButton.styleFrom(backgroundColor: Colors.white, side: BorderSide(color: Colors.grey.shade300), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0)))),
+          ..._seciliTipler.map((e) => _buildTextFilter(e, () => setState(() => _seciliTipler.remove(e)))),
+          ..._seciliHacim.map((e) => _buildTextFilter(e, () => setState(() => _seciliHacim.remove(e)))),
+        ]),
+        const SizedBox(height: 8),
+        Text('${_urunler.length} ÜRÜN SERGİLENMEKTEDİR...', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11, color: Colors.black54, letterSpacing: 0.3)),
+      ]),
+    );
+  }
+
+  Widget _buildTextFilter(String text, VoidCallback onRemove) {
+    return InkWell(onTap: onRemove, borderRadius: BorderRadius.circular(4), child: Padding(padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2), child: Row(mainAxisSize: MainAxisSize.min, children: [Text(text, style: const TextStyle(fontSize: 10, color: Colors.black, fontWeight: FontWeight.w500)), const SizedBox(width: 3), const Icon(Icons.close, size: 12, color: Colors.black54)])));
+  }
+
+  void _openFilterSheet() {
+    showModalBottomSheet(context: context, isScrollControlled: true, backgroundColor: Colors.white, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))), builder: (ctx) {
+      return DraggableScrollableSheet(initialChildSize: 0.85, maxChildSize: 0.95, minChildSize: 0.5, expand: false, builder: (context, scrollController) {
+        return StatefulBuilder(builder: (context, setSheetState) {
+          return Column(children: [
+            Container(margin: const EdgeInsets.only(top: 8), width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10))),
+            Padding(padding: const EdgeInsets.fromLTRB(16, 16, 8, 8), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Filtreler', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.black)), TextButton(onPressed: () { setState(() { _seciliTipler.clear(); _seciliHacim.clear(); }); setSheetState(() {}); }, child: const Text('Temizle', style: TextStyle(color: kCategoryColor, fontWeight: FontWeight.bold)))])),
+            const Divider(height: 1, color: Color(0xFFE0E0E0)),
+            Expanded(child: ListView(controller: scrollController, children: [
+              _filterSectionSheet('Ürün Tipi', _isUrunTipiOpen, () { _isUrunTipiOpen =!_isUrunTipiOpen; setSheetState(() {}); setState(() {}); }, Column(children: _altKategoriler.map((k) => CheckboxListTile(dense: true, activeColor: kCategoryColor, checkColor: Colors.white, contentPadding: const EdgeInsets.symmetric(horizontal: 16), title: Text(k, style: const TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w600)), value: _seciliTipler.contains(k), onChanged: (v) { setState(() { if (v == true) _seciliTipler.add(k); else _seciliTipler.remove(k); }); setSheetState(() {}); })).toList())),
+              const Divider(height: 1, color: Color(0xFFE0E0E0)),
+              _filterSectionSheet('Ölçü / Ebat (${_seciliTipler.isEmpty? "Tümü" : _seciliTipler.first})', _isHacimOpen, () { _isHacimOpen =!_isHacimOpen; setSheetState(() {}); }, Padding(padding: const EdgeInsets.fromLTRB(16, 0, 16, 16), child: Wrap(spacing: 8, runSpacing: 8, children: _aktifHacimListesi.map((e) { final sel = _seciliHacim.contains(e); return ChoiceChip(label: Text(e, style: TextStyle(fontSize: 12, color: sel? Colors.white : Colors.black, fontWeight: FontWeight.w600)), selected: sel, selectedColor: kCategoryColor, backgroundColor: Colors.white, side: BorderSide(color: sel? kCategoryColor : Colors.grey.shade400), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), showCheckmark: false, onSelected: (v) { setState(() { if (v) _seciliHacim.add(e); else _seciliHacim.remove(e); }); setSheetState(() {}); }); }).toList()))),
+            ])),
+            SafeArea(child: Padding(padding: EdgeInsets.fromLTRB(16, 12, 16, 16 + MediaQuery.of(context).viewPadding.bottom), child: SizedBox(width: double.infinity, height: 52, child: ElevatedButton(onPressed: () => Navigator.pop(context), style: ElevatedButton.styleFrom(backgroundColor: kCategoryColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Filtrele', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)))))),
+          ]);
+        });
+      });
+    });
+  }
+
+  Widget _filterSectionSheet(String title, bool isOpen, VoidCallback onTap, Widget child) {
+    return Column(children: [InkWell(onTap: onTap, child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Colors.black)), Icon(isOpen? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: Colors.black)]))), AnimatedCrossFade(firstChild: child, secondChild: const SizedBox.shrink(), crossFadeState: isOpen? CrossFadeState.showFirst : CrossFadeState.showSecond, duration: const Duration(milliseconds: 200))]);
+  }
+
+  Widget _buildDesktopContent(double w) => Row(crossAxisAlignment: CrossAxisAlignment.start, children: [SizedBox(width: 300, child: _buildDesktopFilters()), const SizedBox(width: 16), Expanded(child: _buildProductGrid(w))]);
+
+  Widget _buildDesktopFilters() {
+    return Container(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)]), child: Column(children: [
+      Padding(padding: const EdgeInsets.all(16), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text('Filtreler', style: TextStyle(fontWeight: FontWeight.w800, color: Colors.black)), TextButton(onPressed: () => setState(() { _seciliTipler.clear(); _seciliHacim.clear(); }), child: const Text('Temizle', style: TextStyle(color: kCategoryColor, fontWeight: FontWeight.bold)))])),
+      const Divider(height: 1),
+      _filterSectionSheet('Ürün Tipi', _isUrunTipiOpen, () => setState(() => _isUrunTipiOpen =!_isUrunTipiOpen), Column(children: _altKategoriler.map((k) => CheckboxListTile(dense: true, contentPadding: const EdgeInsets.symmetric(horizontal: 8), activeColor: kCategoryColor, checkColor: Colors.white, title: Text(k, style: const TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.w600)), value: _seciliTipler.contains(k), onChanged: (v) => setState(() { if (v == true) _seciliTipler.add(k); else _seciliTipler.remove(k); }))).toList())),
+      const Divider(height: 1),
+      _filterSectionSheet('Ölçü / Ebat', _isHacimOpen, () => setState(() => _isHacimOpen =!_isHacimOpen), Padding(padding: const EdgeInsets.all(12), child: Wrap(spacing: 6, runSpacing: 6, children: _aktifHacimListesi.map((e) { final sel = _seciliHacim.contains(e); return ChoiceChip(label: Text(e, style: TextStyle(fontSize: 11, color: sel? Colors.white : Colors.black, fontWeight: FontWeight.w600)), selected: sel, selectedColor: kCategoryColor, backgroundColor: Colors.white, side: BorderSide(color: sel? kCategoryColor : Colors.grey.shade400), onSelected: (v) => setState(() { if (v) _seciliHacim.add(e); else _seciliHacim.remove(e); })); }).toList()))),
+    ]));
+  }
+
+  Widget _buildProductGrid(double w) {
+    return GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: _gridCount(w), childAspectRatio: w < 600? 0.52 : 0.60, crossAxisSpacing: 10, mainAxisSpacing: 10), itemCount: _urunler.length, itemBuilder: (context, i) {
+      final u = _urunler[i];
+      return InkWell(onTap: _goCozumOrtagi, borderRadius: BorderRadius.circular(12), child: Container(decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: kCategoryColor, width: 1.5)), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Expanded(flex: 4, child: ClipRRect(borderRadius: const BorderRadius.vertical(top: Radius.circular(10.5)), child: Container(color: Colors.white, child: Image.asset('assets/hug_market/reklam_karti.png', fit: BoxFit.cover, width: double.infinity, height: double.infinity, errorBuilder: (c, e, s) => Container(color: Colors.white, child: const Center(child: Icon(Icons.image_not_supported_outlined, color: kCategoryColor, size: 28))))))),
+        Expanded(flex: 3, child: Padding(padding: const EdgeInsets.fromLTRB(8, 6, 8, 6), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(u['ad'] as String, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.black, height: 1.1)), const SizedBox(height: 2), Text(u['detay'] as String, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 9, color: Colors.black54, height: 1.1)), const Spacer(), Text('${u['fiyat']},00 TL', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.black)), const SizedBox(height: 4), SizedBox(width: double.infinity, height: 28, child: ElevatedButton(onPressed: _goCozumOrtagi, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0B3D91), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: EdgeInsets.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap), child: const Text('Çözüm Ortağı Ol', style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold))))])))])));
+    });
+  }
+
+  Widget _buildFooter() {
+    return Container(width: double.infinity, margin: const EdgeInsets.fromLTRB(12, 24, 12, 12), padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade200)), child: const Center(child: Text('Hemen Ustam Gelsin Her Hakkı Saklıdır © 2026', style: TextStyle(color: Colors.black54, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.3), textAlign: TextAlign.center)));
   }
 }
