@@ -9,16 +9,26 @@ build/
 .packages
 .env
 *.log
-*.lock
 
-# SEO - NEXT.JS (BUNLAR EKSİKTİ BOSS!)
+# SEO - NEXT.JS
 seo/node_modules/
 seo/.next/
 seo/out/
 seo/.vercel/
 
-# Firebase / Functions
-functions/node_modules/
+# Firebase / Functions - TÜM CODEBASE'LER
+firebase_functions/node_modules/
+firebase_functions/lib/
+ustam-gelsin-ai/node_modules/
+ustam-gelsin-ai/lib/
+ustam-gelsin-backend/node_modules/
+ustam-gelsin-backend/lib/
+iyzico/node_modules/
+iyzico/lib/
+
+# ESKİ ÇÖP KLASÖRLER - BİR DAHA GİT'E GİRMESİN
+functions/
+functions_firebase/
 .firebase/
 .firebaserc
 .runtimeconfig.json

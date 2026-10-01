@@ -1,5 +1,6 @@
 // app/hug-market-sitemap.xml/route.ts
 export const dynamic = 'force-static'
+export const revalidate = 86400
 
 export async function GET() {
   const cats = ["banyo-mutfak","temizlik-hijyen","elektrik-aydinlatma","hirdavat-el-aletleri-is-guvenligi","bahce-peyzaj-dis-mekan","tesisat-su-sistemleri","yapi-malzemeleri-insaat","boya-dekorasyon","cati-cephe-sistemleri","havuz-spa-sistemleri","isitma-sogutma-iklimlendirme","seramik-fayans-zemin","yalitim-izolasyon","cam-aluminyum-cephe-sistemleri","yenilenebilir-enerji-guc-sistemleri","kapi-kilit-gecis-kontrol","guvenlik-yangin-zayif-akim","asansor-yuruyen-merdiven"]
@@ -18,6 +19,9 @@ ${urls.map(u => `  <url><loc>${u}</loc><changefreq>weekly</changefreq><priority>
 </urlset>`
 
   return new Response(xml, {
-    headers: { "Content-Type": "application/xml" },
+    headers: {
+      "Content-Type": "application/xml; charset=utf-8",
+      "Cache-Control": "public, max-age=3600"
+    },
   })
 }
