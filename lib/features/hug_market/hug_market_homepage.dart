@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/core/services/auth_service.dart';
 import 'package:ustam_gelsin/features/hug_market/theme/hug_market_theme.dart';
 import 'package:ustam_gelsin/features/hug_market/widgets/hug_market_footer.dart';
@@ -26,6 +27,10 @@ import 'package:ustam_gelsin/features/hug_market/kategoriler/iklimlendirme.dart'
 import 'package:ustam_gelsin/features/hug_market/kategoriler/seramik.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/yalitim.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/yenilenebilir.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/cam_aluminyum.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/kapi_kilit.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/guvenlik.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/asansor.dart';
 import 'package:ustam_gelsin/features/hug_market/cozum_ortagi_page.dart';
 import 'package:ustam_gelsin/web_dosyalari/musteri_kayit_ekrani.dart';
 import 'package:ustam_gelsin/web_dosyalari/usta_kayit_ekrani.dart';
@@ -61,7 +66,6 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
     super.dispose();
   }
 
-  // WEBHOMESCREEN İLE AYNI - KİLİTLİ SİSTEM
   void _showSelectionDialog(BuildContext context, bool isRegister) {
     showDialog(
       context: context,
@@ -119,45 +123,48 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
     }
   }
 
-  void _goSepet() => Navigator.push(context, MaterialPageRoute(builder: (_) => const SepetSayfasi()));
+  void _goSepet() => context.push('/hug-market/sepet');
 
   void _goSiparisTakip() {
     if (_authService.currentUser == null) {
       _showSelectionDialog(context, false);
       return;
     }
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const SiparisTakipSayfasi()));
+    context.push('/hug-market/siparis-takip');
   }
 
-  void _goCozumOrtagi() => Navigator.push(context, MaterialPageRoute(builder: (_) => const CozumOrtagiPage()));
+  void _goCozumOrtagi() => context.push('/hug-market/cozum-ortagi');
 
   void _goKategori(String file) {
-    Widget? page;
-    switch (file) {
-      case 'banyo_mutfak.webp': page = const MutfakBanyoKategoriPage(); break;
-      case 'temizlik.webp': page = const TemizlikKategoriPage(); break;
-      case 'elektrik.webp': page = const ElektrikKategoriPage(); break;
-      case 'hirdavat.webp': page = const HirdavatKategoriPage(); break;
-      case 'peyzaj.webp': page = const PeyzajKategoriPage(); break;
-      case 'tesisat_su.webp': page = const TesisatKategoriPage(); break;
-      case 'yapi_malzemeleri.webp': page = const YapiMalzemeleriKategoriPage(); break;
-      case 'boya_dekarasyon.webp': page = const BoyaDekorasyonKategoriPage(); break;
-      case 'cati.webp': page = const CatiCepheKategoriPage(); break;
-      case 'havuz_spa.webp': page = const HavuzSpaKategoriPage(); break;
-      case 'iklimlendirme.webp': page = const IsitmaSogutmaKategoriPage(); break;
-      case 'seramik_fayans.webp': page = const SeramikFayansKategoriPage(); break;
-      case 'yalitim.webp': page = const YalitimIzolasyonKategoriPage(); break;
-      case 'yenilenebilir.webp': page = const YenilenebilirEnerjiKategoriPage(); break;
+    final slugMap = {
+      'banyo_mutfak.webp': 'banyo-mutfak',
+      'temizlik.webp': 'temizlik',
+      'elektrik.webp': 'elektrik',
+      'hirdavat.webp': 'hirdavat',
+      'peyzaj.webp': 'peyzaj',
+      'tesisat_su.webp': 'tesisat-su',
+      'yapi_malzemeleri.webp': 'yapi-malzemeleri',
+      'boya_dekarasyon.webp': 'boya-dekorasyon',
+      'cati.webp': 'cati-cephe',
+      'havuz_spa.webp': 'havuz-spa',
+      'iklimlendirme.webp': 'iklimlendirme',
+      'seramik_fayans.webp': 'seramik-fayans',
+      'yalitim.webp': 'yalitim-izolasyon',
+      'yenilenebilir.webp': 'yenilenebilir-enerji',
+      'cam_aluminyum.png': 'cam-aluminyum',
+      'kapi_kilit.png': 'kapi-kilit',
+      'guvenlik.png': 'guvenlik-yangin-zayif-akim',
+      'asansor.png': 'asansor-yuruyen-merdiven',
+    };
+    final slug = slugMap[file];
+    if (slug!= null) {
+      context.push('/hug-market/kategori/$slug');
     }
-    if (page!= null) Navigator.push(context, MaterialPageRoute(builder: (_) => page!));
   }
 
   Future<void> _onBack() async {
     if (kIsWeb) {
-      final uri = Uri.parse('https://hemenustamgelsin.com');
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, webOnlyWindowName: '_self');
-      }
+      context.go('/');
     } else {
       if (Navigator.canPop(context)) Navigator.pop(context);
     }
@@ -410,6 +417,10 @@ class _HugMarketHomepageState extends State<HugMarketHomepage> {
       {'name': 'seramik fayans', 'file': 'seramik_fayans.webp'},
       {'name': 'yalitim', 'file': 'yalitim.webp'},
       {'name': 'yenilenebilir', 'file': 'yenilenebilir.webp'},
+      {'name': 'cam aluminyum', 'file': 'cam_aluminyum.png'},
+      {'name': 'kapi kilit', 'file': 'kapi_kilit.png'},
+      {'name': 'guvenlik', 'file': 'guvenlik.png'},
+      {'name': 'asansor', 'file': 'asansor.png'},
     ];
     final filtered = _searchQuery.isEmpty? allCats : allCats.where((c) => (c['name'] as String).toLowerCase().contains(_searchQuery)).toList();
     final cross = isDesktop? 4 : isTablet? 3 : 2;

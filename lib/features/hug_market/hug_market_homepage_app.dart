@@ -27,6 +27,10 @@ import 'package:ustam_gelsin/features/hug_market/kategoriler/iklimlendirme.dart'
 import 'package:ustam_gelsin/features/hug_market/kategoriler/seramik.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/yalitim.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/yenilenebilir.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/cam_aluminyum.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/kapi_kilit.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/guvenlik.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/asansor.dart';
 import 'package:ustam_gelsin/features/hug_market/cozum_ortagi_page.dart';
 
 class HugMarketAppHomepage extends StatefulWidget {
@@ -113,6 +117,10 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
       case 'seramik_fayans.webp': page = const SeramikFayansKategoriPage(); break;
       case 'yalitim.webp': page = const YalitimIzolasyonKategoriPage(); break;
       case 'yenilenebilir.webp': page = const YenilenebilirEnerjiKategoriPage(); break;
+      case 'cam_aluminyum.png': page = const CamAluminyumKategoriPage(); break;
+      case 'kapi_kilit.png': page = const KapiKilitKategoriPage(); break;
+      case 'guvenlik.png': page = const GuvenlikKategoriPage(); break;
+      case 'asansor.png': page = const AsansorKategoriPage(); break;
     }
     if (page!= null) Navigator.push(context, MaterialPageRoute(builder: (_) => page!));
   }
@@ -326,7 +334,6 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
     );
   }
 
-  // KÜÇÜLTÜLMÜŞ - BORDOYA KAÇAN KIRMIZI - PİYANO SİYAHI YAZI
   Widget _buildKategoriBaslikCubugu() {
     return Container(
       width: double.infinity,
@@ -367,6 +374,10 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
       {'name': 'seramik fayans', 'file': 'seramik_fayans.webp'},
       {'name': 'yalitim', 'file': 'yalitim.webp'},
       {'name': 'yenilenebilir', 'file': 'yenilenebilir.webp'},
+      {'name': 'cam aluminyum', 'file': 'cam_aluminyum.png'},
+      {'name': 'kapi kilit', 'file': 'kapi_kilit.png'},
+      {'name': 'guvenlik', 'file': 'guvenlik.png'},
+      {'name': 'asansor', 'file': 'asansor.png'},
     ];
 
     return Padding(

@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/core/theme/app_theme.dart';
 import 'package:ustam_gelsin/features/musteri/screens/musteri_auth_page.dart';
 import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dart';
@@ -243,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ListTile(leading: Icon(Icons.construction, color: AppColors.ustaColor), title: const Text("USTA GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta")))),
                     ],
                   const Divider(),
-                  ListTile(leading: const Icon(Icons.shopping_basket_outlined, color: Colors.black), title: const Text("HUG MARKET"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (context) => const HugMarketAppHomepage())); }),
+                  ListTile(leading: const Icon(Icons.shopping_basket_outlined, color: Colors.black), title: const Text("HUG MARKET"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () { Navigator.pop(context); context.go('/hug-market'); }),
                   ListTile(leading: const Icon(Icons.fingerprint, color: Colors.black), title: const Text("Biz Kimiz"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BizKimizPage()))),
                   ListTile(leading: const Icon(Icons.settings_suggest, color: Colors.black), title: const Text("Nasıl Çalışır"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NasilCalisirPage()))),
                   ListTile(leading: const Icon(Icons.support_agent, color: Colors.black), title: const Text("Destek & İletişim"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DestekIletisimPage()))),
@@ -314,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const HugMarketAppHomepage()));
+                  context.go('/hug-market');
                 },
                 child: Image.asset('assets/hug_market/hugmarket.png', width: double.infinity, fit: BoxFit.contain),
               ),
@@ -424,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               _buildNavItem(Icons.article_outlined, "İNŞAAT REHBERİ", () => Navigator.push(context, MaterialPageRoute(builder: (context) => const InsaatRehberiScreen()))),
-              _buildNavItem(Icons.shopping_basket_outlined, "HUG MARKET", () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HugMarketAppHomepage()))),
+              _buildNavItem(Icons.shopping_basket_outlined, "HUG MARKET", () => context.go('/hug-market')),
             ],
           ),
         ),
