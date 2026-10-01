@@ -1,11 +1,11 @@
 {
-    "name": "ustam_gelsin",
-    "short_name": "ustam_gelsin",
-    "start_url": ".",
+    "name": "Hemen Ustam Gelsin",
+    "short_name": "HUG",
+    "start_url": "/",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FFFFFF",
+    "theme_color": "#E30613",
+    "description": "Türkiye'nin en güvenilir usta bulma platformu - Ev tadilatı, dekorasyon, yapı market ve profesyonel usta hizmetleri.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

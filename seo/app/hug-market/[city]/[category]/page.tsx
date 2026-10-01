@@ -1,4 +1,4 @@
-// app/hug-market/[city]/[category]/page.tsx - B2B LANDING AĞI FINAL - RESİM İSİMLERİ İLE %100 UYUMLU
+// app/hug-market/[city]/[category]/page.tsx - B2B LANDING AĞI FINAL - PREMIUM COZUM-ORTAGI STANDARTI
 export const dynamic = 'force-static'
 import { cities } from '../../../../data/cities'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ type HugCat = {
   why: string[]
   productAreas: string[]
   visual: string
-  imageFile: string // Gerçek dosya adı - slug ile birebir aynı!
+  imageFile: string
 }
 
 const hugCats: HugCat[] = [
@@ -32,11 +32,11 @@ const hugCats: HugCat[] = [
     name: "Temizlik & Hijyen",
     shortName: "Temizlik",
     heroTitle: "Temizlik & Hijyen Çözüm Ortakları",
-    heroDesc: "teslim sonrası ve tadilat temizlik ihtiyaçlarında markanızı profesyonel akışa dahil edin - ENDÜSTRİYEL TEMİZLİK MAKİNELERİ",
+    heroDesc: "teslim sonrası ve tadilat temizlik ihtiyaçlarında markanızı profesyonel akışa dahil edin",
     why: ["İnşaat sonrası temizlik","Sanayi tipi süpürme","Zemin cilalama","Endüstriyel vakum"],
     productAreas: ["İnşaat Sonrası Temizlik","Endüstriyel Süpürme Makinesi","Zemin Cilalama Makinesi","Sanayi Tipi Vakum","Kimyasal & Deterjan"],
     visual: "industrial cleaning machines, floor scrubber",
-    imageFile: "temizlik-hijyen.jpg" // V2 ENDÜSTRİYEL MAKİNE OLAN!
+    imageFile: "temizlik-hijyen.jpg"
   },
   {
     slug: "elektrik-aydinlatma",
@@ -69,7 +69,7 @@ const hugCats: HugCat[] = [
     why: ["Peyzaj uygulamaları","Çim & sulama","Dış mekân zemin","Bahçe yapıları"],
     productAreas: ["Peyzaj Bitki","Çim & Toprak","Sulama Sistemleri","Dış Mekan Zemin","Bahçe Mobilyası","Traverten & Deck"],
     visual: "luxury villa garden with travertine patio and pergola",
-    imageFile: "dis-mekan-bahce.jpg" // V2 EFSANE OLAN!
+    imageFile: "dis-mekan-bahce.jpg"
   },
   {
     slug: "tesisat-su-sistemleri",
@@ -157,7 +157,7 @@ const hugCats: HugCat[] = [
     why: ["Mantolama","Su yalıtımı","Ses yalıtımı","Temel & bodrum"],
     productAreas: ["Mantolama Sistemleri","Su Yalıtım","Isı Yalıtım Levha","Membran & Shingle","Ses Yalıtım"],
     visual: "exterior insulation installation",
-    imageFile: "yalitim-izolasyon.jpg" // (1) SİLİNDİ, DÜZGÜN İSİM!
+    imageFile: "yalitim-izolasyon.jpg"
   },
   {
     slug: "cam-aluminyum-cephe-sistemleri",
@@ -181,7 +181,6 @@ const hugCats: HugCat[] = [
     visual: "solar panel installation on roof",
     imageFile: "yenilenebilir-enerji-guc-sistemleri.jpg"
   },
-  // ÇAKIŞMA ÇÖZÜLDÜ: 2 KAPI KATEGORİSİ AYRI AYRI!
   {
     slug: "celik-kapi-guvenlik-sistemleri",
     name: "Çelik Kapı & Güvenlik Sistemleri",
@@ -191,7 +190,7 @@ const hugCats: HugCat[] = [
     why: ["Çelik kapı montaj","Güvenlik kilidi","Akıllı kilit","Yangın kapısı"],
     productAreas: ["Çelik Kapı","Yangın Kapısı","Akıllı Kilit","Çoklu Kilit Sistemi","Kapı Aksesuar"],
     visual: "modern anthracite steel security door with smart lock",
-    imageFile: "celik-kapi-guvenlik-sistemleri.jpg" // V2 EFSANE OLAN!
+    imageFile: "celik-kapi-guvenlik-sistemleri.jpg"
   },
   {
     slug: "kapi-pencere-dograma",
@@ -224,7 +223,7 @@ const hugCats: HugCat[] = [
     why: ["Asansör montaj","Bakım & revizyon","Yürüyen merdiven","Engelli platform"],
     productAreas: ["Asansör Kabin & Ray","Motor & Kumanda","Yürüyen Merdiven","Bakım & Yedek Parça"],
     visual: "elevator installation, modern elevator shaft",
-    imageFile: "asansor-yuruyen-merdiven-mekanik-tasima.jpg" // KESİLMEDEN TAM İSİM!
+    imageFile: "asansor-yuruyen-merdiven-mekanik-tasima.jpg"
   },
 ]
 
@@ -255,134 +254,235 @@ export default async function Page({ params }: { params: Promise<{ city: string,
   const cat = hugCats.find(c => c.slug === catSlug)!
 
   return (
-    <main className="bg-[#fbfbf8] text-zinc-900">
-      {/* 1. HERO - RESİM İSMİ %100 UYUMLU */}
-      <section className="max-w-[1280px] mx-auto px-6 pt-10 pb-8 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 items-center">
-        <div>
-          <div className="inline-flex items-center gap-2 text-[11px] tracking-widest uppercase bg-black text-white px-3 py-1 rounded-full">HUG MARKET • {city.name} • {cat.shortName}</div>
-          <h1 className="mt-4 text-[36px] lg:text-[48px] leading-[0.95] font-black tracking-tight">{city.name} {cat.heroTitle}</h1>
-          <p className="mt-4 text-[18px] leading-[1.5] text-zinc-600 max-w-[560px]">{city.name}'daki tadilat ve yenileme projelerinde {cat.heroDesc}.</p>
-          <div className="mt-6 flex gap-3">
-            <Link href="/hug-market/cozum-ortagi" className="bg-black text-white px-6 py-3 rounded-full text-sm font-semibold">Çözüm Ortağı Başvurusu →</Link>
-            <Link href={`/hug-market/${city.slug}`} className="border border-zinc-300 px-6 py-3 rounded-full text-sm">{city.name} Kategorileri</Link>
+    <main className="bg-[#fcfcfa] text-zinc-900">
+      {/* TOP BAR - COZUM ORTAGI STANDARTI */}
+      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-100">
+        <div className="max-w-[1280px] mx-auto px-6 h-[64px] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-black rounded-xl flex items-center justify-center text-white font-black text-[10px]">HUG</div>
+            <div className="h-6 w-px bg-zinc-200" />
+            <span className="text-[13px] font-semibold tracking-tight">Proje Odaklı Yapı Malzemeleri Ekosistemi</span>
           </div>
-          <p className="mt-3 text-[11px] text-zinc-500">Kategori • Ürün Entegrasyonu • Kampanya • Proje Bazlı Satış</p>
+          <Link href="/hug-market/cozum-ortagi" className="text-[12px] font-bold px-4 py-2 rounded-full bg-black text-white">Çözüm Ortağı Ol</Link>
         </div>
-        <div className="relative h-[380px] bg-zinc-100 rounded-[24px] overflow-hidden border">
-          {/* %100 UYUMLU - cat.imageFile kullanıyoruz, slug ile aynı! */}
-          <img
-            src={`/assets/hug/${cat.imageFile}`}
-            alt={`${city.name} ${cat.name}`}
-            className="w-full h-full object-cover absolute inset-0"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          <div className="absolute bottom-0 p-4 z-10 text-white text-[12px] tracking-wide">Gerçek proje • Gerçek ihtiyaç • Gerçek usta • {cat.imageFile}</div>
+      </div>
+
+      {/* 1. HERO - SIYAH PREMIUM - COZUM ORTAGI ILE AYNI */}
+      <section className="bg-[#0a0a0a] text-white relative overflow-hidden">
+        <div className="max-w-[1280px] mx-auto px-6 py-16 lg:py-24 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+          <div>
+            <div className="inline-flex items-center rounded-full bg-[#1a0a0f] border border-[#2a1520] px-4 py-1.5 text-[10px] tracking-widest text-[#ff2a5a] uppercase font-bold">
+              MARKANIZ İÇİN YENİ DİJİTAL KANAL • {city.name.toUpperCase()} • {cat.shortName.toUpperCase()}
+            </div>
+            <h1 className="mt-6 text-[40px] lg:text-[64px] leading-[0.9] font-black tracking-[-0.04em]">
+              {city.name}’da<br />
+              {cat.shortName}’ı<br />
+              <span className="text-[#ff214f]">Doğru Proje</span> ile<br />
+              Buluşturun
+            </h1>
+            <p className="mt-6 text-[16px] lg:text-[18px] leading-[1.6] text-zinc-400 max-w-[520px]">
+              {city.name}’daki tadilat ve yenileme projelerinde {cat.heroDesc}. <span className="text-white">© HUG MARKET Çözüm Ortaklığı</span> ile markanız ihtiyaç anında, sahada ürünü kullanan usta ile buluşur. Reklam değil, ihtiyacın içinde yer alın.
+            </p>
+            <div className="mt-8 flex gap-3">
+              <Link href="/hug-market/cozum-ortagi" className="bg-[#ff214f] hover:bg-[#e01d46] text-white px-7 py-3.5 rounded-full text-[14px] font-bold transition">Çözüm Ortağı Ol</Link>
+              <Link href={`/hug-market/${city.slug}`} className="border border-white/20 hover:bg-white/10 px-7 py-3.5 rounded-full text-[14px] font-bold transition">Markanızın Yolculuğu</Link>
+            </div>
+            <div className="mt-6 flex gap-2 text-[10px] tracking-widest uppercase text-zinc-500">
+              <span className="bg-white/10 px-3 py-1 rounded-full">Kategori</span>
+              <span className="bg-white/10 px-3 py-1 rounded-full">Ürün Entegrasyonu</span>
+              <span className="bg-white/10 px-3 py-1 rounded-full">Proje Bazlı</span>
+            </div>
+          </div>
+
+          {/* HERO IMAGE - KÜÇÜLTÜLMÜŞ, KONTROLLÜ - ASLA DEV DEĞİL */}
+          <div className="relative">
+            <div className="relative h-[380px] lg:h-[480px] rounded-[32px] overflow-hidden border border-white/10 bg-zinc-900">
+              <img
+                src={`/assets/hug/${cat.imageFile}`}
+                alt={`${city.name} ${cat.name}`}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+                <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] tracking-widest uppercase text-white/80 border border-white/10">
+                  GERÇEK PROJE • GERÇEK İHTİYAÇ • {cat.imageFile}
+                </div>
+                <div className="bg-white text-black px-3 py-1.5 rounded-full text-[11px] font-bold">HUG MARKET</div>
+              </div>
+            </div>
+            {/* Glow */}
+            <div className="absolute -inset-4 bg-[#ff214f]/20 blur-[60px] -z-10 rounded-[40px]" />
+          </div>
         </div>
       </section>
 
-      {/* 2. NEDEN BU KATEGORİ */}
-      <section className="max-w-[1280px] mx-auto px-6 py-10 grid lg:grid-cols-2 gap-8">
-        <div className="bg-white border rounded-[20px] p-7">
-          <h2 className="text-[22px] font-bold">Neden bu kategori?</h2>
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            {cat.why.map(w => (
-              <div key={w} className="bg-[#f6f6f3] rounded-xl px-4 py-3 text-sm font-medium">{w}</div>
-            ))}
+      {/* 2. NEDEN BU KATEGORI - 4 KART PREMIUM */}
+      <section className="max-w-[1280px] mx-auto px-6 py-16">
+        <div className="flex justify-between items-end">
+          <div>
+            <h2 className="text-[28px] lg:text-[36px] font-black tracking-tight">Neden bu kategori?</h2>
+            <p className="mt-2 text-zinc-500 text-[15px]">Reklam alanı değil, ürün ihtiyacının doğal parçası olun.</p>
           </div>
-          <div className="mt-6 text-[14px] leading-6 text-zinc-600 bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <b>Ürününüz ihtiyaç anında karşısına çıksın.</b><br/>
-            Müşteri işini oluşturur → usta projeye dahil olur → HugAI ihtiyaç listesini oluşturur → HUG MARKET uygun ürünleri eşleştirir.<br/>
-            <span className="text-[12px] text-zinc-500">Bu sayfanın ticari mantığı burada. Resim: {cat.imageFile}</span>
-          </div>
+          <div className="hidden lg:block text-[12px] text-zinc-400">{city.name} • {cat.name} • 4 Temel Dinamik</div>
         </div>
-        <div className="bg-black text-white rounded-[20px] p-7">
-          <h3 className="text-[18px] font-bold">Bu kategoride ürününüzün konumlandığı an</h3>
-          <ul className="mt-4 space-y-2 text-[14px] text-zinc-300">
-            <li>• Müşteri "{city.name} {cat.shortName}" için ilan açar</li>
-            <li>• Sistem proje kapsamını analiz eder</li>
-            <li>• Usta teklifiyle birlikte malzeme ihtiyacı netleşir</li>
-            <li>• Sizin ürününüz o ihtiyaç listesinde önerilir</li>
-          </ul>
-          <div className="mt-6 text-[12px] tracking-widest uppercase text-zinc-400">REKLAM DEĞİL, İHTİYAÇ EŞLEŞMESİ</div>
+
+        <div className="mt-8 grid lg:grid-cols-4 gap-4">
+          {cat.why.map((w, i) => (
+            <div key={w} className="bg-white border border-zinc-100 rounded-[20px] p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition">
+              <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white font-black text-[12px]">0{i+1}</div>
+              <div className="mt-4 font-bold text-[16px]">{w}</div>
+              <div className="mt-2 text-[13px] text-zinc-500 leading-[1.5]">Bu proje tipinde ustalar aktif olarak malzeme önerir, HUG MARKET tam bu anda devreye girer.</div>
+              <div className="mt-4 text-[11px] tracking-widest uppercase text-zinc-400">© HUG MARKET • İhtiyaç Anı</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Ticari Mantık Kutusu */}
+        <div className="mt-6 bg-[#fff8e6] border border-amber-200 rounded-[20px] p-6 flex flex-col lg:flex-row gap-4 items-start">
+          <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-white font-bold text-[14px] shrink-0">!</div>
+          <div>
+            <div className="font-bold text-[14px]">Ürününüz ihtiyaç anında karşısına çıksın.</div>
+            <div className="text-[13px] text-zinc-600 mt-1">Müşteri işini oluşturur → usta projeye dahil olur → HugAI ihtiyaç listesini oluşturur → HUG MARKET uygun ürünleri eşleştirir.</div>
+            <div className="text-[11px] text-zinc-400 mt-2">Bu sayfanın ticari mantığı burada. Görsel referans: {cat.imageFile}</div>
+          </div>
         </div>
       </section>
 
-      {/* 3. NASIL ÇALIŞIR */}
-      <section className="max-w-[1280px] mx-auto px-6 py-6">
-        <h2 className="text-[26px] font-black">Nasıl çalışır?</h2>
-        <div className="mt-6 grid lg:grid-cols-4 gap-4">
+      {/* 3. KONUM & REKLAM DEGIL BANDI - 2'LI PREMIUM KART */}
+      <section className="max-w-[1280px] mx-auto px-6 grid lg:grid-cols-2 gap-4">
+        <div className="bg-white border border-zinc-100 rounded-[24px] p-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">👁️</div>
+            <div className="font-bold text-[18px]">İhtiyaç Anında Görünürlük</div>
+          </div>
+          <p className="mt-4 text-[14px] text-zinc-600 leading-[1.6]">Bir reklam alanında değil, gerçek bir işin içinde görünür olun. <span className="text-[#ff214f] font-bold">© HUG MARKET</span>’teki yolculuk, ürünle değil ihtiyaçla başlar.</p>
+          <div className="mt-6 space-y-2">
+            <div className="bg-[#f6f6f3] rounded-xl px-4 py-3 text-[13px] flex gap-2"><span className="text-zinc-400">•</span> Müşteri "{city.name} {cat.shortName}" için ilan açar</div>
+            <div className="bg-[#f6f6f3] rounded-xl px-4 py-3 text-[13px] flex gap-2"><span className="text-zinc-400">•</span> Sistem proje kapsamını analiz eder</div>
+            <div className="bg-[#f6f6f3] rounded-xl px-4 py-3 text-[13px] flex gap-2"><span className="text-zinc-400">•</span> Usta teklifiyle birlikte malzeme ihtiyacı netleşir</div>
+            <div className="bg-black text-white rounded-xl px-4 py-3 text-[13px] flex gap-2"><span className="text-[#ff214f]">•</span> Sizin ürününüz o ihtiyaç listesinde önerilir</div>
+          </div>
+        </div>
+
+        <div className="bg-black text-white rounded-[24px] p-8 relative overflow-hidden">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">⚙️</div>
+            <div className="font-bold text-[18px]">Usta + Müşteri Eşleşmesi</div>
+          </div>
+          <p className="mt-4 text-[14px] text-zinc-400 leading-[1.6]"><span className="text-[#ff214f] font-bold">© Hemen Ustam Gelsin</span>’de müşteri işini oluşturur, usta teklifiyle projeye dahil olur. İş alındığında ise ihtiyaç duyulan ürünler ve malzemeler belirlenir.</p>
+          <div className="mt-6 bg-white/5 border border-white/10 rounded-xl p-4 text-[13px] text-zinc-300">
+            <span className="text-[#ff214f] font-bold">© HUG MARKET</span>, tam bu noktada devreye girerek projeyi, ustayı ve doğru ürünü aynı ekosistemde buluşturur. Böylece marka yalnızca ürünüyle değil, ürünü uygulayan usta ve gerçek proje üzerinden oluşan ihtiyaçla buluşur.
+          </div>
+          <div className="mt-8 inline-flex bg-[#ff214f] px-4 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase">REKLAM DEĞİL, İHTİYAÇ EŞLEŞMESİ</div>
+        </div>
+      </section>
+
+      {/* 4. NASIL CALISIR - 01-04 TIMELINE - COZUM ORTAGI ILE AYNI */}
+      <section className="max-w-[1280px] mx-auto px-6 py-16">
+        <h2 className="text-[28px] font-black tracking-tight">Markanızın Yolculuğu</h2>
+        <p className="text-zinc-500 text-[14px] mt-1">Markanız © HUG MARKET’te bir reklam alanında değil, gerçek bir projenin ihtiyaç listesinde yer alır.</p>
+
+        <div className="mt-10 grid lg:grid-cols-4 gap-6 relative">
+          {/* çizgi */}
+          <div className="hidden lg:block absolute top-[32px] left-[8%] right-[8%] h-px bg-zinc-200" />
           {[
-            { n: "01", t: "Proje Oluşur", d: "Müşteri yapılacak işi tanımlar." },
-            { n: "02", t: "Usta Eşleşir", d: "Usta projeyi üstlenir." },
-            { n: "03", t: "HugAI İhtiyacı Belirler", d: "Proje için gerekli malzeme listesi oluşturulur." },
-            { n: "04", t: "Marka & Ürün Eşleşir", d: "HUG MARKET'teki uygun ürünler projeye dahil edilir." },
+            { n: "01", t: "İhtiyaç Doğar", sub: "- Müşteri", d: "Hemen Ustam Gelsin’de ilan oluşturulur" },
+            { n: "02", t: "Eşleşme Olur", sub: "- Usta + Hemen Ustam Gelsin", d: "Ustalar bu ilana teklif verir" },
+            { n: "03", t: "HugAI Sepeti Hazırlar", sub: "", d: "Projenin ihtiyaç listesi hazırlanır" },
+            { n: "04", t: "HUG MARKET", sub: "Markayı Gösterir", d: "Ürününüz bu ihtiyacın içinde konumlanır" },
           ].map(s => (
-            <div key={s.n} className="bg-white border rounded-[20px] p-6">
-              <div className="text-[32px] font-black text-zinc-200">{s.n}</div>
-              <div className="mt-2 font-bold">{s.t}</div>
-              <div className="mt-1 text-sm text-zinc-600">{s.d}</div>
+            <div key={s.n} className="relative">
+              <div className="w-[64px] h-[64px] bg-black text-white rounded-full flex items-center justify-center font-black text-[18px] border-4 border-white shadow-[0_0_0_1px_#eee]">{s.n}</div>
+              <div className="mt-4 h-1 w-8 bg-[#ff214f] rounded-full" />
+              <div className="mt-3 font-bold text-[15px]">{s.t}</div>
+              <div className="text-[12px] text-zinc-500">{s.sub}</div>
+              <div className="mt-2 text-[13px] text-zinc-600">{s.d}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 4. MARKANIZ BURADA NE KAZANIYOR */}
-      <section className="max-w-[1280px] mx-auto px-6 py-10">
-        <h2 className="text-[26px] font-black">Markanız burada ne kazanıyor?</h2>
-        <div className="mt-6 grid lg:grid-cols-4 gap-4">
-          <div className="bg-white border rounded-[20px] p-6"><div className="font-bold">Gerçek İhtiyaç</div><div className="mt-2 text-sm text-zinc-600">Reklam gösterimi değil, gerçek proje ihtiyacı.</div></div>
-          <div className="bg-white border rounded-[20px] p-6"><div className="font-bold">Usta Erişimi</div><div className="mt-2 text-sm text-zinc-600">Ürünü uygulayan profesyonelle aynı ekosistem.</div></div>
-          <div className="bg-white border rounded-[20px] p-6"><div className="font-bold">Kategori Konumlandırması</div><div className="mt-2 text-sm text-zinc-600">Markanız ilgili ürün kategorisinde konumlanır.</div></div>
-          <div className="bg-white border rounded-[20px] p-6"><div className="font-bold">Ölçülebilir Satış</div><div className="mt-2 text-sm text-zinc-600">Görüntüleme, etkileşim ve satış performansı takip edilebilir.</div></div>
-        </div>
-      </section>
+      {/* 5. IS BIRLIGI MODELLERI - SIYAH BANT */}
+      <section className="bg-[#0a0a0a] text-white">
+        <div className="max-w-[1280px] mx-auto px-6 py-16">
+          <h2 className="text-[32px] font-black tracking-tight">İş Birliği Modelleri</h2>
+          <p className="text-zinc-400 text-[14px] mt-2">Reklam değil, projenin içinde yer alın. Marka niyetine göre konumlanın.</p>
 
-      {/* 5. BU SAYFA NEDEN VAR */}
-      <section className="max-w-[1280px] mx-auto px-6">
-        <div className="bg-[#f0efe9] border rounded-[20px] p-7">
-          <h3 className="font-bold">{city.name}'da kategori bazlı çözüm ortaklığı</h3>
-          <p className="mt-2 text-sm text-zinc-600 max-w-3xl">HUG MARKET, yapı malzemeleri markalarını yalnızca reklam alanlarında değil, gerçek projelerin ürün ihtiyacında konumlandırmayı hedefler. Bu sayfa, <b>{city.name} + {cat.name}</b> odağında çözüm ortaklığı fırsatını tanımlar.</p>
-        </div>
-      </section>
+          <div className="mt-8 grid lg:grid-cols-3 gap-4">
+            <div className="bg-white text-black rounded-[24px] p-7 border-2 border-[#ff214f] relative">
+              <div className="flex justify-between items-start">
+                <div className="text-[#ff214f] font-black text-[14px]">01</div>
+                <div className="bg-[#ff214f] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">POPÜLER</div>
+              </div>
+              <div className="mt-3 font-black text-[16px] uppercase">KATEGORİ LİDERLİĞİ</div>
+              <div className="text-[12px] text-zinc-500">Kategori Sahipliği - En kapsamlı model</div>
+              <div className="mt-6 space-y-3 text-[13px]">
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> Kategori sahipliği & görünürlüğü</div>
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> HugAI Sepet Entegrasyonu</div>
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> Ürün görünürlüğü</div>
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> Banner alanı</div>
+              </div>
+            </div>
 
-      {/* 6. ÜRÜN ALANLARI */}
-      <section className="max-w-[1280px] mx-auto px-6 py-10">
-        <h2 className="text-[22px] font-bold">{cat.name} Ürün Alanları</h2>
-        <div className="mt-4 grid lg:grid-cols-3 gap-3">
-          {cat.productAreas.map(p => (
-            <div key={p} className="bg-white border rounded-xl px-4 py-3 text-sm flex justify-between"><span>{p}</span><span className="text-zinc-400">→</span></div>
-          ))}
-        </div>
-      </section>
+            <div className="bg-white/[0.06] border border-white/10 rounded-[24px] p-7">
+              <div className="text-[#ff214f] font-black text-[14px]">02</div>
+              <div className="mt-3 font-black text-[16px] uppercase">PROJE & ÜRÜN ENTEGRASYONU</div>
+              <div className="text-[12px] text-zinc-400">Satış odaklı - Projenin içinde yer alın</div>
+              <div className="mt-6 space-y-3 text-[13px] text-zinc-300">
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> HugAI Sepet Entegrasyonu</div>
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> Proje bazlı ürün konumlandırması</div>
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> Usta odaklı satış & prim</div>
+              </div>
+            </div>
 
-      {/* 7. KATEGORİ LİDERİ */}
-      <section className="max-w-[1280px] mx-auto px-6">
-        <div className="bg-white border-2 border-black rounded-[24px] p-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div><h3 className="text-[20px] font-black">Bu kategorinin çözüm ortağı olmak ister misiniz?</h3><p className="text-sm text-zinc-600 mt-1">HUG MARKET'te [{city.name} / {cat.name}] kategorisinde ürünlerinizi proje bazlı satış modeline dahil edin.</p></div>
-          <Link href="/hug-market/cozum-ortagi" className="bg-black text-white px-6 py-3 rounded-full text-sm font-bold whitespace-nowrap">Çözüm Ortağı Başvurusu →</Link>
-        </div>
-      </section>
-
-      {/* 8. ŞEHİR HUB */}
-      <section className="max-w-[1280px] mx-auto px-6 py-10">
-        <h3 className="font-bold">{city.name}'da HUG MARKET</h3>
-        <div className="mt-4">
-          <div className="text-[12px] uppercase tracking-widest text-zinc-500">{city.name}'da HUG MARKET Kategorileri ({hugCats.length} Kategori)</div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {hugCats.map(c => (
-              <Link key={c.slug} href={`/hug-market/${city.slug}/${c.slug}`} className={`px-3 py-1.5 rounded-full border text-[13px] ${c.slug===cat.slug?'bg-black text-white border-black':'bg-white'}`}>{c.name}</Link>
-            ))}
+            <div className="bg-white/[0.06] border border-white/10 rounded-[24px] p-7">
+              <div className="text-[#ff214f] font-black text-[14px]">03</div>
+              <div className="mt-3 font-black text-[16px] uppercase">MARKA & KAMPANYA GÖRÜNÜRLÜĞÜ</div>
+              <div className="text-[12px] text-zinc-400">Bilinirlik odaklı - Premium görünürlük</div>
+              <div className="mt-6 space-y-3 text-[13px] text-zinc-300">
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> Ana sayfa görünürlüğü</div>
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> HUG banner & kategori banner</div>
+                <div className="flex gap-2"><span className="text-[#ff214f]">✓</span> Kampanya alanları & yönlendirmesi</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 9. B2B CTA */}
-      <section className="max-w-[1280px] mx-auto px-6 pb-16">
-        <div className="bg-black text-white rounded-[32px] p-10 text-center">
-          <h2 className="text-[32px] font-black leading-tight">Markanızı HUG MARKET'e Dahil Edin</h2>
-          <p className="mt-3 text-zinc-300 max-w-2xl mx-auto">Ürünlerinizi gerçek projeler, profesyonel ustalar ve ihtiyaç bazlı satın alma akışıyla buluşturmak için çözüm ortaklığı başvurunuzu oluşturun.</p>
-          <Link href="/hug-market/cozum-ortagi" className="mt-6 inline-block bg-white text-black px-8 py-3 rounded-full font-bold">ÇÖZÜM ORTAĞI BAŞVURUSU</Link>
-          <div className="mt-4 text-[11px] tracking-widest text-zinc-500 uppercase">Kategori • Ürün Entegrasyonu • Kampanya • Proje Bazlı Satış • {cat.imageFile}</div>
+      {/* 6. URUN ALANLARI - PILLS */}
+      <section className="max-w-[1280px] mx-auto px-6 py-16">
+        <h2 className="text-[24px] font-black">{city.name} {cat.name} Ürün Alanları</h2>
+        <div className="mt-6 grid lg:grid-cols-3 gap-3">
+          {cat.productAreas.map(p => (
+            <div key={p} className="bg-white border border-zinc-100 rounded-full px-5 py-3.5 text-[14px] flex justify-between items-center hover:bg-black hover:text-white transition cursor-pointer group">
+              <span className="font-medium">{p}</span><span className="text-zinc-400 group-hover:text-white">→</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 7. HANGI KATEGORILER - PILL CLOUD - COZUM ORTAGI ILE AYNI */}
+      <section className="max-w-[1280px] mx-auto px-6 pb-10">
+        <h2 className="text-[20px] font-bold text-zinc-400">Hangi kategoriler?</h2>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {hugCats.map(c => (
+            <Link key={c.slug} href={`/hug-market/${city.slug}/${c.slug}`} className={`px-4 py-2 rounded-full border text-[13px] font-medium transition ${c.slug===cat.slug?'bg-black text-white border-black':'bg-[#f5f5f4] border-transparent hover:bg-black hover:text-white text-zinc-600'}`}>
+              {c.name}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 8. FINAL CTA - SIYAH DEV */}
+      <section className="max-w-[1280px] mx-auto px-6 pb-20">
+        <div className="bg-black text-white rounded-[32px] p-10 lg:p-14 text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#ff214f22,transparent_60%)]" />
+          <div className="relative">
+            <h2 className="text-[36px] lg:text-[48px] font-black leading-[0.95] tracking-tight">Markanızı HUG<br/>MARKET’e Dahil Edin</h2>
+            <p className="mt-4 text-zinc-400 max-w-2xl mx-auto text-[15px]">Ürünlerinizi gerçek projeler, profesyonel ustalar ve ihtiyaç bazlı satın alma akışıyla buluşturmak için çözüm ortaklığı başvurunuzu oluşturun.</p>
+            <Link href="/hug-market/cozum-ortagi" className="mt-8 inline-block bg-white text-black px-10 py-4 rounded-full font-bold text-[14px] hover:bg-zinc-100 transition">ÇÖZÜM ORTAĞI BAŞVURUSU</Link>
+            <div className="mt-6 text-[10px] tracking-[0.2em] text-zinc-500 uppercase">Kategori • Ürün Entegrasyonu • {cat.imageFile}</div>
+          </div>
         </div>
       </section>
     </main>
