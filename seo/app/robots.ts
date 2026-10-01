@@ -11,6 +11,10 @@ export default function robots() {
     sitemap: [
       'https://hemenustamgelsin.com/sitemap.xml',
       'https://hemenustamgelsin.com/usta-sitemap.xml',
+      'https://hemenustamgelsin.com/hug-market-sitemap.xml',
+      'https://hemenustamgelsin.com/llms.txt',
+      'https://hemenustamgelsin.com/llms-full.txt',
+      'https://hemenustamgelsin.com/llms-hug-full.txt',
     ],
   }
 }

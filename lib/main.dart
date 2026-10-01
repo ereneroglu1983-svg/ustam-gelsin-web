@@ -1,4 +1,4 @@
-// lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX
+// lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX + HUG MARKET ROUTE FIX
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +25,30 @@ import 'package:ustam_gelsin/services/yorum_service.dart';
 import 'package:ustam_gelsin/features/admin/screens/blog_ekle_screen.dart';
 import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
 
+// HUG MARKET IMPORTLARI EKLENDI
+import 'package:ustam_gelsin/features/hug_market/hug_market_homepage.dart';
+import 'package:ustam_gelsin/features/hug_market/sepet_sayfasi.dart';
+import 'package:ustam_gelsin/features/hug_market/siparis_takip_sayfasi.dart';
+import 'package:ustam_gelsin/features/hug_market/cozum_ortagi_page.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/mutfak_banyo.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/temizlik.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/elektrik.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/hirdavat.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/peyzaj.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/su_tesisat.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/yapi_malzemeleri.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/boya.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/cati.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/havuz.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/iklimlendirme.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/seramik.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/yalitim.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/yenilenebilir.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/cam_aluminyum.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/kapi_kilit.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/guvenlik.dart';
+import 'package:ustam_gelsin/features/hug_market/kategoriler/asansor.dart';
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -50,6 +74,43 @@ final GoRouter _router = GoRouter(
         return RehberDetayScreen(slug: slug);
       },
     ),
+    // HUG MARKET - BURASI EKLENDI - ARTIK 404 VERMEYECEK
+    GoRoute(
+      path: '/hug-market',
+      builder: (c, s) => const HugMarketHomepage(),
+      routes: [
+        GoRoute(path: 'sepet', builder: (c, s) => const SepetSayfasi()),
+        GoRoute(path: 'siparis-takip', builder: (c, s) => const SiparisTakipSayfasi()),
+        GoRoute(path: 'cozum-ortagi', builder: (c, s) => const CozumOrtagiPage()),
+        GoRoute(
+          path: 'kategori/:slug',
+          builder: (c, s) {
+            final slug = s.pathParameters['slug']!;
+            switch (slug) {
+              case 'banyo-mutfak': return const MutfakBanyoKategoriPage();
+              case 'temizlik': return const TemizlikKategoriPage();
+              case 'elektrik': return const ElektrikKategoriPage();
+              case 'hirdavat': return const HirdavatKategoriPage();
+              case 'peyzaj': return const PeyzajKategoriPage();
+              case 'tesisat-su': return const TesisatKategoriPage();
+              case 'yapi-malzemeleri': return const YapiMalzemeleriKategoriPage();
+              case 'boya-dekorasyon': return const BoyaDekorasyonKategoriPage();
+              case 'cati-cephe': return const CatiCepheKategoriPage();
+              case 'havuz-spa': return const HavuzSpaKategoriPage();
+              case 'iklimlendirme': return const IsitmaSogutmaKategoriPage();
+              case 'seramik-fayans': return const SeramikFayansKategoriPage();
+              case 'yalitim-izolasyon': return const YalitimIzolasyonKategoriPage();
+              case 'yenilenebilir-enerji': return const YenilenebilirEnerjiKategoriPage();
+              case 'cam-aluminyum': return const CamAluminyumKategoriPage();
+              case 'kapi-kilit': return const KapiKilitKategoriPage();
+              case 'guvenlik-yangin-zayif-akim': return const GuvenlikKategoriPage();
+              case 'asansor-yuruyen-merdiven': return const AsansorKategoriPage();
+              default: return const HugMarketHomepage();
+            }
+          },
+        ),
+      ],
+    ),
   ],
 );
 
@@ -64,18 +125,13 @@ void _handleNotificationClick(RemoteMessage message) {
   }
 }
 
-// --- YENİ: runApp SONRASI ARKA PLANDA ÇALIŞACAK AĞIR İŞLER ---
 Future<void> _initializeServicesInBackground() async {
-  // 1. Yorumları arka planda yükle, ana thread'i kitlemeden
   try {
     await YorumService.loadData();
   } catch (e) {
     debugPrint("YorumService yükleme hatası: $e");
   }
-
   if (kIsWeb) return;
-
-  // 2. AppCheck'i arka planda aktive et, bekletme
   if (!kDebugMode) {
     try {
       await FirebaseAppCheck.instance.activate(
@@ -84,12 +140,9 @@ Future<void> _initializeServicesInBackground() async {
       );
     } catch (_) {}
   }
-
-  // 3. Bildirim servisleri
   try {
     await NotificationService().initialize();
     await FirebaseMessaging.instance.subscribeToTopic('acil_cagri_ustalar').catchError((_) {});
-
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       Future.delayed(const Duration(seconds: 1), () => _handleNotificationClick(initialMessage));
@@ -108,23 +161,18 @@ void main() async {
   if (!kIsWeb) {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
-
-  // SADECE Firebase'i bekle, gerisini bekleme! Bu 300ms sürer.
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     debugPrint("✅ Firebase başlatıldı");
     if (kIsWeb) {
       await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
     }
-    // Background handler'ı erken set et, hafiftir
     if (!kIsWeb) {
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     }
   } catch (e) {
     debugPrint("Firebase Hatası: $e");
   }
-
-  // HEMEN EKRANI ÇİZ - 7 tane await'i beklemeden runApp!
   runApp(
     MultiProvider(
       providers: [
@@ -133,8 +181,6 @@ void main() async {
       child: const MyApp(),
     ),
   );
-
-  // Ağır işleri runApp'ten SONRA arka planda başlat
   unawaited(_initializeServicesInBackground());
 }
 
@@ -172,7 +218,6 @@ class _SplashWrapperState extends State<SplashWrapper> {
         if (mounted) context.go('/home');
       });
     } else {
-      // İlk frame çizildikten SONRA splash'i kaldır - beyaz ekranı bitirir
       WidgetsBinding.instance.addPostFrameCallback((_) {
         FlutterNativeSplash.remove();
       });
@@ -203,7 +248,6 @@ class _AuthGateState extends State<AuthGate> {
     if (!kIsWeb) {
       FirebaseAuth.instance.authStateChanges().listen((user) async {
         if (user != null) {
-          // Mesaj dinlemeyi de gecikmeli başlat
           Future.microtask(() => ChatService().yeniMesajlariDinle());
         }
       });

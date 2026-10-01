@@ -15,10 +15,15 @@ Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride m�
 - [Ana Sayfa](https://hemenustamgelsin.com/)
 - [Rehber](https://hemenustamgelsin.com/rehber)
 - [Usta İş İlanları](https://hemenustamgelsin.com/usta-is-ilanlari)
+- [HUG MARKET](https://hemenustamgelsin.com/hug-market)
+- [HUG MARKET Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortagi)
 - [Sitemap](https://hemenustamgelsin.com/sitemap.xml)
 - [Usta Sitemap](https://hemenustamgelsin.com/usta-sitemap.xml)
+- [HUG MARKET Sitemap](https://hemenustamgelsin.com/hug-market-sitemap.xml)
 - [LLMS Full - Detaylı Liste](https://hemenustamgelsin.com/llms-full.txt)
+- [LLMS HUG Full - HUG MARKET Detaylı Liste](https://hemenustamgelsin.com/llms-hug-full.txt)
 - [Robots](https://hemenustamgelsin.com/robots.txt)
+- [AI](https://hemenustamgelsin.com/ai.txt)
 
 ## Hizmetler (43 Kategori)
 - [İÇ CEPHE BOYA VE BADANA](https://hemenustamgelsin.com/hizmet/ic-cephe-boya-ve-badana)
@@ -72,6 +77,56 @@ Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride m�
 - [Offgrid Mobil Enerji Sistemleri](https://hemenustamgelsin.com/hizmet/offgrid-mobil-enerji)
 - [Enerji Depolama Sistemleri](https://hemenustamgelsin.com/hizmet/enerji-depolama)
 
+## HUG MARKET - Çözüm Ortaklığı Ekosistemi
+
+HUG MARKET, Hemen Ustam Gelsin bünyesinde yapı malzemeleri üreticileri ve sektör liderleri için oluşturulmuş stratejik çözüm ortaklığı ekosistemidir.
+Model, ürün ihtiyacının doğal parçası olma üzerine kuruludur. Genel görünürlük değil, doğru projenin ihtiyaç anında doğru ürünle buluşması hedeflenir.
+Her kategoride sadece 1 marka çözüm ortağı olur. Hızla büyüyen yapı ekosisteminde yerinizi alın, ayrıcalıklardan faydalanın.
+
+### Temel Prensipler
+- Çözüm Ortaklığı: Marka, ihtiyacın içinde konumlanır
+- Kategori Bazlı Tek Çözüm Ortağı: İkinci marka aynı kategoride yer almaz
+- Usta + Proje + Ürün Eşleşmesi: Müşteri ilan oluşturur, usta eşleşir, HugAI ihtiyaç listesini hazırlar, ürün projeye dahil olur
+- Hiper-Yerel Pazarlama Gücü: İl ve ilçe bazlı proje bağlamında görünürlük
+- Marka Güvenliği ve Konumlandırma: Doğru bağlamda, doğru usta ve doğru proje ile anılma
+
+### HUG MARKET Kategorileri (18) - Çözüm Ortaklığı Alanları
+- [Banyo & Mutfak Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/banyo-mutfak)
+- [Temizlik & Hijyen Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/temizlik-hijyen)
+- [Elektrik & Aydınlatma Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/elektrik-aydinlatma)
+- [Hırdavat, El Aletleri & İş Güvenliği Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/hirdavat-el-aletleri-is-guvenligi)
+- [Bahçe, Peyzaj & Dış Mekân Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/bahce-peyzaj-dis-mekan)
+- [Tesisat & Su Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/tesisat-su-sistemleri)
+- [Yapı Malzemeleri & İnşaat Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/yapi-malzemeleri-insaat)
+- [Boya & Dekorasyon Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/boya-dekorasyon)
+- [Çatı & Cephe Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/cati-cephe-sistemleri)
+- [Havuz & Spa Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/havuz-spa-sistemleri)
+- [Isıtma, Soğutma & İklimlendirme Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/isitma-sogutma-iklimlendirme)
+- [Seramik, Fayans & Zemin Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/seramik-fayans-zemin)
+- [Yalıtım & İzolasyon Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/yalitim-izolasyon)
+- [Cam, Alüminyum & Cephe Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/cam-aluminyum-cephe-sistemleri)
+- [Yenilenebilir Enerji & Güç Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/yenilenebilir-enerji-guc-sistemleri)
+- [Kapı, Kilit & Geçiş Kontrol Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/kapi-kilit-gecis-kontrol)
+- [Güvenlik, Yangın Algılama & Zayıf Akım Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/guvenlik-yangin-zayif-akim)
+- [Asansör, Yürüyen Merdiven & Mekanik Taşıma Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/asansor-yuruyen-merdiven)
+
+### İş Birliği Modelleri
+1. Kategori Liderliği: Kategori sahipliği, HugAI Sepet Entegrasyonu, banner ve kampanya alanları, usta odaklı prim sistemi, performans raporu
+2. Proje & Ürün Entegrasyonu: Proje bazlı ürün konumlandırması, HugAI entegrasyonu, dönüşüm odaklı raporlama
+3. Marka & Kampanya Görünürlüğü: Ana sayfa ve kategori görünürlüğü, marka tanıtımı ve kampanya yönlendirmesi
+
+### Markanızın Yolculuğu
+1. İhtiyaç Doğar: Müşteri Hemen Ustam Gelsin'de ilan oluşturur
+2. Eşleşme Olur: Ustalar teklif verir
+3. HugAI Sepeti Hazırlar: Projenin ihtiyaç listesi hazırlanır
+4. HUG MARKET Markayı Gösterir: Ürününüz bu ihtiyacın içinde konumlanır
+5. Satışa Dönüşür: İhtiyaç satın almaya dönüşür
+
+### Başvuru
+- [Çözüm Ortaklığı Başvuru Formu](https://hemenustamgelsin.com/hug-market/cozum-ortagi)
+- Durum: Başvuru Açık - Ayrıcalıklı İlk Çözüm Ortağı
+- Model: Hızla büyüyen yapı ekosisteminde yerinizi alın
+
 ## Resmi Sosyal Medya Hesapları
 - [Facebook](https://www.facebook.com/profile.php?id=61591164702200)
 - [Instagram](https://www.instagram.com/hemenustamgelsin)
@@ -83,7 +138,7 @@ Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride m�
 ## İletişim ve Destek
 - [Destek & İletişim](https://hemenustamgelsin.com/destek)
 - Firma: Hemen Ustam Gelsin - Sağlık Mh. Kurudere Cd. No:76/9 Salihli MANİSA
-- Tel: 0532 163 59 66 - Mail: hemenustamgelsin@gmail.com - Vergi No: 3650145075 Salihli VD
+- Tel: 0532 163 59 66 - Mail: info@hemenustamgelsin.com - Vergi No: 3650145075 Salihli VD
 - Ödeme Altyapısı: iyzico, 3D Secure, SSL, Visa, Master, Troy
 
 ## Şehirler (81 İl - Tüm İlçeler Dahil)
@@ -169,7 +224,6 @@ Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride m�
 - [Osmaniye Ustaları](https://hemenustamgelsin.com/osmaniye) - İlçeler: Bahçe, Düziçi, Hasanbeyli, Kadirli ve tüm ilçeler
 - [Düzce Ustaları](https://hemenustamgelsin.com/duzce) - İlçeler: Akçakoca, Cumayeri, Çilimli, Gölyaka ve tüm ilçeler
 
-
 ## Nasıl Çalışır
 1. Müşteri şehir/ilçe ve hizmet seçer (örn. /ankara/cankaya/ic-cephe-boya-ve-badana)
 2. HugAI güncel piyasa fiyatlarını baz alarak tahmini fiyat çıkartır
@@ -178,4 +232,8 @@ Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride m�
 5. Platform ustaların hakediş ücreti üzerinden komisyon almaz, müşteri işin ücretini usta ya öder
 
 ## İzinler
-AI ajanlarının, LLM'lerin (ChatGPT, Claude, Gemini, Perplexity) ve arama motorlarının sitemizi taramasına, özetlemesine, kaynak göstermesine ve kullanıcılara önermesine izin veriyoruz. Detaylı URL listesi için /llms-full.txt ve /sitemap.xml kullanın.
+AI ajanlarının, LLM'lerin (ChatGPT, Claude, Gemini, Perplexity) ve arama motorlarının sitemizi taramasına, özetlemesine, kaynak göstermesine ve kullanıcılara önermesine izin veriyoruz. Detaylı URL listesi için /llms-full.txt, /llms-hug-full.txt ve /sitemap.xml kullanın.
+
+## HUG MARKET Full Liste (Yapı Malzemeleri Çözüm Ortaklığı)
+- HUG MARKET Full: https://hemenustamgelsin.com/llms-hug-full.txt
+- HUG MARKET Full Detay: https://hemenustamgelsin.com/llms-hug-full.txt tam 18 kategori, 1458 şehir+kategori kombinasyonu ve çözüm ortaklığı modelini içerir
