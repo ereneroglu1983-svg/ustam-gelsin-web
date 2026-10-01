@@ -3,6 +3,7 @@
   <component name="CidrRootsConfiguration">
     <excludeRoots>
       <file path="$PROJECT_DIR$/firebase_functions" />
+      <file path="$PROJECT_DIR$/seo" />
     </excludeRoots>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
