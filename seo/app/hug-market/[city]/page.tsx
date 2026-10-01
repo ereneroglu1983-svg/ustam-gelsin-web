@@ -1,7 +1,9 @@
-// app/hug-market/[city]/page.tsx - ŞEHİR HUB - 81 SAYFA - 18 KATEGORİ - FINAL DÜZELTİLMİŞ + BREADCRUMB SCHEMA
+// app/hug-market/[city]/page.tsx - ŞEHİR HUB - 81 SAYFA - 18 KATEGORİ - FINAL DÜZELTİLMİŞ + BREADCRUMB SCHEMA + LOGO FIX + NOTFOUND + EXPORT FIX
 export const dynamic = 'force-static'
+export const dynamicParams = false
 import { cities } from '../../../data/cities'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import sehirler from '../../../data/sehirler.json'
 import ilceler from '../../../data/ilceler.json'
 
@@ -36,11 +38,14 @@ const hugCats: HugCat[] = [
 ]
 
 export async function generateStaticParams() {
-  return cities.map(c => ({ city: c.slug }))
+  return cities
+  .filter(c => c.slug!== 'cozum-ortagi')
+  .map(c => ({ city: c.slug }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ city: string }> }) {
   const { city: citySlug } = await params
+  if (citySlug === 'cozum-ortagi') return {}
   const city = cities.find(c => c.slug === citySlug)
   if(!city) return {}
   return {
@@ -51,10 +56,21 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
 
 export default async function CityHubPage({ params }: { params: Promise<{ city: string }> }) {
   const { city: citySlug } = await params
-  const city = cities.find(c => c.slug === citySlug)!
 
-  // İlçeleri sehir_id ile eşleştir
-  const sehirData = (sehirler as any[]).find(s => s.sehir_adi.toLowerCase() === city.name.toLowerCase() || s.sehir_adi.toLowerCase().includes(city.name.toLowerCase()))
+  if (citySlug === 'cozum-ortagi') {
+    notFound()
+  }
+
+  const city = cities.find(c => c.slug === citySlug)
+  if (!city) {
+    notFound()
+  }
+
+  // İlçeleri sehir_id ile eşleştir - SAFE
+  const sehirData = (sehirler as any[]).find(s =>
+    s.sehir_adi?.toLowerCase() === city.name.toLowerCase() ||
+    s.sehir_adi?.toLowerCase().includes(city.name.toLowerCase())
+  )
   const sehirId = sehirData?.sehir_id
   const cityIlceler = sehirId? (ilceler as any[]).filter(i => i.sehir_id === sehirId) : []
 
@@ -86,11 +102,28 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
 
   return (
     <main className="bg-[#fbfbf8] text-zinc-900">
-      {/* BREADCRUMB SCHEMA JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
+
+      {/* TOP BAR - LOGO 36PX FIX */}
+      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-100">
+        <div className="max-w- mx-auto px-6 h- flex items-center justify-between overflow-hidden">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center shrink-0" style={{ height: '36px' }}>
+              <img
+                src="/assets/hug/hug_logo.jpg"
+                alt="HUG MARKET"
+                style={{ height: '36px', width: 'auto', maxWidth: '180px', objectFit: 'contain', display: 'block' }}
+              />
+            </div>
+            <div className="h-6 w-px bg-zinc-200 shrink-0" />
+            <span className="text- font-semibold tracking-tight truncate">Proje Odaklı Yapı Malzemeleri Ekosistemi</span>
+          </div>
+          <Link href="/hug-market/cozum-ortagi" className="text- font-bold px-4 py-2 rounded-full bg-black text-white shrink-0">Çözüm Ortağı Ol</Link>
+        </div>
+      </div>
 
       {/* HERO */}
       <section className="max-w- mx-auto px-6 pt-12 pb-8">

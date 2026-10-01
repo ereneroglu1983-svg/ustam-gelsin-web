@@ -8,6 +8,7 @@ import 'stats_view.dart';
 import 'user_view.dart';
 import 'robot_view.dart';
 import 'content_view.dart';
+import 'b2b.dart';
 // YENİ EKLENEN IMPORT: Blog ekleme ekranı
 import 'blog_ekle_screen.dart';
 // YENİ EKLENEN IMPORT: Reklam Board
@@ -51,9 +52,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       const ContentView(),
                       FinansView(),
                       ModerasyonView(),
-                      // YENİ EKLENEN SAYFA: Blog Ekle ekranı
+                      const B2BLeadsAdminPage(), // <-- B2B EKLENDİ
                       BlogEkleScreen(),
-                      // YENİ EKLENEN SAYFA: Reklam Board (HUG MARKET sağ taraf)
                       AdminReklamBoardScreen(),
                     ],
                   ),
@@ -72,9 +72,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
       selectedIndex: _selectedIndex,
       onDestinationSelected: (int index) => setState(() => _selectedIndex = index),
       labelType: NavigationRailLabelType.all,
-      // Seçili olduğunda arka planı Lacivert yapıyoruz (Sarıyı sildik)
       indicatorColor: navyBlue,
-      selectedIconTheme: IconThemeData(color: Colors.white, size: 22),
+      selectedIconTheme: const IconThemeData(color: Colors.white, size: 22),
       unselectedIconTheme: const IconThemeData(color: Colors.grey, size: 20),
       selectedLabelTextStyle: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
       unselectedLabelTextStyle: const TextStyle(color: Colors.grey, fontSize: 11),
@@ -85,9 +84,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
         NavigationRailDestination(icon: Icon(Icons.article_outlined), label: Text("İçerik")),
         NavigationRailDestination(icon: Icon(Icons.account_balance_wallet_outlined), label: Text("Finans")),
         NavigationRailDestination(icon: Icon(Icons.admin_panel_settings_outlined), label: Text("Modere")),
-        // YENİ EKLENEN BUTON: Blog butonu
+        NavigationRailDestination(icon: Icon(Icons.business_center_outlined), label: Text("B2B")), // <-- B2B BUTONU EKLENDİ
         NavigationRailDestination(icon: Icon(Icons.post_add_outlined), label: Text("Blog")),
-        // YENİ EKLENEN BUTON: Reklam Board - HUG MARKET
         NavigationRailDestination(icon: Icon(Icons.campaign_outlined), label: Text("Reklam")),
       ],
     );

@@ -7,6 +7,59 @@ const { onSchedule } = require("firebase-functions/v2/scheduler");
 
 admin.initializeApp();
 
+// ===================== YENİ EKLENEN - B2B BİLDİRİM =====================
+exports.onB2BLeadCreated = onDocumentCreated({ document: 'corporate_leads/{leadId}', region: 'europe-west3' }, async (event) => {
+    try {
+        const data = event.data.data();
+        const leadId = event.params.leadId;
+        if (!data) return null;
+
+        const firma = data.firma || 'Bilinmeyen Firma';
+        const yetkili = data.yetkili || '';
+        const kategoriler = (data.kategoriler || []).join(', ');
+        const isBirlikleri = (data.isBirlikleri || []).join(', ');
+
+        const title = `Yeni B2B Başvurusu: ${firma}`;
+        const body = `${kategoriler} • ${isBirlikleri} • ${yetkili}`.substring(0, 150);
+
+        const message = {
+            topic: 'b2b_admin',
+            notification: { title, body },
+            data: {
+                leadId: String(leadId),
+                firma: String(firma),
+                click_action: 'FLUTTER_NOTIFICATION_CLICK',
+            },
+            android: {
+                priority: 'high',
+                notification: { channelId: 'b2b_leads_channel', priority: 'high', visibility: 'public' },
+            },
+            apns: {
+                payload: { aps: { sound: 'default', badge: 1 } },
+            },
+        };
+
+        await admin.messaging().send(message);
+        console.log(`✅ B2B bildirim gönderildi: ${leadId} - ${firma}`);
+
+        await admin.firestore().collection('admin_notifications').add({
+            type: 'b2b_lead',
+            leadId,
+            firma,
+            yetkili,
+            kategoriler: data.kategoriler || [],
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            read: false,
+        });
+
+        return null;
+    } catch (e) {
+        console.error("❌ B2B bildirim hatası:", e);
+        return null;
+    }
+});
+// ===================== B2B BİTİŞ =====================
+
 // 0. KRİTİK SİSTEM ALARM
 exports.adminKritikAlarm = onDocumentCreated({ document: 'system_alerts/{alertId}', region: 'europe-west3' }, async (event) => {
     try {
@@ -134,7 +187,6 @@ exports.sendSupportNotification = onDocumentCreated({ document: 'admin_messages/
     }
 });
 
-// 8. USTA KABUL EDINCE MUSTERIYE BILDIRIM - TAM FIXLENDI
 exports.ustaIsiKabulEdinceMusteriyeBildir = onDocumentUpdated({ document: 'acil_cagri/{cagriId}', region: 'europe-west3' }, async (event) => {
     const newData = event.data.after.data();
     const previousData = event.data.before.data();
@@ -142,20 +194,14 @@ exports.ustaIsiKabulEdinceMusteriyeBildir = onDocumentUpdated({ document: 'acil_
     console.log(`>>> [TETIKLENDI] ${cagriId} onceki:${previousData.durum} yeni:${newData.durum}`);
     if (previousData.durum === newData.durum) return null;
     if (newData.durum !== 'atandi') return null;
-
-    // FIX: musteri ID artik teknikDetaylar icinde de araniyor
     const customerId = newData.userId || newData.teknikDetaylar?.userId || newData.musteriId || newData.musteri_id || newData.olusturanId || newData.createdBy || newData.ownerId;
-
     const ustaAd = newData.ustaAd || newData.ustaName || "Ustanız";
     const ustaTel = newData.ustaTelefon || newData.ustaTel || newData.ustaPhone || "bilinmiyor";
-
     if (!customerId) {
         console.error(`❌ MUSTERI ID BULUNAMADI cagriId:${cagriId} keys:`, Object.keys(newData));
         return null;
     }
-
     console.log(`>>> MUSTERI ID BULUNDU: ${customerId}`);
-
     try {
       const userDoc = await admin.firestore().collection('users').doc(customerId).get();
       if (!userDoc.exists) {
@@ -165,7 +211,6 @@ exports.ustaIsiKabulEdinceMusteriyeBildir = onDocumentUpdated({ document: 'acil_
       const userData = userDoc.data();
       const fcmToken = userData.fcmToken || userData.fcm_token || userData.token;
       console.log(`>>> USER ${customerId} token var mi: ${!!fcmToken}`);
-
       await admin.firestore().collection('bildirimler').add({
         aliciId: customerId, receiverId: customerId, ustaAd, ustaTelefon: ustaTel,
         baslik: 'İlanınız Kabul Edildi!',
@@ -174,12 +219,10 @@ exports.ustaIsiKabulEdinceMusteriyeBildir = onDocumentUpdated({ document: 'acil_
         okundu: false, olusturulmaTarihi: admin.firestore.FieldValue.serverTimestamp()
       });
       console.log(`✅ bildirimler koleksiyonuna yazildi`);
-
       if (!fcmToken) {
           console.log(`>>> TOKEN YOK, PUSH ATLANIYOR AMA DB YAZILDI`);
           return null;
       }
-
       const message = {
         token: fcmToken,
         notification: { title: 'İlanınız Kabul Edildi!', body: `İlanınız ${ustaAd} tarafından kabul edildi. Az sonra sizi ${ustaTel} numarasıyla arayacak.` },
@@ -216,7 +259,6 @@ exports.adminBakiyeYukle = onCall({ region: "europe-west3" }, async (request) =>
   }
 });
 
-// 10. FIYAT HESAPLAMA MOTORU: GROQ LLAMA 3.1 8B - FULL PROMPTLU
 exports.hesaplaFiyat = onCall({
   region: "europe-west3",
   timeoutSeconds: 20,
@@ -234,28 +276,21 @@ exports.hesaplaFiyat = onCall({
     console.error(">>> GROQ_API_KEY tanımlı değil!");
     throw new HttpsError('internal', 'Sunucu yapılandırma hatası');
   }
-
   const detayString = typeof teknikDetaylar === 'string' ? teknikDetaylar : JSON.stringify(teknikDetaylar || {}, null, 2);
-
   const masterPrompt = `
 Sen Türkiye'de inşaat, tadilat, elektrik, tesisat, kombi, klima ve tüm teknik hizmetlerin piyasa fiyatlarını bilen uzman bir maliyet analiz motorusun.
 Adın: Hemen Ustam Gelsin Yapay Zeka Maliyet Motoru.
-
 GÖREV:
 Aşağıdaki işe göre Türkiye 2026 güncel piyasa koşullarına göre tek bir gerçekçi ortalama fiyat hesapla.
-
 KATEGORİ ID: ${kategoriId || kategoriAdi || 'Belirtilmedi'}
 KATEGORİ ADI: ${kategoriAdi || 'Belirtilmedi'}
 İŞ ADI / BAŞLIK: ${isAdi}
-
 TEKNİK DETAYLAR (TÜMÜNÜ DİKKATE AL):
 ${detayString}
-
 KONUM BİLGİSİ:
 İl ID: ${ilId || 'Belirtilmedi'}
 İlçe ID: ${ilceId || 'Belirtilmedi'}
 Bölge Metni: ${sehirIlce || 'Belirtilmedi'}
-
 KURALLAR:
 - Sadece Türkiye fiyatlarını kullan, USD/EUR kullanma.
 - Açıklama, gerekçe, metin, aralık, TL işareti yazma.
@@ -265,7 +300,6 @@ KURALLAR:
 - Şehir büyükşehir ise %10 artır.
 - Sadece rakam döndür, örnek: 65000
 `;
-
   try {
     const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
       model: "llama-3.1-8b-instant",
@@ -294,7 +328,6 @@ KURALLAR:
   }
 });
 
-// 11. HAFTALIK FIYAT GUNCELLEME ROBOTU - GROQ'A BAGLI
 exports.haftalikFiyatGuncelle = onSchedule({
   schedule: "every saturday 03:00",
   timeZone: "Europe/Istanbul",
