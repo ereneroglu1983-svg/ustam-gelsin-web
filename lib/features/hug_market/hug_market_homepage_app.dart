@@ -125,36 +125,50 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
     if (page!= null) Navigator.push(context, MaterialPageRoute(builder: (_) => page!));
   }
 
+  // --- GERİ TUŞU DÜZELTMESİ ---
+  void _handleBackToMain() {
+    if (Navigator.canPop(context)) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snap) {
-        final isLoggedIn = snap.data!= null;
-        final displayName = snap.data?.email?.split('@').first?? 'Hesabım';
-        final uid = snap.data?.uid;
-
-        return Scaffold(
-          backgroundColor: HugMarketTheme.lightBg,
-          body: CustomScrollView(
-            slivers: [
-              _buildAppBar(),
-              _buildActionBar(isLoggedIn, displayName, uid),
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    _buildHero(),
-                    _buildKategoriBaslikCubugu(),
-                    _buildCategories(),
-                    _buildCozumOrtagiBanner(),
-                    const HugMarketFooter(),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBackToMain();
       },
+      child: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snap) {
+          final isLoggedIn = snap.data!= null;
+          final displayName = snap.data?.email?.split('@').first?? 'Hesabım';
+          final uid = snap.data?.uid;
+
+          return Scaffold(
+            backgroundColor: HugMarketTheme.lightBg,
+            body: CustomScrollView(
+              slivers: [
+                _buildAppBar(),
+                _buildActionBar(isLoggedIn, displayName, uid),
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      _buildHero(),
+                      _buildKategoriBaslikCubugu(),
+                      _buildCategories(),
+                      _buildCozumOrtagiBanner(),
+                      const HugMarketFooter(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -170,9 +184,7 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
         padding: const EdgeInsets.only(left: 12),
         child: Center(
           child: InkWell(
-            onTap: () {
-              if (Navigator.canPop(context)) Navigator.pop(context);
-            },
+            onTap: _handleBackToMain,
             borderRadius: BorderRadius.circular(12),
             child: Container(
               width: 44,
