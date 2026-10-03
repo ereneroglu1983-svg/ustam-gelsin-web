@@ -21,19 +21,8 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
     title,
     description,
     alternates: { canonical },
-    openGraph: {
-      title,
-      description,
-      url: canonical,
-      type: 'website',
-      locale: 'tr_TR',
-      siteName: 'Hemen Ustam Gelsin'
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description
-    },
+    openGraph: { title, description, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' },
+    twitter: { card: 'summary_large_image', title, description },
     robots: { index: true, follow: true }
   }
 }
@@ -82,6 +71,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
       <style>{`
         .hero-grid { display:grid; grid-template-columns:1.2fr 0.8fr; gap:24px; align-items:center; }
         .services-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:12px; }
+        .district-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:10px; }
         .cta-row { display:flex; gap:12px; flex-wrap:wrap; }
         .trust-row { display:flex; gap:16px; color:#78716c; font-size:13px; flex-wrap:wrap; }
         @media (max-width: 900px){
@@ -90,18 +80,15 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
         }
         @media (max-width: 600px){
           .services-grid { grid-template-columns:1fr 1fr; gap:10px; }
+          .district-grid { grid-template-columns:1fr 1fr; gap:8px; }
           .cta-row { flex-direction:column; }
           .cta-row a { width:100%; justify-content:center; }
           .trust-row { gap:10px; font-size:12px; }
         }
       `}</style>
 
-      <section style={{
-        background: 'radial-gradient(1200px 600px at 20% -10%, #fef3c7 0%, transparent 60%), radial-gradient(1000px 500px at 90% 0%, #fee2e2 0%, transparent 60%), #FFFBF5',
-        borderBottom: '1px solid #f5f5f4', padding: '32px 20px 36px'
-      }}>
+      <section style={{ background: 'radial-gradient(1200px 600px at 20% -10%, #fef3c7 0%, transparent 60%), radial-gradient(1000px 500px at 90% 0%, #fee2e2 0%, transparent 60%), #FFFBF5', borderBottom: '1px solid #f5f5f4', padding: '32px 20px 36px' }}>
         <div style={{ maxWidth: 1120, margin: '0 auto' }}>
-
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 22 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #fecaca', padding: '6px 12px', borderRadius: 999, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
               <span style={{ width: 22, height: 22, background: '#dc2626', borderRadius: '50%', display: 'grid', placeItems: 'center', color: 'white', fontSize: 12 }}>✓</span>
@@ -126,55 +113,27 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
                 Geleneksel yöntemde usta, sonuçlanmayabilecek işler için de keşfe gitmek zorunda kalabilir. Bizde müşteri akıllı formla gelir,
                 <b style={{ color: '#111' }}> akıllı fiyat tahmini</b> ile uygun ustayla eşleşir. Yakıt yok, zaman kaybı yok.
               </p>
-
               <div className="cta-row" style={{ marginTop: 22 }}>
-                <a href="https://hemenustamgelsin.com"
-                  style={{
-                    background: '#111', color: 'white', padding: '16px 22px', borderRadius: 12,
-                    fontWeight: 800, fontSize: 16, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10,
-                    boxShadow: '0 10px 20px rgba(0,0,0,0.15)'
-                  }}>
+                <a href="https://hemenustamgelsin.com" style={{ background: '#111', color: 'white', padding: '16px 22px', borderRadius: 12, fontWeight: 800, fontSize: 16, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}>
                   <span style={{ width: 28, height: 28, background: 'white', borderRadius: 8, display: 'grid', placeItems: 'center', color: 'black' }}>→</span>
                   HEMEN İLAN VER
                   <span style={{ opacity: 0.6, fontWeight: 600, fontSize: 13, marginLeft: 4 }}>Ücretsiz teklif al</span>
                 </a>
-                <a href="https://hemenustamgelsin.com/usta-kayit"
-                  style={{
-                    background: 'white', color: '#111', padding: '16px 22px', borderRadius: 12,
-                    fontWeight: 800, fontSize: 16, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10,
-                    border: '1px solid #e7e5e4'
-                  }}>
+                <a href="https://hemenustamgelsin.com/usta-kayit" style={{ background: 'white', color: '#111', padding: '16px 22px', borderRadius: 12, fontWeight: 800, fontSize: 16, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, border: '1px solid #e7e5e4' }}>
                   USTA OL, İŞİNİ BUL
                   <span style={{ fontSize: 13, background: '#fef3c7', padding: '2px 8px', borderRadius: 999 }}>Komisyon yok</span>
                 </a>
               </div>
-
               <div className="trust-row" style={{ marginTop: 18 }}>
-                <span>✓ Hızlı eşleşme</span>
-                <span>✓ Şeffaf fiyat</span>
-                <span>✓ Komisyon yok</span>
-                <span>✓ Ustanın hakedişinden başarı komisyonu alınmaz</span>
+                <span>✓ Hızlı eşleşme</span><span>✓ Şeffaf fiyat</span><span>✓ Komisyon yok</span><span>✓ Ustanın hakedişinden başarı komisyonu alınmaz</span>
               </div>
             </div>
-
             <div style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 16, padding: 16, boxShadow: '0 12px 32px rgba(0,0,0,0.08)' }}>
               <div style={{ fontWeight: 800, fontSize: 13, letterSpacing: 0.5, color: '#444', marginBottom: 12 }}>BİZİM SİSTEM VS GELENEKSEL</div>
               <div style={{ display: 'grid', gap: 10 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}><span style={{ color: '#78716c' }}>Gereksiz Keşif</span><span style={{ fontWeight: 800, color: '#dc2626', textDecoration: 'line-through' }}>Yakıt + Zaman</span></div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}><span style={{ color: '#78716c' }}>Akıllı Form</span><span style={{ fontWeight: 800, color: '#16a34a' }}>Akıllı Tahmin</span></div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}><span style={{ color: '#78716c' }}>Doğru Eşleşme</span><span style={{ fontWeight: 800 }}>Hızlı Sonuç</span></div>
-                <div style={{ height: 1, background: '#f5f5f4', margin: '4px 0' }} />
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <div style={{ flex: 1, background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, padding: 10, textAlign: 'center' }}>
-                    <div style={{ fontWeight: 900, color: '#15803d' }}>Akıllı</div><div style={{ fontSize: 11, color: '#166534' }}>Fiyat Tahmini</div>
-                  </div>
-                  <div style={{ flex: 1, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: 10, textAlign: 'center' }}>
-                    <div style={{ fontWeight: 900 }}>Hızlı</div><div style={{ fontSize: 11, color: '#92400e' }}>Eşleşme</div>
-                  </div>
-                  <div style={{ flex: 1, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: 10, textAlign: 'center' }}>
-                    <div style={{ fontWeight: 900, color: '#991b1b' }}>%0</div><div style={{ fontSize: 11, color: '#991b1b' }}>Komisyon</div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -201,11 +160,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
             if (slug.includes('klima')) icon = '❄'
             if (slug.includes('tavan') || slug.includes('alcipan')) icon = '🏗'
             return (
-              <Link key={j.slug} href={`/${city.slug}/${j.slug}`} style={{
-                background: 'white', border: '1px solid #e7e5e4', borderRadius: 14, padding: 14,
-                textDecoration: 'none', color: '#111', display: 'flex', gap: 12, alignItems: 'center',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
-              }}>
+              <Link key={j.slug} href={`/${city.slug}/${j.slug}`} style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 14, padding: 14, textDecoration: 'none', color: '#111', display: 'flex', gap: 12, alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
                 <div style={{ width: 44, height: 44, borderRadius: 12, background: '#f5f5f4', display: 'grid', placeItems: 'center', fontSize: 20, flexShrink: 0 }}>{icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 11, color: '#a8a29e', fontWeight: 700, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{city.name}</div>
@@ -215,6 +170,19 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
               </Link>
             )
           })}
+        </div>
+
+        <div style={{ marginTop: 36 }}>
+          <h2 style={{ fontSize: 'clamp(18px, 2.5vw, 20px)', fontWeight: 900, margin: '0 0 8px 0' }}>{city.name} İlçeleri</h2>
+          <p style={{ color: '#78716c', fontSize: 13, margin: '0 0 14px 0' }}>{city.name}'da {city.districts.length} ilçede komisyonsuz usta - ilçeni seç</p>
+          <div className="district-grid">
+            {city.districts.map((d) => (
+              <Link key={d.slug} href={`/${city.slug}/${d.slug}`} style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 12, padding: '12px 14px', textDecoration: 'none', color: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, fontSize: 14 }}>{d.name}</span>
+                <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 700 }}>→</span>
+              </Link>
+            ))}
+          </div>
         </div>
 
         <div style={{ marginTop: 28, background: '#111', borderRadius: 16, padding: '18px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>

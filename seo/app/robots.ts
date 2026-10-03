@@ -1,4 +1,4 @@
-// app/robots.ts
+// app/robots.ts - FINAL v2 - llms.txt sitemap listesinden çıkarıldı
 export const dynamic = 'force-static'
 
 export default function robots() {
@@ -12,9 +12,6 @@ export default function robots() {
       'https://hemenustamgelsin.com/sitemap.xml',
       'https://hemenustamgelsin.com/usta-sitemap.xml',
       'https://hemenustamgelsin.com/hug-market-sitemap.xml',
-      'https://hemenustamgelsin.com/llms.txt',
-      'https://hemenustamgelsin.com/llms-full.txt',
-      'https://hemenustamgelsin.com/llms-hug-full.txt',
     ],
   }
 }
