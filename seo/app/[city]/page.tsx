@@ -3,6 +3,7 @@ import { jobs } from '../../data/jobs'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import Breadcrumb from '../../components/Breadcrumb'
 
 export function generateStaticParams() {
   return cities.map((city) => ({
@@ -67,6 +68,10 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
     <main style={{ background: '#FFFBF5', minHeight: '100vh' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
+
+      <div style={{ maxWidth: 1120, margin: '0 auto', padding: '14px 20px 0' }}>
+        <Breadcrumb items={[{ name: `${city.name} Ustaları`, href: `/${city.slug}/` }]} />
+      </div>
 
       <style>{`
         .hero-grid { display:grid; grid-template-columns:1.2fr 0.8fr; gap:24px; align-items:center; }

@@ -7,6 +7,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import UstaLiveGrid from '../../../components/UstaLiveGrid'
+import Breadcrumb from '../../../components/Breadcrumb'
 
 const SLOGAN_LINE1 = "İŞ SENİN, EMEK SENİN, KAZANÇ SENİN."
 const SLOGAN_LINE2 = "ÜYELİK ÜCRETİ YOK. KOMİSYON YOK. SONRADAN KESİNTİ YOK."
@@ -239,7 +240,12 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-    <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}><Link href={`/${city.slug}/`} style={{color:'#78716c', textDecoration:'none'}}>{city.name} Ustaları</Link> <span> / </span> <b style={{color:'#111'}}>{job.name}</b></div>
+    <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0'}}>
+      <Breadcrumb items={[
+        { name: `${city.name} Ustaları`, href: `/${city.slug}/` },
+        { name: `${city.name} ${job.name}`, href: `/${city.slug}/${job.slug}/` }
+      ]} />
+    </div>
     <section style={{ background: `radial-gradient(800px 400px at 15% 0%, ${color}15 0%, transparent 60%), #FFFBF5`, padding:'26px 20px 28px' }}>
      <style>{`@media(max-width:768px){.job-hero{grid-template-columns:1fr!important}.job-content{grid-template-columns:1fr!important}}`}</style>
      <div className="job-hero" style={{maxWidth:1120, margin:'0 auto', display:'grid', gridTemplateColumns:'1.15fr 0.85fr', gap:24}}>
@@ -315,7 +321,12 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
-    <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}><Link href="/" style={{color:'#78716c', textDecoration:'none'}}>Ana Sayfa</Link><span> / </span><Link href={`/${city.slug}/`} style={{color:'#78716c', textDecoration:'none'}}>{cName}</Link><span> / </span><b style={{color:'#111'}}>{dName}</b></div>
+    <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0'}}>
+      <Breadcrumb items={[
+        { name: cName, href: `/${city.slug}/` },
+        { name: dName, href: `/${city.slug}/${district.slug}/` }
+      ]} />
+    </div>
 
     <section style={{maxWidth:1120, margin:'0 auto', padding:'20px 20px 0'}}>
      <div style={{background:'#FFFBF5', border:'1px solid #111', borderRadius:12, padding:'12px 14px', fontSize:13, fontWeight:700, color:'#111'}}>
