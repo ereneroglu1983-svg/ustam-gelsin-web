@@ -1,4 +1,4 @@
-// app/hug-market/[city]/[category]/page.tsx - B2B LANDING AĞI FINAL - LOGO FIX 36PX - REVIZE
+// app/hug-market/[city]/[category]/page.tsx - B2B LANDING - FINAL v5 - TRAILING SLASH + BREADCRUMB SCHEMA
 export const dynamic = 'force-static'
 import { cities } from '../../../../data/cities'
 import Link from 'next/link'
@@ -255,9 +255,21 @@ export default async function Page({ params }: { params: Promise<{ city: string,
   const city = cities.find(c => c.slug === citySlug)!
   const cat = hugCats.find(c => c.slug === catSlug)!
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com/" },
+      { "@type": "ListItem", "position": 2, "name": "HUG MARKET", "item": "https://hemenustamgelsin.com/hug-market/" },
+      { "@type": "ListItem", "position": 3, "name": `${city.name}`, "item": `https://hemenustamgelsin.com/hug-market/${city.slug}/` },
+      { "@type": "ListItem", "position": 4, "name": `${cat.name}`, "item": `https://hemenustamgelsin.com/hug-market/${city.slug}/${cat.slug}/` }
+    ]
+  }
+
   return (
     <main className="bg-[#fcfcfa] text-zinc-900">
-      {/* TOP BAR */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+
       <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-100">
         <div className="max-w- mx-auto px-6 h- flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -267,11 +279,19 @@ export default async function Page({ params }: { params: Promise<{ city: string,
             <div className="h-6 w-px bg-zinc-200 shrink-0" />
             <span className="text- font-semibold tracking-tight">Proje Odaklı Yapı Malzemeleri Ekosistemi</span>
           </div>
-          <Link href="/hug-market/cozum-ortagi" className="text- font-bold px-4 py-2 rounded-full bg-black text-white shrink-0">Çözüm Ortağı Ol</Link>
+          <Link href="/hug-market/cozum-ortagi/" className="text- font-bold px-4 py-2 rounded-full bg-black text-white shrink-0">Çözüm Ortağı Ol</Link>
         </div>
       </div>
 
-      {/* 1. HERO */}
+      <section className="max-w- mx-auto px-6 pt-6">
+        <nav className="text- text-zinc-500 mb-4 flex gap-1 items-center flex-wrap">
+          <Link href="/" className="hover:text-black">Ana Sayfa</Link><span>/</span>
+          <Link href="/hug-market/" className="hover:text-black">HUG MARKET</Link><span>/</span>
+          <Link href={`/hug-market/${city.slug}/`} className="hover:text-black">{city.name}</Link><span>/</span>
+          <span className="text-zinc-900 font-medium">{cat.name}</span>
+        </nav>
+      </section>
+
       <section className="bg-[#0a0a0a] text-white relative overflow-hidden">
         <div className="max-w- mx-auto px-6 py-16 lg:py-24 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
           <div>
@@ -288,7 +308,7 @@ export default async function Page({ params }: { params: Promise<{ city: string,
               {city.name}’daki tadilat ve yenileme projelerinde {cat.heroDesc}. <span className="text-white">© HUG MARKET Çözüm Ortaklığı</span> ile markanız ihtiyaç anında, sahada ürünü kullanan usta ile buluşur. Reklam değil, ihtiyacın içinde yer alın.
             </p>
             <div className="mt-8 flex gap-3">
-              <Link href="/hug-market/cozum-ortagi" className="bg-[#ff214f] hover:bg-[#e01d46] text-white px-7 py-3.5 rounded-full text- font-bold transition">Çözüm Ortağı Ol</Link>
+              <Link href="/hug-market/cozum-ortagi/" className="bg-[#ff214f] hover:bg-[#e01d46] text-white px-7 py-3.5 rounded-full text- font-bold transition">Çözüm Ortağı Ol</Link>
             </div>
             <div className="mt-6 flex gap-2 text- tracking-widest uppercase text-zinc-500">
               <span className="bg-white/10 px-3 py-1 rounded-full">Kategori</span>
@@ -307,7 +327,6 @@ export default async function Page({ params }: { params: Promise<{ city: string,
         </div>
       </section>
 
-      {/* 2. NEDEN BU KATEGORI */}
       <section className="max-w- mx-auto px-6 py-16">
         <div className="flex justify-between items-end">
           <div>
@@ -336,19 +355,18 @@ export default async function Page({ params }: { params: Promise<{ city: string,
         </div>
       </section>
 
-      {/* 3. KONUM & REKLAM DEGIL BANDI */}
       <section className="max-w- mx-auto px-6 grid lg:grid-cols-2 gap-4">
         <div className="bg-white border border-zinc-100 rounded- p-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center">👁</div>
             <div className="font-bold text-">İhtiyaç Anında Görünürlük</div>
           </div>
-          <p className="mt-4 text- text-zinc-600 leading-[1.6]">Bir reklam alanında değil, gerçek bir işin içinde görünür olun. <span className="text-[#ff214f] font-bold">© HUG MARKET</span>’teki yolculuk, ürünle değil ihtiyaçla başlar.</p>
+          <p className="mt-4 text- text-zinc-600 leading-[1.6]">Bir reklam alanında değil, gerçek bir işin içinde görünür olun. <span className="text-[#ff2a5a] font-bold">© HUG MARKET</span>’teki yolculuk, ürünle değil ihtiyaçla başlar.</p>
           <div className="mt-6 space-y-2">
             <div className="bg-[#f6f6f3] rounded-xl px-4 py-3 text- flex gap-2"><span className="text-zinc-400">•</span> Müşteri "{city.name} {cat.shortName}" için ilan açar</div>
             <div className="bg-[#f6f6f3] rounded-xl px-4 py-3 text- flex gap-2"><span className="text-zinc-400">•</span> Sistem proje kapsamını analiz eder</div>
             <div className="bg-[#f6f6f3] rounded-xl px-4 py-3 text- flex gap-2"><span className="text-zinc-400">•</span> Usta teklifiyle birlikte malzeme ihtiyacı netleşir</div>
-            <div className="bg-black text-white rounded-xl px-4 py-3 text- flex gap-2"><span className="text-[#ff214f]">•</span> Sizin ürününüz o ihtiyaç listesinde önerilir</div>
+            <div className="bg-black text-white rounded-xl px-4 py-3 text- flex gap-2"><span className="text-[#ff2a5a]">•</span> Sizin ürününüz o ihtiyaç listesinde önerilir</div>
           </div>
         </div>
         <div className="bg-black text-white rounded- p-8 relative overflow-hidden">
@@ -356,15 +374,14 @@ export default async function Page({ params }: { params: Promise<{ city: string,
             <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">⚙</div>
             <div className="font-bold text-">Usta + Müşteri Eşleşmesi</div>
           </div>
-          <p className="mt-4 text- text-zinc-400 leading-[1.6]"><span className="text-[#ff214f] font-bold">© Hemen Ustam Gelsin</span>’de müşteri işini oluşturur, usta teklifiyle projeye dahil olur. İş alındığında ise ihtiyaç duyulan ürünler ve malzemeler belirlenir.</p>
+          <p className="mt-4 text- text-zinc-400 leading-[1.6]"><span className="text-[#ff2a5a] font-bold">© Hemen Ustam Gelsin</span>’de müşteri işini oluşturur, usta teklifiyle projeye dahil olur. İş alındığında ise ihtiyaç duyulan ürünler ve malzemeler belirlenir.</p>
           <div className="mt-6 bg-white/5 border border-white/10 rounded-xl p-4 text- text-zinc-300">
-            <span className="text-[#ff214f] font-bold">© HUG MARKET</span>, tam bu noktada devreye girerek projeyi, ustayı ve doğru ürünü aynı ekosistemde buluşturur.
+            <span className="text-[#ff2a5a] font-bold">© HUG MARKET</span>, tam bu noktada devreye girerek projeyi, ustayı ve doğru ürünü aynı ekosistemde buluşturur.
           </div>
-          <div className="mt-8 inline-flex bg-[#ff214f] px-4 py-2 rounded-full text- font-bold tracking-widest uppercase">REKLAM DEĞİL, İHTİYAÇ EŞLEŞMESİ</div>
+          <div className="mt-8 inline-flex bg-[#ff2a5a] px-4 py-2 rounded-full text- font-bold tracking-widest uppercase">REKLAM DEĞİL, İHTİYAÇ EŞLEŞMESİ</div>
         </div>
       </section>
 
-      {/* 4. NASIL CALISIR */}
       <section className="max-w- mx-auto px-6 py-16">
         <h2 className="text- font-black tracking-tight">Markanızın Yolculuğu</h2>
         <p className="text-zinc-500 text- mt-1">Markanız © HUG MARKET’te bir reklam alanında değil, gerçek bir projenin ihtiyaç listesinde yer alır.</p>
@@ -378,7 +395,7 @@ export default async function Page({ params }: { params: Promise<{ city: string,
           ].map(s => (
             <div key={s.n} className="relative">
               <div className="w- h- bg-black text-white rounded-full flex items-center justify-center font-black text- border-4 border-white shadow-[0_0_0_1px_#eee]">{s.n}</div>
-              <div className="mt-4 h-1 w-8 bg-[#ff214f] rounded-full" />
+              <div className="mt-4 h-1 w-8 bg-[#ff2a5a] rounded-full" />
               <div className="mt-3 font-bold text-">{s.t}</div>
               <div className="text- text-zinc-500">{s.sub}</div>
               <div className="mt-2 text- text-zinc-600">{s.d}</div>
@@ -387,7 +404,6 @@ export default async function Page({ params }: { params: Promise<{ city: string,
         </div>
       </section>
 
-      {/* 5. IS BIRLIGI MODELLERI */}
       <section className="bg-[#0a0a0a] text-white">
         <div className="max-w- mx-auto px-6 py-16">
           <h2 className="text- font-black tracking-tight">İş Birliği Modelleri</h2>
@@ -431,7 +447,6 @@ export default async function Page({ params }: { params: Promise<{ city: string,
         </div>
       </section>
 
-      {/* 6. URUN ALANLARI */}
       <section className="max-w- mx-auto px-6 py-16">
         <h2 className="text- font-black">{city.name} {cat.name} Ürün Alanları</h2>
         <div className="mt-6 grid lg:grid-cols-3 gap-3">
@@ -443,26 +458,24 @@ export default async function Page({ params }: { params: Promise<{ city: string,
         </div>
       </section>
 
-      {/* 7. KATEGORILER */}
       <section className="max-w- mx-auto px-6 pb-10">
         <h2 className="text- font-bold text-zinc-400">Hangi kategoriler?</h2>
         <div className="mt-4 flex flex-wrap gap-2">
           {hugCats.map(c => (
-            <Link key={c.slug} href={`/hug-market/${city.slug}/${c.slug}`} className={`px-4 py-2 rounded-full border text- font-medium transition ${c.slug===cat.slug?'bg-black text-white border-black':'bg-[#f5f5f4] border-transparent hover:bg-black hover:text-white text-zinc-600'}`}>
+            <Link key={c.slug} href={`/hug-market/${city.slug}/${c.slug}/`} className={`px-4 py-2 rounded-full border text- font-medium transition ${c.slug===cat.slug?'bg-black text-white border-black':'bg-[#f5f5f4] border-transparent hover:bg-black hover:text-white text-zinc-600'}`}>
               {c.name}
             </Link>
           ))}
         </div>
       </section>
 
-      {/* 8. FINAL CTA */}
       <section className="max-w- mx-auto px-6 pb-20">
         <div className="bg-black text-white rounded- p-10 lg:p-14 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,#ff214f22,transparent_60%)]" />
           <div className="relative">
             <h2 className="text- lg:text- font-black leading-[0.95] tracking-tight">Markanızı HUG<br/>MARKET’e Dahil Edin</h2>
             <p className="mt-4 text-zinc-400 max-w-2xl mx-auto text-">Ürünlerinizi gerçek projeler, profesyonel ustalar ve ihtiyaç bazlı satın alma akışıyla buluşturmak için çözüm ortaklığı başvurunuzu oluşturun.</p>
-            <Link href="/hug-market/cozum-ortagi" className="mt-8 inline-block bg-white text-black px-10 py-4 rounded-full font-bold text- hover:bg-zinc-100 transition">ÇÖZÜM ORTAĞI BAŞVURUSU</Link>
+            <Link href="/hug-market/cozum-ortagi/" className="mt-8 inline-block bg-white text-black px-10 py-4 rounded-full font-bold text- hover:bg-zinc-100 transition">ÇÖZÜM ORTAĞI BAŞVURUSU</Link>
           </div>
         </div>
       </section>

@@ -9,16 +9,17 @@ class HugMarketFooter extends StatelessWidget {
 
   Future<void> _launchMail() async {
     final Uri emailUri = Uri(scheme: 'mailto', path: 'info@hemenustamgelsin.com');
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    }
+    await launchUrl(emailUri);
   }
 
   Future<void> _launchWeb() async {
-    final Uri webUri = Uri.parse('https://www.hemenustamgelsin.com');
-    if (await canLaunchUrl(webUri)) {
-      await launchUrl(webUri, mode: LaunchMode.externalApplication);
-    }
+    final Uri webUri = Uri.parse('https://hemenustamgelsin.com/');
+    // Web'de garanti çalışması için
+    await launchUrl(
+      webUri,
+      mode: LaunchMode.platformDefault,
+      webOnlyWindowName: '_blank',
+    );
   }
 
   @override
@@ -82,7 +83,6 @@ class HugMarketFooter extends StatelessWidget {
                 style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A), letterSpacing: 0.5),
               ),
               const SizedBox(height: 12),
-              // OVERFLOW DÜZELTMESİ - WRAP
               Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 8,
