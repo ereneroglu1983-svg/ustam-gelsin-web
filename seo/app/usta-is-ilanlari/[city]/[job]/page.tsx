@@ -36,7 +36,7 @@ export async function generateMetadata({params}:{params: Promise<{city:string,jo
   if(!seoData) return {}
   const uniqueTitle = `${city.name} ${job.name} Ustası İş İlanları | ${city.name} ${job.name} İşi Ara - %0 Komisyon`
   const uniqueDesc = `${getCityLocative(city.name)} ${job.name.toLowerCase()} ustası işi arıyorsan doğru yerdesin. ${city.name} ${job.name.toLowerCase()} ustası iş ilanları, gerçek müşteri talepleri, komisyonsuz müşteri bul. Ücretsiz kayıt ol, %0 komisyonla iş al.`
-  const canonical = `https://hemenustamgelsin.com/usta-is-ilanlari/${city.slug}/${job.slug}`
+  const canonical = `https://hemenustamgelsin.com/usta-is-ilanlari/${city.slug}/${job.slug}/`
   return {
     title: uniqueTitle,
     description: uniqueDesc,
@@ -54,7 +54,7 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
   if(!city ||!job) notFound()
   const seoData = getUstaCityJobData(city.name, job.name, city.region || '')
   if(!seoData) notFound()
-  const canonical = `https://hemenustamgelsin.com/usta-is-ilanlari/${city.slug}/${job.slug}`
+  const canonical = `https://hemenustamgelsin.com/usta-is-ilanlari/${city.slug}/${job.slug}/`
   const cityIntro = getCitySeoIntro(city.slug, job.name)
   const cityLoc = getCityLocative(city.name)
   const uniqueH1 = `${city.name} ${job.name} Ustası İş İlanları`
@@ -78,14 +78,14 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
     "name": `${city.name} ${job.name} Ustası İş İlanları`,
     "description": `${city.name} ${job.name.toLowerCase()} ustası iş ilanları, gerçek müşteri talepleri`,
     "url": canonical,
-    "isPartOf": { "@type": "Website", "name": "Hemen Ustam Gelsin", "url": "https://hemenustamgelsin.com" }
+    "isPartOf": { "@type": "Website", "name": "Hemen Ustam Gelsin", "url": "https://hemenustamgelsin.com/" }
   }
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Usta İş İlanları", "item": "https://hemenustamgelsin.com/usta-is-ilanlari" },
+      { "@type": "ListItem", "position": 2, "name": "Usta İş İlanları", "item": "https://hemenustamgelsin.com/usta-is-ilanlari/" },
       { "@type": "ListItem", "position": 3, "name": `${city.name} ${job.name} Ustası İş İlanları`, "item": canonical }
     ]
   }
@@ -107,7 +107,7 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}>
         <Link href={`/`} style={{color:'#78716c', textDecoration:'none'}}>Ana Sayfa</Link> <span> / </span>
-        <Link href={`/usta-is-ilanlari`} style={{color:'#78716c', textDecoration:'none'}}>Usta İş İlanları</Link> <span> / </span>
+        <Link href={`/usta-is-ilanlari/`} style={{color:'#78716c', textDecoration:'none'}}>Usta İş İlanları</Link> <span> / </span>
         <b style={{color:'#111'}}>{city.name} {job.name} Ustası İş İlanları</b>
       </div>
       <section style={{ padding:'26px 20px 28px' }}>
@@ -121,7 +121,7 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
             <h2 style={{fontSize:16, fontWeight:700, color:'#44403c', marginTop:12}}>{uniqueH2}</h2>
             <p style={{fontSize:15, color:'#44403c', marginTop:12, whiteSpace:'pre-line', lineHeight:1.6}}>{ustaIntro}</p>
             <div style={{marginTop:18, display:'flex', gap:10, flexWrap:'wrap'}}>
-              <Link href="/home" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>ÜCRETSİZ KAYIT OL, İŞ AL →</Link>
+              <Link href="/home/" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>ÜCRETSİZ KAYIT OL, İŞ AL →</Link>
             </div>
             <div style={{marginTop:20, background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
               <div style={{fontWeight:900, marginBottom:10}}>✅ {city.name} {job.name} Ustası İşi Nasıl Bulunur?</div>
@@ -146,7 +146,7 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
               <div style={{fontWeight:800, fontSize:13, marginBottom:12}}>{city.name} {job.name} Ustası - İlçelerde İş Ara</div>
               <div style={{display:'flex', flexWrap:'wrap', gap:6}}>
                 {city.districts.slice(0,12).map(d => (
-                  <Link key={d.slug} href={`/usta-is-ilanlari/${city.slug}/${job.slug}#${d.slug}`} style={{fontSize:12, background:'#fafaf9', border:'1px solid #e7e5e4', padding:'6px 10px', borderRadius:999, textDecoration:'none', color:'#44403c'}}>{d.name} {job.name} Ustası İşi</Link>
+                  <Link key={d.slug} href={`/usta-is-ilanlari/${city.slug}/${job.slug}/#${d.slug}`} style={{fontSize:12, background:'#fafaf9', border:'1px solid #e7e5e4', padding:'6px 10px', borderRadius:999, textDecoration:'none', color:'#44403c'}}>{d.name} {job.name} Ustası İşi</Link>
                 ))}
               </div>
               <div style={{fontSize:11, color:'#a8a29e', marginTop:10}}>{city.name} {cityLoc} {city.districts.length} ilçede gerçek {job.name.toLowerCase()} taleplerini takip et, %0 komisyonla iş al.</div>
@@ -158,13 +158,13 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
         <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
           <div style={{fontWeight:800, fontSize:13, marginBottom:12}}>📍 Yakın Şehirlerde {job.name} Ustası İş İlanları</div>
           <div style={{display:'flex', flexWrap:'wrap', gap:6}}>
-            {nearbyCities.map(c=>(<Link key={c.slug} href={`/usta-is-ilanlari/${c.slug}/${job.slug}`} style={{fontSize:12, padding:'7px 12px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:999, textDecoration:'none', color:'#444'}}>{c.name} {job.name} Ustası İş İlanları</Link>))}
+            {nearbyCities.map(c=>(<Link key={c.slug} href={`/usta-is-ilanlari/${c.slug}/${job.slug}/`} style={{fontSize:12, padding:'7px 12px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:999, textDecoration:'none', color:'#444'}}>{c.name} {job.name} Ustası İş İlanları</Link>))}
           </div>
         </div>
         <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
           <div style={{fontWeight:800, fontSize:13, marginBottom:12}}>🛠 {city.name} Diğer Usta İş İlanları</div>
           <div style={{display:'flex', flexWrap:'wrap', gap:6}}>
-            {relatedJobs.map(rj=>(<Link key={rj.slug} href={`/usta-is-ilanlari/${city.slug}/${rj.slug}`} style={{fontSize:12, padding:'7px 12px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:999, textDecoration:'none', color:'#444'}}>{city.name} {rj.name} Ustası İş İlanları</Link>))}
+            {relatedJobs.map(rj=>(<Link key={rj.slug} href={`/usta-is-ilanlari/${city.slug}/${rj.slug}/`} style={{fontSize:12, padding:'7px 12px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:999, textDecoration:'none', color:'#444'}}>{city.name} {rj.name} Ustası İş İlanları</Link>))}
           </div>
         </div>
       </section>

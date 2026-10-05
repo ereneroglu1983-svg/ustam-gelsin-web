@@ -1,4 +1,4 @@
-// app/sitemap.ts - FINAL v12.6 - 973 İLÇE EKLENDİ - 4456 URL
+// app/sitemap.ts - FINAL v12.8 - REVIZE - trailingSlash fix - 4539 URL
 import type { MetadataRoute } from 'next'
 import { cities } from '../data/cities'
 import { jobs } from '../data/jobs'
@@ -6,50 +6,44 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 
 export const dynamic = 'force-static'
-export const revalidate = 86400 // 24 saatte bir yenile, Firebase yüklenmesin
+export const revalidate = 86400
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = 'https://hemenustamgelsin.com'
-  const now = new Date()
+  const contentDate = new Date('2026-10-01')
 
   const urls: MetadataRoute.Sitemap = [
-    { url: base, lastModified: now, changeFrequency: 'daily', priority: 1 },
-    { url: `${base}/rehber`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+    { url: `${base}/`, lastModified: contentDate, changeFrequency: 'daily', priority: 1 },
+    { url: `${base}/rehber/`, lastModified: contentDate, changeFrequency: 'daily', priority: 0.8 },
   ]
 
-  // 81 şehir + 3483 hizmet + 973 ilçe = 4537 + 2 base = 4539 + rehber bloglar
   for (const c of cities) {
-    // Şehir sayfası
     urls.push({
-      url: `${base}/${c.slug}`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.9
+      url: `${base}/${c.slug}/`,
+      lastModified: contentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8
     })
 
-    // Hizmet sayfaları (43 x 81 = 3483)
     for (const j of jobs) {
       urls.push({
-        url: `${base}/${c.slug}/${j.slug}`,
-        lastModified: now,
+        url: `${base}/${c.slug}/${j.slug}/`,
+        lastModified: contentDate,
+        changeFrequency: 'weekly',
+        priority: 0.6
+      })
+    }
+
+    for (const d of c.districts) {
+      urls.push({
+        url: `${base}/${c.slug}/${d.slug}/`,
+        lastModified: contentDate,
         changeFrequency: 'weekly',
         priority: 0.7
       })
     }
-
-    // İLÇE SAYFALARI - YENİ EKLENDİ (973 ilçe)
-    // Bu kısım eski sitemap'te yoktu, Google ilçeleri görmüyordu
-    for (const d of c.districts) {
-      urls.push({
-        url: `${base}/${c.slug}/${d.slug}`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.9 // İlçe sayfaları yüksek öncelikli - lokal SEO için kritik
-      })
-    }
   }
 
-  // REHBER BLOGLAR - Build patlamasın diye izole
   try {
     const snap = await getDocs(collection(db, 'icerikler'))
     for (const doc of snap.docs) {
@@ -58,10 +52,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if(!slug) continue
 
       urls.push({
-        url: `${base}/rehber/${slug}`,
-        lastModified: data.tarih?.toDate ? data.tarih.toDate() : now,
+        url: `${base}/rehber/${slug}/`,
+        lastModified: data.tarih?.toDate ? data.tarih.toDate() : undefined,
         changeFrequency: 'weekly',
-        priority: 0.8
+        priority: 0.7
       })
     }
   } catch (e) {

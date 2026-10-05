@@ -35,7 +35,6 @@ function pickDeterministic<T>(arr: T[], seed: string, count: number): T[] {
  if(arr.length <= count) return [...arr]
  const start = hashString(seed) % arr.length
  const result: T[] = []
- // FIX v15.1: Eski (start + i*7) % length formülü length 7'nin katı olduğunda aynı elemanı tekrar ediyordu. Artık çakışmasız.
  for(let i=0;i<count;i++){ result.push(arr[(start + i) % arr.length]) }
  return result
 }
@@ -81,7 +80,6 @@ function getDistrictSEOData(city: typeof cities[0], district: {slug: string, nam
   nearbyPriority: override.nearbyPriority?? getAutoDistrictPriority(city, district.slug)
  }
 }
-// v15 - DÜRÜST introlar - eski komisyon söylemleri temizlendi, yeni slogan entegre - 60-95 kelime aralığı
 const introVariants: Array<(dName: string, cName: string, dLoc: string) => string> = [
  (d,c,dL) => `${dL} oluşturduğun iş ilanı hizmet alanına göre uygun ${c} ustalarına iletilir ve hızlı teklif alma imkanı sunar, süreci hızlandırır. HugAI tahmini piyasa fiyat aralığını gösterir ve bütçe planlamana net yardımcı olur, ön bilgi sağlar. ${dL} iç cephe boya, su tesisatı, elektrik tesisatı, fayans, parke, mutfak dolabı, banyo tadilatı gibi branşlarda kolayca ilan verebilirsin ve doğrudan şeffaf şekilde eşleşirsin. ${SLOGAN_FULL}`,
  (d,c,dL) => `${d} için açtığın ilan ${c} genelindeki ilgili ustaların ekranına düşer ve teklif süreci hemen başlar, bildirim gider. HugAI yaklaşık piyasa fiyat aralığını sunar ve bütçe planlamana yardımcı olur, fikir verir. ${dL} boya badana, alçı sıva, mutfak dolabı, banyo tadilatı, parke, elektrik ve su tesisatı gibi kategorilerde hizmet alabilirsin ve teklifleri karşılaştırarak en uygun ustayı seçebilirsin. Sistem tamamen şeffaf ilerler, gizli maliyet yoktur ve kazanç doğrudan ustada kalır. Platform yeni ve şeffaf bir modelle büyüyor ve birlikte kazanmaya odaklanıyor. ${SLOGAN_LINE1}`,
@@ -164,9 +162,9 @@ export async function generateMetadata({params}:{params: Promise<{city:string,sl
  const city = cities.find(c=>c.slug===citySlug)
  if(!city) notFound()
  const job = jobs.find(j=>j.slug===slug)
- if(job){ const seoData = getCityJobData(city.slug, job.slug); if(!seoData) notFound(); const canonical = `https://hemenustamgelsin.com/${city.slug}/${job.slug}`; return { title: seoData.metaTitle, description: seoData.metaDescription, alternates: { canonical }, openGraph: { title: seoData.metaTitle, description: seoData.metaDescription, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title: seoData.metaTitle, description: seoData.metaDescription }, robots: { index: true, follow: true } } }
+ if(job){ const seoData = getCityJobData(city.slug, job.slug); if(!seoData) notFound(); const canonical = `https://hemenustamgelsin.com/${city.slug}/${job.slug}/`; return { title: seoData.metaTitle, description: seoData.metaDescription, alternates: { canonical }, openGraph: { title: seoData.metaTitle, description: seoData.metaDescription, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title: seoData.metaTitle, description: seoData.metaDescription }, robots: { index: true, follow: true } } }
  const district = city.districts.find(d=>d.slug===slug)
- if(district){ const dLoc = loc(district.name); const title = `${district.name} Ustaları | ${city.name} – ${SLOGAN_LINE1}`; const description = `${dLoc} usta bul, teklif al. ${SLOGAN_FULL} HugAI tahmini fiyatı ve doğrudan teklif sistemiyle işini başlat.`; const canonical = `https://hemenustamgelsin.com/${city.slug}/${district.slug}`; return { title, description, alternates: { canonical }, openGraph: { title, description, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title, description }, robots: { index: true, follow: true } } }
+ if(district){ const dLoc = loc(district.name); const title = `${district.name} Ustaları | ${city.name} – ${SLOGAN_LINE1}`; const description = `${dLoc} usta bul, teklif al. ${SLOGAN_FULL} HugAI tahmini fiyatı ve doğrudan teklif sistemiyle işini başlat.`; const canonical = `https://hemenustamgelsin.com/${city.slug}/${district.slug}/`; return { title, description, alternates: { canonical }, openGraph: { title, description, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title, description }, robots: { index: true, follow: true } } }
  notFound()
 }
 function getNearbyCities(currentSlug: string) { return cities.filter(c => (nearbyMap[currentSlug]||[]).includes(c.slug)).slice(0,12) }
@@ -207,9 +205,9 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
   if(s.includes('fayans')) { icon='🧱'; color='#a16207' }
   if(s.includes('klima')) { icon='❄'; color='#06b6d4' }
   if(s.includes('tavan')) { icon='🏗'; color='#57534e' }
-  const pageUrl = `https://hemenustamgelsin.com/${city.slug}/${job.slug}`
+  const pageUrl = `https://hemenustamgelsin.com/${city.slug}/${job.slug}/`
   const serviceSchema = { "@context": "https://schema.org", "@type": "Service", "@id": `${pageUrl}#service`, "name": seoData.h1, "serviceType": job.name, "description": seoData.metaDescription, "provider": { "@id": "https://hemenustamgelsin.com/#organization" }, "areaServed": [{ "@type": "City", "name": city.name },...ilceler.map((d: string) => ({ "@type": "AdministrativeArea", "name": d }))], "url": pageUrl }
-  const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com" }, { "@type": "ListItem", "position": 2, "name": `${city.name} Ustaları`, "item": `https://hemenustamgelsin.com/${city.slug}` }, { "@type": "ListItem", "position": 3, "name": `${city.name} ${job.name}`, "item": pageUrl } ] }
+  const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com/" }, { "@type": "ListItem", "position": 2, "name": `${city.name} Ustaları`, "item": `https://hemenustamgelsin.com/${city.slug}/` }, { "@type": "ListItem", "position": 3, "name": `${city.name} ${job.name}`, "item": pageUrl } ] }
   const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": seoData.faqs.map((f: any) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) }
   return (
    <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
@@ -241,7 +239,7 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-    <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}><Link href={`/${city.slug}`} style={{color:'#78716c', textDecoration:'none'}}>{city.name} Ustaları</Link> <span> / </span> <b style={{color:'#111'}}>{job.name}</b></div>
+    <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}><Link href={`/${city.slug}/`} style={{color:'#78716c', textDecoration:'none'}}>{city.name} Ustaları</Link> <span> / </span> <b style={{color:'#111'}}>{job.name}</b></div>
     <section style={{ background: `radial-gradient(800px 400px at 15% 0%, ${color}15 0%, transparent 60%), #FFFBF5`, padding:'26px 20px 28px' }}>
      <style>{`@media(max-width:768px){.job-hero{grid-template-columns:1fr!important}.job-content{grid-template-columns:1fr!important}}`}</style>
      <div className="job-hero" style={{maxWidth:1120, margin:'0 auto', display:'grid', gridTemplateColumns:'1.15fr 0.85fr', gap:24}}>
@@ -250,8 +248,8 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
        <h1 style={{fontSize:'clamp(28px, 4vw, 48px)', fontWeight:900, lineHeight:0.92, margin:0}}>{seoData.h1}<br/> HugAI Destekli Yaklaşık Fiyat Aralığı</h1>
        <p style={{fontSize:16, color:'#44403c', marginTop:12, maxWidth:560}}>{seoData.intro}</p>
        <div style={{marginTop:18, display:'flex', gap:10, flexWrap:'wrap'}}>
-        <a href="https://hemenustamgelsin.com/ilan-olustur" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>HEMEN İLAN VER →</a>
-        <a href="https://hemenustamgelsin.com/usta-kayit" style={{background:'white', color:'#111', padding:'14px 20px', borderRadius:12, fontWeight:800, border:'1px solid #e7e5e4', textDecoration:'none'}}>USTA OL, {city.name.toUpperCase()}'DA İŞ AL</a>
+        <a href="https://hemenustamgelsin.com/ilan-olustur/" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>HEMEN İLAN VER →</a>
+        <a href="https://hemenustamgelsin.com/usta-kayit/" style={{background:'white', color:'#111', padding:'14px 20px', borderRadius:12, fontWeight:800, border:'1px solid #e7e5e4', textDecoration:'none'}}>USTA OL, {city.name.toUpperCase()}'DA İŞ AL</a>
        </div>
       </div>
       <div style={{background:'white', borderRadius:18, border:'1px solid #e7e5e4', padding:16}}>
@@ -276,7 +274,7 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
      </div>
      <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
       <div style={{fontWeight:800, fontSize:13, marginBottom:8}}>{city.name} Yakın Çevresi - {job.name}</div>
-      <div style={{display:'flex', flexWrap:'wrap', gap:6}}>{getNearbyCities(city.slug).map((c)=>(<Link key={c.slug} href={`/${c.slug}/${job.slug}`} style={{fontSize:12, padding:'7px 12px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:999, textDecoration:'none', color:'#444'}}>{c.name} {job.name}</Link>))}</div>
+      <div style={{display:'flex', flexWrap:'wrap', gap:6}}>{getNearbyCities(city.slug).map((c)=>(<Link key={c.slug} href={`/${c.slug}/${job.slug}/`} style={{fontSize:12, padding:'7px 12px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:999, textDecoration:'none', color:'#444'}}>{c.name} {job.name}</Link>))}</div>
      </div>
     </section>
    </main>
@@ -293,10 +291,10 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
   const siblingDistricts = getSiblingDistricts(city, district)
   const districtServices = getDistrictServiceLinks(city, district)
   const faqs = getDistrictFAQs(city, district, dName, cName, dLoc)
-  const canonical = `https://hemenustamgelsin.com/${city.slug}/${district.slug}`
+  const canonical = `https://hemenustamgelsin.com/${city.slug}/${district.slug}/`
   const title = `${dName} Ustaları | ${city.name} – ${SLOGAN_LINE1}`
   const h1 = `${dName} Ustaları – ${cName}`
-  const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", "@id": `${canonical}#breadcrumb`, "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com" }, { "@type": "ListItem", "position": 2, "name": cName, "item": `https://hemenustamgelsin.com/${city.slug}` }, { "@type": "ListItem", "position": 3, "name": dName, "item": canonical } ] }
+  const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", "@id": `${canonical}#breadcrumb`, "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com/" }, { "@type": "ListItem", "position": 2, "name": cName, "item": `https://hemenustamgelsin.com/${city.slug}/` }, { "@type": "ListItem", "position": 3, "name": dName, "item": canonical } ] }
   const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) }
   const serviceSchema = { "@context": "https://schema.org", "@type": "Service", "@id": `${canonical}#service`, "name": `${dName} Ustaları`, "serviceType": "Usta ve Tadilat Hizmetleri", "description": `${dLoc} usta hizmetleri. ${SLOGAN_FULL}`, "provider": { "@id": "https://hemenustamgelsin.com/#organization" }, "areaServed": [{ "@type": "City", "name": cName }, { "@type": "AdministrativeArea", "name": dName }], "url": canonical }
   const webPageSchema = { "@context": "https://schema.org", "@type": "WebPage", "@id": canonical, "name": title, "description": `${dLoc} usta bul, teklif al. ${SLOGAN_FULL}`, "isPartOf": { "@id": "https://hemenustamgelsin.com/#website" }, "about": { "@id": `${canonical}#service` }, "breadcrumb": { "@id": `${canonical}#breadcrumb` } }
@@ -317,7 +315,7 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
-    <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}><Link href="/" style={{color:'#78716c', textDecoration:'none'}}>Ana Sayfa</Link><span> / </span><Link href={`/${city.slug}`} style={{color:'#78716c', textDecoration:'none'}}>{cName}</Link><span> / </span><b style={{color:'#111'}}>{dName}</b></div>
+    <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}><Link href="/" style={{color:'#78716c', textDecoration:'none'}}>Ana Sayfa</Link><span> / </span><Link href={`/${city.slug}/`} style={{color:'#78716c', textDecoration:'none'}}>{cName}</Link><span> / </span><b style={{color:'#111'}}>{dName}</b></div>
 
     <section style={{maxWidth:1120, margin:'0 auto', padding:'20px 20px 0'}}>
      <div style={{background:'#FFFBF5', border:'1px solid #111', borderRadius:12, padding:'12px 14px', fontSize:13, fontWeight:700, color:'#111'}}>
@@ -367,7 +365,7 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
      <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
       <div style={{fontWeight:900, fontSize:14, marginBottom:12}}>{dName} İçin Hizmetler</div>
       <div style={{display:'flex', flexWrap:'wrap', gap:8}}>
-       {districtServices.map(s=>(<Link key={s.slug} href={`/${city.slug}/${s.slug}`} style={{fontSize:12, padding:'8px 12px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:999, textDecoration:'none', color:'#444'}}>{cName} {s.name}</Link>))}
+       {districtServices.map(s=>(<Link key={s.slug} href={`/${city.slug}/${s.slug}/`} style={{fontSize:12, padding:'8px 12px', background:'#fafaf9', border:'1px solid #e7e5e4', borderRadius:999, textDecoration:'none', color:'#444'}}>{cName} {s.name}</Link>))}
       </div>
      </div>
     </section>
@@ -375,11 +373,11 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
      <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
       <div style={{fontWeight:900, fontSize:14, marginBottom:12}}>{cName} Diğer İlçeler - {siblingDistricts.length} ilçe tamamı</div>
       <div style={{display:'flex', flexWrap:'wrap', gap:8}}>
-       {siblingDistricts.map(d=>(<Link key={d.slug} href={`/${city.slug}/${d.slug}`} style={{fontSize:12, padding:'8px 12px', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:999, textDecoration:'none', color:'#92400e'}}>{d.name}</Link>))}
+       {siblingDistricts.map(d=>(<Link key={d.slug} href={`/${city.slug}/${d.slug}/`} style={{fontSize:12, padding:'8px 12px', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:999, textDecoration:'none', color:'#92400e'}}>{d.name}</Link>))}
       </div>
      </div>
     </section>
-    <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}><Link href={`/${city.slug}`} style={{fontSize:13, fontWeight:800, color:'#111', textDecoration:'none', background:'white', border:'1px solid #e7e5e4', padding:'10px 14px', borderRadius:12, display:'inline-block'}}>← {cName} Ustalarına Dön</Link></section>
+    <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}><Link href={`/${city.slug}/`} style={{fontSize:13, fontWeight:800, color:'#111', textDecoration:'none', background:'white', border:'1px solid #e7e5e4', padding:'10px 14px', borderRadius:12, display:'inline-block'}}>← {cName} Ustalarına Dön</Link></section>
     <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}>
      <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
       <h3 style={{marginTop:0}}>Sık Sorulan Sorular - {dName}</h3>
@@ -387,8 +385,8 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
      </div>
     </section>
     <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 40px', display:'flex', gap:10, flexWrap:'wrap'}}>
-     <a href="https://www.hemenustamgelsin.com" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>İLAN VER →</a>
-     <a href="https://www.hemenustamgelsin.com" style={{background:'white', color:'#111', padding:'14px 20px', borderRadius:12, fontWeight:800, border:'1px solid #e7e5e4', textDecoration:'none'}}>TEKLİF AL</a>
+     <a href="https://www.hemenustamgelsin.com/" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>İLAN VER →</a>
+     <a href="https://www.hemenustamgelsin.com/" style={{background:'white', color:'#111', padding:'14px 20px', borderRadius:12, fontWeight:800, border:'1px solid #e7e5e4', textDecoration:'none'}}>TEKLİF AL</a>
     </section>
    </main>
   )

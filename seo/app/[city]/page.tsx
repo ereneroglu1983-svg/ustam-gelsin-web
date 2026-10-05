@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
   const { city: citySlug } = await params
   const city = cities.find(c => c.slug === citySlug)
   if (!city) return {}
-  const canonical = `https://hemenustamgelsin.com/${city.slug}`
+  const canonical = `https://hemenustamgelsin.com/${city.slug}/`
   const title = `${city.name} Ustaları - Komisyonsuz | Hemen Ustam Gelsin`
   const description = `${city.name} bölgesinde komisyonsuz ${jobs.length} farklı hizmet kategorisinde usta bul. Akıllı fiyat tahmini ile işini hızlıca başlat.`
   return {
@@ -32,13 +32,13 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
   const city = cities.find(c => c.slug === citySlug)
   if (!city) notFound()
 
-  const pageUrl = `https://hemenustamgelsin.com/${city.slug}`
+  const pageUrl = `https://hemenustamgelsin.com/${city.slug}/`
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com" },
+      { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com/" },
       { "@type": "ListItem", "position": 2, "name": `${city.name} Ustaları`, "item": pageUrl }
     ]
   }
@@ -49,7 +49,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
     "name": `${city.name} Ustaları - ${jobs.length} Kategoride Usta`,
     "description": `${city.name} bölgesinde komisyonsuz ${jobs.length} farklı hizmet kategorisinde usta bul.`,
     "url": pageUrl,
-    "isPartOf": { "@type": "WebSite", "name": "Hemen Ustam Gelsin", "url": "https://hemenustamgelsin.com" },
+    "isPartOf": { "@type": "WebSite", "name": "Hemen Ustam Gelsin", "url": "https://hemenustamgelsin.com/" },
     "mainEntity": {
       "@type": "ItemList",
       "name": `${city.name} Hizmetleri`,
@@ -58,7 +58,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
         "@type": "ListItem",
         "position": index + 1,
         "name": `${city.name} ${job.name}`,
-        "url": `https://hemenustamgelsin.com/${city.slug}/${job.slug}`
+        "url": `https://hemenustamgelsin.com/${city.slug}/${job.slug}/`
       }))
     }
   }
@@ -114,12 +114,12 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
                 <b style={{ color: '#111' }}> akıllı fiyat tahmini</b> ile uygun ustayla eşleşir. Yakıt yok, zaman kaybı yok.
               </p>
               <div className="cta-row" style={{ marginTop: 22 }}>
-                <a href="https://hemenustamgelsin.com" style={{ background: '#111', color: 'white', padding: '16px 22px', borderRadius: 12, fontWeight: 800, fontSize: 16, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}>
+                <a href="https://hemenustamgelsin.com/" style={{ background: '#111', color: 'white', padding: '16px 22px', borderRadius: 12, fontWeight: 800, fontSize: 16, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}>
                   <span style={{ width: 28, height: 28, background: 'white', borderRadius: 8, display: 'grid', placeItems: 'center', color: 'black' }}>→</span>
                   HEMEN İLAN VER
                   <span style={{ opacity: 0.6, fontWeight: 600, fontSize: 13, marginLeft: 4 }}>Ücretsiz teklif al</span>
                 </a>
-                <a href="https://hemenustamgelsin.com/usta-kayit" style={{ background: 'white', color: '#111', padding: '16px 22px', borderRadius: 12, fontWeight: 800, fontSize: 16, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, border: '1px solid #e7e5e4' }}>
+                <a href="https://hemenustamgelsin.com/usta-kayit/" style={{ background: 'white', color: '#111', padding: '16px 22px', borderRadius: 12, fontWeight: 800, fontSize: 16, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, border: '1px solid #e7e5e4' }}>
                   USTA OL, İŞİNİ BUL
                   <span style={{ fontSize: 13, background: '#fef3c7', padding: '2px 8px', borderRadius: 999 }}>Komisyon yok</span>
                 </a>
@@ -160,7 +160,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
             if (slug.includes('klima')) icon = '❄'
             if (slug.includes('tavan') || slug.includes('alcipan')) icon = '🏗'
             return (
-              <Link key={j.slug} href={`/${city.slug}/${j.slug}`} style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 14, padding: 14, textDecoration: 'none', color: '#111', display: 'flex', gap: 12, alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
+              <Link key={j.slug} href={`/${city.slug}/${j.slug}/`} style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 14, padding: 14, textDecoration: 'none', color: '#111', display: 'flex', gap: 12, alignItems: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
                 <div style={{ width: 44, height: 44, borderRadius: 12, background: '#f5f5f4', display: 'grid', placeItems: 'center', fontSize: 20, flexShrink: 0 }}>{icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 11, color: '#a8a29e', fontWeight: 700, textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{city.name}</div>
@@ -177,7 +177,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
           <p style={{ color: '#78716c', fontSize: 13, margin: '0 0 14px 0' }}>{city.name}'da {city.districts.length} ilçede komisyonsuz usta - ilçeni seç</p>
           <div className="district-grid">
             {city.districts.map((d) => (
-              <Link key={d.slug} href={`/${city.slug}/${d.slug}`} style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 12, padding: '12px 14px', textDecoration: 'none', color: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Link key={d.slug} href={`/${city.slug}/${d.slug}/`} style={{ background: 'white', border: '1px solid #e7e5e4', borderRadius: 12, padding: '12px 14px', textDecoration: 'none', color: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontWeight: 700, fontSize: 14 }}>{d.name}</span>
                 <span style={{ fontSize: 12, color: '#16a34a', fontWeight: 700 }}>→</span>
               </Link>
@@ -190,7 +190,7 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
             <div style={{ fontWeight: 900, fontSize: 'clamp(16px, 2vw, 18px)' }}>İşini şansa bırakma, doğru ustayla eşleş.</div>
             <div style={{ color: '#a8a29e', fontSize: 13, marginTop: 2 }}>{city.name}'da komisyonsuz sistemle hemen başla.</div>
           </div>
-          <a href="https://hemenustamgelsin.com" style={{ background: 'white', color: 'black', padding: '12px 18px', borderRadius: 10, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>hemenustamgelsin.com →</a>
+          <a href="https://hemenustamgelsin.com/" style={{ background: 'white', color: 'black', padding: '12px 18px', borderRadius: 10, fontWeight: 800, textDecoration: 'none', whiteSpace: 'nowrap' }}>hemenustamgelsin.com →</a>
         </div>
       </section>
     </main>

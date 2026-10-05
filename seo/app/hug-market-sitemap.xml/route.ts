@@ -1,4 +1,4 @@
-// app/hug-market-sitemap.xml/route.ts - FINAL v3.1 - IMPORT FIX - BUILD GEÇER
+// app/hug-market-sitemap.xml/route.ts - FINAL v3.3 - REVIZE - trailingSlash fix - 1478 URL
 export const dynamic = 'force-static'
 export const revalidate = 86400
 
@@ -27,18 +27,18 @@ const HUG_CATS = [
 
 export async function GET() {
   const base = 'https://hemenustamgelsin.com'
-  const now = new Date().toISOString()
+  const contentDate = new Date('2026-10-01').toISOString()
 
   const urls = [
-    `${base}/hug-market`,
-    `${base}/hug-market/cozum-ortagi`,
-    ...HUG_CATS.map(c => `${base}/hug-market/cozum-ortakligi/${c}`),
-    ...cities.flatMap(city => HUG_CATS.map(cat => `${base}/hug-market/${city.slug}/${cat}`))
+    `${base}/hug-market/`,
+    `${base}/hug-market/cozum-ortagi/`,
+    ...HUG_CATS.map(c => `${base}/hug-market/cozum-ortakligi/${c}/`),
+    ...cities.flatMap(city => HUG_CATS.map(cat => `${base}/hug-market/${city.slug}/${cat}/`))
   ]
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(u => `  <url><loc>${u}</loc><lastmod>${now}</lastmod></url>`).join("\n")}
+${urls.map(u => `  <url><loc>${u}</loc><lastmod>${contentDate}</lastmod></url>`).join("\n")}
 </urlset>`
 
   return new Response(xml, {

@@ -1,12 +1,14 @@
-// app/robots.ts - FINAL v2 - llms.txt sitemap listesinden çıkarıldı
+// app/robots.ts - FINAL v3 - REVIZE - trailingSlash uyumlu
+import type { MetadataRoute } from 'next'
+
 export const dynamic = 'force-static'
 
-export default function robots() {
+export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/_next/', '/admin'],
+      disallow: ['/api/', '/api', '/_next/', '/_next', '/admin/', '/admin'],
     },
     sitemap: [
       'https://hemenustamgelsin.com/sitemap.xml',
