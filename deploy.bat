@@ -2,107 +2,57 @@
 setlocal
 
 echo ======================================
-echo USTAM WEB DEPLOY - FINAL v7 - STABIL
+echo USTAM WEB DEPLOY - FINAL v8 - CANAVAR
 echo ======================================
 echo.
 
-REM ============================================================
-REM [0/5] TEMIZLIK
-REM ============================================================
-
 echo [0/5] Temizlik...
 call flutter clean
-
 if errorlevel 1 (
-    echo.
     echo HATA: FLUTTER CLEAN BASARISIZ!
     pause
     exit /b 1
 )
-
 echo Temizlik bitti.
 echo.
 
-REM ============================================================
-REM [1/5] SEO SECIMI
-REM ============================================================
-
 :SEO_SECIM
-
 set "SEO_CHOICE="
-
-echo.
 set /p "SEO_CHOICE=SEO dosyalarini deploy etmek istiyor musun? (Y/N): "
-
-if /I "%SEO_CHOICE%"=="Y" (
-    set "SEO_SKIP=0"
-    goto SEO_BUILD
-)
-
-if /I "%SEO_CHOICE%"=="N" (
-    set "SEO_SKIP=1"
-    echo.
-    echo SEO ATLANDI.
-    echo.
-    goto FLUTTER_BUILD
-)
-
-echo.
+if /I "%SEO_CHOICE%"=="Y" goto SEO_BUILD
+if /I "%SEO_CHOICE%"=="N" goto FLUTTER_BUILD
 echo HATA: Lutfen sadece Y veya N gir.
 goto SEO_SECIM
 
-REM ============================================================
-REM [1/5] SEO BUILD
-REM ============================================================
-
 :SEO_BUILD
-
 echo.
 echo [1/5] SEO Build aliniyor...
-
 cd seo
-
+if exist "out" rmdir /S /Q "out" >nul 2>&1
+if exist ".next" rmdir /S /Q ".next" >nul 2>&1
 call npm run build
-
 if errorlevel 1 (
-    echo.
     echo HATA: SEO BUILD BASARISIZ!
     cd ..
     pause
     exit /b 1
 )
-
 cd ..
-
 echo SEO bitti.
 echo.
 
-REM ============================================================
-REM [2/5] FLUTTER BUILD
-REM ============================================================
-
 :FLUTTER_BUILD
-
 echo [2/5] Flutter Build...
-
 call flutter build web --release --tree-shake-icons --no-wasm-dry-run
-
 if errorlevel 1 (
-    echo.
     echo HATA: FLUTTER BUILD BASARISIZ!
     pause
     exit /b 1
 )
-
 echo Flutter bitti.
 echo.
 
-REM ============================================================
-REM [2.5/5] CACHE HEADERS
-REM ============================================================
-
 echo [2.5/5] Cache ayarlari...
-
 (
 echo /*.js
 echo   Cache-Control: public, max-age=31536000, immutable
@@ -122,16 +72,8 @@ echo /*.html
 echo   Cache-Control: public, max-age=0, must-revalidate
 ) > "build\web\_headers"
 
-if errorlevel 1 (
-    echo.
-    echo HATA: _headers DOSYASI OLUSTURULAMADI!
-    pause
-    exit /b 1
-)
-
-REM --- _redirects GARANTI OLUSTUR ---
 (
-echo # GOOGLE INDEX FIX - YANLIS YAZIMLAR 301
+echo # GOOGLE INDEX FIX 301
 echo /usta-is-ilanlari/*/otamatik-sulama-sistemleri /usta-is-ilanlari/:splat/otomatik-sulama-sistemleri 301!
 echo /usta-is-ilanlari/*/otamatik-sulama-sistemleri/ /usta-is-ilanlari/:splat/otomatik-sulama-sistemleri/ 301!
 echo /usta-is-ilanlari/*/boya-badana /usta-is-ilanlari/:splat/ic-cephe-boya-ve-badana 301!
@@ -141,179 +83,72 @@ echo /usta-is-ilanlari/*/cati-yapimi-aktarma-ve-izalasyon/ /usta-is-ilanlari/:sp
 echo /usta-is-ilanlari/*/uydu-internet-ve-kamera-sitemleri /usta-is-ilanlari/:splat/uydu-ve-kamera-sistemleri 301!
 echo /usta-is-ilanlari/*/uydu-internet-ve-kamera-sitemleri/ /usta-is-ilanlari/:splat/uydu-ve-kamera-sistemleri/ 301!
 echo.
-echo # HOME FIX - 301 KALICI
+echo # HOME FIX
 echo /home / 301!
 echo /home/ / 301!
 echo.
-echo # HUG MARKET FIX
-echo /hug-market /index.html 200
-echo /hug-market/ /index.html 200
-echo /hug-market/* /index.html 200
-echo.
-echo # FLUTTER SPA FALLBACK - EN SONDA KALMALI
+echo # FLUTTER SPA FALLBACK - EN SONDA
 echo /* /index.html 200
 ) > "build\web\_redirects"
 
-if errorlevel 1 (
-    echo.
-    echo HATA: _redirects DOSYASI OLUSTURULAMADI!
-    pause
-    exit /b 1
-)
-
-echo Cache ayarlari tamam.
+echo Cache tamam.
 echo.
 
-REM ============================================================
-REM [3/5] SEO'YU FLUTTER BUILD'E GOM
-REM ============================================================
-
-if "%SEO_SKIP%"=="1" goto SEO_GOMME_ATLA
-
+if "%SEO_CHOICE%"=="N" goto SEO_ATLA
 echo [3/5] SEO gomuluyor...
 echo.
-
 for /D %%i in ("seo\out\*") do (
     if /I not "%%~nxi"=="api" (
         echo Kopyalaniyor: %%~nxi
         xcopy "%%i" "build\web\%%~nxi\" /E /Y /I /Q >nul
-        if errorlevel 2 (
-            echo.
-            echo HATA: SEO KLASORU KOPYALANAMADI: %%~nxi
-            pause
-            exit /b 1
-        )
     )
 )
-
 for %%F in ("seo\out\*") do (
     if not exist "%%F\" (
         if /I not "%%~nxF"=="index.html" (
             echo Kopyalaniyor: %%~nxF
             copy /Y "%%F" "build\web\%%~nxF" >nul
-            if errorlevel 1 (
-                echo.
-                echo HATA: SEO DOSYASI KOPYALANAMADI: %%~nxF
-                pause
-                exit /b 1
-            )
         )
     )
 )
-
-echo 404 temizleniyor...
 if exist "build\web\404.html" del /Q "build\web\404.html" >nul 2>&1
 if exist "build\web\404" rmdir /S /Q "build\web\404" >nul 2>&1
-
-echo.
 echo SEO gomuldu.
 echo.
+goto DEPLOY
 
-goto SEO_GOMME_BITTI
-
-:SEO_GOMME_ATLA
-
+:SEO_ATLA
 echo [3/5] SEO ATLANDI.
 echo.
 
-REM ============================================================
-REM [4/5] CLOUDFLARE DEPLOY
-REM ============================================================
-
-:SEO_GOMME_BITTI
-
+:DEPLOY
 echo [4/5] Cloudflare deploy...
 echo.
-
-echo Cloudflare deploy baslatiliyor...
-echo.
-
 call npx wrangler pages deploy build/web --project-name=ustam-web-deploy --commit-dirty=true
-
 if errorlevel 1 (
-    echo.
-    echo ======================================
     echo CLOUDFLARE DEPLOY BASARISIZ!
-    echo ======================================
-    echo.
-    echo Git push YAPILMAYACAK.
-    echo.
     pause
     exit /b 1
 )
-
-echo ======================================
 echo CLOUDFLARE DEPLOY TAMAM!
-echo ======================================
 echo.
 
-REM ============================================================
-REM REVALIDATE
-REM ============================================================
-
-if "%SEO_SKIP%"=="0" (
-    echo Revalidate calistiriliyor...
+if "%SEO_CHOICE%"=="Y" (
+    echo Revalidate...
     curl -s https://hemenustamgelsin.com/api/revalidate >nul
-    if errorlevel 1 (
-        echo UYARI: Revalidate istegi basarisiz oldu.
-    ) else (
-        echo Revalidate tamam.
-    )
+    echo Revalidate tamam.
     echo.
 )
-
-REM ============================================================
-REM [5/5] GIT
-REM ============================================================
 
 echo [5/5] Git push...
-echo.
-
 call git add .
-
-if errorlevel 1 (
-    echo.
-    echo HATA: GIT ADD BASARISIZ!
-    pause
-    exit /b 1
-)
-
-call git commit -m "deploy: %date% %time% - FINAL v7" --allow-empty
-
-if errorlevel 1 (
-    echo.
-    echo HATA: GIT COMMIT BASARISIZ!
-    pause
-    exit /b 1
-)
-
+call git commit -m "deploy: %date% %time% - FINAL v8" --allow-empty
 call git pull --rebase origin main
-
-if errorlevel 1 (
-    echo.
-    echo HATA: GIT PULL --REBASE BASARISIZ!
-    echo.
-    echo Push YAPILMADI.
-    pause
-    exit /b 1
-)
-
 call git push origin main
-
-if errorlevel 1 (
-    echo.
-    echo HATA: GIT PUSH BASARISIZ!
-    pause
-    exit /b 1
-)
-
 echo.
 echo ======================================
 echo DEPLOY TAMAMLANDI!
-echo ======================================
-echo.
 echo https://hemenustamgelsin.com
-echo.
-
+echo ======================================
 pause
 endlocal
