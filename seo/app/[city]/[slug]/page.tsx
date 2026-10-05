@@ -387,8 +387,8 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
      </div>
     </section>
     <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 40px', display:'flex', gap:10, flexWrap:'wrap'}}>
-     <a href="https://hemenustamgelsin.com/ilan-olustur" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>İLAN VER →</a>
-     <a href="https://hemenustamgelsin.com/ilan-olustur" style={{background:'white', color:'#111', padding:'14px 20px', borderRadius:12, fontWeight:800, border:'1px solid #e7e5e4', textDecoration:'none'}}>TEKLİF AL</a>
+     <a href="https://www.hemenustamgelsin.com" style={{background:'#111', color:'white', padding:'14px 20px', borderRadius:12, fontWeight:900, textDecoration:'none'}}>İLAN VER →</a>
+     <a href="https://www.hemenustamgelsin.com" style={{background:'white', color:'#111', padding:'14px 20px', borderRadius:12, fontWeight:800, border:'1px solid #e7e5e4', textDecoration:'none'}}>TEKLİF AL</a>
     </section>
    </main>
   )
