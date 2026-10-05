@@ -1,13 +1,11 @@
-// app/[city]/[slug]/page.tsx - FINAL v14.0 - SEO CANAVARI - TRAFIK CANAVARI
+// app/[city]/[slug]/page.tsx - FINAL v14.2 - TAM EKSİKSİZ - SEO CANAVARI - CLIENT GRID
 import { cities } from '../../../data/cities'
 import { jobs } from '../../../data/jobs'
 import { getCityJobData } from '../../../data/cityJobDatabase'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { collection, getDocs, query, where } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
-import komsuMap from '../../../data/komsu-ilceler.json'
+import UstaLiveGrid from '../../../components/UstaLiveGrid'
 
 function getLastVowel(word: string): string | null {
   for(let i = word.length - 1; i >= 0; i--){
@@ -34,30 +32,6 @@ function pickDeterministic<T>(arr: T[], seed: string, count: number): T[] {
   const result: T[] = []
   for(let i=0;i<count;i++){ result.push(arr[(start + i * 7) % arr.length]) }
   return result
-}
-function toSlug(str: string): string {
-  if(!str) return ''
-  return str.toString()
-.replace(/İ/g,'i').replace(/I/g,'i')
-.toLocaleLowerCase('tr-TR')
-.replace(/ç/g,'c').replace(/ğ/g,'g').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ş/g,'s').replace(/ü/g,'u')
-.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
-}
-function resolveUstaImage(u: any): string {
-  const raw = (u.imagePath || u.resimYolu || u['resim yolu'] || '').toString().trim()
-  if(!raw) return '/app_logo.png'
-  if(raw.startsWith('http://') || raw.startsWith('https://')) return raw
-  const clean = raw.replace(/^\/+/, '')
-  return `https://cdn.hemenustamgelsin.com/${clean}`
-}
-function getUstaSeoAlt(u: any, dName: string, cName: string): string {
-  const hizmet = (u.hizmetler?.[0] || '').toString()
-  return `${u.baslik} - ${dName} ${hizmet} ustası - ${cName}`.slice(0,150)
-}
-function getUstaHizmetlerText(u: any): string[] {
-  const arr = (u.hizmetler || []) as string[]
-  return arr.slice(0,6)
 }
 
 type DistrictSEOData = { serviceFocus: string[]; localIntro: string; demandNote: string; faqTopics: string[]; nearbyPriority: string[] }
@@ -205,34 +179,7 @@ function getDistrictFAQs(city: typeof cities[0], district: {slug: string, name: 
   return pickDeterministic(pool, `${city.slug}/${district.slug}`, 4).map(t=>({ q: t.q(dName), a: t.a(dName, cName, dLoc) }))
 }
 function getDistrictActionNote(city: typeof cities[0], district: {slug: string, name: string}){ return getDistrictSEOData(city, district).demandNote }
-async function getLiveUstalarForDistrict(citySlug: string, districtSlug: string) {
-  try {
-    const hedefKey = `${citySlug}/${districtSlug}`
-    const komsuListesi: string[] = (komsuMap as any)[hedefKey] || []
-    const q = query(collection(db, "karisik_slider"), where("aktif", "==", true))
-    const snap = await getDocs(q)
-    const all = snap.docs.map((d: any) => ({ id: d.id,...d.data() })) as any[]
-    const scored = all.map((u: any) => {
-      const ilSlug = toSlug(u.il || u.ilRaw || u.sehir || '')
-      const ilceSlug = toSlug(u.ilce || u.ilceRaw || u.ilceSlug || '')
-      let tamKonum = (u.tamKonum || '').toString()
-      tamKonum = toSlug(tamKonum.replace(/\//g,' ')).replace(/-/g,'/')
-      if(!tamKonum && ilSlug && ilceSlug) tamKonum = `${ilSlug}/${ilceSlug}`
-      let score = 0
-      if (tamKonum === hedefKey) score = 100
-      else if (komsuListesi.includes(tamKonum)) score = 80
-      else if (ilSlug === citySlug && ilceSlug === districtSlug) score = 100
-      else if (ilSlug === citySlug && ilceSlug) score = 50
-      else if (ilSlug === citySlug) score = 30
-      return {...u, _score: score, _tam: tamKonum, _resolvedImage: resolveUstaImage(u) }
-    }).filter((u: any) => u._score > 0)
-    scored.sort((a: any, b: any) => b._score - a._score)
-    const tam = scored.filter((u: any) => u._score === 100)
-    const komsu = scored.filter((u: any) => u._score === 80)
-    const diger = scored.filter((u: any) => u._score >= 30 && u._score <= 50)
-    return { tam, komsu, diger, scored }
-  } catch { return { tam: [], komsu: [], diger: [], scored: [] } }
-}
+
 export default async function UnifiedCitySlugPage({params}:{params: Promise<{city:string,slug:string}>}){
   const { city: citySlug, slug } = await params
   const city = cities.find(c=>c.slug===citySlug)
@@ -330,24 +277,6 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
     const serviceSchema = { "@context": "https://schema.org", "@type": "Service", "@id": `${canonical}#service`, "name": `${dName} Ustaları`, "serviceType": "Usta ve Tadilat Hizmetleri", "description": `${dLoc} usta hizmetleri. İş sonunda başarı komisyonu yok, hakedişin %100'ü ustanın.`, "provider": { "@id": "https://hemenustamgelsin.com/#organization" }, "areaServed": [{ "@type": "City", "name": cName }, { "@type": "AdministrativeArea", "name": dName }], "url": canonical }
     const webPageSchema = { "@context": "https://schema.org", "@type": "WebPage", "@id": canonical, "name": title, "description": `${dLoc} usta bul, teklif al. İş sonunda başarı komisyonu yok.`, "isPartOf": { "@id": "https://hemenustamgelsin.com/#website" }, "about": { "@id": `${canonical}#service` }, "breadcrumb": { "@id": `${canonical}#breadcrumb` } }
 
-    const liveData = await getLiveUstalarForDistrict(city.slug, district.slug)
-    const itemListSchema = {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "name": `${dName} Ustaları`,
-      "itemListElement": [...liveData.tam,...liveData.komsu,...liveData.diger].slice(0,12).map((u:any,i:number)=>({
-        "@type": "ListItem",
-        "position": i+1,
-        "item": {
-          "@type": "LocalBusiness",
-          "name": u.baslik,
-          "image": u._resolvedImage,
-          "address": { "@type": "PostalAddress", "addressLocality": u.ilceRaw, "addressRegion": u.ilRaw },
-          "description": (u.hizmetlerRaw || u.hizmetler?.join(', ') || '').slice(0,200)
-        }
-      }))
-    }
-
     return (
       <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
         <header style={{background:'white', borderBottom:'1px solid #e7e5e4', padding:'10px 20px', position:'sticky', top:0, zIndex:50}}>
@@ -363,7 +292,6 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
         <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}><Link href="/" style={{color:'#78716c', textDecoration:'none'}}>Ana Sayfa</Link><span> / </span><Link href={`/${city.slug}`} style={{color:'#78716c', textDecoration:'none'}}>{cName}</Link><span> / </span><b style={{color:'#111'}}>{dName}</b></div>
         <section style={{maxWidth:1120, margin:'0 auto', padding:'20px 20px 0'}}>
           <div style={{background:'#dcfce7', border:'1px solid #bbf7d0', borderRadius:12, padding:'12px 14px', fontSize:13, fontWeight:700, color:'#166534'}}>{dLoc} usta bul. İş sonunda başarı komisyonu yok, hakedişin %100'ü ustanın. {localNote}</div>
@@ -375,33 +303,8 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
 
         <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}>
           <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
-            <div style={{fontWeight:900, fontSize:16, marginBottom:14}}>{dName} Ustaları</div>
-            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(320px, 1fr))', gap:16}}>
-              {[...liveData.tam,...liveData.komsu,...liveData.diger].slice(0,12).map((u: any) => {
-                const hizmetler = getUstaHizmetlerText(u)
-                const altText = getUstaSeoAlt(u, dName, cName)
-                return (
-                <div key={u.id} style={{border:'1px solid #e7e5e4', borderRadius:16, overflow:'hidden', background:'white'}}>
-                  <div style={{width:'100%', background:'#ffffff', display:'flex', alignItems:'center', justifyContent:'center', padding:6}}>
-                    <img src={u._resolvedImage} alt={altText} title={altText} loading="lazy" style={{width:'100%', height:'auto', maxHeight:650, objectFit:'contain'}} />
-                  </div>
-                  <div style={{padding:12, borderTop:'1px solid #f5f5f4'}}>
-                    <div style={{fontWeight:900, fontSize:15, lineHeight:1.2}}>{u.baslik} - {dName} Ustası</div>
-                    <div style={{fontSize:11, color:'#57534e', marginTop:4}}>{u.ilceRaw} • {u.ilRaw}</div>
-                    <div style={{marginTop:8, display:'flex', flexWrap:'wrap', gap:5}}>
-                      {hizmetler.map((h:string,i:number)=>(
-                        <span key={i} style={{fontSize:11, background:'#f0fdf4', border:'1px solid #bbf7d0', color:'#166534', padding:'3px 7px', borderRadius:999, fontWeight:600}}>{h}</span>
-                      ))}
-                    </div>
-                    <div style={{fontSize:10, color:'#a8a29e', marginTop:6, lineHeight:1.3}}>{(u.hizmetlerRaw || '').slice(0,120)}</div>
-                  </div>
-                </div>
-                )
-              })}
-              {liveData.tam.length===0 && liveData.komsu.length===0 && liveData.diger.length===0 && (
-                <div style={{fontSize:13, color:'#a8a29e', gridColumn:'1 / -1', padding:'12px 0'}}>Bu ilçede henüz aktif usta kaydı yok. İlan ver, {cName} genelinden teklif al.</div>
-              )}
-            </div>
+            <div style={{fontWeight:900, fontSize:16, marginBottom:14}}>{dName} Ustaları - Canlı</div>
+            <UstaLiveGrid citySlug={city.slug} districtSlug={district.slug} dName={dName} cName={cName} />
           </div>
         </section>
 
