@@ -24,7 +24,6 @@ class _UserViewState extends State<UserView> {
   final Color primaryRed = const Color(0xFFDC143C);
   final Color cardBg = const Color(0xFF1A1A1A);
 
-  // ID'den isme çevrim için değişkenler
   dynamic _sehirler;
   dynamic _ilceler;
 
@@ -45,10 +44,10 @@ class _UserViewState extends State<UserView> {
   }
 
   String _getName(dynamic data, dynamic id, String idKey, String nameKey) {
-    if (id == null || data == null || data is! List) return id?.toString() ?? "-";
+    if (id == null || data == null || data is! List) return id?.toString()?? "-";
     for (var item in data) {
       if (item[idKey]?.toString() == id.toString()) {
-        return item[nameKey]?.toString() ?? id.toString();
+        return item[nameKey]?.toString()?? id.toString();
       }
     }
     return id.toString();
@@ -101,11 +100,11 @@ class _UserViewState extends State<UserView> {
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: Colors.white30, strokeWidth: 2));
         var docs = snapshot.data!.docs.where((doc) {
           var data = doc.data() as Map<String, dynamic>;
-          String displayName = (data['firstName'] != null && data['firstName'].isNotEmpty)
-              ? "${data['firstName']} ${data['lastName'] ?? ''}"
-              : (data['name'] ?? "");
+          String displayName = (data['firstName']!= null && data['firstName'].isNotEmpty)
+              ? "${data['firstName']} ${data['lastName']?? ''}"
+              : (data['name']?? "");
           return displayName.toLowerCase().contains(_searchQuery) ||
-              (data['email'] ?? "").toLowerCase().contains(_searchQuery);
+              (data['email']?? "").toLowerCase().contains(_searchQuery);
         }).toList();
 
         return ListView.builder(
@@ -114,10 +113,10 @@ class _UserViewState extends State<UserView> {
           itemBuilder: (context, index) {
             var user = docs[index];
             var data = user.data() as Map<String, dynamic>;
-            bool isBanned = data['isBanned'] ?? false;
-            String displayName = (data['firstName'] != null && data['firstName'].isNotEmpty)
-                ? "${data['firstName']} ${data['lastName'] ?? ''}"
-                : (data['name'] ?? "İsimsiz/Ünvansız");
+            bool isBanned = data['isBanned']?? false;
+            String displayName = (data['firstName']!= null && data['firstName'].isNotEmpty)
+                ? "${data['firstName']} ${data['lastName']?? ''}"
+                : (data['name']?? "İsimsiz/Ünvansız");
 
             return Container(
               margin: const EdgeInsets.only(bottom: 6),
@@ -127,16 +126,16 @@ class _UserViewState extends State<UserView> {
                 onTap: () => _showUserDetail(user, context),
                 leading: CircleAvatar(
                   radius: 16,
-                  backgroundColor: isBanned ? primaryRed.withOpacity(0.2) : Colors.white10,
-                  child: Text(displayName.isNotEmpty ? displayName[0].toUpperCase() : "?", style: TextStyle(color: isBanned ? primaryRed : Colors.white, fontSize: 12)),
+                  backgroundColor: isBanned? primaryRed.withOpacity(0.2) : Colors.white10,
+                  child: Text(displayName.isNotEmpty? displayName[0].toUpperCase() : "?", style: TextStyle(color: isBanned? primaryRed : Colors.white, fontSize: 12)),
                 ),
                 title: Text(displayName, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-                subtitle: Text(data['email'] ?? "-", style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                subtitle: Text(data['email']?? "-", style: const TextStyle(color: Colors.white54, fontSize: 10)),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(icon: Icon(isBanned ? Icons.lock_open : Icons.block, color: isBanned ? Colors.green : Colors.white38, size: 16),
-                        onPressed: () => _chatService.updateUserBanStatus(user.id, !isBanned)),
+                    IconButton(icon: Icon(isBanned? Icons.lock_open : Icons.block, color: isBanned? Colors.green : Colors.white38, size: 16),
+                        onPressed: () => _chatService.updateUserBanStatus(user.id,!isBanned)),
                     IconButton(icon: const Icon(Icons.delete, color: Colors.white38, size: 16),
                         onPressed: () => _firestore.collection('users').doc(user.id).delete()),
                   ],
@@ -151,22 +150,20 @@ class _UserViewState extends State<UserView> {
 
   Future<void> _showUserDetail(DocumentSnapshot doc, BuildContext context) async {
     var user = doc.data() as Map<String, dynamic>;
-    var riza = user['riza_tarihleri'] ?? {};
+    var riza = user['riza_tarihleri']?? {};
     final TextEditingController msgController = TextEditingController();
     bool isUsta = user['role'] == 'usta';
-    List<dynamic> uzmanliklar = user['uzmanliklar'] ?? [];
+    List<dynamic> uzmanliklar = user['uzmanliklar']?? [];
 
-    // Şehir ve İlçe İsimleri
     String sehirIsmi = _getName(_sehirler, user['sehir_id'], 'sehir_id', 'sehir_adi');
     String ilceIsmi = _getName(_ilceler, user['ilce_id'], 'ilce_id', 'ilce_adi');
 
-    // Komisyon toplamını sistem içinden hesapla
     double toplamKomisyon = 0.0;
     if (isUsta) {
       final allTrans = await _transactionRepository.fetchAllTransactions();
       toplamKomisyon = allTrans
           .where((t) => t['walletId'] == doc.id && t['type'] == 'withdrawal')
-          .fold(0.0, (sum, item) => sum + (double.tryParse(item['amount']?.toString() ?? "0") ?? 0.0));
+          .fold(0.0, (sum, item) => sum + (double.tryParse(item['amount']?.toString()?? "0")?? 0.0));
     }
 
     showDialog(
@@ -176,34 +173,66 @@ class _UserViewState extends State<UserView> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: primaryRed, width: 1)),
         title: const Text("HUKUKİ KAYIT & İLETİŞİM", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
         content: SizedBox(
-          width: 350,
+          width: 380,
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _infoRow("İsim", user['firstName'] ?? user['name'] ?? "-"),
-                _infoRow("Soyisim/Ünvan", user['lastName'] ?? "-"),
-                _infoRow("E-posta", user['email'] ?? "-"),
-                _infoRow("Telefon", user['phone'] ?? "-"),
+                // === YENİ EKLENEN ALAN - SADECE ID + KOPYALA - BAŞKA HİÇBİR YERE DOKUNULMADI ===
+                if (isUsta)...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.orange.withOpacity(0.3))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Sistem ID (UID)", style: TextStyle(color: Colors.orange, fontSize: 11, fontWeight: FontWeight.bold)),
+                        Expanded(
+                          child: Text(doc.id, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold), textAlign: TextAlign.right, overflow: TextOverflow.ellipsis),
+                        ),
+                        const SizedBox(width: 8),
+                        InkWell(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: doc.id));
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ID kopyalandı - Usta Poster ekranına yapıştırabilirsin'), duration: Duration(seconds: 2)));
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(color: Colors.orange, borderRadius: BorderRadius.circular(4)),
+                            child: const Text("KOPYALA", style: TextStyle(color: Colors.black, fontSize: 9, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Divider(color: Colors.white10, height: 1),
+                  const SizedBox(height: 12),
+                ],
+                // === ESKİ YAPI AYNEN DEVAM ===
+                _infoRow("İsim", user['firstName']?? user['name']?? "-"),
+                _infoRow("Soyisim/Ünvan", user['lastName']?? "-"),
+                _infoRow("E-posta", user['email']?? "-"),
+                _infoRow("Telefon", user['phone']?? "-"),
                 _infoRow("Şehir", sehirIsmi),
                 _infoRow("İlçe", ilceIsmi),
-                _infoRow("Kayıt Tarihi", (user['createdAt'] as Timestamp?)?.toDate().toString().substring(0, 16) ?? "-"),
-                if (isUsta) ...[
-                  _infoRow("TC/VD No", user['tcVergiNo'] ?? "-"),
-                  _infoRow("Cüzdan Bakiye", "${user['bakiye'] ?? 0} TL"),
+                _infoRow("Kayıt Tarihi", (user['createdAt'] as Timestamp?)?.toDate().toString().substring(0, 16)?? "-"),
+                if (isUsta)...[
+                  _infoRow("TC/VD No", user['tcVergiNo']?? "-"),
+                  _infoRow("Cüzdan Bakiye", "${user['bakiye']?? 0} TL"),
                   _infoRow("Komisyon Ödemesi", "${toplamKomisyon.toStringAsFixed(2)} TL"),
                   const Divider(color: Colors.white10, height: 20),
                   const Text("UZMANLIK ALANLARI", style: TextStyle(color: Colors.white30, fontSize: 10)),
                   Wrap(spacing: 4, runSpacing: 4, children: uzmanliklar.map((u) => Chip(label: Text(u, style: const TextStyle(fontSize: 9)), backgroundColor: Colors.white10)).toList()),
                 ],
-                _infoRow("IP", user['ipKaydi'] ?? "-"),
+                _infoRow("IP", user['ipKaydi']?? "-"),
                 const Divider(color: Colors.white10, height: 20),
                 const Text("ONAYLAR", style: TextStyle(color: Colors.white30, fontSize: 10)),
                 const SizedBox(height: 8),
-                _infoRow("Sözleşme", riza['sozlesme'] != null ? "ONAYLI" : "BEKLİYOR"),
-                _infoRow("KVKK", riza['kvkk'] != null ? "ONAYLI" : "BEKLİYOR"),
-                _infoRow("Kişisel Veri", riza['kisiselVeri'] != null ? "ONAYLI" : "BEKLİYOR"),
-                _infoRow("Yasal Yüküm.", riza['yasalYukumluluk'] != null ? "ONAYLI" : "BEKLİYOR"),
+                _infoRow("Sözleşme", riza['sozlesme']!= null? "ONAYLI" : "BEKLİYOR"),
+                _infoRow("KVKK", riza['kvkk']!= null? "ONAYLI" : "BEKLİYOR"),
+                _infoRow("Kişisel Veri", riza['kisiselVeri']!= null? "ONAYLI" : "BEKLİYOR"),
+                _infoRow("Yasal Yüküm.", riza['yasalYukumluluk']!= null? "ONAYLI" : "BEKLİYOR"),
                 const SizedBox(height: 12),
                 TextField(
                   controller: msgController,

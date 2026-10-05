@@ -4,6 +4,8 @@ const axios = require("axios");
 const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { defineSecret } = require("firebase-functions/params");
+const nodemailer = require("nodemailer");
 
 admin.initializeApp();
 
@@ -392,3 +394,157 @@ exports.haftalikFiyatGuncelle = onSchedule({
     return null;
   }
 });
+
+// ===================== YENI EKLENEN - KATEGORI MUNHASIR TEKLIF MAIL (PRODUCTION SECURE V3 - FINAL) =====================
+const smtpPass = defineSecret("SMTP_APP_PASSWORD");
+
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+const sanitizeEmail = (email) => {
+  const trimmed = String(email || "").trim();
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!regex.test(trimmed)) throw new HttpsError("invalid-argument", "Gecersiz e-posta formati");
+  if (trimmed.length > 254) throw new HttpsError("invalid-argument", "E-posta cok uzun");
+  return trimmed;
+};
+
+const TIER_PRICING = {
+  "TIER A": { p3: 300000, p6: 550000, p12: 950000 },
+  "TIER A • Premium": { p3: 300000, p6: 550000, p12: 950000 },
+  "TIER B": { p3: 250000, p6: 450000, p12: 800000 },
+  "TIER B • Güçlü": { p3: 250000, p6: 450000, p12: 800000 },
+  "TIER C": { p3: 200000, p6: 375000, p12: 675000 },
+  "TIER C • Orta": { p3: 200000, p6: 375000, p12: 675000 },
+  "TIER D": { p3: 150000, p6: 275000, p12: 500000 },
+  "TIER D • Niş": { p3: 150000, p6: 275000, p12: 500000 },
+};
+
+function getTamFiyat(tierLabel, sureAy) {
+  const pricing = TIER_PRICING[tierLabel];
+  if (!pricing) {
+    throw new HttpsError("invalid-argument", `Gecersiz tier: ${tierLabel}. Izin verilen tier'lar: TIER A/B/C/D ve tanımlı label'lar`);
+  }
+  if (sureAy === 3) return pricing.p3;
+  if (sureAy === 6) return pricing.p6;
+  if (sureAy === 12) return pricing.p12;
+  throw new HttpsError("invalid-argument", "Sure sadece 3, 6 veya 12 olabilir");
+}
+
+exports.sendTeklifMail = onCall(
+  { region: "europe-west3", secrets: [smtpPass] },
+  async (request) => {
+    if (!request.auth || request.auth.token.admin !== true) {
+      throw new HttpsError("permission-denied", "Bu islem icin admin yetkisi gerekli");
+    }
+
+    const { firma, yetkili, email, kategori, altAlanlar, puan, sureAy, tier } = request.data;
+
+    if (!firma || typeof firma !== "string" || firma.trim().length < 2 || firma.trim().length > 200) {
+      throw new HttpsError("invalid-argument", "Firma unvani gecersiz (2-200 karakter)");
+    }
+    if (yetkili && (typeof yetkili !== "string" || yetkili.length > 150)) {
+      throw new HttpsError("invalid-argument", "Yetkili ismi cok uzun");
+    }
+    if (!kategori || typeof kategori !== "string" || kategori.length > 100) {
+      throw new HttpsError("invalid-argument", "Kategori gecersiz");
+    }
+    if (!Array.isArray(altAlanlar) || altAlanlar.length === 0 || altAlanlar.length > 20) {
+      throw new HttpsError("invalid-argument", "Alt alanlar gecersiz");
+    }
+
+    const numPuan = Number(puan);
+    if (!Number.isFinite(numPuan) || numPuan < 1 || numPuan > 100) {
+      throw new HttpsError("invalid-argument", "Puan 1-100 arasinda olmali");
+    }
+
+    const numSureAy = Number(sureAy);
+    if (![3, 6, 12].includes(numSureAy)) {
+      throw new HttpsError("invalid-argument", "Sure sadece 3, 6 veya 12 olabilir");
+    }
+
+    if (!tier || typeof tier !== "string" || tier.length > 50) {
+      throw new HttpsError("invalid-argument", "Tier gecersiz");
+    }
+
+    const safeEmailTo = sanitizeEmail(email);
+    const safeFirma = escapeHtml(firma.trim());
+    const safeYetkili = escapeHtml((yetkili || "").trim());
+    const safeKategori = escapeHtml(kategori.trim());
+    const safeTier = escapeHtml(tier.trim());
+    const safeAltAlanlar = altAlanlar.map((a) => escapeHtml(String(a).trim())).filter((a) => a.length > 0 && a.length < 100);
+
+    if (safeAltAlanlar.length === 0) {
+      throw new HttpsError("invalid-argument", "Alt alan listesi bos");
+    }
+
+    const tamFiyatServer = getTamFiyat(tier, numSureAy);
+    const finalFiyat = Math.round((tamFiyatServer * numPuan) / 100);
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "info@hemenustamgelsin.com",
+        pass: smtpPass.value(),
+      },
+    });
+
+    const html = `
+    <div style="font-family:Poppins,Arial,sans-serif; max-width:600px; margin:0 auto; background:#fff; border-radius:16px; overflow:hidden; border:1px solid #eee;">
+      <div style="background:#000; color:#fff; padding:20px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h2 style="margin:0; font-size:18px;">HEMEN USTAM GELSİN</h2>
+          <p style="margin:4px 0 0; font-size:12px; color:#aaa;">©HUG Market • Kategori Münhasır Çözüm Ortaklığı</p>
+        </div>
+        <div style="text-align:right; font-size:10px; color:#aaa;">
+          Sağlık Mh. Kurudere Cad. No:76/9 Salihli-MANİSA<br/>
+          0532 163 59 66 • info@hemenustamgelsin.com<br/>
+          D-U-N-S®: 751176741
+        </div>
+      </div>
+      <div style="padding:24px;">
+        <h3 style="margin:0 0 8px;">Merhaba ${safeYetkili || safeFirma},</h3>
+        <p style="color:#555; font-size:13px;">${safeKategori} kategorisinde talebiniz için özel çözüm ortaklığı teklifimiz aşağıdadır.</p>
+
+        <div style="background:#f8f8f7; border-radius:12px; padding:16px; margin:16px 0;">
+          <table style="width:100%; font-size:13px; border-collapse:collapse;">
+            <tr><td style="color:#888; padding:6px 0;">Kategori</td><td style="font-weight:700; text-align:right;">${safeKategori}</td></tr>
+            <tr><td style="color:#888; padding:6px 0;">Tier</td><td style="font-weight:600; text-align:right;">${safeTier}</td></tr>
+            <tr><td style="color:#888; padding:6px 0;">Kapsam</td><td style="text-align:right;">%${numPuan} • ${safeAltAlanlar.join(", ")}</td></tr>
+            <tr><td style="color:#888; padding:6px 0;">Süre</td><td style="font-weight:600; text-align:right;">${numSureAy} Ay • 81 İl</td></tr>
+            <tr style="border-top:1px solid #ddd;"><td style="padding:12px 0; font-weight:800;">Teklif Bedeli</td><td style="font-weight:900; font-size:18px; text-align:right;">${finalFiyat} TL</td></tr>
+          </table>
+          <p style="font-size:10px; color:#999; margin:8px 0 0;">Formül: ${numPuan}/100 x ${tamFiyatServer} = ${finalFiyat} • Aylık: ${Math.round(finalFiyat / numSureAy)} TL • Hesaplama sunucu tarafında doğrulandı</p>
+        </div>
+
+        <p style="font-size:11px; color:#888;">Dış açıklama metni: Çözüm ortaklığı bedeli; seçilen kategori/ürün alanları, münhasırlık kapsamı, süre ve entegrasyon kapsamına göre belirlenir.</p>
+
+        <div style="margin:20px 0; padding:12px; background:#fff; border:1px solid #eee; border-radius:8px; font-size:11px; color:#666;">
+          <strong>Ödeme:</strong> TR79 0086 4011 0000 8503 0670 04 • Eren EROĞLU<br/>
+          <strong>Geçerlilik:</strong> 15 gün • ©HUG Market • © Hemen Ustam Gelsin
+        </div>
+
+        <a href="https://hemenustamgelsin.com" style="display:inline-block; background:#000; color:#fff; padding:12px 20px; border-radius:10px; text-decoration:none; font-weight:700; font-size:13px;">Detaylar için görüşelim</a>
+      </div>
+    </div>
+    `;
+
+    await transporter.sendMail({
+      from: '"Hemen Ustam Gelsin • HUG MARKET" <info@hemenustamgelsin.com>',
+      to: safeEmailTo,
+      cc: "info@hemenustamgelsin.com",
+      subject: `HUG MARKET • ${safeKategori} • Kategori Münhasır Teklif - ${safeFirma}`,
+      html: html,
+    });
+
+    return { success: true, message: "Mail gönderildi", serverPrice: finalFiyat, validated: true };
+  }
+);
+// ===================== KATEGORI MUNHASIR TEKLIF MAIL BITIS =====================

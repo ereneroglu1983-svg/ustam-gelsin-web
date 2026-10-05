@@ -1,10 +1,13 @@
-// app/[city]/[slug]/page.tsx - FINAL v12.4 - 20 varyasyon 65-75 garantili - HugAI fotoğraf analizi YOK
+// app/[city]/[slug]/page.tsx - FINAL v14.0 - SEO CANAVARI - TRAFIK CANAVARI
 import { cities } from '../../../data/cities'
 import { jobs } from '../../../data/jobs'
 import { getCityJobData } from '../../../data/cityJobDatabase'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { collection, getDocs, query, where } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
+import komsuMap from '../../../data/komsu-ilceler.json'
 
 function getLastVowel(word: string): string | null {
   for(let i = word.length - 1; i >= 0; i--){
@@ -14,13 +17,13 @@ function getLastVowel(word: string): string | null {
   return null
 }
 const hardConsonants = new Set(['f','s','t','k','ç','ş','h','p','F','S','T','K','Ç','Ş','H','P'])
-function endsWithHardConsonant(word: string): boolean { return word ? hardConsonants.has(word[word.length - 1]) : false }
+function endsWithHardConsonant(word: string): boolean { return word? hardConsonants.has(word[word.length - 1]) : false }
 function getLocativeSuffix(word: string): string {
   const lastVowel = getLastVowel(word)
   const isHard = endsWithHardConsonant(word)
-  if(!lastVowel) return isHard ? "'te" : "'de"
+  if(!lastVowel) return isHard? "'te" : "'de"
   const isFront = ['e','i','ö','ü'].includes(lastVowel)
-  return isFront ? (isHard ? "'te" : "'de") : (isHard ? "'ta" : "'da")
+  return isFront? (isHard? "'te" : "'de") : (isHard? "'ta" : "'da")
 }
 const loc = (name: string) => `${name}${getLocativeSuffix(name)}`
 function countWords(text: string): number { return text.trim().split(/\s+/).filter(Boolean).length }
@@ -32,18 +35,40 @@ function pickDeterministic<T>(arr: T[], seed: string, count: number): T[] {
   for(let i=0;i<count;i++){ result.push(arr[(start + i * 7) % arr.length]) }
   return result
 }
-
-type DistrictSEOData = { serviceFocus: string[]; localIntro: string; demandNote: string; faqTopics: string[]; nearbyPriority: string[] }
-
-const districtSEODataOverride: Record<string, Partial<DistrictSEOData>> = {
-  'manisa/salihli': { serviceFocus: ['ic-cephe-boya-ve-badana','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','fayans-seramik-ve-kalebodur','mutfak-dolabi-ve-tezgahi','laminat-lamine-ve-masif-parke','alci-siva-ve-saten-alci','pvc-dograma','klima-montaj-bakim-ve-gaz-dolumu','cati-yapimi-aktarma-ve-izolasyon'], nearbyPriority: ['turgutlu','akhisar','yunusemre','sehzadeler','soma'] },
-  'manisa/turgutlu': { serviceFocus: ['ic-cephe-boya-ve-badana','dis-cephe-boya-ve-mantolama','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','dogalgaz-tesisati-ve-kombi-montaji-bakimi','mutfak-dolabi-ve-tezgahi','banyo-dolabi-ve-vestiyer','laminat-lamine-ve-masif-parke','oda-kapisi-ve-celik-kapi','pvc-dograma'], nearbyPriority: ['salihli','yunusemre','sehzadeler','akhisar'] },
-  'manisa/akhisar': { serviceFocus: ['ic-cephe-boya-ve-badana','sihhi-tesisat-ve-pis-su-tesisati','elektrik-tesisati','fayans-seramik-ve-kalebodur','laminat-lamine-ve-masif-parke','mutfak-dolabi-ve-tezgahi','alci-siva-ve-saten-alci','oda-kapisi-ve-celik-kapi','klima-montaj-bakim-ve-gaz-dolumu','bahce-peyzaj-ve-cim-ekimi'], nearbyPriority: ['salihli','turgutlu','soma','kirkagac'] },
-  'istanbul/kadikoy': { serviceFocus: ['ic-cephe-boya-ve-badana','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','mutfak-dolabi-ve-tezgahi','banyo-dolabi-ve-vestiyer','laminat-lamine-ve-masif-parke','alci-siva-ve-saten-alci','klima-montaj-bakim-ve-gaz-dolumu','uydu-internet-ve-kamera-sistemleri','marangozluk-ve-mobilya-tamiri'], nearbyPriority: ['uskudar','atasehir','maltepe','besiktas'] },
-  'istanbul/besiktas': { serviceFocus: ['ic-cephe-boya-ve-badana','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','mutfak-dolabi-ve-tezgahi','banyo-dolabi-ve-vestiyer','laminat-lamine-ve-masif-parke','fayans-seramik-ve-kalebodur','klima-montaj-bakim-ve-gaz-dolumu','asansor-bakim-ve-onarim','cam-balkon-ve-giyotin-cam'], nearbyPriority: ['sisli','beyoglu','kadikoy','uskudar'] },
-  'istanbul/uskudar': { nearbyPriority: ['kadikoy','atasehir','beykoz','besiktas'] }
+function toSlug(str: string): string {
+  if(!str) return ''
+  return str.toString()
+.replace(/İ/g,'i').replace(/I/g,'i')
+.toLocaleLowerCase('tr-TR')
+.replace(/ç/g,'c').replace(/ğ/g,'g').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ş/g,'s').replace(/ü/g,'u')
+.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+.replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
+}
+function resolveUstaImage(u: any): string {
+  const raw = (u.imagePath || u.resimYolu || u['resim yolu'] || '').toString().trim()
+  if(!raw) return '/app_logo.png'
+  if(raw.startsWith('http://') || raw.startsWith('https://')) return raw
+  const clean = raw.replace(/^\/+/, '')
+  return `https://cdn.hemenustamgelsin.com/${clean}`
+}
+function getUstaSeoAlt(u: any, dName: string, cName: string): string {
+  const hizmet = (u.hizmetler?.[0] || '').toString()
+  return `${u.baslik} - ${dName} ${hizmet} ustası - ${cName}`.slice(0,150)
+}
+function getUstaHizmetlerText(u: any): string[] {
+  const arr = (u.hizmetler || []) as string[]
+  return arr.slice(0,6)
 }
 
+type DistrictSEOData = { serviceFocus: string[]; localIntro: string; demandNote: string; faqTopics: string[]; nearbyPriority: string[] }
+const districtSEODataOverride: Record<string, Partial<DistrictSEOData>> = {
+  'manisa/salihli': { serviceFocus: ['ic-cephe-boya-ve-badana','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','fayans-seramik-ve-kalebodur','mutfak-dolabi-ve-tezgahi','laminat-lamine-ve-masif-parke','alci-siva-ve-saten-alci','pvc-dograma','klima-montaj-bakim-ve-gaz-dolumu','cati-yapimi-aktarma-ve-izolasyon'], nearbyPriority: ['turgutlu','akhisar','yunusemre','sehzadeler','soma','alasehir','ahmetli','golmarmara','gordes','kula','kirkagac','koprubasi','sarigol','saruhanli','selendi','demirci'] },
+  'manisa/turgutlu': { serviceFocus: ['ic-cephe-boya-ve-badana','dis-cephe-boya-ve-mantolama','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','dogalgaz-tesisati-ve-kombi-montaji-bakimi','mutfak-dolabi-ve-tezgahi','banyo-dolabi-ve-vestiyer','laminat-lamine-ve-masif-parke','oda-kapisi-ve-celik-kapi','pvc-dograma'], nearbyPriority: ['salihli','yunusemre','sehzadeler','akhisar','ahmetli','alasehir','golmarmara','soma','saruhanli','kula','kirkagac','koprubasi','sarigol','selendi','demirci','gordes'] },
+  'manisa/akhisar': { serviceFocus: ['ic-cephe-boya-ve-badana','sihhi-tesisat-ve-pis-su-tesisati','elektrik-tesisati','fayans-seramik-ve-kalebodur','laminat-lamine-ve-masif-parke','mutfak-dolabi-ve-tezgahi','alci-siva-ve-saten-alci','oda-kapisi-ve-celik-kapi','klima-montaj-bakim-ve-gaz-dolumu','bahce-peyzaj-ve-cim-ekimi'], nearbyPriority: ['salihli','turgutlu','soma','kirkagac','golmarmara','gordes','yunusemre','sehzadeler','ahmetli','alasehir','kula','koprubasi','sarigol','saruhanli','selendi','demirci'] },
+  'istanbul/kadikoy': { serviceFocus: ['ic-cephe-boya-ve-badana','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','mutfak-dolabi-ve-tezgahi','banyo-dolabi-ve-vestiyer','laminat-lamine-ve-masif-parke','alci-siva-ve-saten-alci','klima-montaj-bakim-ve-gaz-dolumu','uydu-internet-ve-kamera-sistemleri','marangozluk-ve-mobilya-tamiri'], nearbyPriority: ['uskudar','atasehir','maltepe','besiktas'] },
+  'istanbul/besiktas': { serviceFocus: ['ic-cephe-boya-ve-badana','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','mutfak-dolabi-ve-tezgahi','banyo-dolabi-ve-vestiyer','laminat-lamine-ve-masif-parke','fayans-seramik-ve-kalebodur','klima-montaj-bakim-ve-gaz-dolumu','asansor-bakim-ve-onarim','cam-balkon-ve-giyotin-cam'], nearbyPriority: ['sisli','beyoglu','kadikoy','uskudar','eyupsultan'] },
+  'istanbul/uskudar': { nearbyPriority: ['kadikoy','atasehir','beykoz','besiktas','eyupsultan'] }
+}
 const safeLocalIntroTemplates: Array<(dName: string, cName: string, dLoc: string) => string> = [
   (d,c,dL) => `${d}, ${c} ili sınırları içinde konut ve iş yeri için ilan oluşturabileceğin ilçelerden biridir ve aktif olarak hizmet vermektedir.`,
   (d,c,dL) => `${d} ilçesi ${c} içinde yer alan ve Hemen Ustam Gelsin üzerinden ilan verilebilen bölgelerden biri olarak öne çıkmaktadır.`,
@@ -59,27 +84,23 @@ const safeDemandNoteTemplates: Array<(dName: string, cName: string, dLoc: string
   (d,c,dL) => `${d} için ilan oluşturduktan sonra teklifleri karşılaştırarak ustanı seçebilirsin.`
 ]
 const allFaqTopics = ['usta-fiyatlari','komisyon','ilan-verme','teklif-alma','hizmetler','dis-usta','kesif','ilan-suresi','hugai']
-
 function getAutoServiceFocus(citySlug: string, districtSlug: string): string[] { return pickDeterministic(jobs, `${citySlug}/${districtSlug}/services`, 10).map(j => j.slug) }
 function getAutoLocalIntro(citySlug: string, districtSlug: string, dName: string, cName: string, dLoc: string): string { const tmpl = pickDeterministic(safeLocalIntroTemplates, `${citySlug}/${districtSlug}/localIntro`, 1)[0]; return tmpl(dName, cName, dLoc) }
 function getAutoDemandNote(citySlug: string, districtSlug: string, dName: string, cName: string, dLoc: string): string { const tmpl = pickDeterministic(safeDemandNoteTemplates, `${citySlug}/${districtSlug}/demandNote`, 1)[0]; return tmpl(dName, cName, dLoc) }
 function getAutoFaqTopics(citySlug: string, districtSlug: string): string[] { return pickDeterministic(allFaqTopics, `${citySlug}/${districtSlug}/faq`, 4) }
-function getAutoDistrictPriority(city: typeof cities[0], districtSlug: string): string[] { const others = city.districts.filter(d=>d.slug!==districtSlug).map(d=>d.slug); return pickDeterministic(others, `${city.slug}/${districtSlug}/nearby`, 5) }
-
+function getAutoDistrictPriority(city: typeof cities[0], districtSlug: string): string[] { return city.districts.filter(d=>d.slug!==districtSlug).map(d=>d.slug) }
 function getDistrictSEOData(city: typeof cities[0], district: {slug: string, name: string}): DistrictSEOData {
   const key = `${city.slug}/${district.slug}`
   const override = districtSEODataOverride[key] || {}
   const dLoc = loc(district.name)
   return {
-    serviceFocus: override.serviceFocus ?? getAutoServiceFocus(city.slug, district.slug),
-    localIntro: override.localIntro ?? getAutoLocalIntro(city.slug, district.slug, district.name, city.name, dLoc),
-    demandNote: override.demandNote ?? getAutoDemandNote(city.slug, district.slug, district.name, city.name, dLoc),
-    faqTopics: override.faqTopics ?? getAutoFaqTopics(city.slug, district.slug),
-    nearbyPriority: override.nearbyPriority ?? getAutoDistrictPriority(city, district.slug)
+    serviceFocus: override.serviceFocus?? getAutoServiceFocus(city.slug, district.slug),
+    localIntro: override.localIntro?? getAutoLocalIntro(city.slug, district.slug, district.name, city.name, dLoc),
+    demandNote: override.demandNote?? getAutoDemandNote(city.slug, district.slug, district.name, city.name, dLoc),
+    faqTopics: override.faqTopics?? getAutoFaqTopics(city.slug, district.slug),
+    nearbyPriority: override.nearbyPriority?? getAutoDistrictPriority(city, district.slug)
   }
 }
-
-// FINAL v12.4 - HugAI fotoğraf analizi yok, sadece tahmini piyasa fiyatı - 65-75 kelime garantili
 const introVariants: Array<(dName: string, cName: string, dLoc: string) => string> = [
   (d,c,dL) => `${dL} oluşturduğun iş ilanı hizmet alanına göre uygun ${c} ustalarına iletilir ve hızlı teklif alma imkanı sunar. HugAI tahmini piyasa fiyat aralığını gösterir ve bütçe planlamana net yardımcı olur. ${dL} iç cephe boya, su tesisatı, elektrik tesisatı, fayans döşeme, parke, mutfak dolabı, banyo tadilatı gibi branşlarda kolayca ilan verebilirsin. İlan yayınlandığında ustalar tekliflerini iletir ve iş sonunda başarı komisyonu olmadan hakedişin tamamı ustanın olur ve süreç şeffaf yönetilir.`,
   (d,c,dL) => `${d} için açtığın ilan ${c} genelindeki ilgili ustaların ekranına düşer ve teklif süreci hemen başlar. HugAI yaklaşık piyasa fiyat aralığını sunar ve bütçe planlamana yardımcı olur. ${dL} boya badana, alçı sıva, mutfak dolabı, banyo tadilatı, parke döşeme, elektrik tesisatı, su tesisatı gibi kategorilerde hizmet alabilirsin. İlanını oluşturduktan sonra ustalar tekliflerini iletir ve uygun olanı seçebilirsin. İş tamamlandığında hakedişin tamamı ustaya aittir ve kesinti yapılmaz platform süreci kolaylaştırır ve hızlandırır.`,
@@ -102,7 +123,6 @@ const introVariants: Array<(dName: string, cName: string, dLoc: string) => strin
   (d,c,dL) => `${dL} yayınladığın ilan hizmet kategorisine göre uygun ustalara iletilir eşleştirme yapılır ve teklif süreci başlar. HugAI tahmini piyasa fiyatını gösterir ve yaklaşık maliyet aralığı hakkında net bilgi sunar. ${dL} tesisat, elektrik, boya, parke, mutfak dolabı, banyo tadilatı gibi işler için ilan verebilirsin. Ustalar tekliflerini iletir ve sen uygun olanı seçebilirsin. Hakedişin tamamı ustada kalır ve komisyon yoktur süreç tamamen şeffaftır ve hızlıdır ve güvenlidir ve korunur ve yönetilir.`,
   (d,c,dL) => `${d} için oluşturulan ilan ${c} içindeki ilgili branştaki ustalara yönlendirilir eşleştirme yapılır ve teklif toplama başlar. HugAI yaklaşık piyasa fiyat aralığını gösterir ve detaylı ön bilgilendirme sağlar. ${dL} boya, fayans, parke, tesisat, elektrik, mutfak dolabı, banyo gibi işlerde tek ilan ile teklif toplayabilirsin. Ustalar tekliflerini iletir. İş sonunda hakedişin tamamı ustanın olur ve komisyon alınmaz süreç şeffaf ve hızlıdır ve kolayca yönetilir ve korunur ve sürdürülür ve saklanır.`,
 ]
-
 const faqTemplates = [
   { q: (d:string)=> `${d} usta fiyatları nasıl belirleniyor?`, a: (d:string,c:string,dL:string)=> `${dL} fiyatlar HugAI tahmini piyasa fiyat aralığı olarak gösterilir. Teklif doğrudan ustadan gelir, iş sonunda başarı komisyonu yoktur.`, topic: 'usta-fiyatlari' },
   { q: (d:string)=> `${d} için ek komisyon var mı?`, a: (d:string,c:string,dL:string)=> `Hayır. ${d} dahil ${c} genelinde iş sonunda başarı komisyonu yoktur. Hakedişin %100'ü ustanın olur. Platform ustanın hakedişinden kesinti yapmaz.`, topic: 'komisyon' },
@@ -115,13 +135,10 @@ const faqTemplates = [
   { q: (d:string)=> `${d} için HugAI ne yapar?`, a: (d:string,c:string,dL:string)=> `HugAI ${dL} için tahmini piyasa fiyat aralığını gösterir ve bütçe planlamana yardımcı olur. Bu aralık ${c} koşullarına göre ön bilgilendirme amaçlıdır ve kesin fiyat değildir.`, topic: 'hugai' },
   { q: (d:string)=> `${d} ilanım ne kadar süre yayında kalır?`, a: (d:string,c:string,dL:string)=> `${dL} oluşturduğun ilan teklifler gelene kadar yayında kalır. Teklifleri karşılaştırarak dilediğin zaman ustanı seçebilirsin.`, topic: 'ilan-suresi' }
 ]
-
 const faqTopicMap: Record<string, number[]> = { 'usta-fiyatlari': [0], 'komisyon': [1], 'ilan-verme': [2,6], 'teklif-alma': [7,2], 'hizmetler': [3], 'dis-usta': [4], 'kesif': [5,8], 'ilan-suresi': [9], 'hugai': [8,0] }
-
 const nearbyMap: Record<string, string[]> = {
   'adana': ['mersin','osmaniye','hatay','kahramanmaras','nigde','kayseri'],'adiyaman': ['kahramanmaras','gaziantep','sanliurfa','diyarbakir','malatya'],'afyonkarahisar': ['kutahya','eskisehir','konya','isparta','denizli','usak'],'agri': ['kars','igdir','van','bitlis','mus','erzurum'],'amasya': ['samsun','tokat','corum','yozgat','cankiri'],'ankara': ['kirikkale','konya','eskisehir','cankiri','bolu','kirsehir'],'antalya': ['mugla','burdur','isparta','konya','karaman','mersin'],'artvin': ['rize','erzurum','ardahan','kars'],'aydin': ['izmir','manisa','denizli','mugla'],'balikesir': ['canakkale','bursa','kutahya','manisa','izmir'],'bilecik': ['bursa','kutahya','eskisehir','sakarya','bolu'],'bingol': ['elazig','diyarbakir','mus','erzurum','tunceli'],'bitlis': ['van','mus','siirt','batman','diyarbakir'],'bolu': ['duzce','sakarya','bursa','bilecik','eskisehir','ankara','zonguldak'],'burdur': ['antalya','isparta','afyonkarahisar','denizli','mugla'],'bursa': ['yalova','kocaeli','bilecik','kutahya','balikesir','sakarya'],'canakkale': ['balikesir','tekirdag','edirne'],'cankiri': ['ankara','bolu','karabuk','kastamonu','corum','kirikkale'],'corum': ['samsun','amasya','yozgat','kirikkale','cankiri','sinop'],'denizli': ['mugla','aydin','manisa','usak','afyonkarahisar','burdur'],'diyarbakir': ['batman','mardin','sanliurfa','adiyaman','malatya','elazig','bingol'],'edirne': ['kirklareli','tekirdag','canakkale'],'elazig': ['malatya','diyarbakir','bingol','tunceli'],'erzincan': ['erzurum','tunceli','elazig','sivas','gumushane','bayburt'],'erzurum': ['kars','agri','mus','bingol','erzincan','bayburt','rize','artvin'],'eskisehir': ['bursa','kutahya','afyonkarahisar','ankara','bolu','bilecik'],'gaziantep': ['kilis','hatay','osmaniye','kahramanmaras','adiyaman','sanliurfa'],'giresun': ['trabzon','gumushane','erzincan','sivas','ordu'],'gumushane': ['trabzon','bayburt','erzincan','giresun','rize'],'hakkari': ['van','sirnak'],'hatay': ['adana','osmaniye','gaziantep','kilis'],'isparta': ['burdur','antalya','konya','afyonkarahisar'],'mersin': ['adana','karaman','konya','nigde','antalya','kahramanmaras'],'istanbul': ['kocaeli','tekirdag','yalova','bursa','sakarya'],'izmir': ['manisa','aydin','balikesir','denizli','usak'],'kars': ['ardahan','erzurum','agri','igdir'],'kastamonu': ['sinop','corum','cankiri','karabuk','bartin'],'kayseri': ['sivas','yozgat','nevsehir','nigde','adana','kahramanmaras'],'kirklareli': ['edirne','tekirdag','istanbul'],'kirsehir': ['yozgat','nevsehir','aksaray','ankara','kirikkale'],'kocaeli': ['istanbul','sakarya','bursa','yalova'],'konya': ['ankara','aksaray','karaman','antalya','isparta','afyonkarahisar','eskisehir','nigde'],'kutahya': ['bursa','bilecik','eskisehir','afyonkarahisar','usak','manisa','balikesir'],'malatya': ['elazig','diyarbakir','adiyaman','kahramanmaras','sivas','erzincan'],'manisa': ['izmir','balikesir','kutahya','usak','denizli','aydin'],'kahramanmaras': ['osmaniye','adana','kayseri','sivas','malatya','adiyaman','gaziantep'],'mardin': ['sanliurfa','diyarbakir','batman','sirnak','siirt'],'mugla': ['aydin','denizli','burdur','antalya'],'mus': ['bingol','diyarbakir','batman','bitlis','van','agri','erzurum'],'nevsehir': ['kirsehir','aksaray','nigde','kayseri','yozgat'],'nigde': ['kayseri','adana','mersin','konya','aksaray','nevsehir'],'ordu': ['samsun','tokat','sivas','giresun'],'rize': ['trabzon','artvin','erzurum','bayburt'],'sakarya': ['kocaeli','duzce','bolu','bilecik','bursa','istanbul'],'samsun': ['ordu','tokat','amasya','corum','sinop'],'siirt': ['batman','bitlis','van','sirnak','mardin'],'sinop': ['kastamonu','corum','samsun'],'sivas': ['tokat','ordu','giresun','erzincan','malatya','kayseri','yozgat'],'tekirdag': ['istanbul','kirklareli','edirne','canakkale'],'tokat': ['amasya','samsun','ordu','sivas','yozgat'],'trabzon': ['rize','gumushane','giresun','bayburt'],'tunceli': ['erzincan','elazig','bingol','erzurum'],'sanliurfa': ['gaziantep','adiyaman','diyarbakir','mardin','sirnak'],'usak': ['manisa','kutahya','afyonkarahisar','denizli'],'van': ['agri','bitlis','siirt','sirnak','hakkari','mus'],'yozgat': ['corum','amasya','tokat','sivas','kayseri','kirsehir','cankiri','kirikkale'],'zonguldak': ['duzce','bolu','karabuk','bartin'],'aksaray': ['konya','nigde','nevsehir','kirsehir','ankara'],'bayburt': ['trabzon','rize','erzurum','erzincan','gumushane'],'karaman': ['konya','mersin','antalya'],'kirikkale': ['ankara','cankiri','corum','yozgat','kirsehir'],'batman': ['diyarbakir','mardin','siirt','bitlis','mus'],'sirnak': ['mardin','siirt','van','hakkari','sanliurfa'],'bartin': ['zonguldak','karabuk','kastamonu'],'ardahan': ['kars','artvin','erzurum'],'igdir': ['kars','agri'],'yalova': ['kocaeli','bursa','istanbul','sakarya'],'karabuk': ['bolu','kastamonu','cankiri','bartin','zonguldak'],'kilis': ['gaziantep','hatay'],'osmaniye': ['adana','hatay','gaziantep','kahramanmaras'],'duzce': ['bolu','sakarya','zonguldak'],
 }
-
 function validateBuildData() {
   if (cities.length!==81) throw new Error(`[BUILD FAIL] cities.length=${cities.length}`)
   const citySlugSet = new Set(cities.map(c=>c.slug))
@@ -129,116 +146,47 @@ function validateBuildData() {
   const nearbyKeys = Object.keys(nearbyMap)
   if (nearbyKeys.length!==81) throw new Error(`[BUILD FAIL] nearbyMap count=${nearbyKeys.length}`)
   const nearbyKeySet = new Set(nearbyKeys)
-  for (const cSlug of citySlugSet) {
-    if (!nearbyKeySet.has(cSlug)) throw new Error(`[BUILD FAIL] nearbyMap eksik şehir: ${cSlug}`)
-  }
-  for (const key of nearbyKeys) {
-    if (!citySlugSet.has(key)) throw new Error(`[BUILD FAIL] nearbyMap geçersiz şehir slug: ${key}`)
-  }
+  for (const cSlug of citySlugSet) { if (!nearbyKeySet.has(cSlug)) throw new Error(`[BUILD FAIL] nearbyMap eksik şehir: ${cSlug}`) }
+  for (const key of nearbyKeys) { if (!citySlugSet.has(key)) throw new Error(`[BUILD FAIL] nearbyMap geçersiz şehir slug: ${key}`) }
   for (const [k, vals] of Object.entries(nearbyMap)) {
-    for (const v of vals) {
-      if (!citySlugSet.has(v)) throw new Error(`[BUILD FAIL] nearbyMap[${k}] geçersiz komşu: ${v}`)
-      if (v===k) throw new Error(`[BUILD FAIL] nearbyMap[${k}] kendisini içeriyor`)
-    }
-    if (new Set(vals).size !== vals.length) throw new Error(`[BUILD FAIL] nearbyMap[${k}] duplicate komşu var`)
+    for (const v of vals) { if (!citySlugSet.has(v)) throw new Error(`[BUILD FAIL] nearbyMap[${k}] geçersiz komşu: ${v}`); if (v===k) throw new Error(`[BUILD FAIL] nearbyMap[${k}] kendisini içeriyor`) }
+    if (new Set(vals).size!== vals.length) throw new Error(`[BUILD FAIL] nearbyMap[${k}] duplicate komşu var`)
   }
   if (jobs.length!==43) throw new Error(`[BUILD FAIL] jobs.length=${jobs.length}`)
   const districtCount = cities.reduce((s,c)=>s+c.districts.length,0)
   if (districtCount!==973) throw new Error(`[BUILD FAIL] districtCount=${districtCount}`)
   for (const city of cities) {
     const dSlugs = city.districts.map(d=>d.slug)
-    if (new Set(dSlugs).size !== dSlugs.length) {
-      const dup = dSlugs.find((s,i)=>dSlugs.indexOf(s)!==i)
-      throw new Error(`[BUILD FAIL] ${city.slug} içinde duplicate ilçe slug: ${dup}`)
-    }
+    if (new Set(dSlugs).size!== dSlugs.length) { const dup = dSlugs.find((s,i)=>dSlugs.indexOf(s)!==i); throw new Error(`[BUILD FAIL] ${city.slug} içinde duplicate ilçe slug: ${dup}`) }
   }
   const jobSet = new Set(jobs.map(j=>j.slug))
   if (cities.flatMap(c=>c.districts.map(d=>d.slug)).filter(d=>jobSet.has(d)).length>0) throw new Error(`[BUILD FAIL] JOB ∩ DISTRICT`)
-
-  introVariants.forEach((variant, i) => {
-    const sample = variant('Salihli', 'Manisa', "Salihli'de")
-    const wc = countWords(sample)
-    if (wc < 65 || wc > 75) {
-      throw new Error(`[BUILD FAIL] introVariants[${i}] = ${wc} kelime. Base intro 65-75 arası olmalı. Metin: ${sample.slice(0,60)}`)
-    }
-    if (sample.toLowerCase().includes('fotoğraf') && sample.toLowerCase().includes('analiz')) {
-      throw new Error(`[BUILD FAIL] introVariants[${i}] fotoğraf analizi iddiası içeriyor - HugAI sadece tahmini piyasa fiyatı verir`)
-    }
-  })
-
+  introVariants.forEach((variant, i) => { const sample = variant('Salihli', 'Manisa', "Salihli'de"); const wc = countWords(sample); if (wc < 65 || wc > 75) { throw new Error(`[BUILD FAIL] introVariants[${i}] = ${wc} kelime. Base intro 65-75 arası olmalı.`) } })
   const jobSlugSet = new Set(jobs.map(j => j.slug))
   for (const [key, data] of Object.entries(districtSEODataOverride)) {
-    const [citySlug, districtSlug] = key.split('/')
-    if (!citySlug || !districtSlug) throw new Error(`[BUILD FAIL] Geçersiz key: ${key}`)
-    const city = cities.find(c => c.slug === citySlug)
-    if (!city) throw new Error(`[BUILD FAIL] geçersiz şehir: ${key}`)
-    const district = city.districts.find(d=>d.slug===districtSlug)
-    if (!district) throw new Error(`[BUILD FAIL] geçersiz ilçe: ${key}`)
-    for (const s of data.serviceFocus ?? []) { if (!jobSlugSet.has(s)) throw new Error(`[BUILD FAIL] ${key} geçersiz serviceFocus: ${s}`) }
-    for (const s of data.nearbyPriority ?? []) {
-      if (!city.districts.some(d => d.slug === s)) throw new Error(`[BUILD FAIL] ${key} geçersiz nearbyPriority: ${s}`)
-      if (s === districtSlug) throw new Error(`[BUILD FAIL] ${key} nearbyPriority kendisini içeriyor: ${s}`)
-    }
-    if (data.nearbyPriority && new Set(data.nearbyPriority).size !== data.nearbyPriority.length) {
-      throw new Error(`[BUILD FAIL] ${key} nearbyPriority içinde duplicate var`)
-    }
+    const [citySlug, districtSlug] = key.split('/'); if (!citySlug ||!districtSlug) throw new Error(`[BUILD FAIL] Geçersiz key: ${key}`); const city = cities.find(c => c.slug === citySlug); if (!city) throw new Error(`[BUILD FAIL] geçersiz şehir: ${key}`); const district = city.districts.find(d=>d.slug===districtSlug); if (!district) throw new Error(`[BUILD FAIL] geçersiz ilçe: ${key}`); for (const s of data.serviceFocus?? []) { if (!jobSlugSet.has(s)) throw new Error(`[BUILD FAIL] ${key} geçersiz serviceFocus: ${s}`) }; for (const s of data.nearbyPriority?? []) { if (!city.districts.some(d => d.slug === s)) throw new Error(`[BUILD FAIL] ${key} geçersiz nearbyPriority: ${s}`); if (s === districtSlug) throw new Error(`[BUILD FAIL] ${key} nearbyPriority kendisini içeriyor: ${s}`) }; if (data.nearbyPriority && new Set(data.nearbyPriority).size!== data.nearbyPriority.length) { throw new Error(`[BUILD FAIL] ${key} nearbyPriority içinde duplicate var`) }
   }
-
   let autoCount = 0
-  for (const city of cities) {
-    for (const district of city.districts) {
-      const data = getDistrictSEOData(city, district)
-      if (!data.serviceFocus.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} serviceFocus boş`)
-      if (!data.localIntro) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} localIntro boş`)
-      if (!data.demandNote) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} demandNote boş`)
-      if (!data.faqTopics.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} faqTopics boş`)
-      if (!data.nearbyPriority.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} nearbyPriority boş`)
-      const dLoc = loc(district.name)
-      const base = introVariants[hashString(`${city.slug}/${district.slug}`) % introVariants.length](district.name, city.name, dLoc)
-      const finalIntro = `${data.localIntro} ${base}`
-      const wc = countWords(finalIntro)
-      if (wc < 80 || wc > 120) {
-        throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} final intro = ${wc} kelime. 80-120 arası olmalı.`)
-      }
-      autoCount++
-    }
-  }
-  if (autoCount !== 973) throw new Error(`[BUILD FAIL] count=${autoCount}`)
+  for (const city of cities) { for (const district of city.districts) { const data = getDistrictSEOData(city, district); if (!data.serviceFocus.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} serviceFocus boş`); if (!data.localIntro) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} localIntro boş`); if (!data.demandNote) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} demandNote boş`); if (!data.faqTopics.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} faqTopics boş`); if (!data.nearbyPriority.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} nearbyPriority boş`); const dLoc = loc(district.name); const base = introVariants[hashString(`${city.slug}/${district.slug}`) % introVariants.length](district.name, city.name, dLoc); const finalIntro = `${data.localIntro} ${base}`; const wc = countWords(finalIntro); if (wc < 80 || wc > 120) { throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} final intro = ${wc} kelime. 80-120 arası olmalı.`) }; autoCount++ } }
+  if (autoCount!== 973) throw new Error(`[BUILD FAIL] count=${autoCount}`)
 }
-
 export function generateStaticParams(){
   validateBuildData()
   const params: {city: string, slug: string}[] = []
-  for(const c of cities){
-    for(const j of jobs){ params.push({city: c.slug, slug: j.slug}) }
-    for(const d of c.districts){ params.push({city: c.slug, slug: d.slug}) }
-  }
-  if(params.length !== 4456) throw new Error(`[BUILD FAIL] params.length=${params.length}`)
+  for(const c of cities){ for(const j of jobs){ params.push({city: c.slug, slug: j.slug}) }; for(const d of c.districts){ params.push({city: c.slug, slug: d.slug}) } }
+  if(params.length!== 4456) throw new Error(`[BUILD FAIL] params.length=${params.length}`)
   return params
 }
-
 export async function generateMetadata({params}:{params: Promise<{city:string,slug:string}>}): Promise<Metadata>{
   const { city: citySlug, slug } = await params
   const city = cities.find(c=>c.slug===citySlug)
   if(!city) notFound()
   const job = jobs.find(j=>j.slug===slug)
-  if(job){
-    const seoData = getCityJobData(city.slug, job.slug)
-    if(!seoData) notFound()
-    const canonical = `https://hemenustamgelsin.com/${city.slug}/${job.slug}`
-    return { title: seoData.metaTitle, description: seoData.metaDescription, alternates: { canonical }, openGraph: { title: seoData.metaTitle, description: seoData.metaDescription, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title: seoData.metaTitle, description: seoData.metaDescription }, robots: { index: true, follow: true } }
-  }
+  if(job){ const seoData = getCityJobData(city.slug, job.slug); if(!seoData) notFound(); const canonical = `https://hemenustamgelsin.com/${city.slug}/${job.slug}`; return { title: seoData.metaTitle, description: seoData.metaDescription, alternates: { canonical }, openGraph: { title: seoData.metaTitle, description: seoData.metaDescription, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title: seoData.metaTitle, description: seoData.metaDescription }, robots: { index: true, follow: true } } }
   const district = city.districts.find(d=>d.slug===slug)
-  if(district){
-    const dLoc = loc(district.name)
-    const title = `${district.name} Ustaları | ${city.name} – İş Sonunda Başarı Komisyonu Yok`
-    const description = `${dLoc} usta bul, teklif al. İş sonunda başarı komisyonu yok; hakedişin %100'ü ustanın. HugAI tahmini piyasa fiyatı ve doğrudan teklif sistemiyle işini başlat.`
-    const canonical = `https://hemenustamgelsin.com/${city.slug}/${district.slug}`
-    return { title, description, alternates: { canonical }, openGraph: { title, description, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title, description }, robots: { index: true, follow: true } }
-  }
+  if(district){ const dLoc = loc(district.name); const title = `${district.name} Ustaları | ${city.name} – İş Sonunda Başarı Komisyonu Yok`; const description = `${dLoc} usta bul, teklif al. İş sonunda başarı komisyonu yok; hakedişin %100'ü ustanın. HugAI tahmini piyasa fiyatı ve doğrudan teklif sistemiyle işini başlat.`; const canonical = `https://hemenustamgelsin.com/${city.slug}/${district.slug}`; return { title, description, alternates: { canonical }, openGraph: { title, description, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title, description }, robots: { index: true, follow: true } } }
   notFound()
 }
-
 function getNearbyCities(currentSlug: string) { return cities.filter(c => (nearbyMap[currentSlug]||[]).includes(c.slug)).slice(0,12) }
 function buildDistrictIntro(dName: string, cName: string, dLoc: string, city: typeof cities[0], district: {slug: string, name: string}): string {
   const seoData = getDistrictSEOData(city, district)
@@ -246,7 +194,7 @@ function buildDistrictIntro(dName: string, cName: string, dLoc: string, city: ty
   return `${seoData.localIntro} ${introVariants[introIdx](dName, cName, dLoc)}`
 }
 function getDistrictServiceLinks(city: typeof cities[0], district: {slug: string, name: string}){ return getDistrictSEOData(city, district).serviceFocus.map(slug=>jobs.find(j=>j.slug===slug)).filter(Boolean) as typeof jobs }
-function getSiblingDistricts(city: typeof cities[0], district: {slug: string, name: string}){ return getDistrictSEOData(city, district).nearbyPriority.map(slug=>city.districts.find(d=>d.slug===slug)).filter(Boolean) as typeof city.districts }
+function getSiblingDistricts(city: typeof cities[0], district: {slug: string, name: string}){ return city.districts.filter(d=>d.slug!==district.slug) as typeof city.districts }
 function getDistrictFAQs(city: typeof cities[0], district: {slug: string, name: string}, dName: string, cName: string, dLoc: string){
   const seoData = getDistrictSEOData(city, district)
   let pool = faqTemplates
@@ -257,7 +205,34 @@ function getDistrictFAQs(city: typeof cities[0], district: {slug: string, name: 
   return pickDeterministic(pool, `${city.slug}/${district.slug}`, 4).map(t=>({ q: t.q(dName), a: t.a(dName, cName, dLoc) }))
 }
 function getDistrictActionNote(city: typeof cities[0], district: {slug: string, name: string}){ return getDistrictSEOData(city, district).demandNote }
-
+async function getLiveUstalarForDistrict(citySlug: string, districtSlug: string) {
+  try {
+    const hedefKey = `${citySlug}/${districtSlug}`
+    const komsuListesi: string[] = (komsuMap as any)[hedefKey] || []
+    const q = query(collection(db, "karisik_slider"), where("aktif", "==", true))
+    const snap = await getDocs(q)
+    const all = snap.docs.map((d: any) => ({ id: d.id,...d.data() })) as any[]
+    const scored = all.map((u: any) => {
+      const ilSlug = toSlug(u.il || u.ilRaw || u.sehir || '')
+      const ilceSlug = toSlug(u.ilce || u.ilceRaw || u.ilceSlug || '')
+      let tamKonum = (u.tamKonum || '').toString()
+      tamKonum = toSlug(tamKonum.replace(/\//g,' ')).replace(/-/g,'/')
+      if(!tamKonum && ilSlug && ilceSlug) tamKonum = `${ilSlug}/${ilceSlug}`
+      let score = 0
+      if (tamKonum === hedefKey) score = 100
+      else if (komsuListesi.includes(tamKonum)) score = 80
+      else if (ilSlug === citySlug && ilceSlug === districtSlug) score = 100
+      else if (ilSlug === citySlug && ilceSlug) score = 50
+      else if (ilSlug === citySlug) score = 30
+      return {...u, _score: score, _tam: tamKonum, _resolvedImage: resolveUstaImage(u) }
+    }).filter((u: any) => u._score > 0)
+    scored.sort((a: any, b: any) => b._score - a._score)
+    const tam = scored.filter((u: any) => u._score === 100)
+    const komsu = scored.filter((u: any) => u._score === 80)
+    const diger = scored.filter((u: any) => u._score >= 30 && u._score <= 50)
+    return { tam, komsu, diger, scored }
+  } catch { return { tam: [], komsu: [], diger: [], scored: [] } }
+}
 export default async function UnifiedCitySlugPage({params}:{params: Promise<{city:string,slug:string}>}){
   const { city: citySlug, slug } = await params
   const city = cities.find(c=>c.slug===citySlug)
@@ -266,7 +241,7 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
   if(job){
     const seoData = getCityJobData(city.slug, job.slug)
     if(!seoData) notFound()
-    const ilceler = seoData.ilceler ?? []
+    const ilceler = seoData.ilceler?? []
     const firstIlce = ilceler[0] || city.name
     const ilceCount = ilceler.length
     const s = job.slug.toLowerCase()
@@ -278,12 +253,11 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
     if(s.includes('klima')) { icon='❄'; color='#06b6d4' }
     if(s.includes('tavan')) { icon='🏗'; color='#57534e' }
     const pageUrl = `https://hemenustamgelsin.com/${city.slug}/${job.slug}`
-    const serviceSchema = { "@context": "https://schema.org", "@type": "Service", "@id": `${pageUrl}#service`, "name": seoData.h1, "serviceType": job.name, "description": seoData.metaDescription, "provider": { "@id": "https://hemenustamgelsin.com/#organization" }, "areaServed": [{ "@type": "City", "name": city.name }, ...ilceler.map((d: string) => ({ "@type": "AdministrativeArea", "name": d }))], "url": pageUrl }
+    const serviceSchema = { "@context": "https://schema.org", "@type": "Service", "@id": `${pageUrl}#service`, "name": seoData.h1, "serviceType": job.name, "description": seoData.metaDescription, "provider": { "@id": "https://hemenustamgelsin.com/#organization" }, "areaServed": [{ "@type": "City", "name": city.name },...ilceler.map((d: string) => ({ "@type": "AdministrativeArea", "name": d }))], "url": pageUrl }
     const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com" }, { "@type": "ListItem", "position": 2, "name": `${city.name} Ustaları`, "item": `https://hemenustamgelsin.com/${city.slug}` }, { "@type": "ListItem", "position": 3, "name": `${city.name} ${job.name}`, "item": pageUrl } ] }
     const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": seoData.faqs.map((f: any) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) }
     return (
       <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
-
         <header style={{background:'white', borderBottom:'1px solid #e7e5e4', padding:'10px 20px', position:'sticky', top:0, zIndex:50}}>
           <div style={{maxWidth:1120, margin:'0 auto', display:'flex', alignItems:'center', gap:12}}>
             <img src="/app_logo.png" alt="Hemen Ustam Gelsin" style={{height:48, width:'auto', objectFit:'contain'}} />
@@ -293,13 +267,12 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
             </div>
           </div>
         </header>
-
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
         <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}><Link href={`/${city.slug}`} style={{color:'#78716c', textDecoration:'none'}}>{city.name} Ustaları</Link> <span> / </span> <b style={{color:'#111'}}>{job.name}</b></div>
         <section style={{ background: `radial-gradient(800px 400px at 15% 0%, ${color}15 0%, transparent 60%), #FFFBF5`, padding:'26px 20px 28px' }}>
-          <style>{`@media(max-width:768px){.job-hero{grid-template-columns:1fr!important} .job-content{grid-template-columns:1fr!important}}`}</style>
+          <style>{`@media(max-width:768px){.job-hero{grid-template-columns:1fr!important}.job-content{grid-template-columns:1fr!important}}`}</style>
           <div className="job-hero" style={{maxWidth:1120, margin:'0 auto', display:'grid', gridTemplateColumns:'1.15fr 0.85fr', gap:24}}>
             <div>
               <div style={{display:'inline-flex', gap:6, background:'white', border:'1px solid #e7e5e4', borderRadius:999, padding:'6px 10px', fontSize:11, fontWeight:800, marginBottom:14}}><span style={{background:color, color:'white', borderRadius:999, padding:'2px 8px'}}>{icon} {job.name.toUpperCase()}</span><span>{city.name.toUpperCase()} • HugAI • BAŞARI KOMİSYONU YOK</span></div>
@@ -350,15 +323,33 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
     const districtServices = getDistrictServiceLinks(city, district)
     const faqs = getDistrictFAQs(city, district, dName, cName, dLoc)
     const canonical = `https://hemenustamgelsin.com/${city.slug}/${district.slug}`
-    const title = `${dName} Ustaları | ${cName} – İş Sonunda Başarı Komisyonu Yok`
+    const title = `${dName} Ustaları | ${city.name} – İş Sonunda Başarı Komisyonu Yok`
     const h1 = `${dName} Ustaları – ${cName}`
     const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", "@id": `${canonical}#breadcrumb`, "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com" }, { "@type": "ListItem", "position": 2, "name": cName, "item": `https://hemenustamgelsin.com/${city.slug}` }, { "@type": "ListItem", "position": 3, "name": dName, "item": canonical } ] }
     const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) }
     const serviceSchema = { "@context": "https://schema.org", "@type": "Service", "@id": `${canonical}#service`, "name": `${dName} Ustaları`, "serviceType": "Usta ve Tadilat Hizmetleri", "description": `${dLoc} usta hizmetleri. İş sonunda başarı komisyonu yok, hakedişin %100'ü ustanın.`, "provider": { "@id": "https://hemenustamgelsin.com/#organization" }, "areaServed": [{ "@type": "City", "name": cName }, { "@type": "AdministrativeArea", "name": dName }], "url": canonical }
     const webPageSchema = { "@context": "https://schema.org", "@type": "WebPage", "@id": canonical, "name": title, "description": `${dLoc} usta bul, teklif al. İş sonunda başarı komisyonu yok.`, "isPartOf": { "@id": "https://hemenustamgelsin.com/#website" }, "about": { "@id": `${canonical}#service` }, "breadcrumb": { "@id": `${canonical}#breadcrumb` } }
+
+    const liveData = await getLiveUstalarForDistrict(city.slug, district.slug)
+    const itemListSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": `${dName} Ustaları`,
+      "itemListElement": [...liveData.tam,...liveData.komsu,...liveData.diger].slice(0,12).map((u:any,i:number)=>({
+        "@type": "ListItem",
+        "position": i+1,
+        "item": {
+          "@type": "LocalBusiness",
+          "name": u.baslik,
+          "image": u._resolvedImage,
+          "address": { "@type": "PostalAddress", "addressLocality": u.ilceRaw, "addressRegion": u.ilRaw },
+          "description": (u.hizmetlerRaw || u.hizmetler?.join(', ') || '').slice(0,200)
+        }
+      }))
+    }
+
     return (
       <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
-
         <header style={{background:'white', borderBottom:'1px solid #e7e5e4', padding:'10px 20px', position:'sticky', top:0, zIndex:50}}>
           <div style={{maxWidth:1120, margin:'0 auto', display:'flex', alignItems:'center', gap:12}}>
             <img src="/app_logo.png" alt="Hemen Ustam Gelsin" style={{height:48, width:'auto', objectFit:'contain'}} />
@@ -368,11 +359,11 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
             </div>
           </div>
         </header>
-
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
         <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0', fontSize:12, color:'#a8a29e'}}><Link href="/" style={{color:'#78716c', textDecoration:'none'}}>Ana Sayfa</Link><span> / </span><Link href={`/${city.slug}`} style={{color:'#78716c', textDecoration:'none'}}>{cName}</Link><span> / </span><b style={{color:'#111'}}>{dName}</b></div>
         <section style={{maxWidth:1120, margin:'0 auto', padding:'20px 20px 0'}}>
           <div style={{background:'#dcfce7', border:'1px solid #bbf7d0', borderRadius:12, padding:'12px 14px', fontSize:13, fontWeight:700, color:'#166534'}}>{dLoc} usta bul. İş sonunda başarı komisyonu yok, hakedişin %100'ü ustanın. {localNote}</div>
@@ -381,6 +372,39 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
           <h1 style={{fontSize:'clamp(28px, 4vw, 42px)', fontWeight:900, margin:0}}>{h1}</h1>
           <p style={{fontSize:15, color:'#44403c', marginTop:12, lineHeight:1.7, maxWidth:760}}>{introText}</p>
         </section>
+
+        <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}>
+          <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
+            <div style={{fontWeight:900, fontSize:16, marginBottom:14}}>{dName} Ustaları</div>
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(320px, 1fr))', gap:16}}>
+              {[...liveData.tam,...liveData.komsu,...liveData.diger].slice(0,12).map((u: any) => {
+                const hizmetler = getUstaHizmetlerText(u)
+                const altText = getUstaSeoAlt(u, dName, cName)
+                return (
+                <div key={u.id} style={{border:'1px solid #e7e5e4', borderRadius:16, overflow:'hidden', background:'white'}}>
+                  <div style={{width:'100%', background:'#ffffff', display:'flex', alignItems:'center', justifyContent:'center', padding:6}}>
+                    <img src={u._resolvedImage} alt={altText} title={altText} loading="lazy" style={{width:'100%', height:'auto', maxHeight:650, objectFit:'contain'}} />
+                  </div>
+                  <div style={{padding:12, borderTop:'1px solid #f5f5f4'}}>
+                    <div style={{fontWeight:900, fontSize:15, lineHeight:1.2}}>{u.baslik} - {dName} Ustası</div>
+                    <div style={{fontSize:11, color:'#57534e', marginTop:4}}>{u.ilceRaw} • {u.ilRaw}</div>
+                    <div style={{marginTop:8, display:'flex', flexWrap:'wrap', gap:5}}>
+                      {hizmetler.map((h:string,i:number)=>(
+                        <span key={i} style={{fontSize:11, background:'#f0fdf4', border:'1px solid #bbf7d0', color:'#166534', padding:'3px 7px', borderRadius:999, fontWeight:600}}>{h}</span>
+                      ))}
+                    </div>
+                    <div style={{fontSize:10, color:'#a8a29e', marginTop:6, lineHeight:1.3}}>{(u.hizmetlerRaw || '').slice(0,120)}</div>
+                  </div>
+                </div>
+                )
+              })}
+              {liveData.tam.length===0 && liveData.komsu.length===0 && liveData.diger.length===0 && (
+                <div style={{fontSize:13, color:'#a8a29e', gridColumn:'1 / -1', padding:'12px 0'}}>Bu ilçede henüz aktif usta kaydı yok. İlan ver, {cName} genelinden teklif al.</div>
+              )}
+            </div>
+          </div>
+        </section>
+
         <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}>
           <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
             <div style={{fontWeight:900, fontSize:14, marginBottom:12}}>NASIL ÇALIŞIR?</div>
@@ -402,7 +426,7 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
         </section>
         <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}>
           <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
-            <div style={{fontWeight:900, fontSize:14, marginBottom:12}}>{cName} Diğer İlçeler</div>
+            <div style={{fontWeight:900, fontSize:14, marginBottom:12}}>{cName} Diğer İlçeler - {siblingDistricts.length} ilçe tamamı</div>
             <div style={{display:'flex', flexWrap:'wrap', gap:8}}>
               {siblingDistricts.map(d=>(<Link key={d.slug} href={`/${city.slug}/${d.slug}`} style={{fontSize:12, padding:'8px 12px', background:'#fffbeb', border:'1px solid #fde68a', borderRadius:999, textDecoration:'none', color:'#92400e'}}>{d.name}</Link>))}
             </div>

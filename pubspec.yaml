@@ -51,6 +51,8 @@ dependencies:
   provider: ^6.1.2
   flutter_web_plugins:
     sdk: flutter
+  pdf: ^3.11.0
+  printing: ^5.13.0
 
 dev_dependencies:
   flutter_test:
@@ -166,3 +168,4 @@ flutter:
     - assets/hug_market/kategori/
     - assets/hug_market/
     - assets/
+    - assets/data/komsu-ilceler.json
