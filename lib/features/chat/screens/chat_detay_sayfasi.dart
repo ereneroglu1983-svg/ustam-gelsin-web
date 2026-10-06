@@ -1,4 +1,4 @@
-// lib/features/chat/screens/chat_detay_sayfasi.dart - FINAL FIX
+// lib/features/chat/screens/chat_detay_sayfasi.dart - FINAL FIX V7.1
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,7 +26,6 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
   final ScrollController _scrollController = ScrollController();
 
   late Stream<QuerySnapshot> _mesajStream;
-  Stream<DocumentSnapshot>? _ilanStream;
 
   Future<DocumentSnapshot> _ilanGetir() async {
     var doc = await FirebaseFirestore.instance.collection('ilanlar').doc(widget.ilanId).get();
@@ -41,7 +40,7 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
 
     _chatService.mesajOkunduIsaretle(widget.ilanId, currentUserId);
 
-    // FIX: Mesajları artık sadece ilanId ile değil, doğru chat'i bularak getir
+    // FIX V7.1: orElse hatası giderildi - try/catch ile güvenli arama
     _mesajStream = FirebaseFirestore.instance
         .collection('chats')
         .where('ilanId', isEqualTo: widget.ilanId)
@@ -49,19 +48,24 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
         .snapshots()
         .asyncExpand((chatSnap) {
       if (chatSnap.docs.isEmpty) return const Stream<QuerySnapshot>.empty();
-      // Doğru chat'i bul: içinde widget.ustaId olan
-      var dogruChat = chatSnap.docs.firstWhere(
-            (d) => (d.data() as Map<String, dynamic>)['katilimcilar']?.contains(widget.ustaId)?? false,
-        orElse: () => chatSnap.docs.first,
-      );
+
+      // Doğru chat'i bul - orElse kullanmadan güvenli yöntem
+      var dogruChat = chatSnap.docs.first;
+      try {
+        dogruChat = chatSnap.docs.firstWhere(
+              (d) => (d.data() as Map<String, dynamic>)['katilimcilar']?.contains(widget.ustaId)?? false,
+        );
+      } catch (_) {
+        // Bulamazsa ilk chat'i kullan
+        dogruChat = chatSnap.docs.first;
+      }
+
       return dogruChat.reference
           .collection('mesajlar')
           .orderBy('timestamp', descending: true)
           .limit(50)
           .snapshots();
     });
-
-    _ilanStream = _ilanGetir().asStream();
   }
 
   @override
@@ -81,7 +85,6 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
       mesajMetni: _controller.text.trim(),
     );
     _controller.clear();
-    // Otomatik aşağı kaydır
     Future.delayed(const Duration(milliseconds: 100), () {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
