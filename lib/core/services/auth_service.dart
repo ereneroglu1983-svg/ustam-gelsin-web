@@ -31,15 +31,27 @@ class AuthService {
           _cachedUserData = userDoc.data() as Map<String, dynamic>;
           // Rolü normalize et
           _cachedUserData!['role'] = _normalizeRole(_cachedUserData!['role']);
-          List<String> uzmanliklar = List<String>.from(_cachedUserData!['uzmanliklar'] ?? []);
-          await _notificationService.updateUserToken(userCredential.user!.uid, uzmanliklar);
+          // REVİZE: FCM token güncellemesi login'i patlatmasın diye ayrı try/catch
+          try {
+            List<String> uzmanliklar = List<String>.from(_cachedUserData!['uzmanliklar'] ?? []);
+            await _notificationService.updateUserToken(userCredential.user!.uid, uzmanliklar);
+          } catch (e) {
+            if (kDebugMode) {
+              print("FCM Token güncelleme hatası (login engellenmedi): $e");
+            }
+          }
         }
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') throw "LÜTFEN ÖNCE KAYIT OLUNUZ";
       if (e.code == 'wrong-password' || e.code == 'invalid-credential') throw "LÜTFEN GİRİŞ BİLGİLERİNİZİ KONTROL EDİNİZ";
       throw "GİRİŞ HATASI: ${e.message}";
-    } catch (e) { throw "SİSTEMSEL BİR HATA OLUŞTU"; }
+    } catch (e) {
+      if (kDebugMode) {
+        print("signIn SİSTEMSEL HATA DETAY: $e");
+      }
+      throw "SİSTEMSEL BİR HATA OLUŞTU: $e";
+    }
   }
 
   Future<Map<String, dynamic>?> getUserProfile({bool refresh = false}) async {

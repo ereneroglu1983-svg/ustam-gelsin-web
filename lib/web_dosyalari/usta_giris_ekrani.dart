@@ -1,8 +1,11 @@
+// lib/web_dosyalari/usta_giris_ekrani.dart - FINAL WEB - POP FIX - LOCKED
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/core/services/auth_service.dart';
+import 'package:ustam_gelsin/main.dart';
 
 class UstaGirisEkrani extends StatefulWidget {
   const UstaGirisEkrani({super.key});
@@ -18,32 +21,19 @@ class _UstaGirisEkraniState extends State<UstaGirisEkrani> {
   bool _isLoading = false;
   bool _beniHatirla = false;
 
+  String _normalizeRole(String? role) {
+    if (role == null) return 'musteri';
+    final r = role.toLowerCase().trim();
+    if (r == 'customer') return 'musteri';
+    if (r == 'master') return 'usta';
+    if (r == 'musteri' || r == 'usta' || r == 'admin') return r;
+    return 'musteri';
+  }
+
   @override
   void initState() {
     super.initState();
     _beniHatirlaBilgileriniYukle();
-  }
-
-  Future<void> _beniHatirlaBilgileriniYukle() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _emailController.text = prefs.getString('usta_email') ?? "";
-      _passwordController.text = prefs.getString('usta_password') ?? "";
-      _beniHatirla = prefs.getBool('usta_remember') ?? false;
-    });
-  }
-
-  Future<void> _bilgileriKaydet() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (_beniHatirla) {
-      await prefs.setString('usta_email', _emailController.text.trim());
-      await prefs.setString('usta_password', _passwordController.text.trim());
-      await prefs.setBool('usta_remember', true);
-    } else {
-      await prefs.remove('usta_email');
-      await prefs.remove('usta_password');
-      await prefs.setBool('usta_remember', false);
-    }
   }
 
   @override
@@ -53,63 +43,69 @@ class _UstaGirisEkraniState extends State<UstaGirisEkrani> {
     super.dispose();
   }
 
+  Future<void> _beniHatirlaBilgileriniYukle() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _emailController.text = prefs.getString('usta_email') ?? "";
+      _beniHatirla = prefs.getBool('usta_remember') ?? false;
+    });
+  }
+
+  Future<void> _bilgileriKaydet() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_beniHatirla) {
+      await prefs.setString('usta_email', _emailController.text.trim());
+      await prefs.setBool('usta_remember', true);
+    } else {
+      await prefs.remove('usta_email');
+      await prefs.setBool('usta_remember', false);
+    }
+  }
+
   Future<void> _handleLogin() async {
     if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("E-mail ve şifre alanları boş bırakılamaz.")),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("E-mail ve şifre alanları boş bırakılamaz.")));
       return;
     }
 
     setState(() => _isLoading = true);
     try {
-      await _authService.signIn(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      );
+      await _authService.signIn(_emailController.text.trim(), _passwordController.text.trim());
+
+      final profile = await _authService.getUserProfile(refresh: true);
+      final String actualRole = _normalizeRole(profile?['role']);
+      final bool isAdminUser = actualRole == 'admin';
+
+      if (!mounted) return;
+
+      // Yetki kontrolü - müşteri usta girişine giremez
+      if (!isAdminUser && actualRole != 'usta') {
+        await _authService.signOut();
+        throw "YETKİSİZ ERİŞİM: Bu hesap bir ${actualRole.toUpperCase()} hesabıdır. Lütfen MÜŞTERİ GİRİŞİ'ni kullanın.";
+      }
 
       await _bilgileriKaydet();
 
-      bool isAdminUser = false;
-      try {
-        isAdminUser = await _authService.isAdmin();
-      } catch (_) {
-        isAdminUser = false;
-      }
-
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(isAdminUser ? '✅ Admin girişi başarılı! Panele yönlendiriliyorsunuz...' : '✅ Giriş başarılı! Ana sayfaya yönlendiriliyorsunuz...'),
-          backgroundColor: const Color(0xFF2DB34A),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-
-      await Future.delayed(const Duration(milliseconds: 1500));
-
-      if (!mounted) return;
-
-      setState(() => _isLoading = false);
+      // KRİTİK FIX
+      Navigator.of(context).pop();
 
       if (isAdminUser) {
-        context.go('/admin');
-      } else {
-        context.go('/home');
+        Future.microtask(() {
+          if (navigatorKey.currentContext != null) {
+            GoRouter.of(navigatorKey.currentContext!).go('/admin');
+          }
+        });
       }
+
     } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.red, duration: const Duration(seconds: 4)),
+      );
     }
   }
 
@@ -154,7 +150,7 @@ class _UstaGirisEkraniState extends State<UstaGirisEkrani> {
                     const Text("Usta Girişi", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => context.go('/home'),
+                      onPressed: () => Navigator.of(context).pop(), // FIX
                     ),
                   ],
                 ),
@@ -180,13 +176,8 @@ class _UstaGirisEkraniState extends State<UstaGirisEkrani> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFDC143C),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("GİRİŞ YAP", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text("GİRİŞ YAP", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                   ),
                 ),
               ],

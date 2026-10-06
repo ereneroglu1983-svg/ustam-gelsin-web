@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/core/services/auth_service.dart';
 import 'package:ustam_gelsin/features/hug_market/theme/hug_market_theme.dart';
 import 'package:ustam_gelsin/features/hug_market/widgets/hug_market_footer.dart';
 import 'package:ustam_gelsin/features/hug_market/widgets/reklam_board_slider.dart';
-import 'package:ustam_gelsin/features/hug_market/sepet_sayfasi.dart';
-import 'package:ustam_gelsin/features/hug_market/siparis_takip_sayfasi.dart';
 import 'package:ustam_gelsin/features/musteri/screens/musteri_login.dart';
 import 'package:ustam_gelsin/features/usta/screens/usta_login.dart';
 import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
@@ -86,19 +84,7 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
     }
   }
 
-  void _goSepet() => Navigator.push(context, MaterialPageRoute(builder: (_) => const SepetSayfasi()));
-
-  void _goSiparisTakip() {
-    if (_authService.currentUser == null) {
-      _showLoginDialog();
-      return;
-    }
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const SiparisTakipSayfasi()));
-  }
-
-  void _goCozumOrtagi() {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => const CozumOrtagiPage()));
-  }
+  void _goCozumOrtagi() => Navigator.push(context, MaterialPageRoute(builder: (_) => const CozumOrtagiPage()));
 
   void _goKategori(String file) {
     Widget? page;
@@ -122,14 +108,7 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
       case 'guvenlik.png': page = const GuvenlikKategoriPage(); break;
       case 'asansor.png': page = const AsansorKategoriPage(); break;
     }
-    if (page!= null) Navigator.push(context, MaterialPageRoute(builder: (_) => page!));
-  }
-
-  // --- GERİ TUŞU DÜZELTMESİ ---
-  void _handleBackToMain() {
-    if (Navigator.canPop(context)) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
-    }
+    if (page != null) Navigator.push(context, MaterialPageRoute(builder: (_) => page!));
   }
 
   @override
@@ -137,22 +116,25 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        _handleBackToMain();
+        if (!didPop) {
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          } else {
+            context.go('/');
+          }
+        }
       },
       child: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snap) {
-          final isLoggedIn = snap.data!= null;
-          final displayName = snap.data?.email?.split('@').first?? 'Hesabım';
-          final uid = snap.data?.uid;
-
+          final isLoggedIn = snap.data != null;
+          final displayName = snap.data?.email?.split('@').first ?? 'Hesabım';
           return Scaffold(
             backgroundColor: HugMarketTheme.lightBg,
             body: CustomScrollView(
               slivers: [
                 _buildAppBar(),
-                _buildActionBar(isLoggedIn, displayName, uid),
+                _buildActionBar(isLoggedIn, displayName),
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
@@ -184,7 +166,13 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
         padding: const EdgeInsets.only(left: 12),
         child: Center(
           child: InkWell(
-            onTap: _handleBackToMain,
+            onTap: () {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                context.go('/');
+              }
+            },
             borderRadius: BorderRadius.circular(12),
             child: Container(
               width: 44,
@@ -208,7 +196,8 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
     );
   }
 
-  Widget _buildActionBar(bool isLoggedIn, String displayName, String? uid) {
+  // GOOGLE INCELEMESI ICIN SIPARISLERIM VE SEPET KALDIRILDI
+  Widget _buildActionBar(bool isLoggedIn, String displayName) {
     return SliverToBoxAdapter(
       child: Container(
         color: Colors.white,
@@ -220,75 +209,9 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: InkWell(
-                  onTap: _goSiparisTakip,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFE2E8F0))),
-                    child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      const Icon(Icons.inventory_2_rounded, size: 18, color: Color(0xFF0F172A)),
-                      const SizedBox(width: 6),
-                      Text('Siparişlerim', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A))),
-                    ]),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(child: _buildSepetAction(uid)),
-              const SizedBox(width: 8),
-              Expanded(child: _buildProfilAction(isLoggedIn, displayName)),
-            ],
-          ),
+          child: _buildProfilAction(isLoggedIn, displayName),
         ),
       ),
-    );
-  }
-
-  Widget _buildSepetAction(String? uid) {
-    if (uid == null) {
-      return InkWell(
-        onTap: _goSepet,
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(10)),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.shopping_cart_rounded, size: 18, color: Colors.white),
-            const SizedBox(width: 6),
-            Text('Sepet', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
-          ]),
-        ),
-      );
-    }
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('sepet').where('userId', isEqualTo: uid).snapshots(),
-      builder: (context, snap) {
-        int count = 0;
-        if (snap.hasData) count = snap.data!.docs.length;
-        return InkWell(
-          onTap: _goSepet,
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(10)),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const Icon(Icons.shopping_cart_rounded, size: 18, color: Colors.white),
-              const SizedBox(width: 6),
-              Text('Sepet', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(20)),
-                child: Text('$count', style: GoogleFonts.poppins(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)),
-              ),
-            ]),
-          ),
-        );
-      },
     );
   }
 
@@ -298,13 +221,16 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
         onTap: _goProfil,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF0F172A))),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.account_circle_rounded, size: 18, color: Color(0xFF0F172A)),
-            const SizedBox(width: 4),
-            Flexible(child: Text(displayName, overflow: TextOverflow.ellipsis, style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A)))),
-          ]),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.account_circle_rounded, size: 20, color: Color(0xFF0F172A)),
+              const SizedBox(width: 8),
+              Text(displayName, overflow: TextOverflow.ellipsis, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A))),
+            ],
+          ),
         ),
       );
     } else {
@@ -312,13 +238,16 @@ class _HugMarketAppHomepageState extends State<HugMarketAppHomepage> {
         onTap: _showLoginDialog,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF0F172A))),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.login_rounded, size: 18, color: Color(0xFF0F172A)),
-            const SizedBox(width: 6),
-            Text('Giriş Yap', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: const Color(0xFF0F172A))),
-          ]),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(10)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.login_rounded, size: 20, color: Colors.white),
+              const SizedBox(width: 8),
+              Text('Giriş Yap', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+            ],
+          ),
         ),
       );
     }

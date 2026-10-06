@@ -1,8 +1,11 @@
+// lib/web_dosyalari/musteri_giris_ekrani.dart - FINAL WEB - POP FIX - ONAYLI
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/core/services/auth_service.dart';
+import 'package:ustam_gelsin/main.dart'; // navigatorKey için
 
 class MusteriGirisEkrani extends StatefulWidget {
   const MusteriGirisEkrani({super.key});
@@ -19,17 +22,32 @@ class _MusteriGirisEkraniState extends State<MusteriGirisEkrani> {
   bool _yukleniyor = false;
   bool _beniHatirla = false;
 
+  String _normalizeRole(String? role) {
+    if (role == null) return 'musteri';
+    final r = role.toLowerCase().trim();
+    if (r == 'customer') return 'musteri';
+    if (r == 'musteri' || r == 'usta' || r == 'admin') return r;
+    return 'musteri';
+  }
+
   @override
   void initState() {
     super.initState();
     _beniHatirlaBilgileriniYukle();
   }
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   Future<void> _beniHatirlaBilgileriniYukle() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() {
       _emailController.text = prefs.getString('musteri_email') ?? "";
-      _passwordController.text = prefs.getString('musteri_password') ?? "";
       _beniHatirla = prefs.getBool('musteri_remember') ?? false;
     });
   }
@@ -38,11 +56,9 @@ class _MusteriGirisEkraniState extends State<MusteriGirisEkrani> {
     final prefs = await SharedPreferences.getInstance();
     if (_beniHatirla) {
       await prefs.setString('musteri_email', _emailController.text.trim());
-      await prefs.setString('musteri_password', _passwordController.text.trim());
       await prefs.setBool('musteri_remember', true);
     } else {
       await prefs.remove('musteri_email');
-      await prefs.remove('musteri_password');
       await prefs.setBool('musteri_remember', false);
     }
   }
@@ -72,41 +88,42 @@ class _MusteriGirisEkraniState extends State<MusteriGirisEkrani> {
 
     try {
       await _authService.signIn(_emailController.text.trim(), _passwordController.text.trim());
+
+      // TEK OKUMA - cache bypass
+      final profile = await _authService.getUserProfile(refresh: true);
+      final String actualRole = _normalizeRole(profile?['role']);
+      final bool isAdminUser = actualRole == 'admin';
+
+      if (!mounted) return;
+
+      if (!isAdminUser && actualRole != 'musteri') {
+        await _authService.signOut();
+        throw "YETKİSİZ ERİŞİM: Bu hesap bir ${actualRole.toUpperCase()} hesabıdır. Lütfen USTA GİRİŞİ'ni kullanın.";
+      }
+
       await _bilgileriKaydet();
 
-      bool isAdminUser = false;
-      try {
-        isAdminUser = await _authService.isAdmin();
-      } catch (_) {
-        isAdminUser = false;
-      }
-
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(isAdminUser ? '✅ Admin girişi başarılı! Panele yönlendiriliyorsunuz...' : '✅ Giriş başarılı! Ana sayfaya yönlendiriliyorsunuz...'),
-          backgroundColor: const Color(0xFF2DB34A),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      // KRİTİK FIX: Navigator.push ile açıldı, go değil pop ile kapanacak
+      Navigator.of(context).pop();
 
-      await Future.delayed(const Duration(milliseconds: 1500));
+      // Admin ise admin panele, musteri ise WebHomeScreen zaten authStateChanges ile güncellenecek
+      if (isAdminUser) {
+        // pop sonrası context için microtask
+        Future.microtask(() {
+          if (navigatorKey.currentContext != null) {
+            GoRouter.of(navigatorKey.currentContext!).go('/admin');
+          }
+        });
+      }
 
+    } catch (e) {
       if (!mounted) return;
       setState(() => _yukleniyor = false);
-
-      if (isAdminUser) {
-        context.go('/admin');
-      } else {
-        context.go('/home');
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _yukleniyor = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.red));
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.red),
+      );
     }
   }
 
@@ -150,7 +167,7 @@ class _MusteriGirisEkraniState extends State<MusteriGirisEkrani> {
                     const Text("Müşteri Girişi", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => context.go('/home'),
+                      onPressed: () => Navigator.of(context).pop(), // FIX: go değil pop
                     ),
                   ],
                 ),

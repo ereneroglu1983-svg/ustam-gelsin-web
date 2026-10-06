@@ -1,15 +1,15 @@
-// lib/features/profile/screens/musteri_profil_sayfasi.dart - FIXED
+// lib/features/profile/screens/musteri_profil_sayfasi.dart - FINAL KESIN COZUM - ANA SAYFAYA FIRLATIR
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:go_router/go_router.dart'; // <-- EKLENDI
-import 'package:ustam_gelsin/features/musteri/screens/musteri_is_secimi_sayfasi.dart';
-import 'package:ustam_gelsin/features/musteri/screens/musteri_kisisel_bilgiler_sayfasi.dart';
-import 'package:ustam_gelsin/features/musteri/screens/musteri_ilanlarim_sayfasi.dart';
-import 'package:ustam_gelsin/features/musteri/screens/musteri_is_gecmisi_sayfasi.dart';
-import 'package:ustam_gelsin/features/musteri/screens/musteri_acil_ustam_sayfasi.dart';
-import 'package:ustam_gelsin/features/musteri/screens/musteri_acil_ilanlarim.dart';
-import 'package:ustam_gelsin/features/chat/screens/mesajlarim_sayfasi.dart';
+import 'package:go_router/go_router.dart';
+import '../../musteri/screens/musteri_is_secimi_sayfasi.dart';
+import '../../musteri/screens/musteri_kisisel_bilgiler_sayfasi.dart';
+import '../../musteri/screens/musteri_ilanlarim_sayfasi.dart';
+import '../../musteri/screens/musteri_is_gecmisi_sayfasi.dart';
+import '../../musteri/screens/musteri_acil_ustam_sayfasi.dart';
+import '../../musteri/screens/musteri_acil_ilanlarim.dart';
+import '../../chat/screens/mesajlarim_sayfasi.dart';
 
 class MusteriProfilSayfasi extends StatefulWidget {
   const MusteriProfilSayfasi({super.key});
@@ -20,7 +20,6 @@ class MusteriProfilSayfasi extends StatefulWidget {
 
 class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
 
-  // === YENİ PROFESYONEL ÇIKIŞ FONKSİYONU ===
   Future<void> _cikisYap() async {
     final onay = await showDialog<bool>(
       context: context,
@@ -42,18 +41,11 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
     if (onay != true) return;
 
     try {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Çıkış yapılıyor..."), duration: Duration(milliseconds: 800)),
-        );
-      }
-
       await FirebaseAuth.instance.signOut();
 
       if (!mounted) return;
-      // GoRouter ile tüm geçmişi sil ve ana sayfaya at
-      GoRouter.of(context).go('/home');
 
+      // 1- Mesajı FIRLAT
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("✅ Başarıyla çıkış yapıldı"),
@@ -61,6 +53,15 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+
+      // 2- KESIN ANA SAYFAYA ATMA - GoRouter + Navigator ikisi birlikte
+      // Önce tüm push'lanan sayfaları kapat
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+      // Sonra GoRouter ile home'a fırlat
+      GoRouter.of(context).go('/home');
+
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -68,7 +69,6 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
       );
     }
   }
-  // === FONKSİYON BİTTİ ===
 
   @override
   void initState() {
@@ -126,7 +126,6 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
           child: Column(
             children: [
               _buildMesajBildirimHanesi(user?.uid, context),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: GestureDetector(
@@ -182,8 +181,6 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
               _menuItem(icon: Icons.person_outline, baslik: "Kişisel Bilgilerim", altBaslik: "Ad, adres, telefon ve güvenlik", onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MusteriKisiselBilgilerSayfasi()))),
               _menuItem(icon: Icons.history, baslik: "İş Geçmişim", altBaslik: "Tamamlanmış işler ve usta bilgileri", onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MusteriIsGecmisiSayfasi()))),
               const SizedBox(height: 40),
-
-              // === DÜZELTİLEN ÇIKIŞ BUTONU ===
               TextButton.icon(
                 onPressed: _cikisYap,
                 icon: const Icon(Icons.logout, color: Colors.redAccent, size: 20),

@@ -1,18 +1,15 @@
-// lib/features/usta/screens/usta_login.dart
+// lib/features/usta/screens/usta_login.dart - FINAL APP - TEST EDİLDİ - LOCKED
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// GÜVENLİK PROTOKOLÜ MADDE 3: Dosya yolları iskelet yapısına (Screenshots) göre güncellendi
 import 'package:ustam_gelsin/core/theme/app_theme.dart';
 import 'package:ustam_gelsin/core/services/auth_service.dart';
-// Profil sayfası yolu iskelet yapısına göre revize edildi
-import 'package:ustam_gelsin/features/usta/screens/usta_profil_sayfasi.dart';
+import 'package:ustam_gelsin/features/home/screens/home_screen.dart';
 import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
 
 class UstaLoginPage extends StatefulWidget {
   final String targetRole;
-
   const UstaLoginPage({super.key, required this.targetRole});
 
   @override
@@ -26,32 +23,18 @@ class _UstaLoginPageState extends State<UstaLoginPage> {
   bool _isLoading = false;
   bool _beniHatirla = false;
 
+  String _normalizeRole(String? role) {
+    if (role == null) return 'musteri';
+    final r = role.toLowerCase().trim();
+    if (r == 'customer') return 'musteri';
+    if (r == 'musteri' || r == 'usta' || r == 'master' || r == 'admin') return r == 'master' ? 'usta' : r;
+    return 'musteri';
+  }
+
   @override
   void initState() {
     super.initState();
     _beniHatirlaBilgileriniYukle();
-  }
-
-  Future<void> _beniHatirlaBilgileriniYukle() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _emailController.text = prefs.getString('usta_email') ?? "";
-      _passwordController.text = prefs.getString('usta_password') ?? "";
-      _beniHatirla = prefs.getBool('usta_remember') ?? false;
-    });
-  }
-
-  Future<void> _bilgileriKaydet() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (_beniHatirla) {
-      await prefs.setString('usta_email', _emailController.text.trim());
-      await prefs.setString('usta_password', _passwordController.text.trim());
-      await prefs.setBool('usta_remember', true);
-    } else {
-      await prefs.remove('usta_email');
-      await prefs.remove('usta_password');
-      await prefs.setBool('usta_remember', false);
-    }
   }
 
   @override
@@ -61,48 +44,66 @@ class _UstaLoginPageState extends State<UstaLoginPage> {
     super.dispose();
   }
 
+  Future<void> _beniHatirlaBilgileriniYukle() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _emailController.text = prefs.getString('usta_email') ?? "";
+      _beniHatirla = prefs.getBool('usta_remember') ?? false;
+    });
+  }
+
+  Future<void> _bilgileriKaydet() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_beniHatirla) {
+      await prefs.setString('usta_email', _emailController.text.trim());
+      await prefs.setBool('usta_remember', true);
+    } else {
+      await prefs.remove('usta_email');
+      await prefs.setBool('usta_remember', false);
+    }
+  }
+
   Future<void> _handleLogin() async {
     if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("E-mail ve şifre alanları boş bırakılamaz.")),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("E-mail ve şifre alanları boş bırakılamaz.")));
       return;
     }
 
     setState(() => _isLoading = true);
     try {
-      await _authService.signIn(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      );
+      await _authService.signIn(_emailController.text.trim(), _passwordController.text.trim());
 
-      bool yetkiliMi = await _authService.isAdmin();
-      String? actualRole = await _authService.getUserRole();
+      final profile = await _authService.getUserProfile(refresh: true);
+      final String actualRole = _normalizeRole(profile?['role']);
+      final String target = _normalizeRole(widget.targetRole);
+      final bool isAdminUser = actualRole == 'admin';
 
       if (!mounted) return;
 
-      if (yetkiliMi) {
+      if (isAdminUser) {
         await _bilgileriKaydet();
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const AdminDashboard()),
+              (route) => false,
         );
-      } else if (actualRole == widget.targetRole) {
+      } else if (actualRole == target) {
         await _bilgileriKaydet();
-
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const UstaProfilSayfasi()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
         );
       } else {
         await _authService.signOut();
-        throw "YETKİSİZ ERİŞİM: Bu hesap bir ${actualRole?.toUpperCase()} hesabıdır. Lütfen doğru giriş sayfasını kullanın.";
+        throw "YETKİSİZ ERİŞİM: Bu hesap bir ${actualRole.toUpperCase()} hesabıdır. Lütfen doğru giriş sayfasını kullanın.";
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
+            content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 4),
           ),
@@ -124,11 +125,7 @@ class _UstaLoginPageState extends State<UstaLoginPage> {
             const SizedBox(height: 20),
             Text(
               "Usta Girişi",
-              style: AppTextStyles.buttonTitle.copyWith(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTextStyles.buttonTitle.copyWith(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 40),
             TextField(
@@ -156,10 +153,7 @@ class _UstaLoginPageState extends State<UstaLoginPage> {
             Theme(
               data: ThemeData(unselectedWidgetColor: Colors.white70),
               child: CheckboxListTile(
-                title: const Text(
-                  "Beni Hatırla",
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
+                title: const Text("Beni Hatırla", style: TextStyle(color: Colors.white70, fontSize: 14)),
                 value: _beniHatirla,
                 controlAffinity: ListTileControlAffinity.leading,
                 contentPadding: EdgeInsets.zero,
@@ -199,17 +193,9 @@ class _UstaLoginPageState extends State<UstaLoginPage> {
                 onPressed: _handleLogin,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.ustaColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 ),
-                child: const Text(
-                  "GİRİŞ YAP",
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
+                child: const Text("GİRİŞ YAP", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ),
           ],

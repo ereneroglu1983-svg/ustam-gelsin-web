@@ -1,4 +1,4 @@
-// lib/features/usta/screens/usta_profil_sayfasi.dart
+// lib/features/usta/screens/usta_profil_sayfasi.dart - FINAL KESIN COZUM
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:ustam_gelsin/core/services/auth_service.dart';
 import 'package:ustam_gelsin/core/services/ad_service.dart';
 import 'package:ustam_gelsin/core/services/wallet_service.dart';
@@ -15,7 +14,6 @@ import 'package:ustam_gelsin/core/models/ilan_model.dart';
 import 'package:ustam_gelsin/core/services/profile_image_service.dart';
 import 'package:ustam_gelsin/core/services/acil_is_yonetim_servisi.dart';
 import 'package:ustam_gelsin/core/services/notification_service.dart';
-
 import 'package:ustam_gelsin/features/usta/screens/yeni_is_firsatlari_sayfasi.dart';
 import 'package:ustam_gelsin/features/usta/screens/acil_ilanlar.dart';
 import 'package:ustam_gelsin/features/usta/screens/usta_tekliflerim_sayfasi.dart';
@@ -537,7 +535,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
     );
   }
 
-  // === SADECE BURASI DÜZELTİLDİ - BAŞKA HİÇBİR YERE DOKUNULMADI ===
+  // === SADECE BURASI DÜZELTİLDİ - KESIN ANA SAYFAYA ATMA + MESAJ ===
   Widget _buildLogoutButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -561,7 +559,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                 ],
               ),
             );
-            if (onay!= true) return;
+            if (onay != true) return;
 
             try {
               await _cagriSubscription?.cancel();
@@ -571,7 +569,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
               await FirebaseAuth.instance.signOut();
 
               if (!mounted) return;
-              GoRouter.of(context).go('/home');
 
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -580,6 +577,13 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                   behavior: SnackBarBehavior.floating,
                 ),
               );
+
+              // KESIN ANA SAYFAYA FIRLAT - MUSTERI ILE AYNI FIX
+              if (Navigator.canPop(context)) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
+              GoRouter.of(context).go('/home');
+
             } catch (e) {
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(

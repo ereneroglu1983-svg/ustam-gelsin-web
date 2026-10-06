@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/features/home/screens/home_screen.dart';
 import 'package:ustam_gelsin/features/home/screens/insaat_rehberi.dart';
 import 'package:ustam_gelsin/features/rehber/screens/rehber_detay_screen.dart';
-import 'package:ustam_gelsin/features/hug_market/hug_market_homepage.dart';
+import 'package:ustam_gelsin/features/hug_market/hug_market_homepage.dart' as web_home;
+import 'package:ustam_gelsin/features/hug_market/hug_market_homepage_app.dart' as app_home;
 import 'package:ustam_gelsin/features/hug_market/sepet_sayfasi.dart';
 import 'package:ustam_gelsin/features/hug_market/siparis_takip_sayfasi.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/mutfak_banyo.dart';
@@ -40,10 +42,16 @@ final appRouter = GoRouter(
       ],
     ),
 
-    // HUG MARKET - REVİZE EDİLDİ
+    // HUG MARKET - APP / WEB AYRILDI - CLASS İSİMLERİ DÜZELTİLDİ
     GoRoute(
       path: '/hug-market',
-      builder: (c, s) => const HugMarketHomepage(),
+      builder: (c, s) {
+        if (kIsWeb) {
+          return const web_home.HugMarketHomepage();
+        } else {
+          return const app_home.HugMarketAppHomepage();
+        }
+      },
       routes: [
         GoRoute(path: 'sepet', builder: (c, s) => const SepetSayfasi()),
         GoRoute(path: 'siparis-takip', builder: (c, s) => const SiparisTakipSayfasi()),
@@ -90,7 +98,11 @@ final appRouter = GoRouter(
               case 'asansor-yuruyen-merdiven':
                 return const AsansorKategoriPage();
               default:
-                return const HugMarketHomepage();
+                if (kIsWeb) {
+                  return const web_home.HugMarketHomepage();
+                } else {
+                  return const app_home.HugMarketAppHomepage();
+                }
             }
           },
         ),

@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // GÜVENLİK PROTOKOLÜ MADDE 3: Dosya yolları iskelet yapısına (Screenshots) göre güncellendi
 import 'package:ustam_gelsin/core/theme/app_theme.dart';
-import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dart';
+import 'package:ustam_gelsin/features/home/screens/home_screen.dart';
 import 'package:ustam_gelsin/core/services/auth_service.dart';
 import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
 
@@ -28,6 +28,14 @@ class _MusteriLoginPageState extends State<MusteriLoginPage> {
   bool _isError = false;
   bool _beniHatirla = false;
 
+  // REVİZE: Role normalizasyon - customer vs musteri bug'ını çözer
+  String _normalizeRole(String? role) {
+    if (role == null) return 'musteri';
+    if (role == 'customer') return 'musteri';
+    if (role == 'musteri' || role == 'usta' || role == 'admin') return role;
+    return 'musteri';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -38,7 +46,7 @@ class _MusteriLoginPageState extends State<MusteriLoginPage> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _emailController.text = prefs.getString('musteri_email') ?? "";
-      _passwordController.text = prefs.getString('musteri_password') ?? "";
+      // REVİZE: Şifre artık saklanmıyor, güvenlik için
       _beniHatirla = prefs.getBool('musteri_remember') ?? false;
     });
   }
@@ -47,11 +55,10 @@ class _MusteriLoginPageState extends State<MusteriLoginPage> {
     final prefs = await SharedPreferences.getInstance();
     if (_beniHatirla) {
       await prefs.setString('musteri_email', _emailController.text.trim());
-      await prefs.setString('musteri_password', _passwordController.text.trim());
+      // REVİZE: Şifre plain text olarak asla saklanmaz
       await prefs.setBool('musteri_remember', true);
     } else {
       await prefs.remove('musteri_email');
-      await prefs.remove('musteri_password');
       await prefs.setBool('musteri_remember', false);
     }
   }
@@ -81,16 +88,18 @@ class _MusteriLoginPageState extends State<MusteriLoginPage> {
 
       if (yetkiliMi) {
         await _bilgileriKaydet();
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const AdminDashboard()),
+              (route) => false,
         );
-      } else if (actualRole == widget.targetRole) {
+      } else if (_normalizeRole(actualRole) == _normalizeRole(widget.targetRole)) {
         await _bilgileriKaydet();
-
-        Navigator.pushReplacement(
+        // REVİZE: Profil sayfasına değil, ANA SAYFAYA yönlendir
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const MusteriProfilSayfasi()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
         );
       } else {
         await _authService.signOut();
