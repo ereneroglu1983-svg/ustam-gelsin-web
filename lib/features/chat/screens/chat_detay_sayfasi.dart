@@ -1,5 +1,4 @@
-// lib/features/chat/screens/chat_detay_sayfasi.dart
-
+// lib/features/chat/screens/chat_detay_sayfasi.dart - FINAL FIX
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,7 +26,13 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
   final ScrollController _scrollController = ScrollController();
 
   late Stream<QuerySnapshot> _mesajStream;
-  late Stream<DocumentSnapshot> _ilanStream;
+  Stream<DocumentSnapshot>? _ilanStream;
+
+  Future<DocumentSnapshot> _ilanGetir() async {
+    var doc = await FirebaseFirestore.instance.collection('ilanlar').doc(widget.ilanId).get();
+    if (doc.exists) return doc;
+    return await FirebaseFirestore.instance.collection('acil_cagri').doc(widget.ilanId).get();
+  }
 
   @override
   void initState() {
@@ -36,8 +41,27 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
 
     _chatService.mesajOkunduIsaretle(widget.ilanId, currentUserId);
 
-    _mesajStream = _chatService.mesajlariGetir(widget.ilanId);
-    _ilanStream = FirebaseFirestore.instance.collection('ilanlar').doc(widget.ilanId).snapshots();
+    // FIX: Mesajları artık sadece ilanId ile değil, doğru chat'i bularak getir
+    _mesajStream = FirebaseFirestore.instance
+        .collection('chats')
+        .where('ilanId', isEqualTo: widget.ilanId)
+        .where('katilimcilar', arrayContains: currentUserId)
+        .snapshots()
+        .asyncExpand((chatSnap) {
+      if (chatSnap.docs.isEmpty) return const Stream<QuerySnapshot>.empty();
+      // Doğru chat'i bul: içinde widget.ustaId olan
+      var dogruChat = chatSnap.docs.firstWhere(
+            (d) => (d.data() as Map<String, dynamic>)['katilimcilar']?.contains(widget.ustaId)?? false,
+        orElse: () => chatSnap.docs.first,
+      );
+      return dogruChat.reference
+          .collection('mesajlar')
+          .orderBy('timestamp', descending: true)
+          .limit(50)
+          .snapshots();
+    });
+
+    _ilanStream = _ilanGetir().asStream();
   }
 
   @override
@@ -45,6 +69,24 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _mesajGonder() {
+    if (_controller.text.trim().isEmpty) return;
+    final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    _chatService.mesajGonder(
+      ilanId: widget.ilanId,
+      gonderenId: currentUserId,
+      aliciId: widget.ustaId,
+      mesajMetni: _controller.text.trim(),
+    );
+    _controller.clear();
+    // Otomatik aşağı kaydır
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      }
+    });
   }
 
   @override
@@ -59,16 +101,18 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(widget.ustaAd, style: const TextStyle(color: Colors.white, fontSize: 16)),
-            StreamBuilder<DocumentSnapshot>(
-              stream: _ilanStream,
+            FutureBuilder<DocumentSnapshot>(
+              future: _ilanGetir(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData || !snapshot.data!.exists) {
-                  return const Text("İlan Başlığı", style: TextStyle(fontSize: 12, color: Colors.white70));
+                String baslik = "İlan detayı yükleniyor...";
+                if (snapshot.hasData && snapshot.data!.exists) {
+                  var data = snapshot.data!.data() as Map<String, dynamic>?;
+                  baslik = data?['baslik']?? data?['kategori']?? "İlan Başlığı";
                 }
-                String baslik = snapshot.data!.get('baslik') ?? "İlan Başlığı";
-                return Text(baslik, style: const TextStyle(fontSize: 12, color: Colors.white70));
+                return Text(baslik, style: const TextStyle(fontSize: 12, color: Colors.white70), maxLines: 1, overflow: TextOverflow.ellipsis);
               },
             ),
           ],
@@ -84,23 +128,15 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
                 stream: _mesajStream,
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return const Center(child: Text("Hata oluştu", style: TextStyle(color: Colors.white)));
+                    return Center(child: Text("Hata: ${snapshot.error}", style: const TextStyle(color: Colors.white)));
                   }
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
-
                   final mesajlar = snapshot.data!.docs;
-
                   if (mesajlar.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "Henüz mesajlaşma yok, ilk mesajı sen at!",
-                        style: TextStyle(color: Colors.white54),
-                      ),
-                    );
+                    return const Center(child: Text("Henüz mesajlaşma yok, ilk mesajı sen at!", style: TextStyle(color: Colors.white54)));
                   }
-
                   return ListView.builder(
                     controller: _scrollController,
                     reverse: true,
@@ -110,14 +146,14 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
                       bool isMe = data['gonderenId'] == currentUserId;
                       return ListTile(
                         title: Align(
-                          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                          alignment: isMe? Alignment.centerRight : Alignment.centerLeft,
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: isMe ? Colors.blue : Colors.white24,
+                              color: isMe? Colors.blue : Colors.white24,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Text(data['mesajMetni'] ?? "", style: const TextStyle(color: Colors.white)),
+                            child: Text(data['mesajMetni']?? "", style: const TextStyle(color: Colors.white)),
                           ),
                         ),
                       );
@@ -140,22 +176,10 @@ class _ChatDetaySayfasiState extends State<ChatDetaySayfasi> {
                         enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white30)),
                         focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
                       ),
+                      onSubmitted: (_) => _mesajGonder(),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.send, color: Colors.blue),
-                    onPressed: () {
-                      if (_controller.text.trim().isNotEmpty) { // .trim() eklendi
-                        _chatService.mesajGonder(
-                          ilanId: widget.ilanId,
-                          gonderenId: currentUserId,
-                          aliciId: widget.ustaId,
-                          mesajMetni: _controller.text.trim(),
-                        );
-                        _controller.clear();
-                      }
-                    },
-                  )
+                  IconButton(icon: const Icon(Icons.send, color: Colors.blue), onPressed: _mesajGonder)
                 ],
               ),
             )

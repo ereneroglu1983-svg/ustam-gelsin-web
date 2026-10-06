@@ -1,10 +1,10 @@
-// lib/core/services/chat_service.dart - FINAL FIX - PUSH + LOOP KESİLDİ
+// lib/core/services/chat_service.dart - FINAL FIX - PUSH + LOOP KESİLDİ + ILAN BASLIK EKLENDİ
 import 'package:rxdart/rxdart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ustam_gelsin/core/services/overlay_manager.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:flutter/foundation.dart'; // EKLENDİ - debugPrint için
+import 'package:flutter/foundation.dart';
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -24,7 +24,21 @@ class ChatService {
     });
   }
 
-  // === MESAJ GÖNDERME - ARTIK FCM TETİKLİYOR ===
+  // İLAN BİLGİSİ ÇEK - KANITLI FIELD ADLARI
+  Future<Map<String, dynamic>?> _ilanBilgisiGetir(String ilanId) async {
+    try {
+      var doc = await _firestore.collection('ilanlar').doc(ilanId).get();
+      if (doc.exists) return doc.data();
+      var acilDoc = await _firestore.collection('acil_cagri').doc(ilanId).get();
+      if (acilDoc.exists) return acilDoc.data();
+      return null;
+    } catch (e) {
+      debugPrint("İlan bilgisi alınamadı: $e");
+      return null;
+    }
+  }
+
+  // === MESAJ GÖNDERME - ARTIK FCM + ILAN BASLIK KAYDEDIYOR ===
   Future<void> mesajGonder({
     required String ilanId,
     required String gonderenId,
@@ -43,8 +57,15 @@ class ChatService {
       if (chatQuery.docs.isNotEmpty) {
         chatRef = chatQuery.docs.first.reference;
       } else {
+        // YENİ: İlan başlığını çek ve chat'e kaydet
+        var ilanData = await _ilanBilgisiGetir(ilanId);
+        var ilanBaslik = ilanData?['baslik'] ?? ilanData?['kategori'] ?? 'İlan';
+        var ilanKategori = ilanData?['kategori'] ?? '';
+
         chatRef = await _firestore.collection('chats').add({
           'ilanId': ilanId,
+          'ilanBaslik': ilanBaslik,
+          'ilanKategori': ilanKategori,
           'katilimcilar': [gonderenId, aliciId],
           'timestamp': FieldValue.serverTimestamp(),
           'sonMesaj': mesajMetni,
@@ -53,21 +74,18 @@ class ChatService {
 
       await chatRef.collection('mesajlar').add({
         'gonderenId': gonderenId,
-        'aliciId': aliciId, // EKLENDİ - FCM İÇİN ŞART
+        'aliciId': aliciId,
         'mesajMetni': mesajMetni,
         'timestamp': FieldValue.serverTimestamp(),
         'okundu': false,
       });
 
-      // Ana chat dokümanını da güncelle - Overlay için
       await chatRef.update({
         'sonMesaj': mesajMetni,
         'sonMesajTarihi': FieldValue.serverTimestamp(),
         'sonGonderen': gonderenId,
       });
 
-      // === YENİ: PUSH BİLDİRİM TETİKLE ===
-      // Firestore'a yazdıktan sonra Cloud Function çağır
       try {
         await _functions.httpsCallable('sendChatNotification').call({
           'aliciId': aliciId,
@@ -76,7 +94,6 @@ class ChatService {
           'mesaj': mesajMetni,
         });
       } catch (e) {
-        // Function yoksa yedek yöntem: bildirimler koleksiyonuna yaz
         await _firestore.collection('bildirimler').add({
           'aliciId': aliciId,
           'gonderenId': gonderenId,
@@ -88,20 +105,16 @@ class ChatService {
         });
         print("⚠ Function yok, yedek bildirim koleksiyonuna yazıldı: $e");
       }
-
     } catch (e) {
       print("❌ Mesaj gönderme hatası: $e");
       rethrow;
     }
   }
 
-  // === DÜZELTİLDİ: SADECE YENİ MESAJLARI DİNLE, CHAT DOKÜMANINI DEĞİL ===
   void yeniMesajlariDinle() {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    // ARTIK chats'i değil, mesajlar alt koleksiyonunu dinlemiyoruz
-    // Bu stream build içinde çağrılmamalı, initState'te 1 kere çağrılmalı
     _firestore
         .collectionGroup('mesajlar')
         .where('aliciId', isEqualTo: uid)
@@ -119,7 +132,6 @@ class ChatService {
         }
       }
     }, onError: (e) {
-      // EKLENDİ - İşte senin "hata oluştu" ekranını patlatan yeri yutuyoruz
       debugPrint("⚠ Mesaj dinleme hatası (index bekleniyor olabilir): $e");
     });
   }

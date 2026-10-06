@@ -7,7 +7,7 @@ import '../env.dart';
 class R2Service {
   String get _accessKey => Env.r2FlutterAccessKey.trim();
   String get _secretKey => Env.r2FlutterSecretKey.trim();
-  String get _endpoint => Env.r2FlutterEndpoint.trim().replaceAll('https://', '').replaceAll('/', '');
+  String get _endpoint => Env.r2FlutterEndpoint.trim().replaceAll('https://', '').split('/').first;
   String get _bucket => 'ustam-gelsin-medya';
   String get _baseUrl => Env.r2PublicUrl.trim().replaceAll(RegExp(r'/$'), '');
 
