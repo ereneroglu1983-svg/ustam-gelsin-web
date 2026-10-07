@@ -1,4 +1,4 @@
-// lib/features/admin/hug_market/kategori_munhasir_motoru.dart - V11 FIXED EDITABLE
+// lib/features/admin/hug_market/kategori_munhasir_motoru.dart - V13 MULTI-SELECT - BIRDEN FAZLA KATEGORI
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,8 +45,9 @@ class _KategoriMunhasirMotoruPageState extends State<KategoriMunhasirMotoruPage>
   ];
 
   late List<KategoriModel> tumKategoriler;
-  KategoriModel? seciliKategori;
-  Map<String,bool> seciliAltlar = {};
+  // V13 MULTI - Artık liste!
+  Set<String> seciliKategoriKeys = {'boya-dekorasyon'};
+  Map<String, Map<String,bool>> seciliAltlarMap = {}; // kategoriKey -> altAlan -> secili mi
   int seciliSure = 3;
   bool _firestoreYukleniyor = false;
 
@@ -54,8 +55,7 @@ class _KategoriMunhasirMotoruPageState extends State<KategoriMunhasirMotoruPage>
   void initState() {
     super.initState();
     tumKategoriler = _buildKategoriler();
-    seciliKategori = tumKategoriler.firstWhere((k)=> k.key=='boya-dekorasyon');
-    _resetAltlar();
+    _initAltlar();
     _firestoreVerileriniDene();
   }
 
@@ -66,6 +66,48 @@ class _KategoriMunhasirMotoruPageState extends State<KategoriMunhasirMotoruPage>
     _emailCtrl.dispose();
     super.dispose();
   }
+
+  void _initAltlar(){
+    for(var k in tumKategoriler){
+      seciliAltlarMap[k.key] = { for (var e in k.altAlanlar.keys) e: true };
+    }
+  }
+
+  void _toggleKategori(String key){
+    setState(() {
+      if(seciliKategoriKeys.contains(key)){
+        if(seciliKategoriKeys.length > 1){ // En az 1 kategori kalsın
+          seciliKategoriKeys.remove(key);
+        }
+      } else {
+        seciliKategoriKeys.add(key);
+      }
+    });
+  }
+
+  List<KategoriModel> get seciliKategoriler => tumKategoriler.where((k)=> seciliKategoriKeys.contains(k.key)).toList();
+
+  TierPricing _tierFor(KategoriModel kat) => tierList.firstWhere((t)=> t.tier==kat.tier);
+
+  int _toplamPuanFor(KategoriModel kat){
+    final altMap = seciliAltlarMap[kat.key] ?? {};
+    return altMap.entries.where((e)=> e.value).fold(0,(sum,e)=> sum + (kat.altAlanlar[e.key]??0));
+  }
+
+  int get _toplamPuanTumu => seciliKategoriler.fold(0,(sum, kat)=> sum + _toplamPuanFor(kat));
+
+  int _tamFiyatFor(KategoriModel kat){
+    final tp = _tierFor(kat);
+    if(seciliSure==3) return tp.p3;
+    if(seciliSure==6) return tp.p6;
+    return tp.p12;
+  }
+
+  int _hesapFiyatFor(KategoriModel kat){
+    return ((_tamFiyatFor(kat) * _toplamPuanFor(kat)) / 100).round();
+  }
+
+  int get _hesaplananFiyatTumu => seciliKategoriler.fold(0,(sum, kat)=> sum + _hesapFiyatFor(kat));
 
   Future<void> _firestoreVerileriniDene() async {
     setState(()=> _firestoreYukleniyor=true);
@@ -83,25 +125,6 @@ class _KategoriMunhasirMotoruPageState extends State<KategoriMunhasirMotoruPage>
           return TierPricing(tier: t, label: data['label']??'TIER', color: Color(data['color'] as int), p3: (data['p3'] as num).toInt(), p6: (data['p6'] as num).toInt(), p12: (data['p12'] as num).toInt());
         }).toList();
         if(newTierList.isNotEmpty) setState(()=> tierList = newTierList);
-      }
-      final katSnap = await db.collection('hug_kategoriler').orderBy('sira').get();
-      if(katSnap.docs.isNotEmpty){
-        final newKats = katSnap.docs.map((d){
-          final data = d.data();
-          Tier t = Tier.B;
-          if(data['tier']=='A') t = Tier.A;
-          else if(data['tier']=='B') t = Tier.B;
-          else if(data['tier']=='C') t = Tier.C;
-          else if(data['tier']=='D') t = Tier.D;
-          return KategoriModel(key: data['key'], ad: data['ad'], tier: t, altAlanlar: Map<String,int>.from((data['altAlanlar'] as Map).map((k,v)=> MapEntry(k.toString(), (v as num).toInt()))));
-        }).toList();
-        if(newKats.isNotEmpty){
-          setState((){
-            tumKategoriler = newKats;
-            seciliKategori = tumKategoriler.firstWhere((k)=> k.key=='boya-dekorasyon', orElse: ()=> tumKategoriler.first);
-            _resetAltlar();
-          });
-        }
       }
     }catch(_){}
     setState(()=> _firestoreYukleniyor=false);
@@ -130,18 +153,7 @@ class _KategoriMunhasirMotoruPageState extends State<KategoriMunhasirMotoruPage>
     ];
   }
 
-  void _resetAltlar(){
-    seciliAltlar = { for (var e in seciliKategori!.altAlanlar.keys) e: true };
-  }
-
-  TierPricing get _tierPricing => tierList.firstWhere((t)=> t.tier==seciliKategori!.tier);
-  int get _toplamPuan => seciliAltlar.entries.where((e)=> e.value).fold(0,(sum,e)=> sum + (seciliKategori!.altAlanlar[e.key]??0));
-  int get _tamFiyat {
-    if(seciliSure==3) return _tierPricing.p3;
-    if(seciliSure==6) return _tierPricing.p6;
-    return _tierPricing.p12;
-  }
-  int get _hesaplananFiyat => ((_tamFiyat * _toplamPuan) / 100).round();
+  bool get _isMobile => MediaQuery.of(context).size.width < 900;
 
   @override
   Widget build(BuildContext context) {
@@ -170,21 +182,40 @@ class _KategoriMunhasirMotoruPageState extends State<KategoriMunhasirMotoruPage>
               const SizedBox(width: 12),
               InkWell(onTap: ()=> Navigator.of(context).maybePop(), child: const Icon(Icons.arrow_back, color: Colors.white, size: 22)),
               const SizedBox(width: 12),
-              Text('HUG MARKET', style: GoogleFonts.poppins(fontWeight: FontWeight.w900, fontSize: 15, color: Colors.white, letterSpacing: 0.5)),
-              const SizedBox(width: 16),
-              _sekmeBtn('Genel', 0),
-              _sekmeBtn('Kategoriler', 1),
-              _sekmeBtn('Teklifler', 2),
-              _sekmeBtn('Raporlar', 3),
-              _sekmeBtn('Ayarlar', 4),
+              Text('HUG MARKET', style: GoogleFonts.poppins(fontWeight: FontWeight.w900, fontSize: _isMobile ? 13 : 15, color: Colors.white)),
+              if(!_isMobile) ...[
+                const SizedBox(width: 16),
+                _sekmeBtn('Genel', 0),
+                _sekmeBtn('Kategoriler', 1),
+                _sekmeBtn('Teklifler', 2),
+                _sekmeBtn('Raporlar', 3),
+                _sekmeBtn('Ayarlar', 4),
+              ],
             ],
           ),
           actions: [
             if(_firestoreYukleniyor) const Padding(padding: EdgeInsets.only(right:12), child: Center(child: SizedBox(width:16,height:16,child: CircularProgressIndicator(strokeWidth:2, color: Colors.white)))),
-            Container(margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)), child: Center(child: Text('${tumKategoriler.length} Kategori • 81 İl • ${_firestoreYukleniyor ? 'Yükleniyor' : 'Hazır'}', style: GoogleFonts.poppins(color: Colors.black, fontSize:11, fontWeight: FontWeight.w800)))),
+            if(!_isMobile) Container(margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8), padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)), child: Center(child: Text('${tumKategoriler.length} Kategori • ${seciliKategoriKeys.length} Seçili • 81 İl', style: GoogleFonts.poppins(color: Colors.black, fontSize:11, fontWeight: FontWeight.w800)))),
           ],
         ),
-        body: IndexedStack(index: _sekme, children: [_buildGenelTab(), _buildMotorTab(), _buildTekliflerTab(), _buildRaporlarTab(), _buildAyarlarTabEditable()]),
+        body: IndexedStack(index: _sekme, children: [_buildGenelTab(), _buildMotorTab(), _buildTekliflerTab(), _buildRaporlarTab(), _buildAyarlarTab()]),
+        bottomNavigationBar: _isMobile ? BottomNavigationBar(
+          currentIndex: _sekme,
+          onTap: (i)=> setState(()=> _sekme=i),
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: const Color(0xFF111111),
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white54,
+          selectedLabelStyle: GoogleFonts.poppins(fontSize:10, fontWeight: FontWeight.w700),
+          unselectedLabelStyle: GoogleFonts.poppins(fontSize:10),
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Genel'),
+            BottomNavigationBarItem(icon: Icon(Icons.category), label: 'Kategori'),
+            BottomNavigationBarItem(icon: Icon(Icons.request_quote), label: 'Teklifler'),
+            BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Raporlar'),
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ayarlar'),
+          ],
+        ) : null,
       ),
     );
   }
@@ -195,113 +226,186 @@ class _KategoriMunhasirMotoruPageState extends State<KategoriMunhasirMotoruPage>
   }
 
   Widget _buildGenelTab(){
-    return SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Genel Dashboard', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 20)),
+    return SingleChildScrollView(padding: const EdgeInsets.fromLTRB(12,12,12,100), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Genel Dashboard - Çoklu Seçim Aktif', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 18)),
+      const SizedBox(height: 4),
+      Text('${seciliKategoriKeys.length} kategori seçili • Toplam ${_hesaplananFiyatTumu} TL', style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54)),
       const SizedBox(height: 16),
-      Row(children: [_statBox('Toplam Kategori', '${tumKategoriler.length}', const Color(0xFF3B82F6)), const SizedBox(width: 12), _statBox('Aktif Teklif', '42', const Color(0xFF22C55E)), const SizedBox(width: 12), _statBox('Bekleyen', '3', const Color(0xFFF59E0B)), const SizedBox(width: 12), _statBox('Ciro', '1.2M TL', const Color(0xFF8B5CF6))]),
+      Row(children: [_statBox('Seçili Kategori', '${seciliKategoriKeys.length}', const Color(0xFF3B82F6)), const SizedBox(width: 12), _statBox('Toplam Teklif', '${_hesaplananFiyatTumu~/1000}K TL', const Color(0xFF22C55E)), const SizedBox(width: 12), _statBox('Toplam Puan', '$_toplamPuanTumu', const Color(0xFFF59E0B)), const SizedBox(width: 12), _statBox('Süre', '$seciliSure Ay', const Color(0xFF8B5CF6))]),
     ]));
   }
 
   Widget _statBox(String title, String val, Color c){
-    return Expanded(child: Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFDDDDDD))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(width: 32, height: 32, decoration: BoxDecoration(color: c.withValues(alpha:0.15), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.dashboard, color: c, size: 18)), const SizedBox(height: 8), Text(val, style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 20)), Text(title, style: GoogleFonts.poppins(fontSize: 11, color: Colors.black54)) ])));
+    return Expanded(child: Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFDDDDDD))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(width: 32, height: 32, decoration: BoxDecoration(color: c.withValues(alpha:0.15), borderRadius: BorderRadius.circular(8)), child: Icon(Icons.dashboard, color: c, size: 18)), const SizedBox(height: 8), Text(val, style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 16), maxLines: 1, overflow: TextOverflow.ellipsis), Text(title, style: GoogleFonts.poppins(fontSize: 11, color: Colors.black54)) ])));
   }
 
   Widget _buildMotorTab(){
+    if(_isMobile){
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(12,12,12,100),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildKategoriListesiMulti(),
+            const SizedBox(height: 16),
+            // Seçili kategorilerin detayları
+            ...seciliKategoriler.map((kat) => Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: _buildKategoriDetayCard(kat),
+            )),
+            _buildTeklifOzetiMulti(),
+          ],
+        ),
+      );
+    }
+    // DESKTOP - 3 kolon ama çoklu
     return Row(children: [
-      Container(width: 300, color: Colors.white, child: Column(children: [
-        Container(width: double.infinity, color: const Color(0xFF111111), padding: const EdgeInsets.all(12), child: Row(children: [Text('KATEGORİ SEÇ', style: GoogleFonts.poppins(fontSize:11, fontWeight: FontWeight.w800, letterSpacing:1, color: Colors.white)), const Spacer(), InkWell(onTap: _firestoreVerileriniDene, child: const Icon(Icons.refresh, color: Colors.white, size:16)) ])),
-        Expanded(child: ListView(padding: const EdgeInsets.only(top:8), children: tierList.map((tier){
+      Container(width: 320, color: Colors.white, child: Column(children: [
+        Container(width: double.infinity, color: const Color(0xFF111111), padding: const EdgeInsets.all(12), child: Row(children: [Text('KATEGORİ SEÇ • ÇOKLU', style: GoogleFonts.poppins(fontSize:11, fontWeight: FontWeight.w800, letterSpacing:1, color: Colors.white)), const Spacer(), Container(padding: const EdgeInsets.symmetric(horizontal:8,vertical:3), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)), child: Text('${seciliKategoriKeys.length} seçili', style: GoogleFonts.poppins(fontSize:10, fontWeight: FontWeight.w800, color: Colors.black)))])),
+        Expanded(child: ListView(padding: const EdgeInsets.only(top:8, bottom:80), children: tierList.map((tier){
           final cats = tumKategoriler.where((c)=> c.tier==tier.tier).toList();
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Container(margin: const EdgeInsets.symmetric(horizontal:12,vertical:6), padding: const EdgeInsets.symmetric(horizontal:10,vertical:6), decoration: BoxDecoration(color: tier.color.withValues(alpha:0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: tier.color.withValues(alpha:0.3))), child: Row(children: [Container(width:8,height:8,decoration: BoxDecoration(color: tier.color, shape: BoxShape.circle)), const SizedBox(width:6), Text(tier.label, style: GoogleFonts.poppins(fontSize:11,fontWeight: FontWeight.w800, color: Colors.black)), const Spacer(), Text('${tier.p3~/1000}K / ${tier.p6~/1000}K / ${tier.p12~/1000}K', style: GoogleFonts.poppins(fontSize:9, fontWeight: FontWeight.w800, color: Colors.black87))])),
-            ...cats.map((cat){ final isSel = seciliKategori?.key==cat.key; return InkWell(onTap: (){ setState((){ seciliKategori=cat; _resetAltlar(); }); }, child: Container(margin: const EdgeInsets.symmetric(horizontal:12,vertical:3), padding: const EdgeInsets.symmetric(horizontal:12,vertical:12), decoration: BoxDecoration(color: isSel? Colors.black : Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: isSel? Colors.black : const Color(0xFFDDDDDD), width: 1.2)), child: Row(children: [Expanded(child: Text(cat.ad, style: GoogleFonts.poppins(fontSize:13, fontWeight: FontWeight.w700, color: isSel? Colors.white : Colors.black))), if(isSel) const Icon(Icons.check_circle, size:18, color: Colors.white)]))); }),
+            ...cats.map((cat){ final isSel = seciliKategoriKeys.contains(cat.key); return InkWell(onTap: ()=> _toggleKategori(cat.key), child: Container(margin: const EdgeInsets.symmetric(horizontal:12,vertical:3), padding: const EdgeInsets.symmetric(horizontal:12,vertical:12), decoration: BoxDecoration(color: isSel? Colors.black : Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: isSel? Colors.black : const Color(0xFFDDDDDD), width: 1.2)), child: Row(children: [Expanded(child: Text(cat.ad, style: GoogleFonts.poppins(fontSize:13, fontWeight: FontWeight.w700, color: isSel? Colors.white : Colors.black))), if(isSel) const Icon(Icons.check_circle, size:18, color: Colors.white) else const Icon(Icons.circle_outlined, size:18, color: Colors.black26)]))); }),
             const SizedBox(height:8),
           ]);
         }).toList())),
       ])),
-      Expanded(flex: 2, child: seciliKategori==null? const SizedBox(): SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFDDDDDD), width:1.2)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Container(width: 48, height:48, decoration: BoxDecoration(color: _tierPricing.color, borderRadius: BorderRadius.circular(12)), child: const Icon(Icons.category, color: Colors.white, size: 24)), const SizedBox(width:12), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(seciliKategori!.ad, style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize:18, color: Colors.black)), Text('${_tierPricing.label} • Tam Fiyat ${_tierPricing.p3~/1000}K / ${_tierPricing.p6~/1000}K / ${_tierPricing.p12~/1000}K • 81 İl', style: GoogleFonts.poppins(fontSize:11, color: Colors.black87, fontWeight: FontWeight.w600))])), Container(padding: const EdgeInsets.symmetric(horizontal:12,vertical:6), decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(20)), child: Text('$_toplamPuan / 100 PUAN', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize:12)))]),
-          const SizedBox(height:16),
-          Container(color: Colors.black, padding: const EdgeInsets.symmetric(horizontal:10,vertical:6), child: Text('ALT ALANLAR & AĞIRLIK (100 PUAN)', style: GoogleFonts.poppins(fontSize:10, fontWeight: FontWeight.w800, letterSpacing:1, color: Colors.white))),
-          const SizedBox(height:10),
-          ...seciliKategori!.altAlanlar.entries.map((e){ final sel = seciliAltlar[e.key]??false; return Container(margin: const EdgeInsets.only(bottom:8), padding: const EdgeInsets.symmetric(horizontal:12,vertical:12), decoration: BoxDecoration(color: sel? Colors.white : const Color(0xFFFAFAFA), borderRadius: BorderRadius.circular(12), border: Border.all(color: sel? Colors.black : const Color(0xFFCCCCCC), width: sel?1.8:1.2)), child: Row(children: [Checkbox(value: sel, onChanged: (v){ setState(()=> seciliAltlar[e.key]=v!); }, activeColor: Colors.black, checkColor: Colors.white, side: const BorderSide(color: Colors.black, width:1.5)), Expanded(child: Text(e.key, style: GoogleFonts.poppins(fontSize:14, fontWeight: sel? FontWeight.w700: FontWeight.w500, color: Colors.black))), Container(padding: const EdgeInsets.symmetric(horizontal:10,vertical:5), decoration: BoxDecoration(color: sel? Colors.black : Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black)), child: Text('${e.value} P', style: GoogleFonts.poppins(fontSize:12, color: sel? Colors.white: Colors.black, fontWeight: FontWeight.w800)))])); }),
-          const SizedBox(height:16),
-          Row(children: [Expanded(child: ElevatedButton(onPressed: (){ setState(()=> seciliAltlar.updateAll((k,v)=> true)); }, style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white), child: Text('Tümünü Seç (100 Puan = Full)', style: GoogleFonts.poppins(fontSize:12, fontWeight: FontWeight.w700, color: Colors.white)))), const SizedBox(width:8), Expanded(child: OutlinedButton(onPressed: (){ setState(()=> seciliAltlar.updateAll((k,v)=> false)); }, style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.black, width:1.5)), child: Text('Temizle', style: GoogleFonts.poppins(fontSize:12, fontWeight: FontWeight.w700, color: Colors.black))))]),
-        ])),
-        const SizedBox(height:16),
-        Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFDDDDDD), width:1.2)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(color: Colors.black, padding: const EdgeInsets.symmetric(horizontal:10,vertical:6), child: Text('SÜRE SEÇ', style: GoogleFonts.poppins(fontSize:10, fontWeight: FontWeight.w800, letterSpacing:1, color: Colors.white))), const SizedBox(height:12), Row(children: [_sureChip('3 Ay', 3), const SizedBox(width:8), _sureChip('6 Ay', 6), const SizedBox(width:8), _sureChip('12 Ay', 12)]), const SizedBox(height:14), Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0xFF111111), borderRadius: BorderRadius.circular(12)), child: Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('HESAPLAMA FORMÜLÜ', style: GoogleFonts.poppins(fontSize:10, fontWeight: FontWeight.w800, color: Colors.white70, letterSpacing:1)), const SizedBox(height:6), Text('$_toplamPuan / 100 x ${_tamFiyat} TL = $_hesaplananFiyat TL', style: GoogleFonts.poppins(fontSize:14, fontWeight: FontWeight.w800, color: Colors.white)), const SizedBox(height:4), Text('Tam kategori: ${_tamFiyat} TL • Seçili kapsam: %$_toplamPuan • Aylık: ${(_hesaplananFiyat / seciliSure).round()} TL', style: GoogleFonts.poppins(fontSize:12, color: Colors.white70, fontWeight: FontWeight.w600))]))]))])),
-      ]))),
-      Container(width: 360, color: Colors.white, child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(color: Colors.black, padding: const EdgeInsets.symmetric(horizontal:10,vertical:6), child: Text('TEKLİF ÖZETİ', style: GoogleFonts.poppins(fontSize:11, fontWeight: FontWeight.w800, letterSpacing:1, color: Colors.white))),
-        const SizedBox(height:14),
-        TextField(controller: _firmaCtrl, style: GoogleFonts.poppins(fontSize:14, color: Colors.black, fontWeight: FontWeight.w600), decoration: InputDecoration(labelText:'Firma Ünvanı *', labelStyle: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.w700), filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.5)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.2)))),
-        const SizedBox(height:10),
-        TextField(controller: _yetkiliCtrl, style: GoogleFonts.poppins(fontSize:14, color: Colors.black, fontWeight: FontWeight.w600), decoration: InputDecoration(labelText:'Yetkili Kişi', labelStyle: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.w700), filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.5)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.2)))),
-        const SizedBox(height:10),
-        TextField(controller: _emailCtrl, style: GoogleFonts.poppins(fontSize:14, color: Colors.black, fontWeight: FontWeight.w600), decoration: InputDecoration(labelText:'E-posta *', labelStyle: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.w700), filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.5)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.2)))),
-        const SizedBox(height:16),
-        Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0xFF111111), borderRadius: BorderRadius.circular(16)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('CANLI TEKLİF', style: GoogleFonts.poppins(color: Colors.white70, fontSize:10, fontWeight: FontWeight.w800, letterSpacing:1)), const SizedBox(height:8), Text(seciliKategori?.ad??'-', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize:16)), const SizedBox(height:6), Text(seciliAltlar.entries.where((e)=> e.value).map((e)=> e.key).join(', '), style: GoogleFonts.poppins(color: Colors.white70, fontSize:11, fontWeight: FontWeight.w500), maxLines:3, overflow: TextOverflow.ellipsis), const Divider(color: Colors.white24, height:24), Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Kapsam', style: GoogleFonts.poppins(color: Colors.white70, fontSize:12, fontWeight: FontWeight.w600)), Text('%$_toplamPuan', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize:13))]), const SizedBox(height:6), Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Süre', style: GoogleFonts.poppins(color: Colors.white70, fontSize:12, fontWeight: FontWeight.w600)), Text('$seciliSure Ay', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize:13))]), const SizedBox(height:12), Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TEKLİF BEDELİ', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize:12, color: Colors.black)), Text('$_hesaplananFiyat TL', style: GoogleFonts.poppins(fontWeight: FontWeight.w900, fontSize:16, color: Colors.black))]))])),
-        const SizedBox(height:16),
-        SizedBox(width: double.infinity, child: ElevatedButton.icon(icon: const Icon(Icons.picture_as_pdf, color: Colors.white), label: Text('Antetli PDF Oluştur', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, color: Colors.white)), style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical:14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), onPressed: () async { if(_firmaCtrl.text.isEmpty || _emailCtrl.text.isEmpty || _toplamPuan==0){ ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Firma, e-posta ve en az 1 alt alan seçin'))); return; } final pdfService = TeklifPdfService(); await pdfService.olusturVeKaydet(firma: _firmaCtrl.text, yetkili: _yetkiliCtrl.text, email: _emailCtrl.text, kategori: seciliKategori!.ad, altAlanlar: seciliAltlar.entries.where((e)=> e.value).map((e)=> e.key).toList(), puan: _toplamPuan, sureAy: seciliSure, tamFiyat: _tamFiyat, teklifFiyat: _hesaplananFiyat, tierLabel: _tierPricing.label); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('PDF oluşturuldu'))); })),
-        const SizedBox(height:8),
-        SizedBox(width: double.infinity, child: ElevatedButton.icon(icon: const Icon(Icons.email, color: Colors.white), label: Text('Tek Tuşla Mail At', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, color: Colors.white)), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical:14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), onPressed: () async { if(_firmaCtrl.text.isEmpty || _emailCtrl.text.isEmpty){ ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Firma ve e-posta girin'))); return; } try{ final callable = FirebaseFunctions.instanceFor(region: 'europe-west3').httpsCallable('sendTeklifMail'); await callable.call({'firma': _firmaCtrl.text, 'yetkili': _yetkiliCtrl.text, 'email': _emailCtrl.text, 'kategori': seciliKategori!.ad, 'altAlanlar': seciliAltlar.entries.where((e)=> e.value).map((e)=> e.key).toList(), 'puan': _toplamPuan, 'sureAy': seciliSure, 'tier': _tierPricing.label}); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mail gönderildi: info@hemenustamgelsin.com'))); }catch(e){ ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Mail hatası: $e'))); } })),
-      ]))),
+      Expanded(flex: 2, child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(children: seciliKategoriler.map((kat)=> Padding(padding: const EdgeInsets.only(bottom:16), child: _buildKategoriDetayCard(kat))).toList()))),
+      Container(width: 360, color: Colors.white, child: SingleChildScrollView(padding: const EdgeInsets.all(16), child: _buildTeklifOzetiMulti())),
     ]);
   }
 
+  Widget _buildKategoriListesiMulti(){
+    return Container(
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFDDDDDD))),
+      child: Column(children: [
+        Container(width: double.infinity, decoration: const BoxDecoration(color: Color(0xFF111111), borderRadius: BorderRadius.vertical(top: Radius.circular(12))), padding: const EdgeInsets.all(12), child: Row(children: [Text('KATEGORİ SEÇ • ÇOKLU', style: GoogleFonts.poppins(fontSize:11, fontWeight: FontWeight.w800, letterSpacing:1, color: Colors.white)), const Spacer(), Container(padding: const EdgeInsets.symmetric(horizontal:8,vertical:3), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)), child: Text('${seciliKategoriKeys.length} seçili • ${tumKategoriler.length} toplam', style: GoogleFonts.poppins(fontSize:9, fontWeight: FontWeight.w800, color: Colors.black))) ])),
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            children: tierList.map((tier){
+              final cats = tumKategoriler.where((c)=> c.tier==tier.tier).toList();
+              return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(margin: const EdgeInsets.symmetric(vertical:6), padding: const EdgeInsets.symmetric(horizontal:10,vertical:6), decoration: BoxDecoration(color: tier.color.withValues(alpha:0.15), borderRadius: BorderRadius.circular(8), border: Border.all(color: tier.color.withValues(alpha:0.3))), child: Row(children: [Container(width:8,height:8,decoration: BoxDecoration(color: tier.color, shape: BoxShape.circle)), const SizedBox(width:6), Text(tier.label, style: GoogleFonts.poppins(fontSize:11,fontWeight: FontWeight.w800, color: Colors.black)), const Spacer(), Text('${tier.p3~/1000}K / ${tier.p6~/1000}K / ${tier.p12~/1000}K', style: GoogleFonts.poppins(fontSize:9, fontWeight: FontWeight.w800, color: Colors.black87))])),
+                ...cats.map((cat){ final isSel = seciliKategoriKeys.contains(cat.key); return InkWell(onTap: ()=> _toggleKategori(cat.key), child: Container(margin: const EdgeInsets.only(bottom:6), padding: const EdgeInsets.symmetric(horizontal:12,vertical:12), decoration: BoxDecoration(color: isSel? Colors.black : Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: isSel? Colors.black : const Color(0xFFDDDDDD), width: 1.2)), child: Row(children: [Expanded(child: Text(cat.ad, style: GoogleFonts.poppins(fontSize:13, fontWeight: FontWeight.w700, color: isSel? Colors.white : Colors.black))), if(isSel) const Icon(Icons.check_circle, size:18, color: Colors.white) else const Icon(Icons.circle_outlined, size:18, color: Colors.black26)]))); }),
+              ]);
+            }).toList(),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget _buildKategoriDetayCard(KategoriModel kat){
+    final tp = _tierFor(kat);
+    final puan = _toplamPuanFor(kat);
+    final fiyat = _hesapFiyatFor(kat);
+    final altMap = seciliAltlarMap[kat.key] ?? {};
+    return Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFDDDDDD), width:1.2)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [Container(width: 40, height:40, decoration: BoxDecoration(color: tp.color, borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.category, color: Colors.white, size: 20)), const SizedBox(width:10), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(kat.ad, style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize:14, color: Colors.black)), Text('${tp.label} • ${tp.p3~/1000}K / ${tp.p6~/1000}K / ${tp.p12~/1000}K', style: GoogleFonts.poppins(fontSize:10, color: Colors.black54, fontWeight: FontWeight.w600))])), Container(padding: const EdgeInsets.symmetric(horizontal:10,vertical:5), decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(20)), child: Text('$puan / 100', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize:11))), const SizedBox(width:6), Container(padding: const EdgeInsets.symmetric(horizontal:10,vertical:5), decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(20)), child: Text('$fiyat TL', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize:11))) ]),
+      const SizedBox(height:12),
+      ...kat.altAlanlar.entries.map((e){ final sel = altMap[e.key]??false; return Container(margin: const EdgeInsets.only(bottom:6), padding: const EdgeInsets.symmetric(horizontal:10,vertical:8), decoration: BoxDecoration(color: sel? Colors.white : const Color(0xFFFAFAFA), borderRadius: BorderRadius.circular(10), border: Border.all(color: sel? Colors.black : const Color(0xFFCCCCCC), width: sel?1.5:1)), child: Row(children: [Checkbox(value: sel, onChanged: (v){ setState(()=> seciliAltlarMap[kat.key]![e.key]=v!); }, visualDensity: VisualDensity.compact, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, activeColor: Colors.black, checkColor: Colors.white, side: const BorderSide(color: Colors.black, width:1.2)), Expanded(child: Text(e.key, style: GoogleFonts.poppins(fontSize:12, fontWeight: sel? FontWeight.w700: FontWeight.w500, color: Colors.black))), Container(padding: const EdgeInsets.symmetric(horizontal:8,vertical:3), decoration: BoxDecoration(color: sel? Colors.black : Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black)), child: Text('${e.value} P', style: GoogleFonts.poppins(fontSize:11, color: sel? Colors.white: Colors.black, fontWeight: FontWeight.w800)))])); }),
+    ]));
+  }
+
+  Widget _buildTeklifOzetiMulti(){
+    final seciliAltFlat = <String>[];
+    for(var kat in seciliKategoriler){
+      final altMap = seciliAltlarMap[kat.key] ?? {};
+      for(var entry in altMap.entries.where((e)=> e.value)){
+        seciliAltFlat.add('${kat.ad}: ${entry.key}');
+      }
+    }
+    return Container(
+      padding: EdgeInsets.all(_isMobile ? 0 : 0),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFDDDDDD))),
+          padding: const EdgeInsets.all(16),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(color: Colors.black, padding: const EdgeInsets.symmetric(horizontal:10,vertical:6), child: Text('TEKLİF ÖZETİ • ${seciliKategoriKeys.length} KATEGORİ', style: GoogleFonts.poppins(fontSize:11, fontWeight: FontWeight.w800, letterSpacing:1, color: Colors.white))),
+            const SizedBox(height:14),
+            TextField(controller: _firmaCtrl, style: GoogleFonts.poppins(fontSize:14, color: Colors.black, fontWeight: FontWeight.w600), decoration: InputDecoration(labelText:'Firma Ünvanı *', labelStyle: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.w700), filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.5)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.2)))),
+            const SizedBox(height:10),
+            TextField(controller: _yetkiliCtrl, style: GoogleFonts.poppins(fontSize:14, color: Colors.black, fontWeight: FontWeight.w600), decoration: InputDecoration(labelText:'Yetkili Kişi', labelStyle: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.w700), filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.5)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.2)))),
+            const SizedBox(height:10),
+            TextField(controller: _emailCtrl, style: GoogleFonts.poppins(fontSize:14, color: Colors.black, fontWeight: FontWeight.w600), decoration: InputDecoration(labelText:'E-posta *', labelStyle: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.w700), filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.5)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width:1.2)))),
+            const SizedBox(height:16),
+            Row(children: [_sureChip('3 Ay', 3), const SizedBox(width:8), _sureChip('6 Ay', 6), const SizedBox(width:8), _sureChip('12 Ay', 12)]),
+            const SizedBox(height:16),
+            Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0xFF111111), borderRadius: BorderRadius.circular(16)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('CANLI TEKLİF - ÇOKLU', style: GoogleFonts.poppins(color: Colors.white70, fontSize:10, fontWeight: FontWeight.w800, letterSpacing:1)),
+              const SizedBox(height:8),
+              ...seciliKategoriler.map((kat)=> Padding(
+                padding: const EdgeInsets.only(bottom:6),
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  Expanded(child: Text(kat.ad, style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600, fontSize:12))),
+                  Text('${_toplamPuanFor(kat)} P • ${_hesapFiyatFor(kat)} TL', style: GoogleFonts.poppins(color: Colors.white70, fontSize:11, fontWeight: FontWeight.w700)),
+                ]),
+              )),
+              const Divider(color: Colors.white24, height:20),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Toplam Puan', style: GoogleFonts.poppins(color: Colors.white70, fontSize:12)), Text('$_toplamPuanTumu', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize:13))]),
+              const SizedBox(height:4),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Süre', style: GoogleFonts.poppins(color: Colors.white70, fontSize:12)), Text('$seciliSure Ay', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize:13))]),
+              const SizedBox(height:12),
+              Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('TOPLAM BEDEL', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize:12, color: Colors.black)), Text('$_hesaplananFiyatTumu TL', style: GoogleFonts.poppins(fontWeight: FontWeight.w900, fontSize:18, color: Colors.black))]))])),
+            const SizedBox(height:16),
+            SizedBox(width: double.infinity, child: ElevatedButton.icon(icon: const Icon(Icons.picture_as_pdf, color: Colors.white), label: Text('Antetli PDF Oluştur (${seciliKategoriKeys.length} kategori)', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, color: Colors.white, fontSize:12)), style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical:14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), onPressed: () async {
+              if(_firmaCtrl.text.isEmpty || _emailCtrl.text.isEmpty || _toplamPuanTumu==0){ ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Firma, e-posta ve en az 1 alt alan seçin'))); return; }
+              final pdfService = TeklifPdfService();
+              await pdfService.olusturVeKaydetMulti(firma: _firmaCtrl.text, yetkili: _yetkiliCtrl.text, email: _emailCtrl.text, kategoriler: seciliKategoriler.map((k)=> k.ad).toList(), altAlanlar: seciliAltFlat, puan: _toplamPuanTumu, sureAy: seciliSure, teklifFiyat: _hesaplananFiyatTumu);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF oluşturuldu • ${seciliKategoriKeys.length} kategori • $_hesaplananFiyatTumu TL')));
+            })),
+            const SizedBox(height:8),
+            SizedBox(width: double.infinity, child: ElevatedButton.icon(icon: const Icon(Icons.email, color: Colors.white), label: Text('Tek Tuşla Mail At', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, color: Colors.white)), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical:14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), onPressed: () async {
+              if(_firmaCtrl.text.isEmpty || _emailCtrl.text.isEmpty){ ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Firma ve e-posta girin'))); return; }
+              try{
+                final callable = FirebaseFunctions.instanceFor(region: 'europe-west3').httpsCallable('sendTeklifMail');
+                await callable.call({
+                  'firma': _firmaCtrl.text,
+                  'yetkili': _yetkiliCtrl.text,
+                  'email': _emailCtrl.text,
+                  'kategoriler': seciliKategoriler.map((k)=> k.ad).toList(),
+                  'altAlanlar': seciliAltFlat,
+                  'puan': _toplamPuanTumu,
+                  'sureAy': seciliSure,
+                  'teklifFiyat': _hesaplananFiyatTumu,
+                  'kategoriSayisi': seciliKategoriKeys.length,
+                });
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mail gönderildi')));
+              }catch(e){ ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Mail hatası: $e'))); }
+            })),
+          ]),
+        ),
+      ]),
+    );
+  }
+
   Widget _buildTekliflerTab(){
-    return StreamBuilder<QuerySnapshot>(stream: FirebaseFirestore.instance.collection('hug_teklifler').orderBy('olusturmaTarihi', descending: true).limit(100).snapshots(), builder: (context, snap){ if(!snap.hasData) return const Center(child: CircularProgressIndicator()); final docs = snap.data!.docs; return SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Eski Teklifler • ${docs.length} adet', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 18)), const SizedBox(height: 12), if(docs.isEmpty) Text('Henüz teklif yok', style: GoogleFonts.poppins()), ...docs.map((d){ final data = d.data() as Map<String,dynamic>; return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFDDDDDD))), child: Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(data['firma']??'', style: GoogleFonts.poppins(fontWeight: FontWeight.w700)), Text('${data['kategori']} • ${data['teklifFiyat']} TL • %${data['puan']} • ${data['sureAy']} Ay', style: GoogleFonts.poppins(fontSize: 11, color: Colors.black54))])), Text(data['email']??'', style: GoogleFonts.poppins(fontSize: 10, color: Colors.black45))])); })])); });
+    return StreamBuilder<QuerySnapshot>(stream: FirebaseFirestore.instance.collection('hug_teklifler').orderBy('olusturmaTarihi', descending: true).limit(100).snapshots(), builder: (context, snap){ if(!snap.hasData) return const Center(child: CircularProgressIndicator()); final docs = snap.data!.docs; return SingleChildScrollView(padding: const EdgeInsets.fromLTRB(12,12,12,100), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Eski Teklifler • ${docs.length} adet', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 18)), const SizedBox(height: 12), if(docs.isEmpty) Text('Henüz teklif yok', style: GoogleFonts.poppins()), ...docs.map((d){ final data = d.data() as Map<String,dynamic>; return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFDDDDDD))), child: Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(data['firma']??'', style: GoogleFonts.poppins(fontWeight: FontWeight.w700)), Text('${data['kategori'] ?? (data['kategoriler'] as List?)?.join(', ') ?? ''} • ${data['teklifFiyat'] ?? data['teklifFiyati'] ?? ''} TL', style: GoogleFonts.poppins(fontSize: 11, color: Colors.black54))])), Text(data['email']??'', style: GoogleFonts.poppins(fontSize: 10, color: Colors.black45))])); })])); });
   }
 
   Widget _buildRaporlarTab(){
-    return SingleChildScrollView(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Raporlar', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 18)), const SizedBox(height: 12), Row(children: [_statBox('Toplam Ciro', '2.4M TL', const Color(0xFF22C55E)), const SizedBox(width: 12), _statBox('Ortalama', '185K TL', const Color(0xFF3B82F6))])]));
+    return SingleChildScrollView(padding: const EdgeInsets.fromLTRB(12,12,12,100), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Raporlar', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 18)), const SizedBox(height: 12), Text('Toplam ${seciliKategoriKeys.length} kategori seçili • $_hesaplananFiyatTumu TL', style: GoogleFonts.poppins(fontSize: 12)), const SizedBox(height: 12), Row(children: [_statBox('Toplam Ciro', '2.4M TL', const Color(0xFF22C55E)), const SizedBox(width: 12), _statBox('Ortalama', '185K TL', const Color(0xFF3B82F6))])]));
   }
 
-  // FIXED - EDITABLE AYARLAR - V12
-  Widget _buildAyarlarTabEditable(){
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Ayarlar • Fiyat Değiştir • info@hemenustamgelsin.com', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.black)),
-        const SizedBox(height: 4),
-        Text('Aşağıdaki kutulara yeni fiyatı yazıp ENTER bas - anında Firestore hug_fiyat_tier güncellenir, motor yeni fiyatla çalışır', style: GoogleFonts.poppins(fontSize: 11, color: Colors.black54)),
-        const SizedBox(height: 20),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(child: Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFEEEEEE))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Tier Fiyatları (Kod yok, direkt değiştir)', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 14, color: Colors.black)),
-            const SizedBox(height: 12),
-            StreamBuilder<QuerySnapshot>(stream: hugService.fiyatlarStream(), builder: (c, snap) {
-              if (!snap.hasData) return const Center(child: CircularProgressIndicator());
-              return Column(children: snap.data!.docs.map((doc) {
-                final data = doc.data() as Map<String, dynamic>;
-                return Container(margin: const EdgeInsets.only(bottom: 12), padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFF8F8F7), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black12)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [Container(width: 10, height: 10, decoration: BoxDecoration(color: Color(data['color'] ?? 0xFF000000), shape: BoxShape.circle)), const SizedBox(width: 6), Text(data['label'] ?? data['tier'] ?? '', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.black))]),
-                  const SizedBox(height: 10),
-                  Row(children: [_fiyatFieldEditable(doc.id, 'p3', '3 Ay', data['p3']), const SizedBox(width: 8), _fiyatFieldEditable(doc.id, 'p6', '6 Ay', data['p6']), const SizedBox(width: 8), _fiyatFieldEditable(doc.id, 'p12', '12 Ay', data['p12'])]),
-                ]));
-              }).toList());
-            }),
-            const SizedBox(height: 8),
-            ElevatedButton(onPressed: () => hugService.fiyatlariIlkKur(), style: ElevatedButton.styleFrom(backgroundColor: Colors.black), child: Text('Varsayılan Fiyatları Yükle', style: GoogleFonts.poppins(color: Colors.white, fontSize: 11))),
-          ]))),
-          const SizedBox(width: 16),
-          Expanded(child: Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFEEEEEE))), child: StreamBuilder<DocumentSnapshot>(stream: hugService.ayarlarStream(), builder: (c, snap) {
-            final data = snap.data?.data() as Map<String, dynamic>?;
-            return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Şirket Bilgileri', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 14, color: Colors.black)),
-              const SizedBox(height: 12),
-              _ayarFieldEditable('adres', 'Adres', data?['adres'] ?? 'Sağlık Mh. Kurudere Cad. No:76/9 Salihli-MANİSA'),
-              _ayarFieldEditable('telefon', 'Telefon', data?['telefon'] ?? '0532 163 59 66'),
-              _ayarFieldEditable('email', 'E-posta', data?['email'] ?? 'info@hemenustamgelsin.com'),
-              _ayarFieldEditable('iban', 'IBAN', data?['iban'] ?? 'TR79 0086 4011 0000 8503 0670 04'),
-              _ayarFieldEditable('duns', 'D-U-N-S', data?['duns'] ?? '751176741'),
-              _ayarFieldEditable('vergiNo', 'Vergi No', data?['vergiNo'] ?? ''),
-            ]);
-          }))),
-        ]),
-      ]),
-    );
+  Widget _buildAyarlarTab(){
+    return SingleChildScrollView(padding: EdgeInsets.fromLTRB(16,16,16,100 + MediaQuery.of(context).viewPadding.bottom), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('Ayarlar', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w800)),
+      const SizedBox(height: 20),
+      Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFFEEEEEE))), child: StreamBuilder<QuerySnapshot>(stream: hugService.fiyatlarStream(), builder: (c, snap) {
+        if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+        return Column(children: snap.data!.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return Container(margin: const EdgeInsets.only(bottom: 12), padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFF8F8F7), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.black12)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [Container(width: 10, height: 10, decoration: BoxDecoration(color: Color(data['color'] ?? 0xFF000000), shape: BoxShape.circle)), const SizedBox(width: 6), Text(data['label'] ?? data['tier'] ?? '', style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.black))]),
+            const SizedBox(height: 10),
+            Row(children: [_fiyatFieldEditable(doc.id, 'p3', '3 Ay', data['p3']), const SizedBox(width: 8), _fiyatFieldEditable(doc.id, 'p6', '6 Ay', data['p6']), const SizedBox(width: 8), _fiyatFieldEditable(doc.id, 'p12', '12 Ay', data['p12'])]),
+          ]));
+        }).toList());
+      })),
+    ]));
   }
 
   Widget _fiyatFieldEditable(String docId, String field, String label, dynamic value) {
@@ -309,15 +413,7 @@ class _KategoriMunhasirMotoruPageState extends State<KategoriMunhasirMotoruPage>
     return Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label, style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.black54)),
       const SizedBox(height: 4),
-      TextField(controller: ctrl, keyboardType: TextInputType.number, style: GoogleFonts.poppins(fontSize: 12, color: Colors.black, fontWeight: FontWeight.w700), decoration: InputDecoration(isDense: true, filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black, width: 1.2)), contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10)), onSubmitted: (v) { final intVal = int.tryParse(v) ?? 0; hugService.fiyatGuncelle(docId, {field: intVal}); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$label güncellendi: $intVal TL • Firestore hug_fiyat_tier'))); }),
-    ]));
-  }
-
-  Widget _ayarFieldEditable(String key, String label, String value) {
-    final ctrl = TextEditingController(text: value);
-    return Padding(padding: const EdgeInsets.only(bottom: 10), child: Row(children: [
-      SizedBox(width: 80, child: Text(label, style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black))),
-      Expanded(child: TextField(controller: ctrl, style: GoogleFonts.poppins(fontSize: 11, color: Colors.black), decoration: InputDecoration(isDense: true, filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black45)), contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8)), onSubmitted: (v) { hugService.ayarGuncelle({key: v}); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$label güncellendi • Firestore hug_ayarlar'))); })),
+      TextField(controller: ctrl, keyboardType: TextInputType.number, style: GoogleFonts.poppins(fontSize: 12, color: Colors.black, fontWeight: FontWeight.w700), decoration: InputDecoration(isDense: true, filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black, width: 1.2)), contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10)), onSubmitted: (v) { final intVal = int.tryParse(v) ?? 0; hugService.fiyatGuncelle(docId, {field: intVal}); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$label güncellendi: $intVal TL'))); }),
     ]));
   }
 

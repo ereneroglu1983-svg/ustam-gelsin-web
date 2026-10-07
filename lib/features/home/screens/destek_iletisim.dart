@@ -103,7 +103,7 @@ class _DestekIletisimPageState extends State<DestekIletisimPage> {
               children: [
                 Icon(Icons.email, color: Colors.blueAccent),
                 SizedBox(width: 10),
-                Text("hemenustamgelsin@gmail.com", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text("info@hemenustamgelsin.com", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ),
             const SizedBox(height: 30),

@@ -9,6 +9,291 @@ const nodemailer = require("nodemailer");
 
 admin.initializeApp();
 
+// ===================== YENI EKLENEN - TOPLU MESAJ BROADCAST (FRANKFURT EURO 3) =====================
+exports.sendBroadcastNotification = onDocumentCreated({ document: 'config/broadcasts/queue/{docId}', region: 'europe-west3' }, async (event) => {
+  const data = event.data?.data();
+  if (!data) return null;
+  const title = data.title || "Hemen Ustam Gelsin";
+  const body = data.message || "";
+  const docId = event.params.docId;
+  const db = admin.firestore();
+  try {
+    const usersSnap = await db.collection("users").get();
+    const tokens = [];
+    usersSnap.forEach((doc) => {
+      const d = doc.data();
+      const t = d.fcmToken || d.fcm_token || d.token;
+      if (!t) return;
+      if (Array.isArray(t)) tokens.push(...t);
+      else tokens.push(t);
+    });
+
+    if (tokens.length === 0) {
+      console.log("Broadcast: Token yok");
+      await event.data.ref.update({ status: "no_tokens", checkedAt: admin.firestore.FieldValue.serverTimestamp() });
+      return null;
+    }
+
+    const messaging = admin.messaging();
+    let totalSuccess = 0;
+    // FCM max 500
+    for (let i = 0; i < tokens.length; i += 500) {
+      const batch = tokens.slice(i, i + 500);
+      const resp = await messaging.sendEachForMulticast({
+        tokens: batch,
+        notification: { title: title, body: body },
+        android: { priority: 'high', notification: { channelId: 'high_importance_channel', clickAction: 'FLUTTER_NOTIFICATION_CLICK' } },
+        data: { type: "broadcast", broadcastId: String(docId), click_action: 'FLUTTER_NOTIFICATION_CLICK' }
+      });
+      totalSuccess += resp.successCount;
+      console.log(`Broadcast part ${i/500 + 1}: ${resp.successCount} success, ${resp.failureCount} fail`);
+    }
+
+    await event.data.ref.update({ status: "sent", sentAt: admin.firestore.FieldValue.serverTimestamp(), sentCount: totalSuccess });
+    await db.collection("admin_messages").add({
+      type: "broadcast_success",
+      broadcastId: docId,
+      title: title,
+      message: body,
+      sentCount: totalSuccess,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    console.log(`✅ Broadcast tamamlandi: ${totalSuccess} kisiye - ${docId}`);
+    return null;
+  } catch (e) {
+    console.error("❌ Broadcast hatasi:", e);
+    try {
+      await event.data.ref.update({ status: "failed", error: e.toString(), failedAt: admin.firestore.FieldValue.serverTimestamp() });
+    } catch (_) {}
+    return null;
+  }
+});
+// ===================== TOPLU MESAJ BITIS =====================
+
+// ===================== ÖZEL GÜNLER - OTOMATİK TOPLU MESAJ (FRANKFURT - DİNAMİK YILLI) =====================
+const OZEL_GUNLER = [
+  { gun: 1, ay: 1, type: "yilbasi" },
+  { gun: 23, ay: 4, type: "23nisan" },
+  { gun: 19, ay: 5, type: "19mayis" },
+  { gun: 30, ay: 8, type: "30agustos" },
+  { gun: 29, ay: 10, type: "29ekim" },
+  { gun: 10, ay: 11, type: "10kasim" },
+];
+
+function getOzelGunMesaji(type, yil) {
+  const cumhuriyetYili = yil - 1923;
+  const zaferYili = yil - 1922;
+  switch(type) {
+    case "yilbasi":
+      return { baslik: `🎉 ${yil} Yılınız Kutlu Olsun!`, mesaj: `Hemen Ustam Gelsin ailesi olarak ${yil} yılının size ve sevdiklerinize sağlık, mutluluk ve bol kazanç getirmesini dileriz!` };
+    case "23nisan":
+      return { baslik: "🇹🇷 23 Nisan Ulusal Egemenlik ve Çocuk Bayramı Kutlu Olsun!", mesaj: `Gazi Mustafa Kemal Atatürk'ün tüm dünya çocuklarına armağanı 23 Nisan Ulusal Egemenlik ve Çocuk Bayramımız kutlu olsun!` };
+    case "19mayis":
+      return { baslik: "🇹🇷 19 Mayıs Atatürk'ü Anma, Gençlik ve Spor Bayramı Kutlu Olsun!", mesaj: "19 Mayıs Atatürk'ü Anma, Gençlik ve Spor Bayramımız kutlu olsun! Gençlerimizin ve milletimizin bayramı kutlu olsun." };
+    case "30agustos":
+      return { baslik: "🇹🇷 30 Ağustos Zafer Bayramımız Kutlu Olsun!", mesaj: `30 Ağustos Zafer Bayramımızın ${zaferYili}. yılı kutlu olsun! Başta Gazi Mustafa Kemal Atatürk olmak üzere tüm kahramanlarımızı saygıyla anıyoruz.` };
+    case "29ekim":
+      return { baslik: "🇹🇷 29 Ekim Cumhuriyet Bayramımız Kutlu Olsun!", mesaj: `Cumhuriyetimizin ${cumhuriyetYili}. yılı kutlu olsun! Hemen Ustam Gelsin ailesi olarak Cumhuriyet coşkusunu hep birlikte yaşıyoruz! Yaşasın Cumhuriyet!` };
+    case "10kasim":
+      return { baslik: "♾ Saygı ve Özlemle Anıyoruz", mesaj: `Cumhuriyetimizin kurucusu Gazi Mustafa Kemal Atatürk'ü ebediyete intikalinin ${yil - 1938}. yılında saygı, sevgi ve özlemle anıyoruz. Saat 09:05` };
+    default:
+      return { baslik: "Hemen Ustam Gelsin", mesaj: "" };
+  }
+}
+
+exports.ozelGunKontrol = onSchedule({
+  schedule: "every day 09:05",
+  timeZone: "Europe/Istanbul",
+  region: "europe-west3",
+  memory: "256MiB",
+  timeoutSeconds: 300
+}, async () => {
+  const now = new Date();
+  const trDate = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Istanbul" }));
+  const gun = trDate.getDate();
+  const ay = trDate.getMonth() + 1;
+  const yil = trDate.getFullYear();
+
+  const bugunConfig = OZEL_GUNLER.find(o => o.gun === gun && o.ay === ay);
+  if (!bugunConfig) {
+    console.log(`[OZEL-GUN] Bugun ozel gun yok: ${gun}/${ay}/${yil}`);
+    return null;
+  }
+
+  const bugun = getOzelGunMesaji(bugunConfig.type, yil);
+  console.log(`[OZEL-GUN] TETIKLENDI: ${gun}/${ay}/${yil} - ${bugun.baslik}`);
+
+  const db = admin.firestore();
+  try {
+    // Ayni gun 2 kere gondermesin
+    const logId = `${ay}-${gun}-${yil}`;
+    const logRef = db.collection("config").doc("broadcasts").collection("ozelGunLogs").doc(logId);
+    const logDoc = await logRef.get();
+    if (logDoc.exists) {
+      console.log(`[OZEL-GUN] Zaten gonderilmis: ${logId}, atlaniyor`);
+      return null;
+    }
+
+    const usersSnap = await db.collection("users").get();
+    const tokens = [];
+    usersSnap.forEach((doc) => {
+      const d = doc.data();
+      const t = d.fcmToken || d.fcm_token || d.token;
+      if (!t) return;
+      if (Array.isArray(t)) tokens.push(...t);
+      else tokens.push(t);
+    });
+
+    if (tokens.length === 0) return null;
+
+    const messaging = admin.messaging();
+    for (let i = 0; i < tokens.length; i += 500) {
+      const batch = tokens.slice(i, i + 500);
+      await messaging.sendEachForMulticast({
+        tokens: batch,
+        notification: { title: bugun.baslik, body: bugun.mesaj },
+        android: { priority: 'high', notification: { channelId: 'high_importance_channel', clickAction: 'FLUTTER_NOTIFICATION_CLICK' } },
+        data: { type: "ozel_gun", gun: String(gun), ay: String(ay), click_action: 'FLUTTER_NOTIFICATION_CLICK' }
+      });
+    }
+
+    await logRef.set({
+      baslik: bugun.baslik,
+      mesaj: bugun.mesaj,
+      gonderimTarihi: admin.firestore.FieldValue.serverTimestamp(),
+      gonderilenKisi: tokens.length,
+      gun, ay, yil
+    }, { merge: true });
+
+    console.log(`✅ OZEL GUN GONDERILDI: ${bugun.baslik} - ${tokens.length} kisiye - ${yil}`);
+    return null;
+  } catch (e) {
+    console.error("❌ Ozel gun hatasi:", e);
+    return null;
+  }
+});
+// ===================== ÖZEL GÜNLER BİTİŞ =====================
+
+
+
+// ===================== FİNANS ÖZET - V4 KESİN ÇÖZÜM (onRequest - PUBLIC) =====================
+const { onRequest } = require("firebase-functions/v2/https");
+
+exports.finansOzet = onRequest({
+  region: "europe-west3",
+  memory: "512MiB",
+  timeoutSeconds: 60,
+  cors: true,
+  invoker: "public",
+}, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
+  const startTime = Date.now();
+  const db = admin.firestore();
+  const now = new Date();
+  const trNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Istanbul" }));
+  const yil = trNow.getFullYear();
+  const ay = trNow.getMonth() + 1;
+
+  const yearStart = new Date(yil, 0, 1);
+  const todayStart = new Date(yil, trNow.getMonth(), trNow.getDate(), 0,0,0);
+  const todayEnd = new Date(yil, trNow.getMonth(), trNow.getDate(), 23,59,59,999);
+
+  const monday = new Date(trNow);
+  monday.setDate(trNow.getDate() - (trNow.getDay() === 0 ? 6 : trNow.getDay() - 1));
+  monday.setHours(0,0,0,0);
+  const sunday = new Date(monday); sunday.setDate(monday.getDate()+6); sunday.setHours(23,59,59,999);
+
+  const monthStart = new Date(yil, trNow.getMonth(), 1);
+  const monthEnd = new Date(yil, trNow.getMonth()+1, 0, 23,59,59,999);
+
+  try {
+    // Index gerektirmeyen versiyon - tüm transactions çekip JS'de filtrele
+    const snapAll = await db.collectionGroup('transactions').get();
+    const filteredDocs = snapAll.docs.filter(d => {
+      const data = d.data();
+      if (!data.date) return false;
+      try { return data.date.toDate() >= yearStart; } catch(e){ return false; }
+    });
+    // filteredDocs'u snap gibi kullanacağız
+    const snap = { size: filteredDocs.length, forEach: (cb) => filteredDocs.forEach(cb), docs: filteredDocs };
+
+
+    let gunlukK=0, gunlukC=0, haftalikK=0, haftalikC=0, aylikK=0, aylikC=0, yillikK=0, yillikC=0;
+    const haftalikDetay = [];
+    for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); haftalikDetay.push({ gunAdi: ["Pazartesi","Salı","Çarşamba","Perşembe","Cuma","Cumartesi","Pazar"][i], tarih: `${d.getDate()}/${d.getMonth()+1}`, k:0, c:0, date: d }); }
+    const yillikDetay = [];
+    const ayAdlari = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+    for(let i=0;i<12;i++){ yillikDetay.push({ ayAdi: ayAdlari[i], k:0, c:0, islem:0 }); }
+
+    snap.forEach(doc => {
+      const data = doc.data();
+      const amount = Number(data.amount || 0);
+      const type = data.type;
+      const ts = data.date;
+      if (!ts) return;
+      const d = ts.toDate();
+
+      if (d >= yearStart) {
+        if (type === 'withdrawal') yillikK += amount; else if (type === 'deposit') yillikC += amount;
+        yillikDetay[d.getMonth()].islem++;
+        if (type === 'withdrawal') yillikDetay[d.getMonth()].k += amount; else yillikDetay[d.getMonth()].c += amount;
+      }
+      if (d >= monthStart && d <= monthEnd) {
+        if (type === 'withdrawal') aylikK += amount; else aylikC += amount;
+      }
+      if (d >= monday && d <= sunday) {
+        if (type === 'withdrawal') haftalikK += amount; else haftalikC += amount;
+        const dayIdx = d.getDay() === 0 ? 6 : d.getDay() - 1;
+        if (dayIdx >=0 && dayIdx <7) {
+          if (type === 'withdrawal') haftalikDetay[dayIdx].k += amount; else haftalikDetay[dayIdx].c += amount;
+        }
+      }
+      if (d >= todayStart && d <= todayEnd) {
+        if (type === 'withdrawal') gunlukK += amount; else gunlukC += amount;
+      }
+    });
+
+    const sureMs = Date.now() - startTime;
+    res.status(200).json({
+      gunluk: { k: gunlukK, c: gunlukC },
+      haftalik: { k: haftalikK, c: haftalikC },
+      aylik: { k: aylikK, c: aylikC },
+      yillik: { k: yillikK, c: yillikC },
+      haftalikDetay: haftalikDetay.map(x=>({ gunAdi: x.gunAdi, tarih: x.tarih, k: x.k, c: x.c })),
+      yillikDetay,
+      meta: {
+        yil, ay, ayAdi: ayAdlari[ay-1],
+        bugunStr: `${trNow.getDate().toString().padStart(2,'0')}/${(trNow.getMonth()+1).toString().padStart(2,'0')}/${yil}`,
+        haftaStr: `${monday.getDate()}/${monday.getMonth()+1} - ${sunday.getDate()}/${sunday.getMonth()+1}`,
+        ayStr: `1 - ${monthEnd.getDate()} ${ayAdlari[ay-1]}`,
+        toplamIslem: snap.size,
+        okunanDokuman: snap.size,
+        maliyet: `${(snap.size * 0.00006).toFixed(4)} $`,
+        sureMs
+      }
+    });
+  } catch (e) {
+    console.error("finansOzet hatasi", e);
+    res.status(500).json({ error: e.toString() });
+  }
+});
+// ===================== FİNANS ÖZET V4 BİTİŞ =====================
+
+
+
+
+
+
+
 // ===================== YENİ EKLENEN - B2B BİLDİRİM =====================
 exports.onB2BLeadCreated = onDocumentCreated({ document: 'corporate_leads/{leadId}', region: 'europe-west3' }, async (event) => {
     try {

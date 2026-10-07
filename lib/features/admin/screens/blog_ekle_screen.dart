@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -150,44 +151,64 @@ class _BlogEkleScreenState extends State<BlogEkleScreen> {
   }
 
   @override
+  void dispose() {
+    baslikController.dispose();
+    youtubeController.dispose();
+    icerikController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final bottomSafe = MediaQuery.of(context).viewPadding.bottom;
     return Scaffold(
       appBar: AppBar(title: Text(isUstaPosteri ? 'Usta Posteri Ekle' : 'Rehber Ekle - Admin FIXLENDİ')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            SwitchListTile(
-              title: Text(isUstaPosteri ? 'Mod: USTA POSTERİ (Yazısız)' : 'Mod: İNŞAAT REHBERİ (Yazılı)'),
-              subtitle: Text(isUstaPosteri ? 'Sadece resim yüklenecek' : 'Resim + Yazı yüklenecek'),
-              value: isUstaPosteri,
-              onChanged: (v) => setState(() => isUstaPosteri = v),
-            ),
-            const SizedBox(height: 16),
-            TextField(controller: baslikController, decoration: InputDecoration(labelText: isUstaPosteri ? 'Usta Adı (örn: Ahmet Usta - Boyacı)' : 'Blog Başlığı')),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () async {
-                final resim = await ImagePicker().pickImage(source: ImageSource.gallery);
-                if (resim != null) setState(() => secilenResim = resim);
-              },
-              child: Text(secilenResim == null ? 'Kapak Resmi / Poster Seç' : 'Resim Seçildi ✓'),
-            ),
-            const SizedBox(height: 16),
-            if (!isUstaPosteri) ...[
-              TextField(controller: youtubeController, decoration: const InputDecoration(labelText: 'YouTube Video ID (opsiyonel)')),
+      // Klavye açılınca taşma olmasın
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          // FIX: Alt navigasyon tuşunun altında kalmaması için bottom padding
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 24 + bottomSafe),
+          child: Column(
+            children: [
+              SwitchListTile(
+                title: Text(isUstaPosteri ? 'Mod: USTA POSTERİ (Yazısız)' : 'Mod: İNŞAAT REHBERİ (Yazılı)'),
+                subtitle: Text(isUstaPosteri ? 'Sadece resim yüklenecek' : 'Resim + Yazı yüklenecek'),
+                value: isUstaPosteri,
+                onChanged: (v) => setState(() => isUstaPosteri = v),
+              ),
               const SizedBox(height: 16),
-              TextField(controller: icerikController, decoration: const InputDecoration(labelText: 'Blog İçeriği'), maxLines: 10),
-              const SizedBox(height: 24),
+              TextField(controller: baslikController, decoration: InputDecoration(labelText: isUstaPosteri ? 'Usta Adı (örn: Ahmet Usta - Boyacı)' : 'Blog Başlığı')),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  final resim = await ImagePicker().pickImage(source: ImageSource.gallery);
+                  if (resim != null) setState(() => secilenResim = resim);
+                },
+                child: Text(secilenResim == null ? 'Kapak Resmi / Poster Seç' : 'Resim Seçildi ✓'),
+              ),
+              const SizedBox(height: 16),
+              if (!isUstaPosteri) ...[
+                TextField(controller: youtubeController, decoration: const InputDecoration(labelText: 'YouTube Video ID (opsiyonel)')),
+                const SizedBox(height: 16),
+                TextField(controller: icerikController, decoration: const InputDecoration(labelText: 'Blog İçeriği'), maxLines: 10),
+                const SizedBox(height: 24),
+              ],
+              yukleniyor
+                  ? const CircularProgressIndicator()
+                  : SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: blogKaydet,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                  child: Text(isUstaPosteri ? 'USTA POSTERİNİ YAYINLA' : 'REHBERİ YAYINLA', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+              ),
+              // FIX: En altta ekstra boşluk - navigasyon tuşu için garanti
+              SizedBox(height: 16 + bottomSafe),
             ],
-            yukleniyor
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-              onPressed: blogKaydet,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, minimumSize: const Size(double.infinity, 50)),
-              child: Text(isUstaPosteri ? 'USTA POSTERİNİ YAYINLA' : 'REHBERİ YAYINLA', style: const TextStyle(fontSize: 18)),
-            ),
-          ],
+          ),
         ),
       ),
     );

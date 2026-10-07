@@ -58,6 +58,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   User? _currentUser;
   bool _isProfileLoading = false;
   double? _lat; double? _lng; bool _isLocationLoading = true;
+  // --- SADECE EKLENEN KISIM - ADMIN CACHE ---
+  bool _isAdminCached = false;
 
   static const String FIRMA_UNVANI = "Hemen Ustam Gelsin";
   static const String FIRMA_ADRES = "Sağlık Mh. Kurudere Cd. No:76/9 Salihli - MANİSA";
@@ -70,8 +72,21 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   @override
   void initState() {
     super.initState();
-    FirebaseAuth.instance.authStateChanges().listen((user) { if (mounted) setState(() => _currentUser = user); });
+    FirebaseAuth.instance.authStateChanges().listen((user) async {
+      if (mounted) setState(() => _currentUser = user);
+      if (user!= null) {
+        _checkAdminStatus();
+      } else {
+        if (mounted) setState(() => _isAdminCached = false);
+      }
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) => _initializeLocation());
+  }
+
+  // --- SADECE EKLENEN KISIM - ADMIN KONTROL ---
+  Future<void> _checkAdminStatus() async {
+    bool adminMi = await _authService.isAdmin();
+    if (mounted) setState(() => _isAdminCached = adminMi);
   }
 
   Future<void> _initializeLocation() async => await _determinePositionFromIP();
@@ -160,14 +175,23 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 ElevatedButton(onPressed: ()=> _showSelectionDialog(context, true), style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)), child: const Text("Üye Ol", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold))),
                 const SizedBox(width:8),
                 ElevatedButton(onPressed: ()=> _showSelectionDialog(context, false), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)), child: const Text("GİRİŞ", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)))
-              ]) : ElevatedButton(onPressed: _isProfileLoading? null : () async {
-                setState(()=> _isProfileLoading = true);
-                bool adminMi = await _authService.isAdmin(); String? role = await _authService.getUserRole();
-                if (!mounted) return; setState(()=> _isProfileLoading = false);
-                if (adminMi) Navigator.push(context, MaterialPageRoute(builder: (_)=> const AdminDashboard()));
-                else if (role == 'usta' || role == 'master') Navigator.push(context, MaterialPageRoute(builder: (_)=> const UstaProfilSayfasi()));
-                else Navigator.push(context, MaterialPageRoute(builder: (_)=> const MusteriProfilSayfasi()));
-              }, style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)), child: const Text("Profilim", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)))
+              ]) : Row(mainAxisSize: MainAxisSize.min, children: [
+                // --- SADECE EKLENEN KISIM - MOBIL ADMIN BUTONU ---
+                if (_isAdminCached)
+                  IconButton(
+                    tooltip: "Admin Panel",
+                    icon: const Icon(Icons.admin_panel_settings, color: Color(0xFFFF7A00), size: 26),
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_)=> const AdminDashboard())),
+                  ),
+                ElevatedButton(onPressed: _isProfileLoading? null : () async {
+                  setState(()=> _isProfileLoading = true);
+                  bool adminMi = await _authService.isAdmin(); String? role = await _authService.getUserRole();
+                  if (!mounted) return; setState(()=> _isProfileLoading = false);
+                  if (adminMi) Navigator.push(context, MaterialPageRoute(builder: (_)=> const AdminDashboard()));
+                  else if (role == 'usta' || role == 'master') Navigator.push(context, MaterialPageRoute(builder: (_)=> const UstaProfilSayfasi()));
+                  else Navigator.push(context, MaterialPageRoute(builder: (_)=> const MusteriProfilSayfasi()));
+                }, style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)), child: const Text("Profilim", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)))
+              ])
             ]),
             const SizedBox(height:12),
             Wrap(spacing:16, runSpacing:8, alignment: WrapAlignment.center, children: menuItems.map((item){
@@ -198,6 +222,17 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             const SizedBox(width:12),
             ElevatedButton(onPressed: ()=> _showSelectionDialog(context, false), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), padding: const EdgeInsets.symmetric(horizontal:28, vertical:14)), child: const Text("GİRİŞ YAP", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))
           ]) : Row(mainAxisSize: MainAxisSize.min, children: [
+            // --- SADECE EKLENEN KISIM - DESKTOP ADMIN BUTONU ---
+            if (_isAdminCached)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_)=> const AdminDashboard())),
+                  icon: const Icon(Icons.admin_panel_settings, color: Colors.white, size: 18),
+                  label: const Text("ADMİN", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF7A00), padding: const EdgeInsets.symmetric(horizontal:18, vertical:14)),
+                ),
+              ),
             ElevatedButton(onPressed: _isProfileLoading? null : () async {
               setState(()=> _isProfileLoading = true); bool adminMi = await _authService.isAdmin(); String? role = await _authService.getUserRole();
               if (!mounted) return; setState(()=> _isProfileLoading = false);

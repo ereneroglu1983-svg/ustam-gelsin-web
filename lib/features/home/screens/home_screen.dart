@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -22,6 +23,8 @@ import 'nasil_calisir.dart';
 import 'destek_iletisim.dart';
 import 'insaat_rehberi.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+// --- SADECE EKLENEN IMPORT - ADMIN PANEL ---
+import '../../admin/screens/admin_dashboard.dart';
 
 // SADECE EKLENEN KISIM - Hiçbir yeri bozmaz
 String _normalizeRole(String? role) {
@@ -204,6 +207,13 @@ class _HomeScreenState extends State<HomeScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
         title: Image.asset('assets/app_logo.png', height: 80, fit: BoxFit.contain),
         actions: [
+          // --- SADECE EKLENEN KISIM - ADMIN BUTONU - APPBAR ---
+          if (!_roleYukleniyor && _userRole == 'admin')
+            IconButton(
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboard())),
+              icon: const Icon(Icons.admin_panel_settings, color: Color(0xFFFF7A00), size: 28),
+              tooltip: "Admin Panel",
+            ),
           if (_currentUser == null)
             IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none_rounded, color: Colors.black, size: 30))
           else
@@ -225,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView(padding: EdgeInsets.zero, children: [
                   if (_roleYukleniyor)
                     const ListTile(leading: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)), title: Text("Yükleniyor..."))
-                  else if (_currentUser!= null)
+                  else if (_currentUser!= null)...[
                     ListTile(
                       leading: const Icon(Icons.person, color: Color(0xFF2DB34A)),
                       title: Text(_normalizeRole(_userRole) == 'usta'? "USTA PROFİLİM" : "PROFİLİM"),
@@ -238,11 +248,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const MusteriProfilSayfasi()));
                         }
                       },
-                    )
-                  else...[
-                      ListTile(leading: const Icon(Icons.badge_outlined, color: Color(0xFF2979FF)), title: const Text("MÜŞTERİ GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerAuthPage(role: "customer")))),
-                      ListTile(leading: Icon(Icons.construction, color: AppColors.ustaColor), title: const Text("USTA GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta")))),
-                    ],
+                    ),
+                    // --- SADECE EKLENEN KISIM - DRAWER ADMIN BUTONU ---
+                    if (_userRole == 'admin')
+                      ListTile(
+                        leading: const Icon(Icons.admin_panel_settings, color: Color(0xFFFF7A00)),
+                        title: const Text("ADMİN PANELİ"),
+                        titleTextStyle: const TextStyle(color: Color(0xFFFF7A00), fontWeight: FontWeight.bold),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboard()));
+                        },
+                      ),
+                  ] else...[
+                    ListTile(leading: const Icon(Icons.badge_outlined, color: Color(0xFF2979FF)), title: const Text("MÜŞTERİ GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerAuthPage(role: "customer")))),
+                    ListTile(leading: Icon(Icons.construction, color: AppColors.ustaColor), title: const Text("USTA GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta")))),
+                  ],
                   const Divider(),
                   ListTile(leading: const Icon(Icons.shopping_basket_outlined, color: Colors.black), title: const Text("HUG MARKET"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const HugMarketAppHomepage())); }),
                   ListTile(leading: const Icon(Icons.fingerprint, color: Colors.black), title: const Text("Biz Kimiz"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BizKimizPage()))),
@@ -284,6 +305,31 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.zero,
         child: Column(
           children: [
+            // --- ADMIN DUYURU BANNER - SADECE EKLENEN KISIM ---
+            StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance.collection('config').doc('app_status').snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox.shrink();
+                var data = snapshot.data!.data() as Map<String, dynamic>?;
+                if (data == null) return const SizedBox.shrink();
+                if (data['announcementActive'] != true) return const SizedBox.shrink();
+                String text = (data['announcementText'] ?? "").toString();
+                if (text.trim().isEmpty) return const SizedBox.shrink();
+                return Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(color: const Color(0xFFFF7A00), borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.campaign_rounded, color: Colors.black, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(text, style: GoogleFonts.poppins(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold))),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
