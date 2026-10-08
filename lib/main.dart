@@ -1,4 +1,4 @@
-// lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX + HUG MARKET ROUTE FIX + B ŞIKKI ADMIN EKLENDI - IMPORT FIX + KOMSU HELPER EKLENDI
+// lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX + HUG MARKET ROUTE FIX + B ŞIKKI ADMIN EKLENDI - IMPORT FIX + KOMSU HELPER EKLENDI + ANALYTICS EKLENDI
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:provider/provider.dart';
@@ -65,6 +66,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final GoRouter _router = GoRouter(
   navigatorKey: navigatorKey,
   initialLocation: '/',
+  observers: [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)],
   routes: [
     GoRoute(path: '/', builder: (context, state) => const SplashWrapper()),
     GoRoute(path: '/home', builder: (context, state) => const AuthGate()),
@@ -72,7 +74,6 @@ final GoRouter _router = GoRouter(
     GoRoute(path: '/acil_ilanlar', builder: (context, state) => AcilIlanlarSayfasi()),
     GoRoute(path: '/admin', builder: (context, state) => const AdminDashboard()),
     GoRoute(path: '/admin/blog-ekle', builder: (context, state) => const BlogEkleScreen()),
-    // B ŞIKKI - HUG MARKET ADMIN - V11 TEK KOMUTA - SHELL SILINDI MOTOR EKLENDI
     GoRoute(path: '/hug-market-admin', builder: (context, state) => const KategoriMunhasirMotoruPage()),
     GoRoute(
       path: '/rehber/:slug',
@@ -81,7 +82,6 @@ final GoRouter _router = GoRouter(
         return RehberDetayScreen(slug: slug);
       },
     ),
-    // HUG MARKET - BURASI EKLENDI - ARTIK 404 VERMEYECEK
     GoRoute(
       path: '/hug-market',
       builder: (c, s) => const HugMarketHomepage(),
@@ -138,7 +138,6 @@ Future<void> _initializeServicesInBackground() async {
   } catch (e) {
     debugPrint("YorumService yükleme hatası: $e");
   }
-  // YENI EKLENEN - KOMSU HELPER INIT - 973 ILCE HARITASI
   try {
     await KomsuHelper.init();
     debugPrint("✅ KomsuHelper 973 ilçe yüklendi");
@@ -179,6 +178,10 @@ void main() async {
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     debugPrint("✅ Firebase başlatıldı");
+    // ANALYTICS - CANLI SAYAC ICIN EKLENDI
+    await FirebaseAnalytics.instance.logAppOpen();
+    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+    debugPrint("✅ Analytics başlatıldı");
     if (kIsWeb) {
       await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
     }

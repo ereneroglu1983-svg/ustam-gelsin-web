@@ -28,6 +28,7 @@ echo [1/5] SEO Build...
 cd seo
 if exist "out" rmdir /S /Q "out" >nul 2>&1
 if exist ".next" rmdir /S /Q ".next" >nul 2>&1
+set NODE_OPTIONS=--max-old-space-size=8192
 call npm run build
 if errorlevel 1 (
     cd ..
