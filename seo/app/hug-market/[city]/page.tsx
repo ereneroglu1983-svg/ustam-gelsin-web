@@ -1,4 +1,4 @@
-// app/hug-market/[city]/page.tsx - ŞEHİR HUB - 81 SAYFA - 18 KATEGORİ - FINAL v4 - TRAILING SLASH FIX + BREADCRUMB
+// app/hug-market/[city]/page.tsx - ŞEHİR HUB - FINAL v4.1 - PLAY BANNER
 export const dynamic = 'force-static'
 export const dynamicParams = false
 import { cities } from '../../../data/cities'
@@ -6,6 +6,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import sehirler from '../../../data/sehirler.json'
 import ilceler from '../../../data/ilceler.json'
+
+const PLAY_URL_CLEAN = "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android"
+const PLAY_URL_HUG_CITY = `${PLAY_URL_CLEAN}&pcampaignid=web_hug_city_banner`
 
 type HugCat = {
   slug: string
@@ -45,31 +48,22 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ city: string }> }) {
   const { city: citySlug } = await params
-  if (citySlug === 'cozum-ortagi') return {}
+  if (citySlug.includes('.') || citySlug === 'cozum-ortagi') return {}
   const city = cities.find(c => c.slug === citySlug)
   if(!city) return {}
   return {
     title: `${city.name} HUG MARKET Çözüm Ortakları | 18 Kategori Yapı Malzemeleri B2B`,
-    description: `${city.name}'daki tadilat ve yenileme projelerinde 18 kategoride yapı malzemesi çözüm ortaklığı. Banyo, mutfak, boya, seramik, tesisat, elektrik ve tüm yapı kategorileri.`,
+    description: `${city.name}'daki tadilat ve yenileme projelerinde 18 kategoride yapı malzemesi çözüm ortaklığı.`,
   }
 }
 
 export default async function CityHubPage({ params }: { params: Promise<{ city: string }> }) {
   const { city: citySlug } = await params
-
-  if (citySlug === 'cozum-ortagi') {
-    notFound()
-  }
-
+  if (citySlug.includes('.') || citySlug === 'cozum-ortagi') notFound()
   const city = cities.find(c => c.slug === citySlug)
-  if (!city) {
-    notFound()
-  }
+  if (!city) notFound()
 
-  const sehirData = (sehirler as any[]).find(s =>
-    s.sehir_adi?.toLowerCase() === city.name.toLowerCase() ||
-    s.sehir_adi?.toLowerCase().includes(city.name.toLowerCase())
-  )
+  const sehirData = (sehirler as any[]).find(s => s.sehir_adi?.toLowerCase() === city.name.toLowerCase())
   const sehirId = sehirData?.sehir_id
   const cityIlceler = sehirId? (ilceler as any[]).filter(i => i.sehir_id === sehirId) : []
 
@@ -77,43 +71,21 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Ana Sayfa",
-        "item": "https://hemenustamgelsin.com/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "HUG MARKET",
-        "item": "https://hemenustamgelsin.com/hug-market/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": `${city.name} HUG MARKET`,
-        "item": `https://hemenustamgelsin.com/hug-market/${city.slug}/`
-      }
+      { "@type": "ListItem", "position": 1, "name": "Ana Sayfa", "item": "https://hemenustamgelsin.com/" },
+      { "@type": "ListItem", "position": 2, "name": "HUG MARKET", "item": "https://hemenustamgelsin.com/hug-market/" },
+      { "@type": "ListItem", "position": 3, "name": `${city.name} HUG MARKET`, "item": `https://hemenustamgelsin.com/hug-market/${city.slug}/` }
     ]
   }
 
   return (
     <main className="bg-[#fbfbf8] text-zinc-900">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
       <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-zinc-100">
         <div className="max-w- mx-auto px-6 h- flex items-center justify-between overflow-hidden">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center shrink-0" style={{ height: '36px' }}>
-              <img
-                src="/assets/hug/hug_logo.jpg"
-                alt="HUG MARKET"
-                style={{ height: '36px', width: 'auto', maxWidth: '180px', objectFit: 'contain', display: 'block' }}
-              />
+              <img src="/assets/hug/hug_logo.jpg" alt="HUG MARKET" style={{ height: '36px', width: 'auto', maxWidth: '180px', objectFit: 'contain', display: 'block' }} />
             </div>
             <div className="h-6 w-px bg-zinc-200 shrink-0" />
             <span className="text- font-semibold tracking-tight truncate">Proje Odaklı Yapı Malzemeleri Ekosistemi</span>
@@ -124,20 +96,32 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
 
       <section className="max-w- mx-auto px-6 pt-12 pb-8">
         <nav className="text- text-zinc-500 mb-4 flex gap-1 items-center">
-          <Link href="/" className="hover:text-black">Ana Sayfa</Link>
-          <span>/</span>
-          <Link href="/hug-market/" className="hover:text-black">HUG MARKET</Link>
-          <span>/</span>
+          <Link href="/" className="hover:text-black">Ana Sayfa</Link><span>/</span>
+          <Link href="/hug-market/" className="hover:text-black">HUG MARKET</Link><span>/</span>
           <span className="text-zinc-900 font-medium">{city.name}</span>
         </nav>
         <div className="inline-flex items-center gap-2 text- tracking-widest uppercase bg-black text-white px-3 py-1 rounded-full">HUG MARKET • {city.name} • 18 KATEGORİ</div>
         <h1 className="mt-4 text- lg:text- leading-[0.9] font-black tracking-tight">{city.name} HUG MARKET<br/>Çözüm Ortakları</h1>
         <p className="mt-4 text- leading-[1.5] text-zinc-600 max-w-">{city.name}'daki konut, tadilat ve yenileme projelerinde 18 ana kategoride yapı malzemelerinizi gerçek proje ihtiyaçlarıyla buluşturun. Her kategoride tek çözüm ortağı.</p>
-        <div className="mt-6 flex gap-3">
+        <div className="mt-6 flex gap-3 flex-wrap">
           <Link href="/hug-market/cozum-ortagi/" className="bg-black text-white px-6 py-3 rounded-full text-sm font-semibold">Çözüm Ortağı Ol →</Link>
-          <span className="border border-zinc-300 px-6 py-3 rounded-full text-sm text-zinc-600">{cityIlceler.length || city.districts?.length || ''} İlçe • 18 Kategori • Proje Bazlı Satış</span>
+          <a href={PLAY_URL_HUG_CITY} target="_blank" rel="noopener" className="bg-white border border-black px-6 py-3 rounded-full text-sm font-semibold">📱 Uygulamayı İndir →</a>
         </div>
       </section>
+
+      {/* PLAY BANNER - HUG CITY */}
+      <div className="max-w- mx-auto px-6 pb-6">
+        <div style={{background:'#111', borderRadius:12, padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap'}}>
+          <div style={{display:'flex', alignItems:'center', gap:12}}>
+            <div style={{width:36, height:36, background:'#ff214f', borderRadius:8, display:'grid', placeItems:'center', fontSize:18, color:'white'}}>🛒</div>
+            <div>
+              <div style={{color:'white', fontWeight:800, fontSize:14}}>{city.name} HUG MARKET artık uygulamada!</div>
+              <div style={{color:'#a1a1aa', fontSize:12}}>18 kategoride ürünleri mobil uygulamadan yönet</div>
+            </div>
+          </div>
+          <a href={PLAY_URL_HUG_CITY} target="_blank" rel="noopener" style={{background:'white', color:'black', padding:'10px 16px', borderRadius:10, fontWeight:800, fontSize:13, textDecoration:'none'}}> Google Play →</a>
+        </div>
+      </div>
 
       <section className="max-w- mx-auto px-6 pb-12">
         <div className="flex justify-between items-center mb-6">
@@ -147,11 +131,7 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
           {hugCats.map(cat => (
             <Link key={cat.slug} href={`/hug-market/${city.slug}/${cat.slug}/`} className="group bg-white border rounded- overflow-hidden hover:border-black transition-all hover:shadow-xl">
               <div className="relative h- bg-zinc-100 overflow-hidden">
-                <img
-                  src={`/assets/hug/${cat.imageFile}`}
-                  alt={`${city.name} ${cat.name}`}
-                  className="w-full h-full object-cover absolute inset-0 group-hover:scale-[1.03] transition-transform duration-500"
-                />
+                <img src={`/assets/hug/${cat.imageFile}`} alt={`${city.name} ${cat.name}`} className="w-full h-full object-cover absolute inset-0 group-hover:scale-[1.03] transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 rounded-full text- font-bold tracking-widest uppercase">{cat.shortName}</div>
                 <div className="absolute bottom-0 p-4 text-white">
@@ -179,15 +159,16 @@ export default async function CityHubPage({ params }: { params: Promise<{ city: 
               return <span key={name} className="px-3 py-1.5 bg-[#f6f6f3] border rounded-full text-">{name}</span>
             })}
           </div>
-          <p className="mt-4 text- text-zinc-600">{city.name}'daki {cityIlceler.length || city.districts?.length || 0} ilçede aktif usta ağı ve proje eşleşmesi.</p>
         </div>
       </section>
 
       <section className="max-w- mx-auto px-6 pb-16">
         <div className="bg-black text-white rounded- p-10 text-center">
           <h2 className="text- font-black leading-tight">{city.name}'da Kategori Lideri Olun</h2>
-          <p className="mt-3 text-zinc-300 max-w-2xl mx-auto">18 kategoriden birinde çözüm ortağı olun, {city.name}'daki tüm tadilat projelerinde ürünleriniz ihtiyaç listesinde önerilsin.</p>
-          <Link href="/hug-market/cozum-ortagi/" className="mt-6 inline-block bg-white text-black px-8 py-3 rounded-full font-bold">ÇÖZÜM ORTAĞI BAŞVURUSU</Link>
+          <div className="mt-6 flex gap-3 justify-center flex-wrap">
+            <Link href="/hug-market/cozum-ortagi/" className="bg-white text-black px-8 py-3 rounded-full font-bold">ÇÖZÜM ORTAĞI BAŞVURUSU</Link>
+            <a href={PLAY_URL_HUG_CITY} target="_blank" rel="noopener" className="bg-[#ff214f] text-white px-8 py-3 rounded-full font-bold">📱 UYGULAMAYI İNDİR</a>
+          </div>
         </div>
       </section>
     </main>

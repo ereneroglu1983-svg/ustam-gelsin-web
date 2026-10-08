@@ -1,9 +1,12 @@
-// app/usta-is-ilanlari/[city]/page.tsx - FINAL v2 - REVIZE - trailingSlash fix - EKSILTME YOK
+// app/usta-is-ilanlari/[city]/page.tsx - FINAL v2.1 - PLAY BANNER
 import { cities } from '../../../data/cities'
 import { jobs } from '../../../data/jobs'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+
+const PLAY_URL_CLEAN = "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android"
+const PLAY_URL_USTA_CITY = `${PLAY_URL_CLEAN}&pcampaignid=web_usta_ilan_city_banner`
 
 export function generateStaticParams(){
   return cities.map(c=>({city:c.slug}))
@@ -11,6 +14,7 @@ export function generateStaticParams(){
 
 export async function generateMetadata({params}:{params: Promise<{city:string}>}): Promise<Metadata>{
   const { city: citySlug } = await params
+  if (citySlug.includes('.')) return {}
   const city = cities.find(c=>c.slug===citySlug)
   if(!city) return {}
   const canonical = `https://hemenustamgelsin.com/usta-is-ilanlari/${city.slug}/`
@@ -31,6 +35,7 @@ export async function generateMetadata({params}:{params: Promise<{city:string}>}
 
 export default async function UstaCityPage({params}:{params: Promise<{city:string}>}){
   const { city: citySlug } = await params
+  if (citySlug.includes('.') || citySlug === 'favicon' || citySlug === 'robots') notFound()
   const city = cities.find(c=>c.slug===citySlug)
   if(!city) notFound()
 
@@ -63,6 +68,20 @@ export default async function UstaCityPage({params}:{params: Promise<{city:strin
           </a>
         </div>
       </section>
+
+      {/* PLAY BANNER */}
+      <div style={{maxWidth:1120, margin:'14px auto 0', padding:'0 20px'}}>
+        <div style={{background:'white', border:'1px solid #111', borderRadius:14, padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap'}}>
+          <div style={{display:'flex', alignItems:'center', gap:12}}>
+            <div style={{width:36, height:36, background:'#111', color:'white', borderRadius:8, display:'grid', placeItems:'center', fontSize:18}}>📱</div>
+            <div>
+              <div style={{color:'#111', fontWeight:800, fontSize:14}}>{city.name} Ustası? {jobs.length} kategoride iş var - Uygulama YAYINDA!</div>
+              <div style={{color:'#57534e', fontSize:12}}>%0 Komisyon - Mobil uygulamadan işleri anında gör.</div>
+            </div>
+          </div>
+          <a href={PLAY_URL_USTA_CITY} target="_blank" rel="noopener" style={{background:'#111', color:'white', padding:'10px 16px', borderRadius:10, fontWeight:800, fontSize:13, textDecoration:'none', whiteSpace:'nowrap'}}> Google Play'den İndir →</a>
+        </div>
+      </div>
 
       <section style={{maxWidth:1120, margin:'0 auto', padding:'24px 20px 60px'}}>
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:12}}>

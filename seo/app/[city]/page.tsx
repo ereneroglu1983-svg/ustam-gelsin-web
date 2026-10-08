@@ -5,6 +5,9 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Breadcrumb from '../../components/Breadcrumb'
 
+const PLAY_URL_CLEAN = "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android"
+const PLAY_URL_PAGE = `${PLAY_URL_CLEAN}&pcampaignid=web_seo_city_banner`
+
 export function generateStaticParams() {
   return cities.map((city) => ({
     city: city.slug,
@@ -13,6 +16,8 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ city: string }> }): Promise<Metadata> {
   const { city: citySlug } = await params
+  // Guard
+  if (citySlug.includes('.') || citySlug === 'favicon') return {}
   const city = cities.find(c => c.slug === citySlug)
   if (!city) return {}
   const canonical = `https://hemenustamgelsin.com/${city.slug}/`
@@ -30,6 +35,12 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
 
 export default async function CityPage({ params }: { params: Promise<{ city: string }> }) {
   const { city: citySlug } = await params
+
+  // 1. FAVICON / ROBOTS GUARD - BU HATAYI SUSTURUR
+  if (citySlug.includes('.') || citySlug === 'favicon' || citySlug === 'robots' || citySlug === 'sitemap') {
+    notFound()
+  }
+
   const city = cities.find(c => c.slug === citySlug)
   if (!city) notFound()
 
@@ -71,6 +82,22 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
 
       <div style={{ maxWidth: 1120, margin: '0 auto', padding: '14px 20px 0' }}>
         <Breadcrumb items={[{ name: `${city.name} Ustaları`, href: `/${city.slug}/` }]} />
+      </div>
+
+      {/* 2. YENI - PLAY STORE BANNER - SEO ICIN GERCEK <a> */}
+      <div style={{ maxWidth: 1120, margin: '12px auto 0', padding: '0 20px' }}>
+        <div style={{ background: '#111', borderRadius: 14, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 36, height: 36, background: 'white', borderRadius: 8, display: 'grid', placeItems: 'center', fontSize: 20 }}>📱</div>
+            <div>
+              <div style={{ color: 'white', fontWeight: 800, fontSize: 14 }}>Hemen Ustam Gelsin YAYINDA! %0 Komisyon</div>
+              <div style={{ color: '#a8a29e', fontSize: 12 }}>{city.name}'da ustanı mobil uygulamadan bul, daha hızlı teklif al.</div>
+            </div>
+          </div>
+          <Link href={PLAY_URL_PAGE} target="_blank" rel="noopener" style={{ background: 'white', color: 'black', padding: '10px 16px', borderRadius: 10, fontWeight: 800, fontSize: 13, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+            Google Play'den İndir →
+          </Link>
+        </div>
       </div>
 
       <style>{`

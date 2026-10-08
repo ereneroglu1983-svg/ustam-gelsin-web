@@ -1,8 +1,11 @@
-// app/usta-is-ilanlari/page.tsx - FINAL v2 - trailingSlash fix - EKSILTME YOK
+// app/usta-is-ilanlari/page.tsx - FINAL v2.1 - PLAY BANNER
 import { cities } from '../../data/cities'
 import { jobs } from '../../data/jobs'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+
+const PLAY_URL_CLEAN = "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android"
+const PLAY_URL_USTA_HUB = `${PLAY_URL_CLEAN}&pcampaignid=web_usta_hub_banner`
 
 export const metadata: Metadata = {
   title: `Usta İş İlanları - 81 İlde ${jobs.length} Kategoride Komisyonsuz İş Bul | Hemen Ustam Gelsin`,
@@ -36,9 +39,9 @@ export default function UstaIlanlariHub() {
         <h1 style={{fontSize:'clamp(28px, 4.5vw, 48px)', fontWeight:900, lineHeight:0.95, margin:0}}>Usta mısın? 81 İlde İş Hazır.</h1>
         <p style={{color:'#a8a29e', fontSize:16, marginTop:12}}>Komisyon yok, hakediş %100 senin. 2 dakikada kayıt ol, iş al.</p>
         <div style={{marginTop:24, display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap'}}>
-          <a href="https://hemenustamgelsin.com/?utm_source=seo&utm_medium=usta_hub&utm_campaign=usta_ol"
+          <a href={PLAY_URL_USTA_HUB} target="_blank" rel="noopener"
              style={{background:'white', color:'black', padding:'16px 28px', borderRadius:12, fontWeight:900, textDecoration:'none', display:'inline-block'}}>
-            USTA OL, İŞ AL →
+            📱 UYGULAMAYI İNDİR, İŞ AL →
           </a>
           <a href="https://hemenustamgelsin.com/?utm_source=seo&utm_medium=usta_hub&utm_campaign=ilan_ver"
              style={{background:'transparent', color:'white', border:'1px solid #333', padding:'16px 28px', borderRadius:12, fontWeight:800, textDecoration:'none', display:'inline-block'}}>
@@ -46,6 +49,20 @@ export default function UstaIlanlariHub() {
           </a>
         </div>
       </section>
+
+      {/* PLAY BANNER */}
+      <div style={{maxWidth:1120, margin:'14px auto 0', padding:'0 20px'}}>
+        <div style={{background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:14, padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap'}}>
+          <div style={{display:'flex', alignItems:'center', gap:12}}>
+            <div style={{width:36, height:36, background:'#111', color:'white', borderRadius:8, display:'grid', placeItems:'center', fontSize:18}}>⚡</div>
+            <div>
+              <div style={{color:'#111', fontWeight:800, fontSize:14}}>Android Uygulaması YAYINDA! %0 Komisyon</div>
+              <div style={{color:'#166534', fontSize:12}}>{jobs.length} kategoride işleri mobil uygulamadan takip et, anında teklif ver.</div>
+            </div>
+          </div>
+          <a href={PLAY_URL_USTA_HUB} target="_blank" rel="noopener" style={{background:'#111', color:'white', padding:'10px 16px', borderRadius:10, fontWeight:800, fontSize:13, textDecoration:'none', whiteSpace:'nowrap'}}> 【entity-Google Play¦canonical_name=Google Play】 →</a>
+        </div>
+      </div>
 
       <section style={{maxWidth:1120, margin:'0 auto', padding:'28px 20px 60px'}}>
         <h2 style={{fontSize:13, fontWeight:800, color:'#78716c', letterSpacing:1, marginBottom:12}}>ŞEHİR SEÇ - {cities.length} İL</h2>

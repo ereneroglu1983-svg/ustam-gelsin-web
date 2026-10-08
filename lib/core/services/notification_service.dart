@@ -1,4 +1,4 @@
-// lib/core/services/notification_service.dart - FIXED - DÖNGÜSÜZ + KANAL FIX
+// lib/core/services/notification_service.dart - FIXED
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -21,84 +21,62 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  // === FIX 1: DÖNGÜ KİLİDİ ===
   static String? _sonKaydedilenToken;
   static bool _yaziliyor = false;
 
   Future<void> initialize() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
     await _messaging.requestPermission(alert: true, badge: true, sound: true);
 
-    // === FIX 2: KANALLARI OLUŞTUR - YOKSA BİLDİRİM GELMEZ ===
     const AndroidNotificationChannel mesajKanali = AndroidNotificationChannel(
-      'mesaj_kanali', // id
-      'Mesaj Bildirimleri',
+      'mesaj_kanali', 'Mesaj Bildirimleri',
       description: 'Müşteriden gelen mesajlar',
-      importance: Importance.max,
-      playSound: true,
-      enableVibration: true,
+      importance: Importance.max, playSound: true, enableVibration: true,
     );
-
     const AndroidNotificationChannel genelKanal = AndroidNotificationChannel(
-      'high_importance_channel',
-      'Genel Bildirimler',
-      importance: Importance.max,
-      playSound: true,
+      'high_importance_channel', 'Genel Bildirimler',
+      importance: Importance.max, playSound: true,
+    );
+    const AndroidNotificationChannel adminBazKanali = AndroidNotificationChannel(
+      'admin_baz_channel', 'Admin Baz İstasyonu',
+      description: 'Yönetici bildirimleri',
+      importance: Importance.max, playSound: true, enableVibration: true,
     );
 
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(mesajKanali);
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(genelKanal);
+    await _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(mesajKanali);
+    await _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(genelKanal);
+    await _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(adminBazKanali);
 
-    const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    // ✅ FIX - launcher_icon
+    const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/launcher_icon');
     const InitializationSettings initSettings = InitializationSettings(android: androidSettings);
 
     await _localNotifications.initialize(initSettings,
         onDidReceiveNotificationResponse: (NotificationResponse response) {
-          if (response.payload != null) {
-            _handleMessageNavigationPayload(response.payload!);
-          }
+          if (response.payload != null) _handleMessageNavigationPayload(response.payload!);
         });
 
-    // İlk açılış mesajı
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       if (message != null) {
-        Future.delayed(const Duration(milliseconds: 1500), () => _handleMessageNavigation(message.data)); // DÜZELTİLDİ: 500 -> 1500, navigator hazır olsun diye
+        Future.delayed(const Duration(milliseconds: 1500), () => _handleMessageNavigation(message.data));
       }
     });
-
-    // Ön planda mesaj
-    FirebaseMessaging.onMessage.listen((message) {
-      showLocalNotification(message);
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      _handleMessageNavigation(message.data);
-    });
-
-    // Token yenilenirse SADECE DEĞİŞTİYSE yaz
+    FirebaseMessaging.onMessage.listen((message) => showLocalNotification(message));
+    FirebaseMessaging.onMessageOpenedApp.listen((message) => _handleMessageNavigation(message.data));
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
       if (newToken != _sonKaydedilenToken) {
         final prefs = await SharedPreferences.getInstance();
-        final uid = prefs.getString('son_uid'); // uid'yi cache'den al
-        if (uid != null) {
-          await _guvenliYaz(uid, newToken, []);
-        }
+        final uid = prefs.getString('son_uid');
+        if (uid != null) await _guvenliYaz(uid, newToken, []);
       }
     });
   }
 
-  // === FIX 3: GÜVENLİ YAZMA - AYNI TOKENI TEKRAR YAZMAZ ===
   Future<void> updateUserToken(String uid, List<String> uzmanliklar) async {
     if (_yaziliyor) return;
     String? token = await _messaging.getToken();
     if (token == null) return;
-    if (token == _sonKaydedilenToken) return; // AYNI TOKENSA DUR
-
+    if (token == _sonKaydedilenToken) return;
     await _guvenliYaz(uid, token, uzmanliklar);
   }
 
@@ -108,24 +86,14 @@ class NotificationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final cacheToken = prefs.getString('fcm_token_cache');
-
-      // Cache ile aynıysa Firestore'a hiç dokunma - DÖNGÜ BİTER
-      if (cacheToken == token && _sonKaydedilenToken == token) {
-        return;
-      }
-
+      if (cacheToken == token && _sonKaydedilenToken == token) return;
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'fcmToken': token,
-        'uzmanliklar': uzmanliklar,
+        'fcmToken': token, 'uzmanliklar': uzmanliklar,
         'lastTokenUpdate': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-
       await prefs.setString('fcm_token_cache', token);
       await prefs.setString('son_uid', uid);
       _sonKaydedilenToken = token;
-
-      // LOGU KAPAT - ARTIK SPAM YOK
-      // debugPrint("✅ FCM TOKEN YAZILDI..."); // SİLDİK
       debugPrint("✅ [TOKEN KAYDEDİLDİ - TEK SEFER]");
     } catch (e) {
       debugPrint("❌ Token yazma hatası: $e");
@@ -136,18 +104,20 @@ class NotificationService {
 
   Future<void> showLocalNotification(RemoteMessage message) async {
     final String type = message.data['type'] ?? '';
-    final String channelId = type == 'chat' ? 'mesaj_kanali' : 'high_importance_channel';
-
+    String channelId = 'high_importance_channel';
+    String channelName = 'Bildirimler';
+    if (type == 'chat') {
+      channelId = 'mesaj_kanali'; channelName = 'Mesaj Bildirimleri';
+    } else if (type.startsWith('yeni_') || type == 'para_girisi' || type == 'odeme' || type == 'cozum_ortakligi' || type == 'sistem_mesaj') {
+      channelId = 'admin_baz_channel'; channelName = 'Admin Baz İstasyonu';
+    }
+    // ✅ FIX - launcher_icon
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      channelId,
-      type == 'chat' ? 'Mesaj Bildirimleri' : 'Bildirimler',
-      importance: Importance.max,
-      priority: Priority.high,
-      playSound: true,
-      enableVibration: true,
-      icon: '@mipmap/ic_launcher',
+      channelId, channelName,
+      importance: Importance.max, priority: Priority.high,
+      playSound: true, enableVibration: true,
+      icon: '@mipmap/launcher_icon',
     );
-
     await _localNotifications.show(
       message.hashCode,
       message.notification?.title ?? message.data['title'] ?? "Yeni Bildirim",
@@ -161,16 +131,13 @@ class NotificationService {
     try {
       final Map<String, dynamic> dataMap = jsonDecode(payload);
       _handleMessageNavigation(dataMap);
-    } catch (e) {
-      debugPrint("Payload hatası: $e");
-    }
+    } catch (e) { debugPrint("Payload hatası: $e"); }
   }
 
   void _handleMessageNavigation(Map<String, dynamic> dataMap) async {
     String type = dataMap['type']?.toString().trim() ?? '';
-    String typeLower = type.toLowerCase(); // DÜZELTİLDİ: EKLENDİ
-
-    if (typeLower.contains('acil')) { // DÜZELTİLDİ: == 'acil_cagri' yerine contains('acil') yapıldı, ana sayfaya düşmesin diye
+    String typeLower = type.toLowerCase();
+    if (typeLower.contains('acil')) {
       navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => AcilIlanlarSayfasi()));
     } else if (type == 'chat') {
       navigatorKey.currentState?.push(MaterialPageRoute(

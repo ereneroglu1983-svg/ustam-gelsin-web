@@ -1,4 +1,4 @@
-// app/usta-sitemap.xml/route.ts - FINAL v2.2 - REVIZE - trailingSlash fix - 3565 URL
+// app/usta-sitemap.xml/route.ts - FINAL v2.3
 export const dynamic = 'force-static'
 export const revalidate = 86400
 
@@ -7,7 +7,7 @@ import { jobs } from '../../data/jobs'
 
 export async function GET() {
   const base = 'https://hemenustamgelsin.com'
-  const contentDate = new Date('2026-10-01').toISOString()
+  const contentDate = new Date().toISOString()
 
   const urls: string[] = []
   urls.push(`${base}/usta-is-ilanlari/`)
@@ -21,10 +21,10 @@ export async function GET() {
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(u => `  <url><loc>${u}</loc><lastmod>${contentDate}</lastmod></url>`).join('\n')}
+${urls.map(u => `  <url><loc>${u}</loc><lastmod>${contentDate}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`).join('\n')}
 </urlset>`
 
   return new Response(xml, {
-    headers: { 'Content-Type': 'application/xml; charset=utf-8' },
+    headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=0, must-revalidate' },
   })
 }

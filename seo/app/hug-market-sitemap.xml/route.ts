@@ -1,4 +1,4 @@
-// app/hug-market-sitemap.xml/route.ts - FINAL v3.3 - REVIZE - trailingSlash fix - 1478 URL
+// app/hug-market-sitemap.xml/route.ts - FINAL v3.4
 export const dynamic = 'force-static'
 export const revalidate = 86400
 
@@ -27,7 +27,7 @@ const HUG_CATS = [
 
 export async function GET() {
   const base = 'https://hemenustamgelsin.com'
-  const contentDate = new Date('2026-10-01').toISOString()
+  const contentDate = new Date().toISOString()
 
   const urls = [
     `${base}/hug-market/`,
@@ -38,10 +38,10 @@ export async function GET() {
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(u => `  <url><loc>${u}</loc><lastmod>${contentDate}</lastmod></url>`).join("\n")}
+${urls.map(u => `  <url><loc>${u}</loc><lastmod>${contentDate}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`).join("\n")}
 </urlset>`
 
   return new Response(xml, {
-    headers: { "Content-Type": "application/xml; charset=utf-8" },
+    headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=0, must-revalidate" },
   })
 }

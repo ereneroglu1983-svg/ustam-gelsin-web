@@ -1,5 +1,5 @@
 // 'use client' KALDIRILDI - SERVER COMPONENT
-// app/[city]/[slug]/page.tsx - FINAL v16.0 - LUX KURUMSAL - PATH FIX - DÜRÜST - SLOGAN FIX - PANELLER SİLİNDİ - POSTER KORUNDU - BUILD FIX
+// app/[city]/[slug]/page.tsx - FINAL v16.1 - PLAY BANNER EKLENDI
 import { cities } from '../../../data/cities'
 import { jobs } from '../../../data/jobs'
 import { getCityJobData } from '../../../data/cityJobDatabase'
@@ -8,6 +8,9 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import UstaLiveGrid from '../../../components/UstaLiveGrid'
 import Breadcrumb from '../../../components/Breadcrumb'
+
+const PLAY_URL_CLEAN = "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android"
+const PLAY_URL_CITY_SLUG = `${PLAY_URL_CLEAN}&pcampaignid=web_city_slug_banner`
 
 const SLOGAN_LINE1 = "İŞ SENİN, EMEK SENİN, KAZANÇ SENİN."
 const SLOGAN_LINE2 = "ÜYELİK ÜCRETİ YOK. KOMİSYON YOK. SONRADAN KESİNTİ YOK."
@@ -160,13 +163,14 @@ export function generateStaticParams(){
 }
 export async function generateMetadata({params}:{params: Promise<{city:string,slug:string}>}): Promise<Metadata>{
  const { city: citySlug, slug } = await params
+ if (slug.includes('.') || citySlug.includes('.')) return {}
  const city = cities.find(c=>c.slug===citySlug)
- if(!city) notFound()
+ if(!city) return {}
  const job = jobs.find(j=>j.slug===slug)
- if(job){ const seoData = getCityJobData(city.slug, job.slug); if(!seoData) notFound(); const canonical = `https://hemenustamgelsin.com/${city.slug}/${job.slug}/`; return { title: seoData.metaTitle, description: seoData.metaDescription, alternates: { canonical }, openGraph: { title: seoData.metaTitle, description: seoData.metaDescription, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title: seoData.metaTitle, description: seoData.metaDescription }, robots: { index: true, follow: true } } }
+ if(job){ const seoData = getCityJobData(city.slug, job.slug); if(!seoData) return {}; const canonical = `https://hemenustamgelsin.com/${city.slug}/${job.slug}/`; return { title: seoData.metaTitle, description: seoData.metaDescription, alternates: { canonical }, openGraph: { title: seoData.metaTitle, description: seoData.metaDescription, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title: seoData.metaTitle, description: seoData.metaDescription }, robots: { index: true, follow: true } } }
  const district = city.districts.find(d=>d.slug===slug)
  if(district){ const dLoc = loc(district.name); const title = `${district.name} Ustaları | ${city.name} – ${SLOGAN_LINE1}`; const description = `${dLoc} usta bul, teklif al. ${SLOGAN_FULL} HugAI tahmini fiyatı ve doğrudan teklif sistemiyle işini başlat.`; const canonical = `https://hemenustamgelsin.com/${city.slug}/${district.slug}/`; return { title, description, alternates: { canonical }, openGraph: { title, description, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title, description }, robots: { index: true, follow: true } } }
- notFound()
+ return {}
 }
 function getNearbyCities(currentSlug: string) { return cities.filter(c => (nearbyMap[currentSlug]||[]).includes(c.slug)).slice(0,12) }
 function buildDistrictIntro(dName: string, cName: string, dLoc: string, city: typeof cities[0], district: {slug: string, name: string}): string {
@@ -189,6 +193,7 @@ function getDistrictActionNote(city: typeof cities[0], district: {slug: string, 
 
 export default async function UnifiedCitySlugPage({params}:{params: Promise<{city:string,slug:string}>}){
  const { city: citySlug, slug } = await params
+ if (slug.includes('.') || citySlug.includes('.') || slug === 'favicon' || slug === 'robots') notFound()
  const city = cities.find(c=>c.slug===citySlug)
  if(!city) notFound()
  const job = jobs.find(j=>j.slug===slug)
@@ -216,15 +221,9 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
      <div style={{maxWidth:1120, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12}}>
       <div style={{display:'flex', alignItems:'center', gap:12}}>
        <Link href="/" style={{display:'flex', alignItems:'center', gap:12, textDecoration:'none'}}>
-        <img
-         src="/assets/hug/app_logo.png"
-         alt="Hemen Ustam Gelsin" style={{height:72, width:'auto', objectFit:'contain'}}
-        />
+        <img src="/assets/hug/app_logo.png" alt="Hemen Ustam Gelsin" style={{height:72, width:'auto', objectFit:'contain'}} />
         <div style={{width:1, height:32, background:'#e7e5e4'}} />
-        <img
-         src="/assets/hug/hug_logo.jpg"
-         alt="Hug Market" style={{height:60, width:'auto', objectFit:'contain', borderRadius:8}}
-        />
+        <img src="/assets/hug/hug_logo.jpg" alt="Hug Market" style={{height:60, width:'auto', objectFit:'contain', borderRadius:8}} />
         <div style={{display:'flex', flexDirection:'column', lineHeight:1, marginLeft:4}}>
          <span style={{fontWeight:900, fontSize:17, letterSpacing:0.8, color:'#111'}}>HEMEN <span style={{color:'#111'}}>USTAM</span> <span style={{color:'#dc2626'}}>GELSİN</span></span>
          <span style={{fontSize:9.5, color:'#78716c', fontWeight:700, letterSpacing:0.3, marginTop:2, textTransform:'uppercase'}}>LÜX KURUMSAL • {SLOGAN_LINE1}</span>
@@ -246,6 +245,21 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
         { name: `${city.name} ${job.name}`, href: `/${city.slug}/${job.slug}/` }
       ]} />
     </div>
+
+    {/* PLAY BANNER - JOB */}
+    <div style={{maxWidth:1120, margin:'12px auto 0', padding:'0 20px'}}>
+      <div style={{background:'#111', borderRadius:14, padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap'}}>
+        <div style={{display:'flex', alignItems:'center', gap:12}}>
+          <div style={{width:36, height:36, background:'white', borderRadius:8, display:'grid', placeItems:'center', fontSize:20}}>📱</div>
+          <div>
+            <div style={{color:'white', fontWeight:800, fontSize:14}}>{city.name} {job.name} YAYINDA! %0 Komisyon</div>
+            <div style={{color:'#a8a29e', fontSize:12}}>Uygulamadan ilan ver, {city.name}'da daha hızlı teklif al.</div>
+          </div>
+        </div>
+        <a href={PLAY_URL_CITY_SLUG} target="_blank" rel="noopener" style={{background:'white', color:'black', padding:'10px 16px', borderRadius:10, fontWeight:800, fontSize:13, textDecoration:'none', whiteSpace:'nowrap'}}>【entity-Google Play¦canonical_name=Google Play】'den İndir →</a>
+      </div>
+    </div>
+
     <section style={{ background: `radial-gradient(800px 400px at 15% 0%, ${color}15 0%, transparent 60%), #FFFBF5`, padding:'26px 20px 28px' }}>
      <style>{`@media(max-width:768px){.job-hero{grid-template-columns:1fr!important}.job-content{grid-template-columns:1fr!important}}`}</style>
      <div className="job-hero" style={{maxWidth:1120, margin:'0 auto', display:'grid', gridTemplateColumns:'1.15fr 0.85fr', gap:24}}>
@@ -326,6 +340,20 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
         { name: cName, href: `/${city.slug}/` },
         { name: dName, href: `/${city.slug}/${district.slug}/` }
       ]} />
+    </div>
+
+    {/* PLAY BANNER - ILCE */}
+    <div style={{maxWidth:1120, margin:'12px auto 0', padding:'0 20px'}}>
+      <div style={{background:'#111', borderRadius:14, padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap'}}>
+        <div style={{display:'flex', alignItems:'center', gap:12}}>
+          <div style={{width:36, height:36, background:'white', borderRadius:8, display:'grid', placeItems:'center', fontSize:20}}>📱</div>
+          <div>
+            <div style={{color:'white', fontWeight:800, fontSize:14}}>{dName} YAYINDA! %0 Komisyon - Uygulamadan Bul</div>
+            <div style={{color:'#a8a29e', fontSize:12}}>{dLoc} ustanı mobil uygulamadan bul, hızlı teklif al.</div>
+          </div>
+        </div>
+        <a href={PLAY_URL_CITY_SLUG} target="_blank" rel="noopener" style={{background:'white', color:'black', padding:'10px 16px', borderRadius:10, fontWeight:800, fontSize:13, textDecoration:'none', whiteSpace:'nowrap'}}>【entity-Google Play¦canonical_name=Google Play】'den İndir →</a>
+      </div>
     </div>
 
     <section style={{maxWidth:1120, margin:'0 auto', padding:'20px 20px 0'}}>

@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
+const PLAY_URL_CLEAN = "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android"
+const PLAY_URL_USTA_ILAN = `${PLAY_URL_CLEAN}&pcampaignid=web_usta_is_ilanlari_banner`
+
 const nearbyMap: Record<string, string[]> = {
   'adana': ['mersin','osmaniye','hatay','kahramanmaras','nigde','kayseri'],'adiyaman': ['kahramanmaras','gaziantep','sanliurfa','diyarbakir','malatya'],'afyonkarahisar': ['kutahya','eskisehir','konya','isparta','denizli','usak'],'agri': ['kars','igdir','van','bitlis','mus','erzurum'],'amasya': ['samsun','tokat','corum','yozgat','cankiri'],'ankara': ['kirikkale','konya','eskisehir','cankiri','bolu','kirsehir'],'antalya': ['mugla','burdur','isparta','konya','karaman','mersin'],'artvin': ['rize','erzurum','ardahan','kars'],'aydin': ['izmir','manisa','denizli','mugla'],'balikesir': ['canakkale','bursa','kutahya','manisa','izmir'],'bilecik': ['bursa','kutahya','eskisehir','sakarya','bolu'],'bingol': ['elazig','diyarbakir','mus','erzurum','tunceli'],'bitlis': ['van','mus','siirt','batman','diyarbakir'],'bolu': ['duzce','sakarya','bursa','bilecik','eskisehir','ankara','zonguldak'],'burdur': ['antalya','isparta','afyonkarahisar','denizli','mugla'],'bursa': ['yalova','kocaeli','bilecik','kutahya','balikesir','sakarya'],'canakkale': ['balikesir','tekirdag','edirne'],'cankiri': ['ankara','bolu','karabuk','kastamonu','corum','kirikkale'],'corum': ['samsun','amasya','yozgat','kirikkale','cankiri','sinop'],'denizli': ['mugla','aydin','manisa','usak','afyonkarahisar','burdur'],'diyarbakir': ['batman','mardin','sanliurfa','adiyaman','malatya','elazig','bingol'],'edirne': ['kirklareli','tekirdag','canakkale'],'elazig': ['malatya','diyarbakir','bingol','tunceli'],'erzincan': ['erzurum','tunceli','elazig','sivas','gumushane','bayburt'],'erzurum': ['kars','agri','mus','bingol','erzincan','bayburt','rize','artvin'],'eskisehir': ['bursa','kutahya','afyonkarahisar','ankara','bolu','bilecik'],'gaziantep': ['kilis','hatay','osmaniye','kahramanmaras','adiyaman','sanliurfa'],'giresun': ['trabzon','gumushane','erzincan','sivas','ordu'],'gumushane': ['trabzon','bayburt','erzincan','giresun','rize'],'hakkari': ['van','sirnak'],'hatay': ['adana','osmaniye','gaziantep','kilis'],'isparta': ['burdur','antalya','konya','afyonkarahisar'],'mersin': ['adana','karaman','konya','nigde','antalya','kahramanmaras'],'istanbul': ['kocaeli','tekirdag','yalova','bursa','sakarya'],'izmir': ['manisa','aydin','balikesir','denizli','usak'],'kars': ['ardahan','erzurum','agri','igdir'],'kastamonu': ['sinop','corum','cankiri','karabuk','bartin'],'kayseri': ['sivas','yozgat','nevsehir','nigde','adana','kahramanmaras'],'kirklareli': ['edirne','tekirdag','istanbul'],'kirsehir': ['yozgat','nevsehir','aksaray','ankara','kirikkale'],'kocaeli': ['istanbul','sakarya','bursa','yalova'],'konya': ['ankara','aksaray','karaman','antalya','isparta','afyonkarahisar','eskisehir','nigde'],'kutahya': ['bursa','bilecik','eskisehir','afyonkarahisar','usak','manisa','balikesir'],'malatya': ['elazig','diyarbakir','adiyaman','kahramanmaras','sivas','erzincan'],'manisa': ['izmir','balikesir','kutahya','usak','denizli','aydin'],'kahramanmaras': ['osmaniye','adana','kayseri','sivas','malatya','adiyaman','gaziantep'],'mardin': ['sanliurfa','diyarbakir','batman','sirnak','siirt'],'mugla': ['aydin','denizli','burdur','antalya'],'mus': ['bingol','diyarbakir','batman','bitlis','van','agri','erzurum'],'nevsehir': ['kirsehir','aksaray','nigde','kayseri','yozgat'],'nigde': ['kayseri','adana','mersin','konya','aksaray','nevsehir'],'ordu': ['samsun','tokat','sivas','giresun'],'rize': ['trabzon','artvin','erzurum','bayburt'],'sakarya': ['kocaeli','duzce','bolu','bilecik','bursa','istanbul'],'samsun': ['ordu','tokat','amasya','corum','sinop'],'siirt': ['batman','bitlis','van','sirnak','mardin'],'sinop': ['kastamonu','corum','samsun'],'sivas': ['tokat','ordu','giresun','erzincan','malatya','kayseri','yozgat'],'tekirdag': ['istanbul','kirklareli','edirne','canakkale'],'tokat': ['amasya','samsun','ordu','sivas','yozgat'],'trabzon': ['rize','gumushane','giresun','bayburt'],'tunceli': ['erzincan','elazig','bingol','erzurum'],'sanliurfa': ['gaziantep','adiyaman','diyarbakir','mardin','sirnak'],'usak': ['manisa','kutahya','afyonkarahisar','denizli'],'van': ['agri','bitlis','siirt','sirnak','hakkari','mus'],'yozgat': ['corum','amasya','tokat','sivas','kayseri','kirsehir','cankiri','kirikkale'],'zonguldak': ['duzce','bolu','karabuk','bartin'],'aksaray': ['konya','nigde','nevsehir','kirsehir','ankara'],'bayburt': ['trabzon','rize','erzurum','erzincan','gumushane'],'karaman': ['konya','mersin','antalya'],'kirikkale': ['ankara','cankiri','corum','yozgat','kirsehir'],'batman': ['diyarbakir','mardin','siirt','bitlis','mus'],'sirnak': ['mardin','siirt','van','hakkari','sanliurfa'],'bartin': ['zonguldak','karabuk','kastamonu'],'ardahan': ['kars','artvin','erzurum'],'igdir': ['kars','agri'],'yalova': ['kocaeli','bursa','istanbul','sakarya'],'karabuk': ['bolu','kastamonu','cankiri','bartin','zonguldak'],'kilis': ['gaziantep','hatay'],'osmaniye': ['adana','hatay','gaziantep','kahramanmaras'],'duzce': ['bolu','sakarya','zonguldak'],
 }
@@ -29,6 +32,7 @@ export function generateStaticParams(){
 
 export async function generateMetadata({params}:{params: Promise<{city:string,job:string}>}): Promise<Metadata>{
   const { city: citySlug, job: jobSlug } = await params
+  if (citySlug.includes('.') || jobSlug.includes('.')) return {}
   const city = cities.find(c=>c.slug===citySlug)
   const job = jobs.find(j=>j.slug===jobSlug)
   if(!city ||!job) return {}
@@ -49,6 +53,7 @@ export async function generateMetadata({params}:{params: Promise<{city:string,jo
 
 export default async function UstaJobCityPage({params}:{params: Promise<{city:string,job:string}>}){
   const { city: citySlug, job: jobSlug } = await params
+  if (citySlug.includes('.') || jobSlug.includes('.')) notFound()
   const city = cities.find(c=>c.slug===citySlug)
   const job = jobs.find(j=>j.slug===jobSlug)
   if(!city ||!job) notFound()
@@ -110,6 +115,21 @@ export default async function UstaJobCityPage({params}:{params: Promise<{city:st
         <Link href={`/usta-is-ilanlari/`} style={{color:'#78716c', textDecoration:'none'}}>Usta İş İlanları</Link> <span> / </span>
         <b style={{color:'#111'}}>{city.name} {job.name} Ustası İş İlanları</b>
       </div>
+
+      {/* PLAY BANNER - USTA IS ILANLARI */}
+      <div style={{maxWidth:1120, margin:'12px auto 0', padding:'0 20px'}}>
+        <div style={{background:'#111', borderRadius:14, padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap'}}>
+          <div style={{display:'flex', alignItems:'center', gap:12}}>
+            <div style={{width:36, height:36, background:'white', borderRadius:8, display:'grid', placeItems:'center', fontSize:20}}>🔧</div>
+            <div>
+              <div style={{color:'white', fontWeight:800, fontSize:14}}>{city.name} {job.name} Ustası? Uygulama YAYINDA!</div>
+              <div style={{color:'#a8a29e', fontSize:12}}>{city.name}'da {job.name.toLowerCase()} işlerini kaçırma, mobil uygulamadan takip et.</div>
+            </div>
+          </div>
+          <a href={PLAY_URL_USTA_ILAN} target="_blank" rel="noopener" style={{background:'white', color:'black', padding:'10px 16px', borderRadius:10, fontWeight:800, fontSize:13, textDecoration:'none', whiteSpace:'nowrap'}}> Google Play'den İndir →</a>
+        </div>
+      </div>
+
       <section style={{ padding:'26px 20px 28px' }}>
         <div style={{maxWidth:1120, margin:'0 auto', display:'grid', gridTemplateColumns:'1.15fr 0.85fr', gap:24}}>
           <div>

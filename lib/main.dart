@@ -157,6 +157,7 @@ Future<void> _initializeServicesInBackground() async {
   try {
     await NotificationService().initialize();
     await FirebaseMessaging.instance.subscribeToTopic('acil_cagri_ustalar').catchError((_) {});
+    await FirebaseMessaging.instance.subscribeToTopic('admin_notifications').catchError((_) {});
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       Future.delayed(const Duration(seconds: 1), () => _handleNotificationClick(initialMessage));

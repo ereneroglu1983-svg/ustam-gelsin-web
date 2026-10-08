@@ -1,0 +1,11 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.hemenustamgelsin.android",
+      "sha256_cert_fingerprints":
+      ["8F:84:7C:65:6B:E0:0F:5A:45:61:6E:09:27:02:70:85:5C:2A:DC:9D:7A:17:5D:0D:80:F1:24:C9:72:57:44:5D"]
+    }
+  }
+]

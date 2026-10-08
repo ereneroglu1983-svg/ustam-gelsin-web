@@ -1,7 +1,6 @@
-// lib/features/admin/screens/admin_dashboard.dart - V7 BAKIYE YUKLE EKLI - TAM
+// lib/features/admin/screens/admin_dashboard.dart - V8 HUG PRO EKLİ - TAM
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'moderasyon_view.dart';
 import 'finans_view.dart';
 import 'stats_view.dart';
@@ -14,7 +13,8 @@ import 'admin_reklam_board.dart';
 import '../hug_market/kategori_munhasir_motoru.dart';
 import 'usta_poster.dart';
 import 'system_messages_view.dart';
-import 'bakiye_yukle_view.dart'; // YENİ EKLENDİ MORUK!
+import 'bakiye_yukle_view.dart';
+import '../../hug_pro/hug_pro_home.dart'; // HUG PRO - YENİ EKLENDİ MORUK!
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -35,7 +35,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   void _handleNavigateToFinans() { setState(() { _userRoleFilter = null; _selectedIndex = 4; }); }
   void _handleNavigateToB2B() { setState(() { _userRoleFilter = null; _selectedIndex = 6; }); }
   void _handleNavigateToSystemMessages() { setState(() { _userRoleFilter = null; _selectedIndex = 11; }); }
-  void _handleNavigateToBakiyeYukle() { setState(() { _userRoleFilter = null; _selectedIndex = 12; }); } // YENİ
+  void _handleNavigateToBakiyeYukle() { setState(() { _userRoleFilter = null; _selectedIndex = 12; }); }
 
   Widget _getView(int index) {
     switch (index) {
@@ -51,13 +51,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 9: return const KategoriMunhasirMotoruPage();
       case 10: return const UstaPosterScreen();
       case 11: return const SystemMessagesView();
-      case 12: return const BakiyeYukleView(); // YENİ EKLENDİ!
+      case 12: return const BakiyeYukleView();
+      case 13: return const HugProHomePage(); // HUG PRO - YENİ! BASINCA ANA SAYFA AÇILIYOR
       default: return StatsView(onNavigateToUsers: _handleStatsUserTap, onNavigateToRobot: _handleNavigateToRobot, onNavigateToFinans: _handleNavigateToFinans, onNavigateToB2B: _handleNavigateToB2B, onNavigateToSystemMessages: _handleNavigateToSystemMessages);
     }
   }
 
   String _getTitle(int index) {
-    const titles = ["Ana Sayfa","Kullanıcılar","Yeni Katılanlar","İçerik","Finans","Modere","B2B","Blog","Reklam","Kategori","Usta Poster","Sistem Mesajları","Bakiye Yükle"];
+    const titles = ["Ana Sayfa","Kullanıcılar","Yeni Katılanlar","İçerik","Finans","Modere","B2B","Blog","Reklam","Kategori","Usta Poster","Sistem Mesajları","Bakiye Yükle","HUG PRO"];
     return titles[index];
   }
 
@@ -94,7 +95,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
         NavigationRailDestination(icon: Icon(Icons.category_outlined), label: Text("Kategori")),
         NavigationRailDestination(icon: Icon(Icons.engineering_outlined), label: Text("Usta Poster")),
         NavigationRailDestination(icon: Icon(Icons.mail_outline), label: Text("Sistem Msj")),
-        NavigationRailDestination(icon: Icon(Icons.account_balance_wallet, color: Colors.green), label: Text("Bakiye Yükle")), // YENİ!
+        NavigationRailDestination(icon: Icon(Icons.account_balance_wallet, color: Colors.green), label: Text("Bakiye Yükle")),
+        NavigationRailDestination(icon: Icon(Icons.apartment_rounded, color: Colors.red), label: Text("HUG PRO")), // YENİ! KIRMIZI!
       ],
     );
   }
@@ -119,7 +121,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
           _drawerItem(10, Icons.engineering_outlined, "Usta Poster"),
           _drawerItem(11, Icons.mail_outline, "Sistem Mesajları"),
           const Divider(color: Colors.white10),
-          _drawerItem(12, Icons.account_balance_wallet, "Bakiye Yükle", isGreen: true), // YENİ! YEŞİL İKON!
+          _drawerItem(12, Icons.account_balance_wallet, "Bakiye Yükle", isGreen: true),
+          const Divider(color: Colors.white10),
+          _drawerItem(13, Icons.apartment_rounded, "HUG PRO", isRed: true), // YENİ! KIRMIZI - BASINCA ANA SAYFA!
           const Divider(color: Colors.white10),
           ListTile(leading: const Icon(Icons.logout, color: Colors.grey), title: const Text("Çıkış Yap (Firebase)", style: TextStyle(color: Colors.grey, fontSize: 12)), onTap: () => FirebaseAuth.instance.signOut()),
         ],
@@ -127,13 +131,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  ListTile _drawerItem(int index, IconData icon, String title, {bool isGreen = false}) {
+  ListTile _drawerItem(int index, IconData icon, String title, {bool isGreen = false, bool isRed = false}) {
     final bool selected = _selectedIndex == index;
+    Color iconColor = Colors.grey;
+    if (selected) iconColor = primaryOrange;
+    else if (isGreen) iconColor = Colors.green;
+    else if (isRed) iconColor = Colors.red;
+
+    Color textColor = Colors.white70;
+    if (selected) textColor = primaryOrange;
+    else if (isGreen) textColor = Colors.green.shade300;
+    else if (isRed) textColor = Colors.red.shade300;
+
     return ListTile(
-        leading: Icon(icon, color: selected? primaryOrange : (isGreen? Colors.green : Colors.grey)),
-        title: Text(title, style: TextStyle(color: selected? primaryOrange : (isGreen? Colors.green.shade300 : Colors.white70), fontWeight: selected? FontWeight.bold : FontWeight.normal)),
+        leading: Icon(icon, color: iconColor),
+        title: Text(title, style: TextStyle(color: textColor, fontWeight: selected? FontWeight.bold : FontWeight.normal)),
         selected: selected,
-        selectedTileColor: isGreen? Colors.green.withOpacity(0.1) : primaryOrange.withOpacity(0.1),
+        selectedTileColor: isRed? Colors.red.withOpacity(0.15) : (isGreen? Colors.green.withOpacity(0.1) : primaryOrange.withOpacity(0.1)),
         onTap: () { setState(() { _selectedIndex = index; if (index!= 1) _userRoleFilter = null; }); Navigator.pop(context); }
     );
   }
