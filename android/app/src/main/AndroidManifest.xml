@@ -5,13 +5,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <!-- Uygulama İzinleri -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <queries>
-        <!-- URL Launcher için -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
@@ -20,8 +17,6 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="http" />
         </intent>
-
-        <!-- Kamera ve Galeri -->
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
         </intent>
@@ -32,7 +27,7 @@
     </queries>
 
     <application
-        android:label="ustam_gelsin"
+        android:label="Hemen Ustam Gelsin"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:hardwareAccelerated="true"
@@ -58,6 +53,16 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- HEMEN USTAM GELSIN - APP LINKS - GOOGLE İÇİN ŞART -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="hemenustamgelsin.com" />
+                <data android:scheme="https" android:host="www.hemenustamgelsin.com" />
+            </intent-filter>
+
         </activity>
 
         <service
@@ -73,5 +78,4 @@
             android:value="2" />
 
     </application>
-
 </manifest>
