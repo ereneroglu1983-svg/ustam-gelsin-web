@@ -25,6 +25,13 @@
       "type": "text/html",
       "url": "https://hemenustamgelsin.com/insaat-rehberi",
       "description": "Insaat, tadilat ve dekorasyon rehberleri, nasil yapilir icerikleri"
+    },
+    {
+      "identifier": "urn:ai:hemenustamgelsin.com:app:android",
+      "displayName": "Hemen Ustam Gelsin - Android Uygulaması",
+      "type": "application/vnd.android.package-archive",
+      "url": "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android",
+      "description": "Android uygulaması Google Play'de yayında - Usta bul, teklif al, mesajlaş. Package: com.hemenustamgelsin.android - App Links doğrulandı: /.well-known/assetlinks.json"
     }
   ]
 }

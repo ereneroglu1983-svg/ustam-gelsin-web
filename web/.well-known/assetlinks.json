@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.hemenustamgelsin.android",
+      "sha256_cert_fingerprints": [
+        "8F:84:7C:65:6B:E0:0F:5A:45:61:6E:09:27:02:70:85:5C:2A:DC:9D:7A:17:5D:0D:80:F1:24:C9:72:57:44:5D",
+        "99:DC:8E:17:11:28:37:AD:C7:00:9F:E8:24:C8:E4:D2:49:42:88:FD:E8:AA:E4:14:F6:32:A0:DD:7B:EE:54:BF"
+      ]
+    }
+  }
+]

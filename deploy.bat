@@ -183,6 +183,7 @@ echo /hug-market/* /hug-market/:splat 200
 echo /usta-is-ilanlari/* /usta-is-ilanlari/:splat 200
 echo /404/* /404/:splat 200
 echo /_next/* /_next/:splat 200
+echo /.well-known/* /.well-known/:splat 200
 echo.
 echo # FLUTTER SPA FALLBACK - EN SONDA KALMALI
 echo /* /index.html 200
@@ -221,7 +222,7 @@ echo.
 :DEPLOY
 echo [4/5] Cloudflare PRODUCTION deploy...
 echo.
-call npx wrangler pages deploy build/web --project-name=ustam-web-deploy --branch=main --commit-dirty=true
+call wrangler pages deploy build/web --project-name=ustam-web-deploy --branch=main --commit-dirty=true
 if errorlevel 1 (
     echo CLOUDFLARE DEPLOY BASARISIZ!
     pause
