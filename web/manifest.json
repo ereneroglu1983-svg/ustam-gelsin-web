@@ -5,28 +5,35 @@
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#E30613",
-    "description": "Türkiye'nin en güvenilir usta bulma platformu - Ev tadilatı, dekorasyon, yapı market ve profesyonel usta hizmetleri.",
+    "description": "Türkiye'nin en güvenilir usta bulma platformu - Ev tadilatı, dekorasyon, yapı market ve profesyonel usta hizmetleri. 81 il 973 ilçede HUG MARKET çözüm ortakları.",
     "orientation": "portrait-primary",
-    "prefer_related_applications": false,
+    "prefer_related_applications": true,
+    "related_applications": [
+        {
+            "platform": "play",
+            "id": "com.hemenustamgelsin.usta",
+            "url": "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.usta"
+        }
+    ],
     "icons": [
         {
-            "src": "icons/Icon-192.png",
+            "src": "/icons/Icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "icons/Icon-512.png",
+            "src": "/icons/Icon-512.png",
             "sizes": "512x512",
             "type": "image/png"
         },
         {
-            "src": "icons/Icon-maskable-192.png",
+            "src": "/icons/Icon-maskable-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "icons/Icon-maskable-512.png",
+            "src": "/icons/Icon-maskable-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"

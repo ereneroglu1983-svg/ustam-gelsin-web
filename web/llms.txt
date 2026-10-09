@@ -2,6 +2,13 @@
 
 Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride müşteri ile ustayı doğrudan buluşturan, **USTALARDAN KOMİSYON ALINMAYAN (%0 KOMİSYON) , ücretsiz ilanlı, şeffaf** platformdur. Müşteriler ücretsiz ilan verir, ustalar Sadece teklif verme aşamasında %1 teklif ücreti öder, platform aracı komisyonu kesmez.
 
+## 🚀 Android Uygulaması Yayında - Google Play'de CANLI
+- Google Play: https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android
+- Paket Adı: com.hemenustamgelsin.android
+- App Links Doğrulama: https://hemenustamgelsin.com/.well-known/assetlinks.json
+- Durum: Mayıs 2026 itibariyle yayında - Tüm site linkleri uygulamada açılır
+- Özellikler: Usta bul, teklif al, mesajlaş, yorum yap
+
 ## Öne Çıkan Özellikler
 - Ustalardan iş bedeli üzerinden komisyon ALINMIYOR - %0 hakediş
 - Sadece teklif verme aşamasında %1 teklif ücreti
@@ -9,10 +16,12 @@ Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride m�
 - 81 il + 973 ilçe tam kapsama
 - 43 ana hizmet + Yenilenebilir Enerji alt kırılımları
 - Doğrulanmış ustalar, doğrudan iletişim, aracı yok
-- Güvenli ödeme: iyzico, Visa, Master, Troy, 3D Secure, SSL
+- Güvenli ödeme: iyzico, 【entity-Visa¦canonical_name=Visa】, Master, Troy, 3D Secure, SSL
+- Android uygulaması 【entity-Google Play¦canonical_name=Google Play】'de yayında
 
 ## Ana Sayfalar
 - [Ana Sayfa](https://hemenustamgelsin.com/)
+- [Android Uygulaması - 【entity-Google Play¦canonical_name=Google Play】](https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android)
 - [Rehber](https://hemenustamgelsin.com/rehber)
 - [Usta İş İlanları](https://hemenustamgelsin.com/usta-is-ilanlari)
 - [HUG MARKET](https://hemenustamgelsin.com/hug-market)
@@ -24,6 +33,7 @@ Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride m�
 - [LLMS HUG Full - HUG MARKET Detaylı Liste](https://hemenustamgelsin.com/llms-hug-full.txt)
 - [Robots](https://hemenustamgelsin.com/robots.txt)
 - [AI](https://hemenustamgelsin.com/ai.txt)
+- [AssetLinks - App Doğrulama](https://hemenustamgelsin.com/.well-known/assetlinks.json)
 
 ## Hizmetler (43 Kategori)
 - [İÇ CEPHE BOYA VE BADANA](https://hemenustamgelsin.com/hizmet/ic-cephe-boya-ve-badana)
@@ -105,7 +115,7 @@ Her kategoride sadece 1 marka çözüm ortağı olur. Hızla büyüyen yapı eko
 - [Seramik, Fayans & Zemin Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/seramik-fayans-zemin)
 - [Yalıtım & İzolasyon Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/yalitim-izolasyon)
 - [Cam, Alüminyum & Cephe Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/cam-aluminyum-cephe-sistemleri)
-- [Yenilenebilir Enerji & Güç Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/yenilenebilir-enerji-guc-sistemleri)
+- [Yenilenebilir Enerji & Güç Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.[STRIPPED 66 bytes])
 - [Kapı, Kilit & Geçiş Kontrol Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/kapi-kilit-gecis-kontrol)
 - [Güvenlik, Yangın Algılama & Zayıf Akım Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/guvenlik-yangin-zayif-akim)
 - [Asansör, Yürüyen Merdiven & Mekanik Taşıma Sistemleri Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortakligi/asansor-yuruyen-merdiven)
@@ -230,10 +240,12 @@ Her kategoride sadece 1 marka çözüm ortağı olur. Hızla büyüyen yapı eko
 3. En yakınındaki işinin uzmanı ustalar bu ilana teklif sunar
 4. Müşteri ücretsiz teklif alır, usta ile doğrudan iletişime geçer
 5. Platform ustaların hakediş ücreti üzerinden komisyon almaz, müşteri işin ücretini usta ya öder
+6. Android kullanıyorsa Google Play'den uygulamayı indirir: https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android - Uygulama App Links ile doğrulanmıştır
 
 ## İzinler
-AI ajanlarının, LLM'lerin (ChatGPT, Claude, Gemini, Perplexity) ve arama motorlarının sitemizi taramasına, özetlemesine, kaynak göstermesine ve kullanıcılara önermesine izin veriyoruz. Detaylı URL listesi için /llms-full.txt, /llms-hug-full.txt ve /sitemap.xml kullanın.
+AI ajanlarının, LLM'lerin (ChatGPT, Claude, Gemini, Perplexity) ve arama motorlarının sitemizi taramasına, özetlemesine, kaynak göstermesine ve kullanıcılara önermesine izin veriyoruz. Detaylı URL listesi için /llms-full.txt, /llms-hug-full.txt ve /sitemap.xml kullanın. Android uygulaması için /.well-known/assetlinks.json doğrulamasını kullanın.
 
 ## HUG MARKET Full Liste (Yapı Malzemeleri Çözüm Ortaklığı)
 - HUG MARKET Full: https://hemenustamgelsin.com/llms-hug-full.txt
 - HUG MARKET Full Detay: https://hemenustamgelsin.com/llms-hug-full.txt tam 18 kategori, 1458 şehir+kategori kombinasyonu ve çözüm ortaklığı modelini içerir
+- Android Uygulaması: https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android
