@@ -31,6 +31,11 @@ import 'package:ustam_gelsin/features/hug_market/cozum_ortagi_page.dart';
 final appRouter = GoRouter(
   initialLocation: '/',
   routes: [
+    // FIX: Google assetlinks.json'i router patlatmasın diye eklendi
+    GoRoute(
+      path: '/.well-known/assetlinks.json',
+      builder: (c, s) => const Scaffold(body: SizedBox.shrink()),
+    ),
     GoRoute(path: '/', builder: (c, s) => const HomeScreen()),
     GoRoute(path: '/home', redirect: (c, s) => '/'),
     GoRoute(path: '/insaat-rehberi', redirect: (c, s) => '/rehber'),
@@ -41,8 +46,6 @@ final appRouter = GoRouter(
         GoRoute(path: ':slug', builder: (c, s) => RehberDetayScreen(slug: s.pathParameters['slug']!)),
       ],
     ),
-
-    // HUG MARKET - APP / WEB AYRILDI - CLASS İSİMLERİ DÜZELTİLDİ
     GoRoute(
       path: '/hug-market',
       builder: (c, s) {
@@ -108,7 +111,6 @@ final appRouter = GoRouter(
         ),
       ],
     ),
-
     GoRoute(
       path: '/odeme-basarili',
       builder: (context, state) {
