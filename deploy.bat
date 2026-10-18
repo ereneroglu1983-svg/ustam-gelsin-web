@@ -211,19 +211,6 @@ if exist "build\web\404.html" del /Q "build\web\404.html" >nul 2>&1
 if exist "build\web\404" rmdir /S /Q "build\web\404" >nul 2>&1
 del /f /q "build\web\_worker.js" >nul 2>&1
 del /f /q "build\web\_routes.json" >nul 2>&1
-
-echo [FIX] Sitemap kopyalaniyor - HTML bug fix...
-if exist "seo\out\sitemap.xml" copy /Y "seo\out\sitemap.xml" "build\web\sitemap.xml" >nul
-if exist "seo\.next\server\app\sitemap.xml" copy /Y "seo\.next\server\app\sitemap.xml" "build\web\sitemap.xml" >nul
-if exist "seo\.next\server\app\sitemap.xml.body" copy /Y "seo\.next\server\app\sitemap.xml.body" "build\web\sitemap.xml" >nul
-if exist "seo\out\usta-sitemap.xml" copy /Y "seo\out\usta-sitemap.xml" "build\web\usta-sitemap.xml" >nul
-if exist "seo\.next\server\app\usta-sitemap.xml" copy /Y "seo\.next\server\app\usta-sitemap.xml" "build\web\usta-sitemap.xml" >nul
-if exist "seo\.next\server\app\usta-sitemap.xml.body" copy /Y "seo\.next\server\app\usta-sitemap.xml.body" "build\web\usta-sitemap.xml" >nul
-if exist "seo\out\hug-market-sitemap.xml" copy /Y "seo\out\hug-market-sitemap.xml" "build\web\hug-market-sitemap.xml" >nul
-if exist "seo\.next\server\app\hug-market-sitemap.xml" copy /Y "seo\.next\server\app\hug-market-sitemap.xml" "build\web\hug-market-sitemap.xml" >nul
-if exist "seo\.next\server\app\hug-market-sitemap.xml.body" copy /Y "seo\.next\server\app\hug-market-sitemap.xml.body" "build\web\hug-market-sitemap.xml" >nul
-dir "build\web\sitemap.xml"
-echo [FIX] Sitemap fix tamam.
 goto DEPLOY
 
 :SEO_ATLA
