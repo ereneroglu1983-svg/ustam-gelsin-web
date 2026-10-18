@@ -1,4 +1,4 @@
-// app/usta-sitemap.xml/route.ts - FINAL v2.3
+// app/usta-sitemap.xml/route.ts - FINAL v2.4 - İLÇE EKLENDİ BOZULMAZ
 export const dynamic = 'force-static'
 export const revalidate = 86400
 
@@ -16,6 +16,13 @@ export async function GET() {
     urls.push(`${base}/usta-is-ilanlari/${c.slug}/`)
     for (const j of jobs) {
       urls.push(`${base}/usta-is-ilanlari/${c.slug}/${j.slug}/`)
+    }
+    // SADECE BU EKLENDİ - MEVCUT HİÇBİR ŞEY SİLİNMEDİ
+    for (const d of c.districts) {
+      urls.push(`${base}/usta-is-ilanlari/${c.slug}/${d.slug}/`)
+      for (const j of jobs) {
+        urls.push(`${base}/usta-is-ilanlari/${c.slug}/${d.slug}/${j.slug}/`)
+      }
     }
   }
 

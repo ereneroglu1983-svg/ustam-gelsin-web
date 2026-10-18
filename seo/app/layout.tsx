@@ -10,11 +10,9 @@ export const metadata: Metadata = {
   title: 'Hemen Ustam Gelsin - %0 Komisyonlu Usta Bulma Platformu',
   description: OFFICIAL_IDENTITY,
   verification: { yandex: '1992acbf758234c0' },
-  alternates: { canonical: 'https://hemenustamgelsin.com' },
   openGraph: {
     type: 'website',
     locale: 'tr_TR',
-    url: 'https://hemenustamgelsin.com',
     siteName: 'Hemen Ustam Gelsin',
     title: 'Hemen Ustam Gelsin - %0 Komisyonlu Usta Bulma Platformu',
     description: OFFICIAL_IDENTITY,
@@ -63,8 +61,7 @@ export default function RootLayout({children}:{children:React.ReactNode}){
       "https://www.facebook.com/profile.php?id=61591164702200",
       "https://x.com/Hemenustamglsn",
       "https://www.tiktok.com/@hemen_ustam_gelsin",
-      "https://www.youtube.com/@HemenUstamGelsin",
-      PLAY_URL
+      "https://www.youtube.com/@HemenUstamGelsin"
     ]
   }
 
