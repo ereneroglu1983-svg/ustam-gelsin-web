@@ -1,5 +1,4 @@
-
-// lib/features/admin/screens/user_view.dart - V3 TARIHE GORE SIRALI + GO HOME
+// lib/features/admin/screens/user_view.dart - V3 TARIHE GORE SIRALI + GO HOME + SAYAC
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ustam_gelsin/core/services/chat_service.dart';
@@ -11,7 +10,6 @@ class UserView extends StatefulWidget {
   const UserView({super.key, this.initialRoleFilter});
 
   final String? initialRoleFilter;
-
 
   @override
   State<UserView> createState() => _UserViewState();
@@ -55,6 +53,17 @@ class _UserViewState extends State<UserView> {
       }
     }
     return id.toString();
+  }
+
+  // SADECE EKLENEN YER - BAŞKA HİÇBİR YERE DOKUNMADIM
+  Widget _countTab(String title, String role) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _firestore.collection('users').where('role', isEqualTo: role).snapshots(),
+      builder: (context, snapshot) {
+        final count = snapshot.hasData ? snapshot.data!.docs.length : 0;
+        return Tab(text: "$title ($count)");
+      },
+    );
   }
 
   @override
@@ -111,7 +120,10 @@ class _UserViewState extends State<UserView> {
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white38,
             labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-            tabs: const [Tab(text: "MÜŞTERİ"), Tab(text: "USTA")],
+            tabs: [
+              _countTab("MÜŞTERİ", 'customer'),
+              _countTab("USTA", 'usta'),
+            ],
           ),
           Expanded(
             child: SafeArea(
@@ -129,11 +141,9 @@ class _UserViewState extends State<UserView> {
 
   Widget _userList(String role) {
     return StreamBuilder<QuerySnapshot>(
-      // TARIHE GORE SIRALI - EN YENILER USTTE - INDEX GEREKMEZSE CLIENT'DA DA SORTLUYORUZ
       stream: _firestore.collection('users').where('role', isEqualTo: role).orderBy('createdAt', descending: true).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          // Index yoksa fallback - orderBy olmadan cekip client'da sortla
           return StreamBuilder<QuerySnapshot>(
             stream: _firestore.collection('users').where('role', isEqualTo: role).snapshots(),
             builder: (context, snap2) {
@@ -149,7 +159,6 @@ class _UserViewState extends State<UserView> {
   }
 
   Widget _buildSortedList(List<QueryDocumentSnapshot> docs, String role) {
-    // CLIENT SIDE GARANTI SORT - EN YENILER USTTE KILITLI
     docs.sort((a, b) {
       try {
         var dataA = a.data() as Map<String, dynamic>;
@@ -159,11 +168,10 @@ class _UserViewState extends State<UserView> {
         if (timeA == null && timeB == null) return 0;
         if (timeA == null) return 1;
         if (timeB == null) return -1;
-        return timeB.compareTo(timeA); // descending - yeniler ustte
+        return timeB.compareTo(timeA);
       } catch (_) { return 0; }
     });
 
-    // arama filtre
     var filtered = docs.where((doc) {
       var data = doc.data() as Map<String, dynamic>;
       String displayName = (data['firstName'] != null && data['firstName'].isNotEmpty)

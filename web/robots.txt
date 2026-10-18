@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /api
+Disallow: /_next/
+Disallow: /_next
+Disallow: /admin/
+Disallow: /admin
+
+# AI Search botları (ChatGPT, Claude, Perplexity, Grok)
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Grok
+Allow: /
+
+# Google AI
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://hemenustamgelsin.com/sitemap.xml
+Sitemap: https://hemenustamgelsin.com/usta-sitemap.xml
+Sitemap: https://hemenustamgelsin.com/hug-market-sitemap.xml

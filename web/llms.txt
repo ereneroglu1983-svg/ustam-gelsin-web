@@ -1,3 +1,5 @@
+> Hemen Ustam Gelsin, Türkiye'nin 81 ilinde ustadan komisyon almayan (%0) usta bulma platformudur. Müşteri ücretsiz ilan verir, ustalar sadece teklif aşamasında %1 teklif ücreti öder. 43 hizmet kategorisinde doğrudan usta-müşteri eşleşmesi sağlar. Android uygulaması Google Play'de yayındadır.
+
 # Hemen Ustam Gelsin
 
 Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride müşteri ile ustayı doğrudan buluşturan, **USTALARDAN KOMİSYON ALINMAYAN (%0 KOMİSYON) , ücretsiz ilanlı, şeffaf** platformdur. Müşteriler ücretsiz ilan verir, ustalar Sadece teklif verme aşamasında %1 teklif ücreti öder, platform aracı komisyonu kesmez.
