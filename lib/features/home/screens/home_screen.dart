@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -18,6 +19,9 @@ import 'package:ustam_gelsin/features/home/widgets/ilan_akisi_slider.dart';
 import 'package:ustam_gelsin/features/home/widgets/insaat_rehberi_slider.dart';
 import 'package:ustam_gelsin/features/hug_market/hug_market_homepage_app.dart';
 import 'package:ustam_gelsin/features/hug_pro/hug_pro_home.dart';
+import 'package:ustam_gelsin/features/hug_pro/screens/pro_login.dart';
+import 'package:ustam_gelsin/features/hug_pro/screens/pro_register.dart';
+import 'package:ustam_gelsin/features/hug_pro/screens/pro_islemleri.dart';
 import 'web_home_screen.dart';
 import 'nasil_calisir.dart';
 import 'destek_iletisim.dart';
@@ -25,11 +29,13 @@ import 'insaat_rehberi.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../../admin/screens/admin_dashboard.dart';
 import 'hug_proje_ilanlari.dart';
+import 'package:ustam_gelsin/features/hug_pro/pro_profil.dart';
 
 String _normalizeRole(String? role) {
   if (role == null) return 'musteri';
   if (role == 'customer') return 'musteri';
-  if (role == 'musteri' || role == 'usta' || role == 'admin') return role;
+  if (role == 'pro' || role == 'professional' || role == 'profesyonel' || role == 'PRO' || role == 'PROFESYONEL') return 'pro';
+  if (role == 'musteri' || role == 'usta' || role == 'admin' || role == 'pro') return role;
   return 'musteri';
 }
 
@@ -104,15 +110,36 @@ class _HomeScreenState extends State<HomeScreen> {
         return;
       }
       try {
+        // 🔥 FIX - ÖNCE ADMİN Mİ DİYE BAK, SONRA PRO, SONRA DİĞERLERİ - SENİN İSTEĞİN
+        // Aynı UID hem users hem users_pro'da olabilir, PRO öncelikli!
+
+        // 1) users KOLEKSİYONU - ADMİN KONTROLÜ
         final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+        if (doc.exists) {
+          final role = _normalizeRole(doc.data()?['role'] as String?);
+          if (role == 'admin' && mounted) {
+            setState(() { _userRole = 'admin'; _roleYukleniyor = false; });
+            return;
+          }
+        }
+
+        // 2) users_pro KOLEKSİYONU - PRO KONTROLÜ - ÖNCELİKLİ! (Aynı UID hem usta hem pro olabilir)
+        final proDoc = await FirebaseFirestore.instance.collection('users_pro').doc(user.uid).get();
+        if (proDoc.exists && mounted) {
+          setState(() { _userRole = 'pro'; _roleYukleniyor = false; });
+          return;
+        }
+
+        // 3) users KOLEKSİYONU - musteri/usta
         if (doc.exists && mounted) {
           setState(() {
             _userRole = _normalizeRole(doc.data()?['role'] as String?);
             _roleYukleniyor = false;
           });
-        } else {
-          if (mounted) setState(() { _userRole = null; _roleYukleniyor = false; });
+          return;
         }
+
+        if (mounted) setState(() { _userRole = null; _roleYukleniyor = false; });
       } catch (e) {
         if (mounted) setState(() => _roleYukleniyor = false);
       }
@@ -121,8 +148,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _handleProfilIcon() {
     if (_currentUser == null) return;
-    if (_normalizeRole(_userRole) == 'usta') {
+    final r = _normalizeRole(_userRole);
+    if (r == 'usta') {
       Navigator.push(context, MaterialPageRoute(builder: (_) => const UstaProfilSayfasi()));
+    } else if (r == 'pro') {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const ProProfilScreen()));
     } else {
       Navigator.push(context, MaterialPageRoute(builder: (_) => const MusteriProfilSayfasi()));
     }
@@ -217,8 +247,12 @@ class _HomeScreenState extends State<HomeScreen> {
           else
             IconButton(
               onPressed: _handleProfilIcon,
-              icon: const Icon(Icons.person_rounded, color: Colors.black, size: 30),
-              tooltip: "Profilim",
+              icon: Icon(
+                  _normalizeRole(_userRole) == 'pro' ? Icons.workspace_premium_rounded : Icons.person_rounded,
+                  color: _normalizeRole(_userRole) == 'pro' ? const Color(0xFFC8A45D) : Colors.black,
+                  size: 30
+              ),
+              tooltip: _normalizeRole(_userRole) == 'pro' ? "Pro Profilim" : "Profilim",
             ),
           const SizedBox(width: 4),
         ],
@@ -234,20 +268,27 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (_roleYukleniyor)
                     const ListTile(leading: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)), title: Text("Yükleniyor..."))
                   else if (_currentUser!= null)...[
-                    ListTile(
-                      leading: const Icon(Icons.person, color: Color(0xFF2DB34A)),
-                      title: Text(_normalizeRole(_userRole) == 'usta'? "USTA PROFİLİM" : "PROFİLİM"),
-                      titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                      onTap: () {
-                        Navigator.pop(context);
-                        if (_normalizeRole(_userRole) == 'usta') {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => const UstaProfilSayfasi()));
-                        } else {
+                    // 🔥 ADMIN İÇİN HER İKİSİ DE - SENİN İSTEĞİN - users ve users_pro ikisi de var
+                    if (_userRole == 'admin') ...[
+                      ListTile(
+                        leading: const Icon(Icons.person, color: Color(0xFF2DB34A)),
+                        title: const Text("PROFİLİM"),
+                        titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        onTap: () {
+                          Navigator.pop(context);
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const MusteriProfilSayfasi()));
-                        }
-                      },
-                    ),
-                    if (_userRole == 'admin')
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFC8A45D)),
+                        title: const Text("PRO PROFİLİM"),
+                        titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: const Color(0xFFC8A45D), borderRadius: BorderRadius.circular(3)), child: const Text("PRO", style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Color(0xFF0B0B0B)))),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const ProProfilScreen()));
+                        },
+                      ),
                       ListTile(
                         leading: const Icon(Icons.admin_panel_settings, color: Color(0xFFFF7A00)),
                         title: const Text("ADMİN PANELİ"),
@@ -257,9 +298,44 @@ class _HomeScreenState extends State<HomeScreen> {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboard()));
                         },
                       ),
+                    ] else if (_normalizeRole(_userRole) == 'pro')
+                      ListTile(
+                        leading: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFC8A45D)),
+                        title: const Text("PRO PROFİLİM"),
+                        titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: const Color(0xFFC8A45D), borderRadius: BorderRadius.circular(3)), child: const Text("PRO", style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Color(0xFF0B0B0B)))),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const ProProfilScreen()));
+                        },
+                      )
+                    else
+                      ListTile(
+                        leading: const Icon(Icons.person, color: Color(0xFF2DB34A)),
+                        title: Text(_normalizeRole(_userRole) == 'usta'? "USTA PROFİLİM" : "PROFİLİM"),
+                        titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        onTap: () {
+                          Navigator.pop(context);
+                          if (_normalizeRole(_userRole) == 'usta') {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const UstaProfilSayfasi()));
+                          } else {
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const MusteriProfilSayfasi()));
+                          }
+                        },
+                      ),
                   ] else...[
                     ListTile(leading: const Icon(Icons.badge_outlined, color: Color(0xFF2979FF)), title: const Text("MÜŞTERİ GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CustomerAuthPage(role: "customer")))),
                     ListTile(leading: Icon(Icons.construction, color: AppColors.ustaColor), title: const Text("USTA GİRİŞİ"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const UstaAuthPage(role: "usta")))),
+                    ListTile(
+                      leading: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFC8A45D)),
+                      title: const Text("PROFESYONEL GİRİŞİ"),
+                      titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                      trailing: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), decoration: BoxDecoration(color: const Color(0xFFC8A45D), borderRadius: BorderRadius.circular(3)), child: const Text("PRO", style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Color(0xFF0B0B0B)))),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ProIslemleriScreen()));
+                      },
+                    ),
                   ],
                   const Divider(),
                   ListTile(leading: const Icon(Icons.shopping_basket_outlined, color: Colors.black), title: const Text("HUG MARKET"), titleTextStyle: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), onTap: () { Navigator.pop(context); Navigator.push(context, MaterialPageRoute(builder: (_) => const HugMarketAppHomepage())); }),
@@ -565,7 +641,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    // SADECE ALTTAKI ISILTILI YAZI KALIYOR - UST YAZI SILINDI
                     Positioned(
                       left: 0,
                       right: 0,

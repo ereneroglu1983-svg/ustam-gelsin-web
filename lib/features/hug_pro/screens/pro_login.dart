@@ -1,7 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ustam_gelsin/features/hug_pro/hug_ontoloji.dart';
+import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
+import 'package:ustam_gelsin/features/hug_pro/pro_profil.dart';
 
 const _black = Color(0xFF0B0B0B);
 const _dark = Color(0xFF111111);
@@ -31,9 +34,23 @@ class _ProLoginScreenState extends State<ProLoginScreen> {
         password: _passCtrl.text,
       );
       final uid = cred.user!.uid;
+
+      // 🔥 ADMIN KONTROLÜ - ÖNCE users KOLEKSİYONU - SENİN İSTEĞİN - ADMİN PRO PROFİLE GİREBİLSİN
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final isAdmin = userDoc.exists && (userDoc.data()?['role'] == 'admin');
+
+      if (isAdmin) {
+        // 👑 ADMIN - PRO LOGİNDEN GİRDİ - ADMİN MENÜSÜ AÇILSIN + EXTRA PRO PROFİL
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('👑 Admin olarak giriş yapıldı'), backgroundColor: _gold));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AdminDashboard()));
+        return;
+      }
+
+      // NORMAL PRO KONTROLÜ
       final doc = await FirebaseFirestore.instance.collection('users_pro').doc(uid).get();
       if (!doc.exists) {
-        throw Exception('Bu hesap HUG Professional değil');
+        throw Exception('Bu hesap HUG Professional değil - Sadece PRO hesaplar girebilir');
       }
       final data = doc.data()!;
       if (data['durum'] != 'ONAYLANDI' || data['isActive'] == false) {
@@ -51,11 +68,11 @@ class _ProLoginScreenState extends State<ProLoginScreen> {
         return;
       }
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/pro-dashboard');
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ProProfilScreen()));
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Giriş başarısız')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Giriş başarısız')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -68,7 +85,6 @@ class _ProLoginScreenState extends State<ProLoginScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // HERO - AYNI TEMA: HUG + IŞIK + PROJE + BÜYÜK PROJELER YAZISI
             Container(
               width: double.infinity,
               color: _black,
@@ -79,7 +95,6 @@ class _ProLoginScreenState extends State<ProLoginScreen> {
                 ],
               ),
             ),
-            // FORM ALANI - OFFWHITE
             Container(
               width: double.infinity,
               color: _offWhite,
@@ -121,7 +136,7 @@ class _ProLoginScreenState extends State<ProLoginScreen> {
                     const SizedBox(height: 40),
                     Container(height: 1, color: Colors.black12),
                     const SizedBox(height: 12),
-                    const Text('© 2026 HUG PROJE - PROFESSIONAL', style: TextStyle(color: _gray, fontSize: 8, letterSpacing: 1)),
+                    const Text('© 2026 HUG PROJE - PROFESSIONAL - ADMIN ERİŞİM AKTİF', style: TextStyle(color: _gray, fontSize: 8, letterSpacing: 1)),
                   ],
                 ),
               ),
@@ -133,7 +148,6 @@ class _ProLoginScreenState extends State<ProLoginScreen> {
   }
 }
 
-// AYNI HERO HEADER - REGISTER'DA DA KULLANILACAK
 class _HeroHeader extends StatefulWidget {
   const _HeroHeader();
   @override
