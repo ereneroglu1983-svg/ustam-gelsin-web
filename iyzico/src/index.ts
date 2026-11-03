@@ -64,18 +64,25 @@ export const checkout = onCall(
     const secretKey = SECRET_KEY.value()?.trim();
     if (!apiKey ||!secretKey) throw new HttpsError("failed-precondition", "API anahtari yok");
 
-    const userSnap = await db.collection("users").doc(uid).get();
-    if (!userSnap.exists) throw new HttpsError("not-found", "Kullanici bulunamadi");
-    const userData = userSnap.data()!;
+    // === HUG PRO DESTEĞİ: önce users, yoksa users_pro ===
+    let userSnap = await db.collection("users").doc(uid).get();
+    let userData: any;
+    if (userSnap.exists) {
+      userData = userSnap.data()!;
+    } else {
+      const proSnap = await db.collection("users_pro").doc(uid).get();
+      if (!proSnap.exists) throw new HttpsError("not-found", "Kullanici bulunamadi");
+      userData = proSnap.data()!;
+    }
 
-    const firstName = (userData.firstName || userData.name?.split(" ")[0] || "Usta").substring(0, 50);
-    const lastName = (userData.lastName || userData.name?.split(" ").slice(1).join(" ") || "Kullanici").substring(0, 50);
+    const firstName = (userData.firstName || userData.adSoyad?.split(" ")[0] || userData.yetkiliAdSoyad?.split(" ")[0] || userData.name?.split(" ")[0] || "Usta").substring(0, 50);
+    const lastName = (userData.lastName || userData.adSoyad?.split(" ").slice(1).join(" ") || userData.yetkiliAdSoyad?.split(" ").slice(1).join(" ") || userData.name?.split(" ").slice(1).join(" ") || "Kullanici").substring(0, 50);
     const email = userData.email || request.auth.token.email || `user_${uid}@example.com`;
-    const phone = formatPhone(userData.phone || "");
-    let adresRaw = (userData.faturaAdresi || userData.adres || "").trim();
+    const phone = formatPhone(userData.phone || userData.gsm || userData.telefon || "");
+    let adresRaw = (userData.faturaAdresi || userData.adres || userData.address || "").trim();
     if (!adresRaw) adresRaw = "Manisa Salihli Merkez Mah. Ataturk Cad. No:1";
     const adres = adresRaw.substring(0, 200);
-    const identityNumberRaw = (userData.vergiNo || userData.tcVergiNo || userData.mernisNo || userData.tcKimlikNo || userData.vkn || "").toString().trim();
+    const identityNumberRaw = (userData.vergiNo || userData.tcVergiNo || userData.mernisNo || userData.tcKimlikNo || userData.tcNo || userData.tc || userData.vkn || userData.vergiKimlikNo || "").toString().trim();
     const cleanId = identityNumberRaw.replace(/\D/g, "");
     const city = getSehirIsim(userData.sehir_id);
     const district = getIlceIsim(userData.ilce_id);

@@ -1,0 +1,1282 @@
+{
+  "ALTYAPI_YOL": {
+    "baslik": "YOL",
+    "kategori": "ALTYAPI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "uzunluk",
+        "label": "Uzunluk (m)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "uzunluk"
+      },
+      {
+        "id": "genislik",
+        "label": "Genişlik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 100,
+        "zorunlu": true,
+        "grokAnahtari": "genislik"
+      },
+      {
+        "id": "yukseklikDerinlik",
+        "label": "Yükseklik / Derinlik (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 100,
+        "zorunlu": false,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU",
+          "BATAK",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "KARMA",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK",
+          "BETONARME_DOSEME",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "drenaj",
+        "label": "Drenaj Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "EVET",
+          "HAYIR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "drenaj"
+      },
+      {
+        "id": "aydinlatma",
+        "label": "Aydınlatma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "aydinlatma"
+      },
+      {
+        "id": "yolTipi",
+        "label": "Yol Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ASFALT",
+          "BETON_YOL",
+          "PARKE",
+          "STABILIZE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yolTipi"
+      },
+      {
+        "id": "seritSayisi",
+        "label": "Şerit Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "serit"
+      },
+      {
+        "id": "kaldirim",
+        "label": "Kaldırım Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "kaldirim"
+      },
+      {
+        "id": "kaplamaKalinligi",
+        "label": "Kaplama Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "5cm",
+          "8cm",
+          "10cm",
+          "15cm",
+          "20cm",
+          "25cm_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kaplamaKal"
+      }
+    ]
+  },
+  "ALTYAPI_KOPRU": {
+    "baslik": "KÖPRÜ",
+    "kategori": "ALTYAPI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "uzunluk",
+        "label": "Uzunluk (m)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "uzunluk"
+      },
+      {
+        "id": "genislik",
+        "label": "Genişlik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 100,
+        "zorunlu": true,
+        "grokAnahtari": "genislik"
+      },
+      {
+        "id": "yukseklikDerinlik",
+        "label": "Yükseklik / Derinlik (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 100,
+        "zorunlu": false,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU",
+          "BATAK",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "KARMA",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK",
+          "BETONARME_DOSEME",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "drenaj",
+        "label": "Drenaj Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "EVET",
+          "HAYIR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "drenaj"
+      },
+      {
+        "id": "aydinlatma",
+        "label": "Aydınlatma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "aydinlatma"
+      },
+      {
+        "id": "kopruTipi",
+        "label": "Köprü Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIRISLI",
+          "KEMERLI",
+          "ASMA",
+          "GERGIN_EGIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kopruTipi"
+      },
+      {
+        "id": "ayakSayisi",
+        "label": "Ayak Sayısı",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "ayak"
+      },
+      {
+        "id": "tasiyiciKapasite",
+        "label": "Taşıma Kapasitesi (ton)",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "tasiyiciKapasite",
+        "min": 10,
+        "max": 5000
+      },
+      {
+        "id": "temelTuru",
+        "label": "Temel Türü",
+        "tip": "select",
+        "secenekler": [
+          "YUZEYSEL_TEMEL",
+          "KAZIKLI_TEMEL",
+          "RADYE_TEMEL",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temelTuru"
+      }
+    ]
+  },
+  "ALTYAPI_VIYADUK": {
+    "baslik": "VİYADÜK",
+    "kategori": "ALTYAPI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "uzunluk",
+        "label": "Uzunluk (m)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "uzunluk"
+      },
+      {
+        "id": "genislik",
+        "label": "Genişlik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 100,
+        "zorunlu": true,
+        "grokAnahtari": "genislik"
+      },
+      {
+        "id": "yukseklikDerinlik",
+        "label": "Yükseklik / Derinlik (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 100,
+        "zorunlu": false,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU",
+          "BATAK",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "KARMA",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK",
+          "BETONARME_DOSEME",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "drenaj",
+        "label": "Drenaj Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "EVET",
+          "HAYIR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "drenaj"
+      },
+      {
+        "id": "aydinlatma",
+        "label": "Aydınlatma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "aydinlatma"
+      },
+      {
+        "id": "ayakYuksekligi",
+        "label": "Ayak Yüksekliği (m)",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "ayakYukseklik",
+        "min": 5,
+        "max": 100
+      },
+      {
+        "id": "aciklik",
+        "label": "Açıklık (m)",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "aciklik",
+        "min": 10,
+        "max": 500
+      },
+      {
+        "id": "temelTuru",
+        "label": "Temel Türü",
+        "tip": "select",
+        "secenekler": [
+          "YUZEYSEL_TEMEL",
+          "KAZIKLI_TEMEL",
+          "RADYE_TEMEL",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temelTuru"
+      }
+    ]
+  },
+  "ALTYAPI_TUNEL": {
+    "baslik": "TÜNEL",
+    "kategori": "ALTYAPI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "uzunluk",
+        "label": "Uzunluk (m)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "uzunluk"
+      },
+      {
+        "id": "genislik",
+        "label": "Genişlik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 100,
+        "zorunlu": true,
+        "grokAnahtari": "genislik"
+      },
+      {
+        "id": "yukseklikDerinlik",
+        "label": "Yükseklik / Derinlik (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 100,
+        "zorunlu": false,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU",
+          "BATAK",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "KARMA",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK",
+          "BETONARME_DOSEME",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "drenaj",
+        "label": "Drenaj Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "EVET",
+          "HAYIR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "drenaj"
+      },
+      {
+        "id": "aydinlatma",
+        "label": "Aydınlatma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "aydinlatma"
+      },
+      {
+        "id": "tunelTipi",
+        "label": "Tünel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "AC_KAPA",
+          "DELMELI",
+          "BATIRMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tunelTipi"
+      },
+      {
+        "id": "havalandirma",
+        "label": "Havalandırma Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "DOGAL",
+          "MEKANIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "havalandirma"
+      },
+      {
+        "id": "yanginSistemiTunel",
+        "label": "Yangın Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yangin"
+      },
+      {
+        "id": "kaziYontemi",
+        "label": "Kazı Yöntemi",
+        "tip": "select",
+        "secenekler": [
+          "NATM",
+          "TBM",
+          "AC_KAPA",
+          "KLASIK_KAZI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kaziYontemi"
+      },
+      {
+        "id": "destekSistemi",
+        "label": "Zemin Destekleme Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "PUSKURTME_BETON",
+          "CELIK_IKSA",
+          "ANKRAJ",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "destek"
+      }
+    ]
+  },
+  "ALTYAPI_DEMIRYOLU": {
+    "baslik": "DEMİRYOLU",
+    "kategori": "ALTYAPI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "uzunluk",
+        "label": "Uzunluk (m)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "uzunluk"
+      },
+      {
+        "id": "genislik",
+        "label": "Genişlik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 100,
+        "zorunlu": true,
+        "grokAnahtari": "genislik"
+      },
+      {
+        "id": "yukseklikDerinlik",
+        "label": "Yükseklik / Derinlik (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 100,
+        "zorunlu": false,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU",
+          "BATAK",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "KARMA",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK",
+          "BETONARME_DOSEME",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "drenaj",
+        "label": "Drenaj Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "EVET",
+          "HAYIR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "drenaj"
+      },
+      {
+        "id": "aydinlatma",
+        "label": "Aydınlatma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "aydinlatma"
+      },
+      {
+        "id": "rayTipi",
+        "label": "Ray Tipi",
+        "tip": "select",
+        "secenekler": [
+          "STANDART",
+          "YUKSEK_HIZLI",
+          "YUK_TRENİ"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "rayTipi"
+      },
+      {
+        "id": "elektrifikasyon",
+        "label": "Elektrifikasyon",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "elektrifikasyon"
+      },
+      {
+        "id": "hatSayisi",
+        "label": "Hat Sayısı",
+        "tip": "select",
+        "secenekler": [
+          "TEK_HAT",
+          "CIFT_HAT",
+          "COK_HATLI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "hatSayisi"
+      }
+    ]
+  },
+  "ALTYAPI_RAYLI": {
+    "baslik": "RAYLI SİSTEM / METRO / TRAMVAY",
+    "kategori": "ALTYAPI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "uzunluk",
+        "label": "Uzunluk (m)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "uzunluk"
+      },
+      {
+        "id": "genislik",
+        "label": "Genişlik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 100,
+        "zorunlu": true,
+        "grokAnahtari": "genislik"
+      },
+      {
+        "id": "yukseklikDerinlik",
+        "label": "Yükseklik / Derinlik (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 100,
+        "zorunlu": false,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU",
+          "BATAK",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "KARMA",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK",
+          "BETONARME_DOSEME",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "drenaj",
+        "label": "Drenaj Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "EVET",
+          "HAYIR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "drenaj"
+      },
+      {
+        "id": "aydinlatma",
+        "label": "Aydınlatma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "aydinlatma"
+      },
+      {
+        "id": "sistemTipi",
+        "label": "Sistem Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TRAMVAY",
+          "METRO",
+          "METROBUS_YOLU",
+          "HAFIF_METRO"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistemTipi"
+      },
+      {
+        "id": "istasyonSayisi",
+        "label": "İstasyon Sayısı",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "istasyon"
+      },
+      {
+        "id": "guzergahTipi",
+        "label": "Güzergah Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YER_USTU",
+          "YER_ALTI",
+          "VIYADUK",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "guzergah"
+      }
+    ]
+  },
+  "ALTYAPI_OTOPARK": {
+    "baslik": "OTOPARK",
+    "kategori": "ALTYAPI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "uzunluk",
+        "label": "Uzunluk (m)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": false,
+        "grokAnahtari": "uzunluk"
+      },
+      {
+        "id": "genislik",
+        "label": "Genişlik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 100,
+        "zorunlu": false,
+        "grokAnahtari": "genislik"
+      },
+      {
+        "id": "yukseklikDerinlik",
+        "label": "Yükseklik / Derinlik (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 100,
+        "zorunlu": false,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU",
+          "BATAK",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "KARMA",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK",
+          "BETONARME_DOSEME",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "drenaj",
+        "label": "Drenaj Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "EVET",
+          "HAYIR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "drenaj"
+      },
+      {
+        "id": "aydinlatma",
+        "label": "Aydınlatma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "aydinlatma"
+      },
+      {
+        "id": "otoparkTipi",
+        "label": "Otopark Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ACIK",
+          "KAPALI",
+          "COK_KATLI",
+          "YER_ALTI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "otoparkTipi"
+      },
+      {
+        "id": "aracKapasitesi",
+        "label": "Araç Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "aracKapasite"
+      },
+      {
+        "id": "catiTipiOtopark",
+        "label": "Çatı Tipi (kapalı ise)",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK",
+          "SANDVIC_PANEL",
+          "KENET_METAL",
+          "BETONARME"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "catiDetay"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam İnşaat Alanı m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "toplamAlan"
+      },
+      {
+        "id": "katSayisiOtopark",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "katSayisi"
+      },
+      {
+        "id": "bodrumKatSayisi",
+        "label": "Bodrum Kat Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 5,
+        "zorunlu": false,
+        "grokAnahtari": "bodrumKat"
+      }
+    ]
+  },
+  "ALTYAPI": {
+    "baslik": "GENEL ALTYAPI",
+    "kategori": "ALTYAPI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "uzunluk",
+        "label": "Uzunluk (m)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "uzunluk"
+      },
+      {
+        "id": "genislik",
+        "label": "Genişlik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 100,
+        "zorunlu": true,
+        "grokAnahtari": "genislik"
+      },
+      {
+        "id": "yukseklikDerinlik",
+        "label": "Yükseklik / Derinlik (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 100,
+        "zorunlu": false,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU",
+          "BATAK",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "KARMA",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK",
+          "BETONARME_DOSEME",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "drenaj",
+        "label": "Drenaj Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "EVET",
+          "HAYIR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "drenaj"
+      },
+      {
+        "id": "aydinlatma",
+        "label": "Aydınlatma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "aydinlatma"
+      }
+    ]
+  }
+}

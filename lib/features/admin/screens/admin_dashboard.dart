@@ -1,4 +1,4 @@
-// lib/features/admin/screens/admin_dashboard.dart - V8 HUG PRO EKLİ - TAM
+// lib/features/admin/screens/admin_dashboard.dart - V9 HUG PRO ONAY BAĞLI - TAM
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'moderasyon_view.dart';
@@ -14,7 +14,7 @@ import '../hug_market/kategori_munhasir_motoru.dart';
 import 'usta_poster.dart';
 import 'system_messages_view.dart';
 import 'bakiye_yukle_view.dart';
-import '../../hug_pro/hug_pro_home.dart'; // HUG PRO - YENİ EKLENDİ MORUK!
+import 'hug_pro.dart'; // HUG PRO ONAY - YENİ! TEK DART AÇILIR EKRAN
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -52,7 +52,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 10: return const UstaPosterScreen();
       case 11: return const SystemMessagesView();
       case 12: return const BakiyeYukleView();
-      case 13: return const HugProHomePage(); // HUG PRO - YENİ! BASINCA ANA SAYFA AÇILIYOR
+      case 13: return const HugProAdminScreen(); // HUG PRO ONAY - TEK DART AÇILIR KARTLI
       default: return StatsView(onNavigateToUsers: _handleStatsUserTap, onNavigateToRobot: _handleNavigateToRobot, onNavigateToFinans: _handleNavigateToFinans, onNavigateToB2B: _handleNavigateToB2B, onNavigateToSystemMessages: _handleNavigateToSystemMessages);
     }
   }
@@ -96,7 +96,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         NavigationRailDestination(icon: Icon(Icons.engineering_outlined), label: Text("Usta Poster")),
         NavigationRailDestination(icon: Icon(Icons.mail_outline), label: Text("Sistem Msj")),
         NavigationRailDestination(icon: Icon(Icons.account_balance_wallet, color: Colors.green), label: Text("Bakiye Yükle")),
-        NavigationRailDestination(icon: Icon(Icons.apartment_rounded, color: Colors.red), label: Text("HUG PRO")), // YENİ! KIRMIZI!
+        NavigationRailDestination(icon: Icon(Icons.apartment_rounded, color: Colors.red), label: Text("HUG PRO")),
       ],
     );
   }
@@ -123,7 +123,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           const Divider(color: Colors.white10),
           _drawerItem(12, Icons.account_balance_wallet, "Bakiye Yükle", isGreen: true),
           const Divider(color: Colors.white10),
-          _drawerItem(13, Icons.apartment_rounded, "HUG PRO", isRed: true), // YENİ! KIRMIZI - BASINCA ANA SAYFA!
+          _drawerItem(13, Icons.apartment_rounded, "HUG PRO", isRed: true),
           const Divider(color: Colors.white10),
           ListTile(leading: const Icon(Icons.logout, color: Colors.grey), title: const Text("Çıkış Yap (Firebase)", style: TextStyle(color: Colors.grey, fontSize: 12)), onTap: () => FirebaseAuth.instance.signOut()),
         ],

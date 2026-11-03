@@ -1,0 +1,1983 @@
+{
+  "KAMU_OKUL": {
+    "baslik": "OKUL",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "sinifSayisi",
+        "label": "Sınıf Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "sinifSayisi"
+      },
+      {
+        "id": "labSayisi",
+        "label": "Laboratuvar Sayısı",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "lab"
+      },
+      {
+        "id": "sporSalonu",
+        "label": "Spor Salonu",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_KUCUK",
+          "VAR_BUYUK"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "spor"
+      },
+      {
+        "id": "yemekhane",
+        "label": "Yemekhane",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "yemekhane"
+      }
+    ]
+  },
+  "KAMU_UNIVERSITE": {
+    "baslik": "ÜNİVERSİTE",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "fakulteSayisi",
+        "label": "Fakülte / Bölüm Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "fakulte"
+      },
+      {
+        "id": "amfiSayisi",
+        "label": "Amfi / Derslik Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "amfi"
+      },
+      {
+        "id": "labSayisiUni",
+        "label": "Laboratuvar Sayısı",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "lab"
+      },
+      {
+        "id": "kutuphaneUni",
+        "label": "Kütüphane Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "kutuphane"
+      }
+    ]
+  },
+  "KAMU_HASTANE": {
+    "baslik": "HASTANE",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "yatakSayisi",
+        "label": "Yatak Sayısı",
+        "tip": "number",
+        "min": 10,
+        "max": 1000,
+        "zorunlu": true,
+        "grokAnahtari": "yatak"
+      },
+      {
+        "id": "ameliyathane",
+        "label": "Ameliyathane Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "ameliyathane"
+      },
+      {
+        "id": "yogunBakim",
+        "label": "Yoğun Bakım Yatak Sayısı",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "yogunBakim"
+      },
+      {
+        "id": "acilServis",
+        "label": "Acil Servis Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "acil"
+      },
+      {
+        "id": "goruntuleme",
+        "label": "Görüntüleme (MR/Tomografi)",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "goruntuleme"
+      }
+    ]
+  },
+  "KAMU_SAGLIK": {
+    "baslik": "SAĞLIK OCAĞI / KLİNİK",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "muayeneOdasi",
+        "label": "Muayene Odası Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "muayene"
+      },
+      {
+        "id": "labSaglik",
+        "label": "Laboratuvar Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "lab"
+      }
+    ]
+  },
+  "KAMU_BELEDIYE": {
+    "baslik": "BELEDİYE BİNASI",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "birimSayisi",
+        "label": "Birim / Oda Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "birim"
+      },
+      {
+        "id": "meclisSalonu",
+        "label": "Meclis Salonu Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "meclis"
+      }
+    ]
+  },
+  "KAMU_ADLIYE": {
+    "baslik": "ADLİYE",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "durusmaSalonu",
+        "label": "Duruşma Salonu Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "durusma"
+      },
+      {
+        "id": "gozetimAlani",
+        "label": "Gözetim Alanı Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "gozetim"
+      }
+    ]
+  },
+  "KAMU_KULTUR": {
+    "baslik": "KÜLTÜR MERKEZİ",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "salonKapasitesi",
+        "label": "Salon Kapasitesi",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "salonKapasite"
+      },
+      {
+        "id": "sahneVar",
+        "label": "Sahne Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "sahne"
+      },
+      {
+        "id": "akustik",
+        "label": "Akustik Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "EVET",
+          "HAYIR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "akustik"
+      }
+    ]
+  },
+  "KAMU_MUZE": {
+    "baslik": "MÜZE",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "sergiAlani",
+        "label": "Sergi Alanı m²",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "sergi"
+      },
+      {
+        "id": "depoArsiv",
+        "label": "Depo / Arşiv Alanı Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "depo"
+      },
+      {
+        "id": "iklimKontrol",
+        "label": "İklim Kontrol (Nem/Isı)",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "iklim"
+      }
+    ]
+  },
+  "KAMU_KUTUPHANE": {
+    "baslik": "KÜTÜPHANE",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "kitapKapasitesi",
+        "label": "Kitap Kapasitesi",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "kitapKapasite"
+      },
+      {
+        "id": "okumaSalonu",
+        "label": "Okuma Salonu Kapasitesi",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "okuma"
+      }
+    ]
+  },
+  "KAMU_SPOR": {
+    "baslik": "SPOR TESİSİ",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      },
+      {
+        "id": "sporTipi",
+        "label": "Spor Tipi",
+        "tip": "select",
+        "secenekler": [
+          "FUTBOL_SAHASI",
+          "BASKETBOL_SALONU",
+          "YUZME_HAVUZU",
+          "FITNESS_SALONU",
+          "COK_AMACLI",
+          "STADYUM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sporTipi"
+      },
+      {
+        "id": "tribunKapasitesi",
+        "label": "Tribün Kapasitesi",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "tribun"
+      },
+      {
+        "id": "zeminTipiSpor",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "DOGAL_CIM",
+          "SENTETIK_CIM",
+          "PARKET",
+          "TARTAN",
+          "BETON"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      }
+    ]
+  },
+  "KAMU": {
+    "baslik": "GENEL KAMU YAPISI",
+    "kategori": "KAMU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kisiKapasitesi",
+        "label": "Kişi Kapasitesi",
+        "tip": "number",
+        "min": 10,
+        "max": 50000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 15,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "toplamAlan",
+        "label": "Toplam Alan m²",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "BETONARME_TERAS",
+          "GIZLI_DERE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KOMPOZIT",
+          "PREKAST",
+          "CAM_GIYDIRME",
+          "BOYALI_SIVA",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 10,
+        "zorunlu": false,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "engelliErisim",
+        "label": "Engelli Erişim Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "engelli"
+      },
+      {
+        "id": "yanginMerdiveni",
+        "label": "Yangın Merdiveni",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginMerdiven"
+      },
+      {
+        "id": "enerjiSinifi",
+        "label": "Enerji Sınıfı Hedefi",
+        "tip": "select",
+        "secenekler": [
+          "C",
+          "B",
+          "A",
+          "A_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "enerjiSinif"
+      }
+    ]
+  }
+}

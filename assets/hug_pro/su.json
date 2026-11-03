@@ -1,0 +1,577 @@
+{
+  "SU_ARITMA": {
+    "baslik": "ARITMA TESİSİ",
+    "kategori": "SU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapasiteM3",
+        "label": "Tesis/Havuz Toplam Hacmi m³ (Yapı Hacmi)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite",
+        "aciklama": "Havuzların ve yapıların toplam hacmi, debi ile karıştırılmamalı"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ACIK",
+          "BETONARME_KAPAK",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "derinlik",
+        "label": "Derinlik / Yükseklik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 50,
+        "zorunlu": true,
+        "grokAnahtari": "derinlik"
+      },
+      {
+        "id": "aritmaTipi",
+        "label": "Arıtma Tipi",
+        "tip": "select",
+        "secenekler": [
+          "BIYOLOJIK",
+          "KIMYASAL",
+          "MEKANIK",
+          "PAKET_ARITMA",
+          "MBR",
+          "MBBR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "aritmaTipi"
+      },
+      {
+        "id": "debi",
+        "label": "Günlük Arıtılacak Debi m³/gün",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "debi",
+        "aciklama": "Günlük arıtılacak su miktarı"
+      },
+      {
+        "id": "kirlilikYuku",
+        "label": "Kirlilik Yükü",
+        "tip": "select",
+        "secenekler": [
+          "DUSUK",
+          "ORTA",
+          "YUKSEK",
+          "ENDUSTRIYEL"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kirlilik"
+      },
+      {
+        "id": "pompaSayisi",
+        "label": "Pompa Sayısı",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "pompaSayisi"
+      },
+      {
+        "id": "otomasyon",
+        "label": "Otomasyon Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "YARI_OTOMATIK",
+          "FULL_OTOMATIK"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "otomasyon"
+      }
+    ]
+  },
+  "SU_DEPO": {
+    "baslik": "SU DEPOSU",
+    "kategori": "SU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapasiteM3",
+        "label": "Kapasite m³",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ACIK",
+          "BETONARME_KAPAK",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "derinlik",
+        "label": "Derinlik / Yükseklik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 50,
+        "zorunlu": true,
+        "grokAnahtari": "derinlik"
+      },
+      {
+        "id": "depoTipi",
+        "label": "Depo Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YER_USTU",
+          "YER_ALTI_GOMULU",
+          "YUKSEK_AYAKLI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "depoTipi",
+        "aciklama": "YER_ALTI_GOMULU: hem yer altı hem gömülü tipi kapsar"
+      },
+      {
+        "id": "malzeme",
+        "label": "Malzeme",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "POLYESTER",
+          "PASLANMAZ_CELIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "malzeme"
+      },
+      {
+        "id": "yalitim",
+        "label": "Yalıtım Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yalitim"
+      },
+      {
+        "id": "kapakTipi",
+        "label": "Kapak Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ACIK",
+          "KAPALI",
+          "KILITLI"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "kapak"
+      }
+    ]
+  },
+  "SU_TERFI": {
+    "baslik": "TERFİ MERKEZİ / POMPA İSTASYONU",
+    "kategori": "SU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapasiteM3",
+        "label": "Kapasite m³",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "kapasite"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ACIK",
+          "BETONARME_KAPAK",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "derinlik",
+        "label": "Derinlik / Yükseklik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 50,
+        "zorunlu": true,
+        "grokAnahtari": "derinlik"
+      },
+      {
+        "id": "pompaGucu",
+        "label": "Pompa Başına Güç kW",
+        "tip": "number",
+        "min": 1,
+        "max": 1000,
+        "zorunlu": true,
+        "grokAnahtari": "pompaGucu",
+        "aciklama": "Bir pompanın gücü, toplam değil"
+      },
+      {
+        "id": "pompaSayisiTerfi",
+        "label": "Pompa Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 20,
+        "zorunlu": true,
+        "grokAnahtari": "pompaSayisi"
+      },
+      {
+        "id": "terfiYuksekligi",
+        "label": "Terfi Yüksekliği (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 500,
+        "zorunlu": true,
+        "grokAnahtari": "terfiYukseklik"
+      },
+      {
+        "id": "boruCapi",
+        "label": "Boru Çapı (mm)",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "boruCapi"
+      },
+      {
+        "id": "enerjiTipi",
+        "label": "Enerji Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ELEKTRIK",
+          "DIZEL",
+          "GUNES_PANELI",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "enerjiTipi"
+      }
+    ]
+  },
+  "SU": {
+    "baslik": "GENEL SU YAPISI",
+    "kategori": "SU",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapasiteM3",
+        "label": "Kapasite m³ (Alt türe göre)",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": false,
+        "grokAnahtari": "kapasite",
+        "kosul": "Alt türe göre değerlendirilir, genel kategoride opsiyonel",
+        "aciklama": "Arıtma için havuz hacmi, depo için depo hacmi"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ACIK",
+          "BETONARME_KAPAK",
+          "CELIK_CATI",
+          "SANDVIC_PANEL",
+          "MEMBRAN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati",
+        "kosul": "Alt türe göre değerlendirilir, genel kategoride opsiyonel"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "KIL",
+          "KUM",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "derinlik",
+        "label": "Derinlik / Yükseklik (m)",
+        "tip": "number",
+        "min": 1,
+        "max": 50,
+        "zorunlu": false,
+        "grokAnahtari": "derinlik",
+        "kosul": "Alt türe göre değerlendirilir, genel kategoride opsiyonel"
+      },
+      {
+        "id": "suTipi",
+        "label": "Su Yapısı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ARITMA",
+          "DEPO",
+          "TERFI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "suTipi"
+      }
+    ]
+  }
+}

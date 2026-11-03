@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:math' as math;
 
 class InsaatRehberiScreen extends StatelessWidget {
   const InsaatRehberiScreen({super.key});
@@ -82,6 +83,7 @@ class InsaatRehberiScreen extends StatelessWidget {
                 );
               },
             ),
+            // YENI KATILAN USTALAR - ARTIK KENDI ICINDE STATE TUTUYOR, SAYFA DEGISTIRINCE EKRAN ZIPLAMAZ
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance.collection('karisik_slider').snapshots(),
               builder: (context, snap) {
@@ -96,62 +98,10 @@ class InsaatRehberiScreen extends StatelessWidget {
                   final tb = db['tarih'] is Timestamp? (db['tarih'] as Timestamp).toDate().millisecondsSinceEpoch : 0;
                   return tb.compareTo(ta);
                 });
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(isWeb ? 24 : 16, 8, isWeb ? 24 : 16, 8),
-                      child: Text("Yeni Katılan Ustalar (${docs.length})", style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: isWeb ? 14 : 16)),
-                    ),
-                    Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: isWeb ? 1200 : double.infinity),
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: EdgeInsets.symmetric(horizontal: isWeb ? 24 : 16),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: isWeb ? 6 : 2,
-                            childAspectRatio: 0.75,
-                            crossAxisSpacing: isWeb ? 8 : 12,
-                            mainAxisSpacing: isWeb ? 8 : 12,
-                          ),
-                          itemCount: docs.length,
-                          itemBuilder: (context, i) {
-                            final d = docs[i].data() as Map<String, dynamic>;
-                            final img = _fixUrl(d['imagePath'] ?? d['image'] ?? d['resim'] ?? d['photoURL'] ?? '');
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(isWeb ? 8 : 12),
-                                border: Border.all(color: Colors.grey.shade200),
-                                boxShadow: isWeb ? [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))] : null,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(isWeb ? 8 : 12),
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    Image.network(img, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade100, child: const Icon(Icons.person))),
-                                    Positioned(
-                                      bottom: 0,
-                                      left: 0,
-                                      right: 0,
-                                      child: Container(
-                                        padding: EdgeInsets.all(isWeb ? 5 : 8),
-                                        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black87])),
-                                        child: Text(d['baslik'] ?? d['adSoyad'] ?? d['displayName'] ?? 'Usta', style: GoogleFonts.poppins(color: Colors.white, fontSize: isWeb ? 9 : 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
+                return _UstalarPaginatedSection(
+                  docs: docs,
+                  isWeb: isWeb,
+                  fixUrl: _fixUrl,
                 );
               },
             ),
@@ -220,6 +170,176 @@ class InsaatRehberiScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// BU WIDGET SADECE USTALARI GOSTERIYOR, KENDI STATE'INI TUTUYOR - EKRAN ZIPLAMAZ
+class _UstalarPaginatedSection extends StatefulWidget {
+  final List docs;
+  final bool isWeb;
+  final String Function(String) fixUrl;
+  const _UstalarPaginatedSection({required this.docs, required this.isWeb, required this.fixUrl});
+
+  @override
+  State<_UstalarPaginatedSection> createState() => _UstalarPaginatedSectionState();
+}
+
+class _UstalarPaginatedSectionState extends State<_UstalarPaginatedSection> {
+  int _currentPage = 1;
+  static const int _itemsPerPage = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    final int totalItems = widget.docs.length;
+    final int totalPages = (totalItems / _itemsPerPage).ceil();
+    if (_currentPage > totalPages && totalPages > 0) {
+      _currentPage = totalPages;
+    }
+    final int startIndex = (_currentPage - 1) * _itemsPerPage;
+    final int endIndex = math.min(startIndex + _itemsPerPage, totalItems);
+    final paginatedDocs = (totalItems > 0 && startIndex < totalItems) ? widget.docs.sublist(startIndex, endIndex) : [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(widget.isWeb ? 24 : 16, 8, widget.isWeb ? 24 : 16, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Yeni Katılan Ustalar ($totalItems)", style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: widget.isWeb ? 14 : 16)),
+              Text("Sayfa $_currentPage / $totalPages", style: GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 11, color: Colors.grey.shade600)),
+            ],
+          ),
+        ),
+        Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: widget.isWeb ? 1200 : double.infinity),
+            child: GridView.builder(
+              key: ValueKey('ustalar_grid_page_$_currentPage'), // Smooth geçiş için
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: widget.isWeb ? 24 : 16),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: widget.isWeb ? 6 : 2,
+                childAspectRatio: 0.75,
+                crossAxisSpacing: widget.isWeb ? 8 : 12,
+                mainAxisSpacing: widget.isWeb ? 8 : 12,
+              ),
+              itemCount: paginatedDocs.length,
+              itemBuilder: (context, i) {
+                final d = paginatedDocs[i].data() as Map<String, dynamic>;
+                final img = widget.fixUrl(d['imagePath'] ?? d['image'] ?? d['resim'] ?? d['photoURL'] ?? '');
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(widget.isWeb ? 8 : 12),
+                    border: Border.all(color: Colors.grey.shade200),
+                    boxShadow: widget.isWeb ? [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))] : null,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(widget.isWeb ? 8 : 12),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(img, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade100, child: const Icon(Icons.person))),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            padding: EdgeInsets.all(widget.isWeb ? 5 : 8),
+                            decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Colors.black87])),
+                            child: Text(d['baslik'] ?? d['adSoyad'] ?? d['displayName'] ?? 'Usta', style: GoogleFonts.poppins(color: Colors.white, fontSize: widget.isWeb ? 9 : 11, fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        if (totalPages > 1)
+          Padding(
+            padding: EdgeInsets.fromLTRB(widget.isWeb ? 24 : 16, 20, widget.isWeb ? 24 : 16, 10),
+            child: Center(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  _buildPageButton(
+                    isWeb: widget.isWeb,
+                    text: "‹",
+                    isActive: false,
+                    isDisabled: _currentPage == 1,
+                    onTap: () {
+                      if (_currentPage > 1) setState(() => _currentPage--);
+                    },
+                  ),
+                  ...List.generate(totalPages, (index) {
+                    final pageNum = index + 1;
+                    return _buildPageButton(
+                      isWeb: widget.isWeb,
+                      text: "$pageNum",
+                      isActive: pageNum == _currentPage,
+                      isDisabled: false,
+                      onTap: () => setState(() => _currentPage = pageNum),
+                    );
+                  }),
+                  _buildPageButton(
+                    isWeb: widget.isWeb,
+                    text: "›",
+                    isActive: false,
+                    isDisabled: _currentPage == totalPages,
+                    onTap: () {
+                      if (_currentPage < totalPages) setState(() => _currentPage++);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(widget.isWeb ? 24 : 16, 4, widget.isWeb ? 24 : 16, 0),
+          child: Center(
+            child: Text(
+              "Toplam $totalItems usta • Her sayfada $_itemsPerPage usta • Yeni eklenen en başa, eskiler otomatik geriye kayar",
+              style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey.shade500),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPageButton({required bool isWeb, required String text, required bool isActive, required bool isDisabled, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: isDisabled ? null : onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        width: isWeb ? 36 : 32,
+        height: isWeb ? 36 : 32,
+        decoration: BoxDecoration(
+          color: isActive ? const Color(0xFF0f2233) : isDisabled ? Colors.grey.shade200 : Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: isActive ? const Color(0xFF0f2233) : Colors.grey.shade300),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: GoogleFonts.poppins(
+              fontSize: isWeb ? 13 : 12,
+              fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+              color: isActive ? Colors.white : isDisabled ? Colors.grey.shade400 : Colors.black87,
+            ),
+          ),
         ),
       ),
     );

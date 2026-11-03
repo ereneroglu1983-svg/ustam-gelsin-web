@@ -1,0 +1,770 @@
+{
+  "KONUT_MUSTAKIL": {
+    "baslik": "MÜSTAKİL KONUT",
+    "kategori": "KONUT",
+    "aciklama": "Grok maliyet hesabı için kritik detaylar",
+    "alanlar": [
+      {
+        "id": "odaSayisi",
+        "label": "Oda Sayısı",
+        "tip": "select",
+        "secenekler": [
+          "2+1",
+          "3+1",
+          "4+1",
+          "4+2",
+          "5+1",
+          "5+2",
+          "6+1",
+          "6+"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "oda"
+      },
+      {
+        "id": "banyoSayisi",
+        "label": "Banyo / WC Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 6,
+        "zorunlu": true,
+        "grokAnahtari": "banyo"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "HAFIF_CELIK",
+          "AHSAP",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "TERAS_MEMBRAN",
+          "GIZLI_DERE",
+          "AHSAP_SINDLE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "bodrum",
+        "label": "Bodrum Kat",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "YARIM_BODRUM",
+          "TAM_BODRUM"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "bodrum"
+      },
+      {
+        "id": "garaj",
+        "label": "Garaj",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "1_ARAC_ACIK",
+          "1_ARAC_KAPALI",
+          "2_ARAC"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "garaj"
+      },
+      {
+        "id": "isitma",
+        "label": "Isıtma Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YERDEN_ISITMA",
+          "PETEK_DOGALGAZ",
+          "VRF",
+          "ISI_POMPASI",
+          "SOBA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "isitma"
+      },
+      {
+        "id": "akilliEv",
+        "label": "Akıllı Ev Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "TEMEL",
+          "FULL"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "akilli"
+      }
+    ]
+  },
+  "KONUT_VILLA": {
+    "baslik": "VİLLA",
+    "kategori": "KONUT",
+    "aciklama": "Villa tipi için lüks detaylar",
+    "alanlar": [
+      {
+        "id": "odaSayisi",
+        "label": "Oda Sayısı",
+        "tip": "select",
+        "secenekler": [
+          "3+1",
+          "4+1",
+          "4+2",
+          "5+1",
+          "5+2",
+          "6+1",
+          "7+"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "oda"
+      },
+      {
+        "id": "banyoSayisi",
+        "label": "Banyo / WC Sayısı",
+        "tip": "number",
+        "min": 2,
+        "max": 8,
+        "zorunlu": true,
+        "grokAnahtari": "banyo"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS",
+          "SARAY_TIPI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "HAFIF_CELIK",
+          "AHSAP",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "TERAS_MEMBRAN",
+          "GIZLI_DERE",
+          "CAM_CATI_KISMI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "havuz",
+        "label": "Havuz",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "ACIK_HAVUZ",
+          "KAPALI_HAVUZ",
+          "INFINITY_HAVUZ"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "havuz"
+      },
+      {
+        "id": "veranda",
+        "label": "Veranda / Teras",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "KUCUK",
+          "GENIS",
+          "TAM_CEVRE_VERANDA"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "veranda"
+      },
+      {
+        "id": "garaj",
+        "label": "Garaj",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "1_ARAC",
+          "2_ARAC",
+          "3_ARAC_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "garaj"
+      },
+      {
+        "id": "bahceDuvari",
+        "label": "Bahçe Duvarı / Peyzaj",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "TEL_CIT",
+          "DUVAR",
+          "LUKS_PEYZAJ"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "peyzaj"
+      },
+      {
+        "id": "isitma",
+        "label": "Isıtma Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YERDEN_ISITMA",
+          "VRF",
+          "ISI_POMPASI",
+          "SOMINE_DESTEKLI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "isitma"
+      },
+      {
+        "id": "akilliEv",
+        "label": "Akıllı Ev",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "TEMEL",
+          "FULL_KNX"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "akilli"
+      }
+    ]
+  },
+  "KONUT_APARTMAN": {
+    "baslik": "APARTMAN",
+    "kategori": "KONUT",
+    "aciklama": "Apartman tipi çok katlı konut",
+    "alanlar": [
+      {
+        "id": "daireSayisi",
+        "label": "Daire Sayısı",
+        "tip": "number",
+        "min": 2,
+        "max": 100,
+        "zorunlu": true,
+        "grokAnahtari": "daireSayisi"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 2,
+        "max": 20,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "daireTipi",
+        "label": "Daire Tipi (Ortalama)",
+        "tip": "select",
+        "secenekler": [
+          "1+1",
+          "2+1",
+          "3+1",
+          "4+1",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "daireTipi"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "TUNEL_KALIP"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "GIZLI_DERE",
+          "KENET_METAL"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "asansor",
+        "label": "Asansör",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "1_ADET",
+          "2_ADET"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "asansor"
+      },
+      {
+        "id": "otopark",
+        "label": "Otopark",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "ACIK",
+          "KAPALI",
+          "2_KATLI"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "otopark"
+      },
+      {
+        "id": "isitma",
+        "label": "Isıtma Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "MERKEZI",
+          "BIREYSEL_KOMBI",
+          "YERDEN_ISITMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "isitma"
+      }
+    ]
+  },
+  "KONUT_SITE": {
+    "baslik": "SİTE / TOPLU KONUT",
+    "kategori": "KONUT",
+    "aciklama": "Site içi sosyal donatılar",
+    "alanlar": [
+      {
+        "id": "blokSayisi",
+        "label": "Blok Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 50,
+        "zorunlu": true,
+        "grokAnahtari": "blok"
+      },
+      {
+        "id": "daireSayisiToplam",
+        "label": "Toplam Daire Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "daireToplam"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "TUNEL_KALIP",
+          "PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi (Genel)",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "KIREMIT",
+          "KENET_METAL"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "sosyalDonati",
+        "label": "Sosyal Donatılar",
+        "tip": "multi_select",
+        "secenekler": [
+          "HAVUZ",
+          "COCUK_PARKI",
+          "FITNESS",
+          "KAMELYA",
+          "GUVENLIK",
+          "OTOPARK"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "sosyal"
+      },
+      {
+        "id": "peyzaj",
+        "label": "Peyzaj Alanı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "AZ",
+          "ORTA",
+          "GENIS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "peyzaj"
+      }
+    ]
+  },
+  "KONUT_REZIDANS": {
+    "baslik": "REZİDANS",
+    "kategori": "KONUT",
+    "aciklama": "Lüks rezidans, otel konforunda",
+    "alanlar": [
+      {
+        "id": "daireSayisi",
+        "label": "Daire Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "daire"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TERAS_MEMBRAN",
+          "CAM_TERAS",
+          "KENET_METAL"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "CAM_GIYDIRME",
+          "KOMPOZIT",
+          "PREKAST",
+          "DOGAL_TAS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "heliport",
+        "label": "Helikopter Pisti",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "heliport"
+      },
+      {
+        "id": "hizmetler",
+        "label": "Rezidans Hizmetleri",
+        "tip": "multi_select",
+        "secenekler": [
+          "RESEPSIYON",
+          "VALE",
+          "KAT_HIZMETI",
+          "SPA",
+          "HAVUZ",
+          "FITNESS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "hizmet"
+      }
+    ]
+  },
+  "KONUT_BUNGALOV": {
+    "baslik": "BUNGALOV",
+    "kategori": "KONUT",
+    "aciklama": "Ahşap / hafif çelik bungalov",
+    "alanlar": [
+      {
+        "id": "odaSayisi",
+        "label": "Oda Sayısı",
+        "tip": "select",
+        "secenekler": [
+          "1+0",
+          "1+1",
+          "2+1",
+          "3+1"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "oda"
+      },
+      {
+        "id": "yapiSistemi",
+        "label": "Yapı Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "AHSAP_KUTUK",
+          "AHSAP_CERCEVE",
+          "HAFIF_CELIK",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistem"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "GLAMPING_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SHINGLE",
+          "AHSAP_SINDLE",
+          "KIREMIT",
+          "KENET_METAL",
+          "TERAS_AHSAP"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtımı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "veranda",
+        "label": "Veranda",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "KUCUK",
+          "GENIS",
+          "JAKUZILI"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "veranda"
+      },
+      {
+        "id": "temelTipi",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME_PLAK",
+          "AYAKLI_CELIK",
+          "KAZIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temel"
+      },
+      {
+        "id": "isitma",
+        "label": "Isıtma",
+        "tip": "select",
+        "secenekler": [
+          "SOMINE",
+          "ELEKTRIKLI",
+          "VRF",
+          "SOBA"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "isitma"
+      }
+    ]
+  }
+}

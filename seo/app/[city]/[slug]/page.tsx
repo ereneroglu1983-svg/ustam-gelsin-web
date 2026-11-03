@@ -1,5 +1,5 @@
-// 'use client' KALDIRILDI - SERVER COMPONENT
-// app/[city]/[slug]/page.tsx - FINAL v16.1 - PLAY BANNER EKLENDI
+// app/[city]/[slug]/page.tsx - FINAL v16.1 MODULAR - FIXED
+// Tüm logic modüllere bölündü, burası sadece orchestration
 import { cities } from '../../../data/cities'
 import { jobs } from '../../../data/jobs'
 import { getCityJobData } from '../../../data/cityJobDatabase'
@@ -9,6 +9,20 @@ import { notFound } from 'next/navigation'
 import UstaLiveGrid from '../../../components/UstaLiveGrid'
 import Breadcrumb from '../../../components/Breadcrumb'
 
+import { loc, countWords, hashString, pickDeterministic } from './helpers'
+import { districtSEODataOverride } from './district-overrides'
+import { introVariants } from './intro-variants'
+import { faqTemplates, faqTopicMap } from './faq-templates'
+import { nearbyMap } from './nearby-map'
+import {
+  getDistrictSEOData,
+  buildDistrictIntro,
+  getDistrictServiceLinks,
+  getSiblingDistricts,
+  getDistrictFAQs,
+  getDistrictActionNote
+} from './seo-logic'
+
 const PLAY_URL_CLEAN = "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android"
 const PLAY_URL_CITY_SLUG = `${PLAY_URL_CLEAN}&pcampaignid=web_city_slug_banner`
 
@@ -16,113 +30,6 @@ const SLOGAN_LINE1 = "İŞ SENİN, EMEK SENİN, KAZANÇ SENİN."
 const SLOGAN_LINE2 = "ÜYELİK ÜCRETİ YOK. KOMİSYON YOK. SONRADAN KESİNTİ YOK."
 const SLOGAN_FULL = `${SLOGAN_LINE1} ${SLOGAN_LINE2}`
 
-function getLastVowel(word: string): string | null {
- for(let i = word.length - 1; i >= 0; i--){
-  const ch = word[i].toLowerCase()
-  if(['a','e','ı','i','o','ö','u','ü'].includes(ch)) return ch
- }
- return null
-}
-const hardConsonants = new Set(['f','s','t','k','ç','ş','h','p','F','S','T','K','Ç','Ş','H','P'])
-function endsWithHardConsonant(word: string): boolean { return word? hardConsonants.has(word[word.length - 1]) : false }
-function getLocativeSuffix(word: string): string {
- const lastVowel = getLastVowel(word)
- const isHard = endsWithHardConsonant(word)
- if(!lastVowel) return isHard? "'te" : "'de"
- const isFront = ['e','i','ö','ü'].includes(lastVowel)
- return isFront? (isHard? "'te" : "'de") : (isHard? "'ta" : "'da")
-}
-const loc = (name: string) => `${name}${getLocativeSuffix(name)}`
-function countWords(text: string): number { return text.trim().split(/\s+/).filter(Boolean).length }
-function hashString(str: string): number { let hash = 0; for(let i=0;i<str.length;i++){ hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0 } return Math.abs(hash) }
-function pickDeterministic<T>(arr: T[], seed: string, count: number): T[] {
- if(arr.length <= count) return [...arr]
- const start = hashString(seed) % arr.length
- const result: T[] = []
- for(let i=0;i<count;i++){ result.push(arr[(start + i) % arr.length]) }
- return result
-}
-
-type DistrictSEOData = { serviceFocus: string[]; localIntro: string; demandNote: string; faqTopics: string[]; nearbyPriority: string[] }
-const districtSEODataOverride: Record<string, Partial<DistrictSEOData>> = {
- 'manisa/salihli': { serviceFocus: ['ic-cephe-boya-ve-badana','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','fayans-seramik-ve-kalebodur','mutfak-dolabi-ve-tezgahi','laminat-lamine-ve-masif-parke','alci-siva-ve-saten-alci','pvc-dograma','klima-montaj-bakim-ve-gaz-dolumu','cati-yapimi-aktarma-ve-izolasyon'], nearbyPriority: ['turgutlu','akhisar','yunusemre','sehzadeler','soma','alasehir','ahmetli','golmarmara','gordes','kula','kirkagac','koprubasi','sarigol','saruhanli','selendi','demirci'] },
- 'manisa/turgutlu': { serviceFocus: ['ic-cephe-boya-ve-badana','dis-cephe-boya-ve-mantolama','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','dogalgaz-tesisati-ve-kombi-montaji-bakimi','mutfak-dolabi-ve-tezgahi','banyo-dolabi-ve-vestiyer','laminat-lamine-ve-masif-parke','oda-kapisi-ve-celik-kapi','pvc-dograma'], nearbyPriority: ['salihli','yunusemre','sehzadeler','akhisar','ahmetli','alasehir','golmarmara','soma','saruhanli','kula','kirkagac','koprubasi','sarigol','selendi','demirci','gordes'] },
- 'manisa/akhisar': { serviceFocus: ['ic-cephe-boya-ve-badana','sihhi-tesisat-ve-pis-su-tesisati','elektrik-tesisati','fayans-seramik-ve-kalebodur','laminat-lamine-ve-masif-parke','mutfak-dolabi-ve-tezgahi','alci-siva-ve-saten-alci','oda-kapisi-ve-celik-kapi','klima-montaj-bakim-ve-gaz-dolumu','bahce-peyzaj-ve-cim-ekimi'], nearbyPriority: ['salihli','turgutlu','soma','kirkagac','golmarmara','gordes','yunusemre','sehzadeler','ahmetli','alasehir','kula','koprubasi','sarigol','saruhanli','selendi','demirci'] },
- 'istanbul/kadikoy': { serviceFocus: ['ic-cephe-boya-ve-badana','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','mutfak-dolabi-ve-tezgahi','banyo-dolabi-ve-vestiyer','laminat-lamine-ve-masif-parke','alci-siva-ve-saten-alci','klima-montaj-bakim-ve-gaz-dolumu','uydu-internet-ve-kamera-sistemleri','marangozluk-ve-mobilya-tamiri'], nearbyPriority: ['uskudar','atasehir','maltepe','besiktas'] },
- 'istanbul/besiktas': { serviceFocus: ['ic-cephe-boya-ve-badana','elektrik-tesisati','sihhi-tesisat-ve-pis-su-tesisati','mutfak-dolabi-ve-tezgahi','banyo-dolabi-ve-vestiyer','laminat-lamine-ve-masif-parke','fayans-seramik-ve-kalebodur','klima-montaj-bakim-ve-gaz-dolumu','asansor-bakim-ve-onarim','cam-balkon-ve-giyotin-cam'], nearbyPriority: ['sisli','beyoglu','kadikoy','uskudar','eyupsultan'] },
- 'istanbul/uskudar': { nearbyPriority: ['kadikoy','atasehir','beykoz','besiktas','eyupsultan'] }
-}
-const safeLocalIntroTemplates: Array<(dName: string, cName: string, dLoc: string) => string> = [
- (d,c,dL) => `${d}, ${c} ili sınırları içinde konut ve iş yeri için ilan oluşturabileceğin ilçelerden biridir ve aktif olarak hizmet vermektedir.`,
- (d,c,dL) => `${d} ilçesi ${c} içinde yer alan ve Hemen Ustam Gelsin üzerinden ilan verilebilen bölgelerden biri olarak öne çıkmaktadır.`,
- (d,c,dL) => `${c} içinde ${d} ilçesi için Hemen Ustam Gelsin üzerinden ilan oluşturarak doğrudan usta teklifi alabilirsin ve süreci başlatabilirsin.`,
- (d,c,dL) => `${d} ${c} içinde ilan oluşturulabilen ilçelerden biri olup ${dL} tadilat ve yenileme işleri için hızlıca hizmet alabilirsin ve teklif toplayabilirsin.`,
- (d,c,dL) => `${d} ilçesi ${c} genelinde Hemen Ustam Gelsin üzerinden aktif olarak ilan açılabilen ve teklif alınabilen bölgelerden biridir.`
-]
-const safeDemandNoteTemplates: Array<(dName: string, cName: string, dLoc: string) => string> = [
- (d,c,dL) => `${d} için oluşturulan ilanlar ilgili hizmet kategorisindeki uygun ustalara iletilir.`,
- (d,c,dL) => `${d} ilçesinde ilan verdiğinde ustalar tekliflerini iletir.`,
- (d,c,dL) => `${d} için yayınladığın ilan ${c} içindeki ilgili ustalara yönlendirilir.`,
- (d,c,dL) => `${d} ilçesi için açtığın ilan ilgili hizmet kategorisindeki ustalara iletilir.`,
- (d,c,dL) => `${d} için ilan oluşturduktan sonra teklifleri karşılaştırarak ustanı seçebilirsin.`
-]
-const allFaqTopics = ['usta-fiyatlari','komisyon','ilan-verme','teklif-alma','hizmetler','dis-usta','kesif','ilan-suresi','hugai']
-function getAutoServiceFocus(citySlug: string, districtSlug: string): string[] { return pickDeterministic(jobs, `${citySlug}/${districtSlug}/services`, 10).map(j => j.slug) }
-function getAutoLocalIntro(citySlug: string, districtSlug: string, dName: string, cName: string, dLoc: string): string { const tmpl = pickDeterministic(safeLocalIntroTemplates, `${citySlug}/${districtSlug}/localIntro`, 1)[0]; return tmpl(dName, cName, dLoc) }
-function getAutoDemandNote(citySlug: string, districtSlug: string, dName: string, cName: string, dLoc: string): string { const tmpl = pickDeterministic(safeDemandNoteTemplates, `${citySlug}/${districtSlug}/demandNote`, 1)[0]; return tmpl(dName, cName, dLoc) }
-function getAutoFaqTopics(citySlug: string, districtSlug: string): string[] { return pickDeterministic(allFaqTopics, `${citySlug}/${districtSlug}/faq`, 4) }
-function getAutoDistrictPriority(city: typeof cities[0], districtSlug: string): string[] { return city.districts.filter(d=>d.slug!==districtSlug).map(d=>d.slug) }
-function getDistrictSEOData(city: typeof cities[0], district: {slug: string, name: string}): DistrictSEOData {
- const key = `${city.slug}/${district.slug}`
- const override = districtSEODataOverride[key] || {}
- const dLoc = loc(district.name)
- return {
-  serviceFocus: override.serviceFocus?? getAutoServiceFocus(city.slug, district.slug),
-  localIntro: override.localIntro?? getAutoLocalIntro(city.slug, district.slug, district.name, city.name, dLoc),
-  demandNote: override.demandNote?? getAutoDemandNote(city.slug, district.slug, district.name, city.name, dLoc),
-  faqTopics: override.faqTopics?? getAutoFaqTopics(city.slug, district.slug),
-  nearbyPriority: override.nearbyPriority?? getAutoDistrictPriority(city, district.slug)
- }
-}
-const introVariants: Array<(dName: string, cName: string, dLoc: string) => string> = [
- (d,c,dL) => `${dL} oluşturduğun iş ilanı hizmet alanına göre uygun ${c} ustalarına iletilir ve hızlı teklif alma imkanı sunar, süreci hızlandırır. HugAI tahmini piyasa fiyat aralığını gösterir ve bütçe planlamana net yardımcı olur, ön bilgi sağlar. ${dL} iç cephe boya, su tesisatı, elektrik tesisatı, fayans, parke, mutfak dolabı, banyo tadilatı gibi branşlarda kolayca ilan verebilirsin ve doğrudan şeffaf şekilde eşleşirsin. ${SLOGAN_FULL}`,
- (d,c,dL) => `${d} için açtığın ilan ${c} genelindeki ilgili ustaların ekranına düşer ve teklif süreci hemen başlar, bildirim gider. HugAI yaklaşık piyasa fiyat aralığını sunar ve bütçe planlamana yardımcı olur, fikir verir. ${dL} boya badana, alçı sıva, mutfak dolabı, banyo tadilatı, parke, elektrik ve su tesisatı gibi kategorilerde hizmet alabilirsin ve teklifleri karşılaştırarak en uygun ustayı seçebilirsin. Sistem tamamen şeffaf ilerler, gizli maliyet yoktur ve kazanç doğrudan ustada kalır. Platform yeni ve şeffaf bir modelle büyüyor ve birlikte kazanmaya odaklanıyor. ${SLOGAN_LINE1}`,
- (d,c,dL) => `${dL} yayınladığın ilan uygun kategorideki ${c} ustalarına iletilir ve teklif toplama süreci hızlıca başlar, ustalar görür. HugAI tahmini piyasa fiyatını gösterir ve yaklaşık maliyet aralığı hakkında net bilgi sunar, bütçeni korur. ${dL} ev ve iş yeri tadilatlarında boya, tesisat, elektrik, fayans, parke, mutfak dolabı gibi branşlarda ${c} ustalarıyla kolayca eşleşme sağlar ve süreci baştan sona güvenle yönetebilirsin. Birlikte büyüyüp birlikte kazanacağız ve şeffaf kalacağız.`,
- (d,c,dL) => `${d} için açılan ilanlar ilgili branştaki deneyimli ustalara yönlendirilir ve teklif modeli ile sorunsuz çalışır, eşleşme hızlıdır. HugAI tahmini piyasa fiyat aralığını gösterir ve detaylı ön bilgilendirme sağlar, maliyet netleşir. ${dL} iç ve dış cephe boya, seramik döşeme, parke, PVC doğrama, çatı izolasyonu, mantolama gibi hizmetlerde hızlıca ilan verebilirsin ve bütçene uygun çözümler bulabilirsin. Biz yeniyiz ama kendimize güveniyoruz ve birlikte büyümeye inanıyoruz. ${SLOGAN_LINE2}`,
- (d,c,dL) => `${dL} oluşturduğun ilan ${c} içindeki uygun ustalara iletilir ve teklif süreci anında başlar, zaman kazandırır. HugAI yaklaşık piyasa fiyatını gösterir ve bütçene göre net ön bilgi sunar, plan yaparsın. ${dL} mutfak dolabı yenileme, banyo tadilatı, elektrik tesisatı, su tesisatı, fayans, parke, boya badana gibi alanlarda güvenilir usta bulabilirsin ve detayları doğrudan konuşabilirsin. İş senin, emek senin, kazanç senin modeliyle ilerliyoruz ve gizli maliyet asla yok.`,
- (d,c,dL) => `${d} için yayınladığın ilan seçtiğin hizmet kategorisindeki profesyonel ustalara yönlendirilir ve hızlı eşleştirme yapılır, teklifler toplanır. HugAI tahmini piyasa fiyat aralığını gösterir ve yaklaşık maliyet hakkında net bilgi verir, bütçeni korur. ${dL} boya, alçı, parke, tesisat, mobilya montajı, mutfak dolabı, banyo yenileme gibi işler için tek ilan yeterli olur ve zaman kazandırır. Birlikte büyüyüp birlikte kazanacağımız bir sistem kuruyoruz ve dürüstlüğü her zaman önceliyoruz.`,
- (d,c,dL) => `${dL} ilan oluşturduğunda ilan uygun branştaki ${c} ustalarına iletilir ve ustalar tekliflerini hızla iletir, süreç hızlanır. HugAI tahmini piyasa fiyatını gösterir ve yaklaşık aralık hakkında net bilgi sunar, ön fikir verir. ${dL} iç cephe boya, dış cephe boya, elektrik tesisatı, su tesisatı, fayans döşeme, parke, mutfak dolabı gibi hizmetler için ilan açabilirsin ve süreci kolayca yönetebilirsin. Yeni bir platformuz, dürüst ve şeffaf ilerlemeyi seçiyoruz ve abartıdan uzak duruyoruz.`,
- (d,c,dL) => `${d} için oluşturulan ilanlar ${c} genelinde hizmet veren ilgili ustalara iletilir ve anında eşleştirme yapılır, bildirim iletilir. HugAI yaklaşık piyasa fiyat aralığını gösterir ve detaylı ön bilgilendirme sağlar, bütçeni planlarsın. ${dL} boya badana, alçı sıva, banyo tadilatı, parke döşeme, fayans, elektrik, su tesisatı gibi hizmetlerde usta bulman mümkün olur ve hızlıca teklif alabilirsin. İşi sen yönetirsin, süreci kontrol edersin. ${SLOGAN_FULL}`,
- (d,c,dL) => `${dL} yayınladığın ilan hizmet kategorisine göre akıllıca eşleştirilir ve uygun ustalara hızlıca iletilir, zaman kazandırır. HugAI tahmini piyasa fiyatını gösterir ve bütçe planlamana yardımcı olur, maliyet netleşir. ${dL} tesisat, elektrik, boya, parke, mantolama, mutfak dolabı, banyo yenileme gibi işler için hızlıca ilan verebilirsin ve karşılaştırma yaparak karar verebilirsin. Beraber büyüyeceğiz, kazancı usta ve müşteri birlikte görecek ve şeffaf bir düzen kuracağız.`,
- (d,c,dL) => `${dL} oluşturduğun ilan ${c} içindeki ilgili ustalara yönlendirilir ve teklif toplama hemen başlar, ustalar teklif verir. HugAI yaklaşık piyasa fiyat aralığını gösterir ve bütçe için net ön bilgi sunar, plan yaparsın. ${dL} mutfak, banyo ve salon tadilatı için kolayca ilan açabilirsin ve ihtiyacını net anlatabilirsin. Elektrik, su tesisatı, fayans, parke ve boya gibi branşlarda kaliteli hizmet alabilirsin ve süreci güvenle tamamlayabilirsin. ${SLOGAN_LINE2}`,
- (d,c,dL) => `${d} için açtığın ilan ${c} genelinde ilgili kategoride hizmet veren ustalara iletilir ve hızlı eşleştirme yapılır, teklifler gelir. HugAI tahmini piyasa fiyatını gösterir ve yaklaşık maliyet aralığı hakkında net bilgi sunar, bütçeni korur. ${dL} iç cephe boya, dış cephe boya, alçı sıva, seramik, tesisat, elektrik, parke gibi alanlarda usta bulabilirsin ve teklifleri inceleyebilirsin. Yeniyiz, iddialıyız ve birlikte kazanmaya odaklanıyoruz, yalan istatistikler olmadan dürüst büyüyoruz.`,
- (d,c,dL) => `${d} için yayınladığın ilan ${c} içindeki uygun ustalara yönlendirilir ve teklif süreci hemen başlar, ustalar görür. HugAI yaklaşık piyasa fiyat aralığını gösterir ve detaylı ön bilgilendirme sağlar, maliyet netleşir. ${dL} boya, tesisat, elektrik, fayans, parke, mutfak dolabı, banyo tadilatı gibi branşlarda kaliteli hizmet alabilirsin ve ustalarla doğrudan iletişime geçebilirsin. Platformda gizli maliyet yok, süreç baştan sona şeffaf ilerliyor ve güven üzerine kurulu şekilde yönetiliyor.`,
- (d,c,dL) => `${dL} yayınladığın ilan hizmet alanına göre profesyonelce eşleştirilir ve uygun ustalara iletilir, teklifler hızlıca toplanır. HugAI tahmini piyasa fiyat aralığını gösterir ve bütçe planlamana net yardımcı olur, ön bilgi sunar. ${dL} mutfak dolabı, banyo yenileme, boya badana, elektrik tesisatı, su tesisatı, parke, fayans gibi işler için usta bulabilirsin ve süreci hızla başlatabilirsin. ${SLOGAN_LINE1} Anlayışıyla hareket ediyoruz ve birlikte büyümeyi her zaman hedefliyoruz.`,
- (d,c,dL) => `${dL} oluşturduğun ilan ilgili branştaki ${c} ustalarına iletilir ve ustalar tekliflerini hızla iletir, eşleşme sağlanır. HugAI yaklaşık piyasa fiyatını gösterir ve detaylı ön bilgilendirme sağlar, bütçeni planlarsın. ${dL} iç cephe boya, dış cephe boya, çatı izolasyonu, PVC doğrama, su tesisatı, elektrik, parke gibi hizmetlerde ilan verebilirsin ve bütçeni koruyabilirsin. Yeni olmamıza rağmen kendimize güveniyoruz, birlikte büyüyeceğiz ve dürüst kalarak hep birlikte kazanacağız.`,
- (d,c,dL) => `${d} için açılan ilanlar seçtiğin kategoriye göre hızlıca yönlendirilir ve profesyonel eşleştirme yapılır, ustalar teklif verir. HugAI tahmini piyasa fiyat aralığını gösterir ve yaklaşık maliyet hakkında net bilgi verir, fikir edinirsin. ${dL} boya, fayans, parke, tesisat, elektrik, mantolama, mutfak dolabı, banyo gibi işlerde ilan verebilirsin ve hızlıca sonuç alabilirsin. Kazanç ustanın, iş senin, emek senin ve modelimiz tamamen şeffaf ve yalansız şekilde ilerliyor.`,
- (d,c,dL) => `${dL} yayınladığın ilan ${c} içindeki ilgili ustalara iletilir ve teklif toplama hemen başlar, ustalar dönüş yapar. HugAI yaklaşık piyasa fiyatını gösterir ve bütçe planlamana net yardımcı olur, ön bilgi sağlar. ${dL} banyo tadilatı, mutfak yenileme, boya, alçı, parke, fayans, elektrik tesisatı gibi alanlarda hizmet alabilirsin ve teklifleri kolayca karşılaştırabilirsin. Şeffaf, yalansız ve birlikte kazanmaya odaklı bir yapı kuruyoruz ve abartılı vaatlerden uzak duruyoruz.`,
- (d,c,dL) => `${dL} ilan oluşturduğunda ilan uygun kategorideki ${c} ustalarına yönlendirilir ve hızlı eşleştirme yapılır, zaman kazanırsın. HugAI tahmini piyasa fiyat aralığını gösterir ve bütçe için net ön bilgi sunar, maliyet netleşir. ${dL} iç cephe boya, dış cephe boya, elektrik tesisatı, su tesisatı, parke, fayans, mutfak dolabı gibi hizmetlerde usta bulabilirsin ve doğrudan anlaşabilirsin. Üyelik yok, komisyon yok, sonradan kesinti yok ve süreç tamamen senin kontrolünde ilerliyor.`,
- (d,c,dL) => `${d} için açtığın ilan ${c} genelindeki ilgili ustalara iletilir ve uygun ustalara anında yönlendirilir, bildirim gider. HugAI yaklaşık piyasa fiyat aralığını gösterir ve bütçe planlamana net yardımcı olur, bütçeni korur. ${dL} boya badana, alçı sıva, parke döşeme, banyo tadilatı, elektrik, su tesisatı, fayans gibi hizmetlerde ilan verebilirsin ve kısa sürede dönüş alabilirsin. Birlikte büyüyüp birlikte kazanacağız mottosuyla ilerliyoruz ve güven inşa ediyoruz.`,
- (d,c,dL) => `${dL} yayınladığın ilan hizmet kategorisine göre uygun ustalara iletilir eşleştirme yapılır ve teklif süreci başlar, ustalar görür. HugAI tahmini piyasa fiyatını gösterir ve yaklaşık maliyet aralığı hakkında net bilgi sunar, ön fikir verir. ${dL} tesisat, elektrik, boya, parke, mutfak dolabı, banyo tadilatı gibi işler için ilan verebilirsin ve bütçeni aşmadan çözüm bulabilirsin. Süreci sen yönetirsin ve kontrol sende kalır. ${SLOGAN_FULL}`,
- (d,c,dL) => `${d} için oluşturulan ilan ${c} içindeki ilgili branştaki ustalara yönlendirilir eşleştirme yapılır ve teklif toplama başlar, ustalar teklif verir. HugAI yaklaşık piyasa fiyat aralığını gösterir ve detaylı ön bilgilendirme sağlar, maliyet netleşir. ${dL} boya, fayans, parke, tesisat, elektrik, mutfak dolabı, banyo gibi işlerde tek ilan ile teklif toplayabilirsin ve hızlıca karar verebilirsin. Yeniyiz ama iddialıyız, şeffaf modelle büyüyoruz ve birlikte kazanmaya odaklanıyoruz.`,
-]
-
-const faqTemplates = [
- { q: (d:string)=> `${d} usta fiyatları nasıl belirleniyor?`, a: (d:string,c:string,dL:string)=> `${dL} fiyatlar HugAI tahmini piyasa fiyat aralığı olarak gösterilir. Teklif doğrudan ustadan gelir. ${SLOGAN_FULL}`, topic: 'usta-fiyatlari' },
- { q: (d:string)=> `${d} için ek komisyon var mı?`, a: (d:string,c:string,dL:string)=> `Hayır. ${SLOGAN_LINE2} Modelimiz budur: ${SLOGAN_LINE1}`, topic: 'komisyon' },
- { q: (d:string)=> `${d} ilanına nasıl teklif alırım?`, a: (d:string,c:string,dL:string)=> `${dL} ilan oluşturduğunda ilan ${c} içindeki ilgili kategorideki ustalara iletilir. Ustalar tekliflerini iletir ve sen uygun olanı seçerek iletişime geçebilirsin.`, topic: 'ilan-verme' },
- { q: (d:string)=> `${d} hangi hizmetlerde usta bulabilirim?`, a: (d:string,c:string,dL:string)=> `${dL} boya, alçı, fayans, parke, tesisat, elektrik, doğalgaz, çatı, mutfak dolabı ve banyo tadilatı gibi tüm branşlarda ilan açabilirsin.`, topic: 'hizmetler' },
- { q: (d:string)=> `${d} dışından usta gelebilir mi?`, a: (d:string,c:string,dL:string)=> `Evet. ${c} genelindeki ustalar ${dL} için teklif verebilir. İlanın uygun ustalara iletilir, teklif verenler arasından seçim yapabilirsin.`, topic: 'dis-usta' },
- { q: (d:string)=> `${d} ön analiz ücreti var mı?`, a: (d:string,c:string,dL:string)=> `${dL} HugAI tahmini piyasa fiyat aralığını ücretsiz olarak gösterir. Detaylı değerlendirme gerekirse usta ile doğrudan görüşebilirsin.`, topic: 'kesif' },
- { q: (d:string)=> `${d} için nasıl ilan oluştururum?`, a: (d:string,c:string,dL:string)=> `${dL} iş detaylarını ve ölçülerini ekleyerek ilan oluşturabilirsin. İlan yayınlandığında uygun ustalara iletilir.`, topic: 'ilan-verme' },
- { q: (d:string)=> `${d} ustaları nasıl seçiliyor?`, a: (d:string,c:string,dL:string)=> `${dL} ilan oluşturduğunda sistem hizmet kategorine göre uygun ${c} ustalarına iletim yapar. Ustalar teklif verir, sen de uygun olanı seçersin.`, topic: 'teklif-alma' },
- { q: (d:string)=> `${d} için HugAI ne yapar?`, a: (d:string,c:string,dL:string)=> `HugAI ${dL} için tahmini piyasa fiyat aralığını gösterir ve bütçe planlamana yardımcı olur. Bu aralık ${c} koşullarına göre ön bilgilendirme amaçlıdır ve kesin fiyat değildir.`, topic: 'hugai' },
- { q: (d:string)=> `${d} ilanım ne kadar süre yayında kalır?`, a: (d:string,c:string,dL:string)=> `${dL} oluşturduğun ilan teklifler gelene kadar yayında kalır. Teklifleri karşılaştırarak dilediğin zaman ustanı seçebilirsin.`, topic: 'ilan-suresi' }
-]
-const faqTopicMap: Record<string, number[]> = { 'usta-fiyatlari': [0], 'komisyon': [1], 'ilan-verme': [2,6], 'teklif-alma': [7,2], 'hizmetler': [3], 'dis-usta': [4], 'kesif': [5,8], 'ilan-suresi': [9], 'hugai': [8,0] }
-const nearbyMap: Record<string, string[]> = {
- 'adana': ['mersin','osmaniye','hatay','kahramanmaras','nigde','kayseri'],'adiyaman': ['kahramanmaras','gaziantep','sanliurfa','diyarbakir','malatya'],'afyonkarahisar': ['kutahya','eskisehir','konya','isparta','denizli','usak'],'agri': ['kars','igdir','van','bitlis','mus','erzurum'],'amasya': ['samsun','tokat','corum','yozgat','cankiri'],'ankara': ['kirikkale','konya','eskisehir','cankiri','bolu','kirsehir'],'antalya': ['mugla','burdur','isparta','konya','karaman','mersin'],'artvin': ['rize','erzurum','ardahan','kars'],'aydin': ['izmir','manisa','denizli','mugla'],'balikesir': ['canakkale','bursa','kutahya','manisa','izmir'],'bilecik': ['bursa','kutahya','eskisehir','sakarya','bolu'],'bingol': ['elazig','diyarbakir','mus','erzurum','tunceli'],'bitlis': ['van','mus','siirt','batman','diyarbakir'],'bolu': ['duzce','sakarya','bursa','bilecik','eskisehir','ankara','zonguldak'],'burdur': ['antalya','isparta','afyonkarahisar','denizli','mugla'],'bursa': ['yalova','kocaeli','bilecik','kutahya','balikesir','sakarya'],'canakkale': ['balikesir','tekirdag','edirne'],'cankiri': ['ankara','bolu','karabuk','kastamonu','corum','kirikkale'],'corum': ['samsun','amasya','yozgat','kirikkale','cankiri','sinop'],'denizli': ['mugla','aydin','manisa','usak','afyonkarahisar','burdur'],'diyarbakir': ['batman','mardin','sanliurfa','adiyaman','malatya','elazig','bingol'],'edirne': ['kirklareli','tekirdag','canakkale'],'elazig': ['malatya','diyarbakir','bingol','tunceli'],'erzincan': ['erzurum','tunceli','elazig','sivas','gumushane','bayburt'],'erzurum': ['kars','agri','mus','bingol','erzincan','bayburt','rize','artvin'],'eskisehir': ['bursa','kutahya','afyonkarahisar','ankara','bolu','bilecik'],'gaziantep': ['kilis','hatay','osmaniye','kahramanmaras','adiyaman','sanliurfa'],'giresun': ['trabzon','gumushane','erzincan','sivas','ordu'],'gumushane': ['trabzon','bayburt','erzincan','giresun','rize'],'hakkari': ['van','sirnak'],'hatay': ['adana','osmaniye','gaziantep','kilis'],'isparta': ['burdur','antalya','konya','afyonkarahisar'],'mersin': ['adana','karaman','konya','nigde','antalya','kahramanmaras'],'istanbul': ['kocaeli','tekirdag','yalova','bursa','sakarya'],'izmir': ['manisa','aydin','balikesir','denizli','usak'],'kars': ['ardahan','erzurum','agri','igdir'],'kastamonu': ['sinop','corum','cankiri','karabuk','bartin'],'kayseri': ['sivas','yozgat','nevsehir','nigde','adana','kahramanmaras'],'kirklareli': ['edirne','tekirdag','istanbul'],'kirsehir': ['yozgat','nevsehir','aksaray','ankara','kirikkale'],'kocaeli': ['istanbul','sakarya','bursa','yalova'],'konya': ['ankara','aksaray','karaman','antalya','isparta','afyonkarahisar','eskisehir','nigde'],'kutahya': ['bursa','bilecik','eskisehir','afyonkarahisar','usak','manisa','balikesir'],'malatya': ['elazig','diyarbakir','adiyaman','kahramanmaras','sivas','erzincan'],'manisa': ['izmir','balikesir','kutahya','usak','denizli','aydin'],'kahramanmaras': ['osmaniye','adana','kayseri','sivas','malatya','adiyaman','gaziantep'],'mardin': ['sanliurfa','diyarbakir','batman','sirnak','siirt'],'mugla': ['aydin','denizli','burdur','antalya'],'mus': ['bingol','diyarbakir','batman','bitlis','van','agri','erzurum'],'nevsehir': ['kirsehir','aksaray','nigde','kayseri','yozgat'],'nigde': ['kayseri','adana','mersin','konya','aksaray','nevsehir'],'ordu': ['samsun','tokat','sivas','giresun'],'rize': ['trabzon','artvin','erzurum','bayburt'],'sakarya': ['kocaeli','duzce','bolu','bilecik','bursa','istanbul'],'samsun': ['ordu','tokat','amasya','corum','sinop'],'siirt': ['batman','bitlis','van','sirnak','mardin'],'sinop': ['kastamonu','corum','samsun'],'sivas': ['tokat','ordu','giresun','erzincan','malatya','kayseri','yozgat'],'tekirdag': ['istanbul','kirklareli','edirne','canakkale'],'tokat': ['amasya','samsun','ordu','sivas','yozgat'],'trabzon': ['rize','gumushane','giresun','bayburt'],'tunceli': ['erzincan','elazig','bingol','erzurum'],'sanliurfa': ['gaziantep','adiyaman','diyarbakir','mardin','sirnak'],'usak': ['manisa','kutahya','afyonkarahisar','denizli'],'van': ['agri','bitlis','siirt','sirnak','hakkari','mus'],'yozgat': ['corum','amasya','tokat','sivas','kayseri','kirsehir','cankiri','kirikkale'],'zonguldak': ['duzce','bolu','karabuk','bartin'],'aksaray': ['konya','nigde','nevsehir','kirsehir','ankara'],'bayburt': ['trabzon','rize','erzurum','erzincan','gumushane'],'karaman': ['konya','mersin','antalya'],'kirikkale': ['ankara','cankiri','corum','yozgat','kirsehir'],'batman': ['diyarbakir','mardin','siirt','bitlis','mus'],'sirnak': ['mardin','siirt','van','hakkari','sanliurfa'],'bartin': ['zonguldak','karabuk','kastamonu'],'ardahan': ['kars','artvin','erzurum'],'igdir': ['kars','agri'],'yalova': ['kocaeli','bursa','istanbul','sakarya'],'karabuk': ['bolu','kastamonu','cankiri','bartin','zonguldak'],'kilis': ['gaziantep','hatay'],'osmaniye': ['adana','hatay','gaziantep','kahramanmaras'],'duzce': ['bolu','sakarya','zonguldak'],
-}
 function validateBuildData() {
  if (cities.length!==81) throw new Error(`[BUILD FAIL] cities.length=${cities.length}`)
  const citySlugSet = new Set(cities.map(c=>c.slug))
@@ -151,9 +58,10 @@ function validateBuildData() {
   const [citySlug, districtSlug] = key.split('/'); if (!citySlug ||!districtSlug) throw new Error(`[BUILD FAIL] Geçersiz key: ${key}`); const city = cities.find(c => c.slug === citySlug); if (!city) throw new Error(`[BUILD FAIL] geçersiz şehir: ${key}`); const district = city.districts.find(d=>d.slug===districtSlug); if (!district) throw new Error(`[BUILD FAIL] geçersiz ilçe: ${key}`); for (const s of data.serviceFocus?? []) { if (!jobSlugSet.has(s)) throw new Error(`[BUILD FAIL] ${key} geçersiz serviceFocus: ${s}`) }; for (const s of data.nearbyPriority?? []) { if (!city.districts.some(d => d.slug === s)) throw new Error(`[BUILD FAIL] ${key} geçersiz nearbyPriority: ${s}`); if (s === districtSlug) throw new Error(`[BUILD FAIL] ${key} nearbyPriority kendisini içeriyor: ${s}`) }; if (data.nearbyPriority && new Set(data.nearbyPriority).size!== data.nearbyPriority.length) { throw new Error(`[BUILD FAIL] ${key} nearbyPriority içinde duplicate var`) }
  }
  let autoCount = 0
- for (const city of cities) { for (const district of city.districts) { const data = getDistrictSEOData(city, district); if (!data.serviceFocus.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} serviceFocus boş`); if (!data.localIntro) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} localIntro boş`); if (!data.demandNote) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} demandNote boş`); if (!data.faqTopics.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} faqTopics boş`); if (!data.nearbyPriority.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} nearbyPriority boş`); const dLoc = loc(district.name); const base = introVariants[hashString(`${city.slug}/${district.slug}`) % introVariants.length](district.name, city.name, dLoc); const finalIntro = `${data.localIntro} ${base}`; const wc = countWords(finalIntro); if (wc < 75 || wc > 145) { throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} final intro = ${wc} kelime. 75-145 arası olmalı.`) }; autoCount++ } }
+ for (const city of cities) { for (const district of city.districts) { const data = getDistrictSEOData(city, district); if (!data.serviceFocus.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} serviceFocus boş`); if (!data.localIntro) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} localIntro boş`); if (!data.demandNote) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} demandNote boş`); if (!data.faqTopics.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} faqTopics boş`); if (!data.nearbyPriority.length) throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} nearbyPriority boş`); const dLoc = loc(district.name); const base = introVariants[hashString(`${city.slug}/${district.slug}`) % introVariants.length](district.name, city.name, dLoc); const finalIntro = `${data.localIntro} ${base}`; const wc = countWords(finalIntro); if (wc < 75 || wc > 200) { throw new Error(`[BUILD FAIL] ${city.slug}/${district.slug} final intro = ${wc} kelime. 75-200 arası olmalı.`) }; autoCount++ } }
  if (autoCount!== 973) throw new Error(`[BUILD FAIL] count=${autoCount}`)
 }
+
 export function generateStaticParams(){
  validateBuildData()
  const params: {city: string, slug: string}[] = []
@@ -161,6 +69,7 @@ export function generateStaticParams(){
  if(params.length!== 4456) throw new Error(`[BUILD FAIL] params.length=${params.length}`)
  return params
 }
+
 export async function generateMetadata({params}:{params: Promise<{city:string,slug:string}>}): Promise<Metadata>{
  const { city: citySlug, slug } = await params
  if (slug.includes('.') || citySlug.includes('.')) return {}
@@ -172,24 +81,8 @@ export async function generateMetadata({params}:{params: Promise<{city:string,sl
  if(district){ const dLoc = loc(district.name); const title = `${district.name} Ustaları | ${city.name} – ${SLOGAN_LINE1}`; const description = `${dLoc} usta bul, teklif al. ${SLOGAN_FULL} HugAI tahmini fiyatı ve doğrudan teklif sistemiyle işini başlat.`; const canonical = `https://hemenustamgelsin.com/${city.slug}/${district.slug}/`; return { title, description, alternates: { canonical }, openGraph: { title, description, url: canonical, type: 'website', locale: 'tr_TR', siteName: 'Hemen Ustam Gelsin' }, twitter: { card: 'summary_large_image', title, description }, robots: { index: true, follow: true } } }
  return {}
 }
+
 function getNearbyCities(currentSlug: string) { return cities.filter(c => (nearbyMap[currentSlug]||[]).includes(c.slug)).slice(0,12) }
-function buildDistrictIntro(dName: string, cName: string, dLoc: string, city: typeof cities[0], district: {slug: string, name: string}): string {
- const seoData = getDistrictSEOData(city, district)
- const introIdx = hashString(`${city.slug}/${district.slug}`) % introVariants.length
- return `${seoData.localIntro} ${introVariants[introIdx](dName, cName, dLoc)}`
-}
-function getDistrictServiceLinks(city: typeof cities[0], district: {slug: string, name: string}){ return getDistrictSEOData(city, district).serviceFocus.map(slug=>jobs.find(j=>j.slug===slug)).filter(Boolean) as typeof jobs }
-function getSiblingDistricts(city: typeof cities[0], district: {slug: string, name: string}){ return city.districts.filter(d=>d.slug!==district.slug) as typeof city.districts }
-function getDistrictFAQs(city: typeof cities[0], district: {slug: string, name: string}, dName: string, cName: string, dLoc: string){
- const seoData = getDistrictSEOData(city, district)
- let pool = faqTemplates
- const wantedTopics = new Set(seoData.faqTopics)
- const filteredIndices: number[] = []
- for(const topic of wantedTopics) for(const idx of (faqTopicMap[topic] || [])) if(!filteredIndices.includes(idx)) filteredIndices.push(idx)
- if(filteredIndices.length >= 3) pool = filteredIndices.map(i=>faqTemplates[i]).filter(Boolean)
- return pickDeterministic(pool, `${city.slug}/${district.slug}`, 4).map(t=>({ q: t.q(dName), a: t.a(dName, cName, dLoc) }))
-}
-function getDistrictActionNote(city: typeof cities[0], district: {slug: string, name: string}){ return getDistrictSEOData(city, district).demandNote }
 
 export default async function UnifiedCitySlugPage({params}:{params: Promise<{city:string,slug:string}>}){
  const { city: citySlug, slug } = await params
@@ -240,13 +133,8 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
     <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0'}}>
-      <Breadcrumb items={[
-        { name: `${city.name} Ustaları`, href: `/${city.slug}/` },
-        { name: `${city.name} ${job.name}`, href: `/${city.slug}/${job.slug}/` }
-      ]} />
+      <Breadcrumb items={[{ name: `${city.name} Ustaları`, href: `/${city.slug}/` }, { name: `${city.name} ${job.name}`, href: `/${city.slug}/${job.slug}/` }]} />
     </div>
-
-    {/* PLAY BANNER - JOB */}
     <div style={{maxWidth:1120, margin:'12px auto 0', padding:'0 20px'}}>
       <div style={{background:'#111', borderRadius:14, padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap'}}>
         <div style={{display:'flex', alignItems:'center', gap:12}}>
@@ -259,7 +147,6 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
         <a href={PLAY_URL_CITY_SLUG} target="_blank" rel="noopener" style={{background:'white', color:'black', padding:'10px 16px', borderRadius:10, fontWeight:800, fontSize:13, textDecoration:'none', whiteSpace:'nowrap'}}>【entity-Google Play¦canonical_name=Google Play】'den İndir →</a>
       </div>
     </div>
-
     <section style={{ background: `radial-gradient(800px 400px at 15% 0%, ${color}15 0%, transparent 60%), #FFFBF5`, padding:'26px 20px 28px' }}>
      <style>{`@media(max-width:768px){.job-hero{grid-template-columns:1fr!important}.job-content{grid-template-columns:1fr!important}}`}</style>
      <div className="job-hero" style={{maxWidth:1120, margin:'0 auto', display:'grid', gridTemplateColumns:'1.15fr 0.85fr', gap:24}}>
@@ -318,7 +205,6 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
   const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) }
   const serviceSchema = { "@context": "https://schema.org", "@type": "Service", "@id": `${canonical}#service`, "name": `${dName} Ustaları`, "serviceType": "Usta ve Tadilat Hizmetleri", "description": `${dLoc} usta hizmetleri. ${SLOGAN_FULL}`, "provider": { "@id": "https://hemenustamgelsin.com/#organization" }, "areaServed": [{ "@type": "City", "name": cName }, { "@type": "AdministrativeArea", "name": dName }], "url": canonical }
   const webPageSchema = { "@context": "https://schema.org", "@type": "WebPage", "@id": canonical, "name": title, "description": `${dLoc} usta bul, teklif al. ${SLOGAN_FULL}`, "isPartOf": { "@id": "https://hemenustamgelsin.com/#website" }, "about": { "@id": `${canonical}#service` }, "breadcrumb": { "@id": `${canonical}#breadcrumb` } }
-
   return (
    <main style={{background:'#FFFBF5', minHeight:'100vh'}}>
     <header style={{background:'white', borderBottom:'1px solid #e7e5e4', padding:'10px 20px', position:'sticky', top:0, zIndex:50}}>
@@ -336,13 +222,8 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }} />
     <div style={{maxWidth:1120, margin:'0 auto', padding:'14px 20px 0'}}>
-      <Breadcrumb items={[
-        { name: cName, href: `/${city.slug}/` },
-        { name: dName, href: `/${city.slug}/${district.slug}/` }
-      ]} />
+      <Breadcrumb items={[{ name: cName, href: `/${city.slug}/` }, { name: dName, href: `/${city.slug}/${district.slug}/` }]} />
     </div>
-
-    {/* PLAY BANNER - ILCE */}
     <div style={{maxWidth:1120, margin:'12px auto 0', padding:'0 20px'}}>
       <div style={{background:'#111', borderRadius:14, padding:'12px 16px', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap'}}>
         <div style={{display:'flex', alignItems:'center', gap:12}}>
@@ -355,18 +236,15 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
         <a href={PLAY_URL_CITY_SLUG} target="_blank" rel="noopener" style={{background:'white', color:'black', padding:'10px 16px', borderRadius:10, fontWeight:800, fontSize:13, textDecoration:'none', whiteSpace:'nowrap'}}>【entity-Google Play¦canonical_name=Google Play】'den İndir →</a>
       </div>
     </div>
-
     <section style={{maxWidth:1120, margin:'0 auto', padding:'20px 20px 0'}}>
      <div style={{background:'#FFFBF5', border:'1px solid #111', borderRadius:12, padding:'12px 14px', fontSize:13, fontWeight:700, color:'#111'}}>
       {dLoc} usta bul. {SLOGAN_FULL} • {localNote}
      </div>
     </section>
-
     <section style={{maxWidth:1120, margin:'0 auto', padding:'20px 20px'}}>
      <h1 style={{fontSize:'clamp(28px, 4vw, 42px)', fontWeight:900, margin:0}}>{h1}</h1>
      <p style={{fontSize:15, color:'#44403c', marginTop:12, lineHeight:1.7, maxWidth:760}}>{introText}</p>
     </section>
-
     <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}>
      <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
       <div style={{fontWeight:900, fontSize:16}}>BİRLİKTE BÜYÜYÜP BİRLİKTE KAZANACAĞIZ</div>
@@ -381,14 +259,12 @@ export default async function UnifiedCitySlugPage({params}:{params: Promise<{cit
       </div>
      </div>
     </section>
-
     <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}>
      <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
       <div style={{fontWeight:900, fontSize:16, marginBottom:14}}>{dName} Ustaları - Canlı</div>
       <UstaLiveGrid citySlug={city.slug} districtSlug={district.slug} dName={dName} cName={cName} />
      </div>
     </section>
-
     <section style={{maxWidth:1120, margin:'0 auto', padding:'0 20px 20px'}}>
      <div style={{background:'white', border:'1px solid #e7e5e4', borderRadius:16, padding:18}}>
       <div style={{fontWeight:900, fontSize:14, marginBottom:12}}>NASIL ÇALIŞIR?</div>

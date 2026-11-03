@@ -1,7 +1,7 @@
 name: ustam_gelsin
 description: Usta-Müşteri uygulaması
 publish_to: 'none'
-version: 1.0.0+8
+version: 1.1.0+10
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -170,3 +170,4 @@ flutter:
     - assets/hug_market/
     - assets/
     - assets/data/komsu-ilceler.json
+    - assets/hug_pro/

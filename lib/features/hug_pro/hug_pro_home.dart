@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'hug_proje_olustur_page.dart'; // [EKLENDI] - HUG PROJE OLUSTUR PAGE
+import 'pro_bul/pro_bul_screen.dart'; // pro_bul_screen.dart -> hug_pro/pro_bul/ içinde
 
 // KİLİTLİ: HugProHomePage
 // RÖTUŞ SÜRÜMÜ 9.5+ - TAM VE EKSİKSİZ - HİÇBİR YER KISALMADI
@@ -13,6 +15,8 @@ import 'package:flutter/material.dart';
 // 9. Footer 2026
 // 10. Signature Motion - Hero açılış animasyonu
 // 11. v5.2: YAPI PROFESYONELLERİ → gerçek 12 ANA DAL
+// 12. [EKLENDI] v9.6: PROJE OLUSTUR butonlari route'a baglandi
+// 13. [EKLENDI] v9.7: PROFESYONEL BUL butonu + intent 02 -> ProBulScreen
 
 const _black = Color(0xFF0B0B0B);
 const _dark = Color(0xFF111111);
@@ -285,7 +289,7 @@ class HugProHomePage extends StatelessWidget {
           const SizedBox(height: 12),
           const Text("Her proje doğrulanmış profesyonellerle eşleşir.", style: TextStyle(color: Colors.white30, fontSize: 10, letterSpacing: 0.8, height: 1.5)),
           const SizedBox(height: 28),
-          _CtaWithLight(label: 'PROJEMİ OLUŞTUR', big: true, intensity: 0.85),
+          _CtaWithLight(label: 'PROJEMİ OLUŞTUR', big: true, intensity: 0.85, onTap: null, routeName: '/hug-proje-olustur'), // [EKLENDI] routeName ve onTap altyapisi
           const SizedBox(height: 10),
           const Text('2 dakikada — ücretsiz ön değerlendirme', style: TextStyle(color: Colors.white30, fontSize: 8, letterSpacing: 1)),
           const SizedBox(height: 40),
@@ -334,6 +338,24 @@ class _HeroWithEntranceState extends State<_HeroWithEntrance> with TickerProvide
     super.dispose();
   }
 
+  void _goProjeOlustur() {
+    // [EKLENDI] Direkt push - named route yoksa fallback
+    try {
+      Navigator.of(context).pushNamed('/hug-proje-olustur');
+    } catch (_) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HugProjeOlusturPage()));
+    }
+  }
+
+  void _goProBul() {
+    // [EKLENDI v9.7] Pro Bul - musteri ozel davet akisi
+    try {
+      Navigator.of(context).pushNamed('/pro-bul');
+    } catch (_) {
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProBulScreen()));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -378,8 +400,8 @@ class _HeroWithEntranceState extends State<_HeroWithEntrance> with TickerProvide
             spacing: 12,
             runSpacing: 12,
             children: [
-              _CtaWithLight(label: 'PROJE OLUŞTUR', intensity: 0.70),
-              _CtaWithLight(label: 'PROFESYONEL BUL', intensity: 0.70),
+              _CtaWithLight(label: 'PROJE OLUŞTUR', intensity: 0.70, onTap: _goProjeOlustur), // [EKLENDI] onTap
+              _CtaWithLight(label: 'PROFESYONEL BUL', intensity: 0.70, onTap: _goProBul), // [EKLENDI v9.7] ProBul'e baglandi
             ],
           ),
         ),
@@ -469,8 +491,10 @@ class _ArchGridPainter extends CustomPainter {
 class _CtaWithLight extends StatefulWidget {
   final String label;
   final bool big;
-  final double intensity; // 0.7 hero, 0.85 final, 1.0 logo
-  const _CtaWithLight({required this.label, this.big = false, this.intensity = 0.70});
+  final double intensity;
+  final VoidCallback? onTap; // [EKLENDI]
+  final String? routeName; // [EKLENDI] fallback icin
+  const _CtaWithLight({required this.label, this.big = false, this.intensity = 0.70, this.onTap, this.routeName});
   @override
   State<_CtaWithLight> createState() => _CtaWithLightState();
 }
@@ -489,37 +513,63 @@ class _CtaWithLightState extends State<_CtaWithLight> with SingleTickerProviderS
     super.dispose();
   }
 
+  void _handleTap() {
+    if (widget.onTap != null) {
+      widget.onTap!.call();
+      return;
+    }
+    if (widget.routeName != null) {
+      try {
+        Navigator.of(context).pushNamed(widget.routeName!);
+      } catch (_) {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HugProjeOlusturPage()));
+      }
+      return;
+    }
+    // Eger label PROJE ise default davranis
+    if (widget.label.contains('PROJE') && widget.label.contains('OLUŞTUR')) {
+      try {
+        Navigator.of(context).pushNamed('/hug-proje-olustur');
+      } catch (_) {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HugProjeOlusturPage()));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final whiteOpacity = 0.15 + (widget.intensity * 0.10); // 0.22 max, 0.18 min
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (_, __) {
-        return Stack(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: widget.big ? 28 : 20, vertical: widget.big ? 16 : 12),
-              color: _gold,
-              child: Row(mainAxisSize: MainAxisSize.min, children: [Text(widget.label, style: TextStyle(color: _black, fontSize: widget.big ? 11 : 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)), const SizedBox(width: 12), Container(width: widget.big ? 28 : 20, height: 1, color: Colors.black54)]),
-            ),
-            Positioned.fill(
-              child: ClipRect(
-                child: Transform.translate(
-                  offset: Offset((_controller.value * 200) - 50, 0),
-                  child: Container(
-                    width: 36,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.transparent, Colors.white.withOpacity(whiteOpacity), Colors.transparent],
+    final whiteOpacity = 0.15 + (widget.intensity * 0.10);
+    return GestureDetector(
+      onTap: (widget.label.contains('PROJE') && widget.label.contains('OLUŞTUR')) || (widget.label.contains('PROFESYONEL') && widget.label.contains('BUL')) || widget.onTap != null || widget.routeName != null ? _handleTap : null,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (_, __) {
+          return Stack(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: widget.big ? 28 : 20, vertical: widget.big ? 16 : 12),
+                color: _gold,
+                child: Row(mainAxisSize: MainAxisSize.min, children: [Text(widget.label, style: TextStyle(color: _black, fontSize: widget.big ? 11 : 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)), const SizedBox(width: 12), Container(width: widget.big ? 28 : 20, height: 1, color: Colors.black54)]),
+              ),
+              Positioned.fill(
+                child: ClipRect(
+                  child: Transform.translate(
+                    offset: Offset((_controller.value * 200) - 50, 0),
+                    child: Container(
+                      width: 36,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.transparent, Colors.white.withOpacity(whiteOpacity), Colors.transparent],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -529,44 +579,68 @@ class _IntentStatic extends StatelessWidget {
   final String n, title, desc;
   const _IntentStatic({required this.n, required this.title, required this.desc});
 
+  void _handleTap(BuildContext context) {
+    // [EKLENDI] 01 = proje olustur, 02 = pro bul
+    if (n == '01' || title.contains('PROJE OLUŞTURMAK')) {
+      try {
+        Navigator.of(context).pushNamed('/hug-proje-olustur');
+      } catch (_) {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HugProjeOlusturPage()));
+      }
+      return;
+    }
+    if (n == '02' || title.contains('PROFESYONEL ARIYORUM')) {
+      // [EKLENDI v9.7]
+      try {
+        Navigator.of(context).pushNamed('/pro-bul');
+      } catch (_) {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProBulScreen()));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x14000000)))),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(width: 48, child: Text(n, style: TextStyle(fontSize: 32, fontWeight: FontWeight.w200, color: _gold.withOpacity(0.8), letterSpacing: -1))),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: -0.2, color: Colors.black)),
-                    const SizedBox(height: 6),
-                    Text(desc, style: const TextStyle(fontSize: 11, color: _gray, height: 1.5)),
-                  ],
+    final isClickable = n == '01' || n == '02' || title.contains('PROJE OLUŞTURMAK') || title.contains('PROFESYONEL ARIYORUM');
+    return GestureDetector(
+      onTap: isClickable ? () => _handleTap(context) : null,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x14000000)))),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: 48, child: Text(n, style: TextStyle(fontSize: 32, fontWeight: FontWeight.w200, color: _gold.withOpacity(0.8), letterSpacing: -1))),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: -0.2, color: Colors.black)),
+                      const SizedBox(height: 6),
+                      Text(desc, style: const TextStyle(fontSize: 11, color: _gray, height: 1.5)),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.transparent,
-                  border: Border.all(color: const Color(0xFFD6D6D6), width: 0.8),
+                const SizedBox(width: 12),
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.transparent,
+                    border: Border.all(color: const Color(0xFFD6D6D6), width: 0.8),
+                  ),
+                  child: const Icon(Icons.arrow_outward, size: 13, color: Color(0xFF999999)),
                 ),
-                child: const Icon(Icons.arrow_outward, size: 13, color: Color(0xFF999999)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Container(height: 1, color: const Color(0xFFE5E5E5)),
-        ],
+              ],
+            ),
+            const SizedBox(height: 20),
+            Container(height: 1, color: const Color(0xFFE5E5E5)),
+          ],
+        ),
       ),
     );
   }

@@ -150,6 +150,46 @@ export const callback = onRequest(
           });
         }
 
+        // === HUG PRO ABONELIK AKTIVASYONU - SADECE EKLEME ===
+        try {
+          const paketTipi = (pendingData as any).paketTipi as string | undefined;
+          if (paketTipi) {
+            let ayEkle = 1;
+            if (paketTipi === "MONTHLY") ayEkle = 1;
+            if (paketTipi === "THREE_MONTH") ayEkle = 3;
+            if (paketTipi === "SIX_MONTH") ayEkle = 6;
+            if (paketTipi === "YEARLY") ayEkle = 12;
+
+            const simdi = new Date();
+            const proSnap = await db.collection("users_pro").doc(uid).get();
+            let baslangicTarihi = simdi;
+            if (proSnap.exists) {
+              const proData = proSnap.data() as any;
+              const mevcutBitis = proData.subscriptionExpiry?.toDate?.() as Date | undefined;
+              if (mevcutBitis && mevcutBitis > simdi) {
+                baslangicTarihi = mevcutBitis;
+              }
+            }
+            const bitisTarihi = new Date(baslangicTarihi);
+            bitisTarihi.setMonth(bitisTarihi.getMonth() + ayEkle);
+
+            await db.collection("users_pro").doc(uid).set({
+              isActive: true,
+              subscriptionType: paketTipi,
+              subscriptionExpiry: admin.firestore.Timestamp.fromDate(bitisTarihi),
+              lastPaymentId: paymentId,
+              lastPaymentAmount: paidPrice,
+              lastPaymentDate: admin.firestore.FieldValue.serverTimestamp(),
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            }, { merge: true });
+
+            console.log(`HUG PRO ABONELIK AKTIF: uid=${uid} paket=${paketTipi} bitis=${bitisTarihi.toISOString()}`);
+          }
+        } catch (e: any) {
+          console.error("HUG PRO ABONELIK GUNCELLEME HATASI:", e?.message, e?.stack);
+        }
+        // === HUG PRO BITIS ===
+
         if (platform === "web") {
           res.redirect(302, `https://hemenustamgelsin.com/odeme-basarili?amount=${paidPrice}&paymentId=${paymentId}`);
         } else {

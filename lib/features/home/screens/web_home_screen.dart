@@ -23,6 +23,8 @@ import 'package:ustam_gelsin/features/home/screens/biz_kimiz_page.dart';
 import 'package:ustam_gelsin/features/home/screens/destek_iletisim.dart';
 import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
 import 'package:ustam_gelsin/features/hug_market/hug_market_homepage.dart';
+import 'package:ustam_gelsin/features/hug_pro/hug_pro_home.dart';
+import 'package:ustam_gelsin/features/home/screens/hug_proje_ilanlari.dart';
 
 Future<void> showSozlesmeDialog(BuildContext context, String documentId, String defaultBaslik) async {
   showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
@@ -58,7 +60,6 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   User? _currentUser;
   bool _isProfileLoading = false;
   double? _lat; double? _lng; bool _isLocationLoading = true;
-  // --- SADECE EKLENEN KISIM - ADMIN CACHE ---
   bool _isAdminCached = false;
 
   static const String FIRMA_UNVANI = "Hemen Ustam Gelsin";
@@ -83,7 +84,6 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _initializeLocation());
   }
 
-  // --- SADECE EKLENEN KISIM - ADMIN KONTROL ---
   Future<void> _checkAdminStatus() async {
     bool adminMi = await _authService.isAdmin();
     if (mounted) setState(() => _isAdminCached = adminMi);
@@ -148,6 +148,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             _buildTrustBar(context, isMobile: isMobile, isTablet: isTablet, isDesktop: isDesktop),
             _buildHowItWorks(context, isMobile: isMobile, isTablet: isTablet, isDesktop: isDesktop),
             _buildCanliIlanlarSection(isMobile: isMobile, isTablet: isTablet),
+            _buildHugProjeIlanlariSection(isMobile: isMobile, isTablet: isTablet, isDesktop: isDesktop),
             _buildHizmetlerimizSection(isMobile: isMobile, isTablet: isTablet),
             _buildFooter(context, isMobile: isMobile, isTablet: isTablet, isDesktop: isDesktop)
           ]),
@@ -162,10 +163,48 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
       {"title": "AI Fiyat Tahmini", "page": const HomePageAI()},
       {"title": "Hakkımızda", "page": const BizKimizPage()},
       {"title": "İletişim", "page": const DestekIletisimPage()},
-      {"title": "HUG MARKET", "page": const HugMarketHomepage()},
+      {"title": "HUG PROJE", "page": const HugProHomePage(), "isPro": true},
+      {"title": "HUG MARKET", "page": const HugMarketHomepage(), "isMarket": true},
     ];
     final hPad = isMobile? 16.0 : isTablet? 24.0 : 80.0;
     final logoH = isMobile? 48.0 : isTablet? 64.0 : 88.0;
+
+    Widget buildMenuItem(Map<String, dynamic> item) {
+      final isPro = item['isPro'] == true;
+      final isMarket = item['isMarket'] == true;
+      if (isPro) {
+        return InkWell(
+          onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (_)=> item['page'] as Widget)),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0A0A0A),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: const Color(0xFFD4AF37).withOpacity(0.7), width: 0.9),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("HUG", style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w300, letterSpacing: 3)),
+                Container(height: 1, width: 38, color: const Color(0xFFD4AF37), margin: const EdgeInsets.symmetric(vertical: 2)),
+                Text("PROJE", style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w300, letterSpacing: 2.5)),
+              ],
+            ),
+          ),
+        );
+      }
+      if (isMarket) {
+        return InkWell(
+          onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (_)=> item['page'] as Widget)),
+          child: Text("HUG MARKET", style: GoogleFonts.poppins(fontSize: isMobile? 13 : isTablet? 13.5 : 15.5, fontWeight: FontWeight.w800, color: const Color(0xFFDC143C))),
+        );
+      }
+      return InkWell(
+        onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (_)=> item['page'] as Widget)),
+        child: Text(item['title'] as String, style: GoogleFonts.poppins(fontSize: isMobile? 13 : isTablet? 13.5 : 15.5, fontWeight: FontWeight.w500, color: Colors.black87)),
+      );
+    }
+
     if (isMobile) {
       return Padding(padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 12),
           child: Column(children: [
@@ -176,7 +215,6 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 const SizedBox(width:8),
                 ElevatedButton(onPressed: ()=> _showSelectionDialog(context, false), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)), child: const Text("GİRİŞ", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)))
               ]) : Row(mainAxisSize: MainAxisSize.min, children: [
-                // --- SADECE EKLENEN KISIM - MOBIL ADMIN BUTONU ---
                 if (_isAdminCached)
                   IconButton(
                     tooltip: "Admin Panel",
@@ -194,35 +232,20 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               ])
             ]),
             const SizedBox(height:12),
-            Wrap(spacing:16, runSpacing:8, alignment: WrapAlignment.center, children: menuItems.map((item){
-              final isHug = item['title'] == "HUG MARKET";
-              return InkWell(onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (_)=> item['page'] as Widget)),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(item['title'] as String, style: GoogleFonts.poppins(fontSize:13, fontWeight: isHug? FontWeight.w800 : FontWeight.w500, color: isHug? const Color(0xFFDC143C) : Colors.black87)),
-                    if (isHug)...[const SizedBox(width:4), Container(width:6, height:6, decoration: const BoxDecoration(color: Color(0xFFDC143C), shape: BoxShape.circle))]
-                  ]));
-            }).toList())
+            Wrap(spacing:16, runSpacing:8, alignment: WrapAlignment.center, children: menuItems.map((item)=> buildMenuItem(item)).toList())
           ]));
     }
     return Padding(padding: EdgeInsets.symmetric(horizontal: hPad, vertical: 16),
         child: Row(children: [
           Image.asset('assets/web_logo.png', height: logoH),
           SizedBox(width: isTablet?20:50),
-          Expanded(child: Wrap(spacing: isTablet?16:28, runSpacing:10, alignment: WrapAlignment.center, children: menuItems.map((item){
-            final isHug = item['title'] == "HUG MARKET";
-            return InkWell(onTap: ()=> Navigator.push(context, MaterialPageRoute(builder: (_)=> item['page'] as Widget)),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(item['title'] as String, style: GoogleFonts.poppins(fontSize: isTablet?13.5:15.5, fontWeight: isHug? FontWeight.w800 : FontWeight.w500, color: isHug? const Color(0xFFDC143C) : Colors.black87)),
-                  if (isHug)...[const SizedBox(width:6), Container(padding: const EdgeInsets.symmetric(horizontal:6, vertical:2), decoration: BoxDecoration(color: const Color(0xFFDC143C), borderRadius: BorderRadius.circular(10)), child: Text("CANLI", style: GoogleFonts.poppins(color: Colors.white, fontSize:9, fontWeight: FontWeight.w800)))]
-                ]));
-          }).toList())),
+          Expanded(child: Wrap(spacing: isTablet?16:28, runSpacing:10, alignment: WrapAlignment.center, crossAxisAlignment: WrapCrossAlignment.center, children: menuItems.map((item)=> buildMenuItem(item)).toList())),
           const SizedBox(width:20),
           _currentUser == null? Row(mainAxisSize: MainAxisSize.min, children: [
             ElevatedButton(onPressed: ()=> _showSelectionDialog(context, true), style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal:28, vertical:14)), child: const Text("Üye Ol", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
             const SizedBox(width:12),
             ElevatedButton(onPressed: ()=> _showSelectionDialog(context, false), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFDC143C), padding: const EdgeInsets.symmetric(horizontal:28, vertical:14)), child: const Text("GİRİŞ YAP", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))
           ]) : Row(mainAxisSize: MainAxisSize.min, children: [
-            // --- SADECE EKLENEN KISIM - DESKTOP ADMIN BUTONU ---
             if (_isAdminCached)
               Padding(
                 padding: const EdgeInsets.only(right: 8),
@@ -268,25 +291,65 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   Widget _buildHugMarketBanner(BuildContext context, {required bool isMobile, required bool isTablet, required bool isDesktop}) {
     final hMargin = isMobile?16.0: isTablet?24.0:80.0;
     void goToHugMarket()=> Navigator.push(context, MaterialPageRoute(builder: (_)=> const HugMarketHomepage()));
-    final bannerInner = Container(decoration: BoxDecoration(color: const Color(0xFFFAFAF8), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFF3F4F6), width:1)),
-        child: ClipRRect(borderRadius: BorderRadius.circular(20), child: isMobile? Column(children: [
-          Padding(padding: const EdgeInsets.fromLTRB(20,20,20,16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Image.asset('assets/hug_market/hug_logo.png', height:44, fit: BoxFit.contain, errorBuilder: (c,e,s)=> Container(height:44, width:100, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.store_outlined, color: Colors.grey))),
-            const SizedBox(height:14), Text("Büyüyen Yapı Ekosisteminde Yerinizi Alın.", style: GoogleFonts.poppins(fontSize:20, fontWeight: FontWeight.w800, color: Colors.black87, height:1.15)),
-            const SizedBox(height:10), Text("Markanızı, gerçek ihtiyacın doğduğu anda müşterinizle buluşturalım.", style: GoogleFonts.poppins(fontSize:13, fontWeight: FontWeight.w400, color: Color(0xFF6B7280), height:1.5)),
-            const SizedBox(height:16), SizedBox(width: double.infinity, child: ElevatedButton(onPressed: goToHugMarket, style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical:14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text("Marketi Keşfet →", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w700, fontSize:14))))
-          ])),
-          Image.asset('assets/hug_market/hugmarket.png', fit: BoxFit.contain, width: double.infinity, errorBuilder: (c,e,s)=> Container(width: double.infinity, height:180, color: Colors.grey[100], child: const Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.grey, size:40))))
-        ]) : Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          Expanded(flex:4, child: Padding(padding: EdgeInsets.fromLTRB(isDesktop?32:24,28,isDesktop?20:16,28), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Image.asset('assets/hug_market/hug_logo.png', height: isDesktop?52:44, fit: BoxFit.contain, errorBuilder: (c,e,s)=> Container(height: isDesktop?52:44, width:120, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.store_outlined, color: Colors.grey))),
-            const SizedBox(height:16), Text("Büyüyen Yapı Ekosisteminde Yerinizi Alın.", style: GoogleFonts.poppins(fontSize: isDesktop?26:20, fontWeight: FontWeight.w800, color: Colors.black87, height:1.15)),
-            const SizedBox(height:10), Text("Markanızı, gerçek ihtiyacın doğduğu anda müşterinizle buluşturalım.", style: GoogleFonts.poppins(fontSize: isDesktop?14:13, fontWeight: FontWeight.w400, color: const Color(0xFF6B7280), height:1.5)),
-            const SizedBox(height:20), ElevatedButton(onPressed: goToHugMarket, style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: EdgeInsets.symmetric(horizontal: isDesktop?22:18, vertical:12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: Text("Marketi Keşfet →", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w700, fontSize: isDesktop?14:13)))
-          ]))),
-          Expanded(flex:6, child: Padding(padding: const EdgeInsets.fromLTRB(0,12,12,12), child: ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.asset('assets/hug_market/hugmarket.png', fit: BoxFit.contain, height: isDesktop?320:240, errorBuilder: (c,e,s)=> Container(height: isDesktop?320:240, color: Colors.grey[100], child: const Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.grey, size:40)))))))
-        ])));
-    return Container(margin: EdgeInsets.fromLTRB(hMargin,0,hMargin,20), child: Material(color: Colors.transparent, child: InkWell(onTap: goToHugMarket, borderRadius: BorderRadius.circular(20), child: bannerInner)));
+    void goToHugPro()=> Navigator.push(context, MaterialPageRoute(builder: (_)=> const HugProHomePage()));
+
+    final hugProImage = ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.asset('assets/hug_pro/web_banner.webp', fit: BoxFit.contain, width: double.infinity, errorBuilder: (c,e,s)=> Container(height: 240, color: Colors.grey[100], child: const Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.grey, size:40)))),
+    );
+
+    final hugMarketImage = ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Stack(
+        children: [
+          Image.asset('assets/hug_market/hugmarket.png', fit: BoxFit.contain, width: double.infinity, errorBuilder: (c,e,s)=> Container(height: 240, color: Colors.grey[100], child: const Center(child: Icon(Icons.image_not_supported_outlined, color: Colors.grey, size:40)))),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: InkWell(
+              onTap: goToHugMarket,
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(20)),
+                child: Text("Marketi Keşfet →", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 11)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    final bannerInner = Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.5),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFE5E7EB), width: 1)),
+              child: Text("HUG EKOSİSTEMİ", style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.8, color: const Color(0xFF6B7280))),
+            ),
+            const SizedBox(height: 10),
+            isMobile? Column(children: [
+              InkWell(onTap: goToHugPro, borderRadius: BorderRadius.circular(12), child: hugProImage),
+              const SizedBox(height: 12),
+              InkWell(onTap: goToHugMarket, borderRadius: BorderRadius.circular(12), child: hugMarketImage)
+            ]) : Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(child: Padding(padding: const EdgeInsets.only(right: 6), child: InkWell(onTap: goToHugPro, borderRadius: BorderRadius.circular(12), child: hugProImage))),
+              Expanded(child: Padding(padding: const EdgeInsets.only(left: 6), child: InkWell(onTap: goToHugMarket, borderRadius: BorderRadius.circular(12), child: hugMarketImage))),
+            ]),
+          ],
+        ),
+      ),
+    );
+    return Container(margin: EdgeInsets.fromLTRB(hMargin,0,hMargin,20), child: bannerInner);
   }
 
   Widget _buildTrustBar(BuildContext context, {required bool isMobile, required bool isTablet, required bool isDesktop}) {
@@ -325,6 +388,63 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
         const SizedBox(height:16),
         _isLocationLoading? const Center(child: CircularProgressIndicator()) : _lat == null || _lng == null? const IlanAkisiSlider() : IlanAkisiSlider(ustaLat: _lat!, ustaLng: _lng!)
       ]),
+    );
+  }
+
+  // YENİ EKLENEN BÖLÜM - HUG PROJE İLANLARI - KARTLAR AYNI BOYUTTA YATAY
+  Widget _buildHugProjeIlanlariSection({required bool isMobile, required bool isTablet, required bool isDesktop}) {
+    final hPad = isMobile ? 16.0 : isTablet ? 24.0 : 80.0;
+    return Container(
+      color: const Color(0xFFFAF8F5),
+      padding: EdgeInsets.symmetric(vertical: isMobile ? 24 : 48),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // HEADER - APP ILE AYNI YAPI
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: hPad),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(width: 28, height: 1, color: const Color(0xFFC8A45D)),
+                    const SizedBox(width: 10),
+                    Text("HUG PROJE İLANLARI", style: GoogleFonts.poppins(fontSize: isMobile ? 20 : 28, fontWeight: FontWeight.bold, letterSpacing: -0.3)),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(color: const Color(0xFFC8A45D), borderRadius: BorderRadius.circular(4)),
+                      child: Text("YENİ", style: GoogleFonts.poppins(fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1, color: const Color(0xFF0B0B0B))),
+                    ),
+                    const SizedBox(width: 10),
+                    InkWell(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HugProHomePage())),
+                      child: Text("Tümünü Gör →", style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.bold, color: const Color(0xFFC8A45D))),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: hPad),
+            child: Text("Büyük ölçekli projeler, teknik danışmanlık ve profesyonel çözümler", style: GoogleFonts.poppins(fontSize: 13, color: Colors.black54)),
+          ),
+          const SizedBox(height: 24),
+          // KARTLAR - AYNI BOYUTTA KESMEDEN
+          ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse, PointerDeviceKind.trackpad},
+            ),
+            child: const HugProjeIlanlari(),
+          ),
+        ],
+      ),
     );
   }
 

@@ -27,6 +27,8 @@ import 'package:ustam_gelsin/features/hug_market/kategoriler/kapi_kilit.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/guvenlik.dart';
 import 'package:ustam_gelsin/features/hug_market/kategoriler/asansor.dart';
 import 'package:ustam_gelsin/features/hug_market/cozum_ortagi_page.dart';
+import 'package:ustam_gelsin/features/hug_pro/hug_pro_home.dart';
+import 'package:ustam_gelsin/features/hug_pro/hug_proje_olustur_page.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -46,6 +48,8 @@ final appRouter = GoRouter(
         GoRoute(path: ':slug', builder: (c, s) => RehberDetayScreen(slug: s.pathParameters['slug']!)),
       ],
     ),
+    GoRoute(path: '/hug-proje', builder: (c, s) => const HugProHomePage()),
+    GoRoute(path: '/hug-proje-olustur', builder: (c, s) => const HugProjeOlusturPage()),
     GoRoute(
       path: '/hug-market',
       builder: (c, s) {

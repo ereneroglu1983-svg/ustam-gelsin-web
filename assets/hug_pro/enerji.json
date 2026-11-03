@@ -1,0 +1,939 @@
+{
+  "ENERJI_GES": {
+    "baslik": "GES - GÜNEŞ ENERJİ SANTRALİ",
+    "kategori": "ENERJI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "TARLA",
+          "KUM",
+          "KIL",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "sebekeBaglanti",
+        "label": "Şebeke Bağlantısı",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK",
+          "BASVURU_YAPILDI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sebeke"
+      },
+      {
+        "id": "trafoMesafesi",
+        "label": "Trafo / Şebeke Mesafesi (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 10000,
+        "zorunlu": false,
+        "grokAnahtari": "trafoMesafe"
+      },
+      {
+        "id": "kuruluGuc",
+        "label": "Kurulu Güç kWp",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "guc"
+      },
+      {
+        "id": "alanTipi",
+        "label": "Alan Tipi",
+        "tip": "select",
+        "secenekler": [
+          "CATI",
+          "ARAZI",
+          "IKISI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "alanTipi"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi (ÇATI seçildi ise zorunlu)",
+        "tip": "select",
+        "secenekler": [
+          "TRAPEZ_SAC",
+          "SANDVIC_PANEL",
+          "KIREMIT",
+          "BETONARME_TERAS",
+          "YOK_ARAZI"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati",
+        "kosul": "alanTipi == CATI veya IKISI ise zorunlu"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım (çatı ise)",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "catiYalitim",
+        "kosul": "alanTipi == CATI veya IKISI ise geçerli"
+      },
+      {
+        "id": "catiEgimi",
+        "label": "Çatı / Arazi Eğimi",
+        "tip": "select",
+        "secenekler": [
+          "DUZ",
+          "5_DERECE",
+          "10_DERECE",
+          "15_DERECE",
+          "20_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "egim",
+        "kosul": "alanTipi == CATI veya IKISI ise geçerli"
+      },
+      {
+        "id": "golgeleme",
+        "label": "Gölgelenme Var mı?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "KISMI",
+          "COK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "golge"
+      },
+      {
+        "id": "panelTipi",
+        "label": "Panel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "MONOKRISTAL",
+          "POLIKRISTAL",
+          "BIFACIAL",
+          "THIN_FILM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "panelTipi"
+      },
+      {
+        "id": "panelGucu",
+        "label": "Panel Gücü Wp",
+        "tip": "select",
+        "secenekler": [
+          "400Wp",
+          "450Wp",
+          "500Wp",
+          "550Wp",
+          "600Wp_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "panelGucu"
+      },
+      {
+        "id": "inverterTipi",
+        "label": "İnverter Tipi",
+        "tip": "select",
+        "secenekler": [
+          "STRING",
+          "CENTRAL",
+          "MIKRO_INVERTER"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "inverter"
+      },
+      {
+        "id": "montajTipi",
+        "label": "Montaj Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SABIT",
+          "TRACKER_TEK_EKSEN",
+          "TRACKER_CIFT_EKSEN"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "montaj"
+      },
+      {
+        "id": "konstruksiyonTipi",
+        "label": "Konstrüksiyon Tipi",
+        "tip": "select",
+        "secenekler": [
+          "ALUMINYUM",
+          "GALVANIZ_CELIK",
+          "AHSAP"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "konstruksiyon"
+      },
+      {
+        "id": "panelSayisi",
+        "label": "Panel Sayısı (yaklaşık)",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "panelSayisi"
+      }
+    ]
+  },
+  "ENERJI_RES": {
+    "baslik": "RES - RÜZGAR ENERJİ SANTRALİ",
+    "kategori": "ENERJI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "TARLA",
+          "KUM",
+          "KIL",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "sebekeBaglanti",
+        "label": "Şebeke Bağlantısı",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK",
+          "BASVURU_YAPILDI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sebeke"
+      },
+      {
+        "id": "trafoMesafesi",
+        "label": "Trafo / Şebeke Mesafesi (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 10000,
+        "zorunlu": false,
+        "grokAnahtari": "trafoMesafe"
+      },
+      {
+        "id": "kuruluGucRES",
+        "label": "Kurulu Güç kW / MW",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "guc"
+      },
+      {
+        "id": "turbinSayisi",
+        "label": "Türbin Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 100,
+        "zorunlu": true,
+        "grokAnahtari": "turbinSayisi"
+      },
+      {
+        "id": "turbinGucu",
+        "label": "Türbin Gücü",
+        "tip": "select",
+        "secenekler": [
+          "500kW",
+          "1MW",
+          "2MW",
+          "3MW",
+          "4MW_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "turbinGucu"
+      },
+      {
+        "id": "kuleYuksekligi",
+        "label": "Kule Yüksekliği (m)",
+        "tip": "number",
+        "min": 30,
+        "max": 150,
+        "zorunlu": true,
+        "grokAnahtari": "kuleYukseklik"
+      },
+      {
+        "id": "kanatCapi",
+        "label": "Kanat Çapı (m)",
+        "tip": "number",
+        "min": 20,
+        "max": 200,
+        "zorunlu": false,
+        "grokAnahtari": "kanatCapi"
+      },
+      {
+        "id": "ruzgarHizi",
+        "label": "Ortalama Rüzgar Hızı m/s",
+        "tip": "select",
+        "secenekler": [
+          "5_6",
+          "6_7",
+          "7_8",
+          "8_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "ruzgarHizi"
+      },
+      {
+        "id": "temelTipiRES",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YUZEYSEL",
+          "KAZIKLI",
+          "KAYA_ANKRAJLI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temelTipi"
+      },
+      {
+        "id": "sahaErisimi",
+        "label": "Saha Erişimi / Yol",
+        "tip": "select",
+        "secenekler": [
+          "VAR_ASFALT",
+          "VAR_STABILIZE",
+          "YOK_YAPILACAK",
+          "ZORLU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sahaErisim"
+      },
+      {
+        "id": "sahaIciYol",
+        "label": "Saha İçi Ulaşım Yolu Gerekli mi?",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_KISA",
+          "VAR_UZUN"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "sahaIciYol"
+      },
+      {
+        "id": "enerjiNakilHatti",
+        "label": "Enerji Nakil Hattı Mesafesi (m)",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "nakilHatti"
+      }
+    ]
+  },
+  "ENERJI_TRAFO": {
+    "baslik": "TRAFO MERKEZİ",
+    "kategori": "ENERJI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "TARLA",
+          "KUM",
+          "KIL",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "sebekeBaglanti",
+        "label": "Şebeke Bağlantısı",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK",
+          "BASVURU_YAPILDI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sebeke"
+      },
+      {
+        "id": "trafoMesafesi",
+        "label": "Trafo / Şebeke Mesafesi (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 10000,
+        "zorunlu": false,
+        "grokAnahtari": "trafoMesafe"
+      },
+      {
+        "id": "trafoSayisi",
+        "label": "Trafo Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 20,
+        "zorunlu": true,
+        "grokAnahtari": "trafoSayisi"
+      },
+      {
+        "id": "trafoGucu",
+        "label": "Trafo Gücü (birim başına kVA)",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "trafoGucu"
+      },
+      {
+        "id": "toplamTrafoGucu",
+        "label": "Toplam Trafo Gücü kVA",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "toplamTrafoGucu"
+      },
+      {
+        "id": "gerilimSeviyesi",
+        "label": "Gerilim Seviyesi",
+        "tip": "select",
+        "secenekler": [
+          "0.4kV",
+          "6.3kV",
+          "15kV",
+          "34.5kV",
+          "154kV",
+          "380kV"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "gerilim"
+      },
+      {
+        "id": "trafoTipi",
+        "label": "Trafo Tipi",
+        "tip": "select",
+        "secenekler": [
+          "DIREK_TIPI",
+          "BINA_TIPI",
+          "SAHA_TIPI",
+          "MOBIL",
+          "DAGITIM_TIPI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "trafoTipi"
+      },
+      {
+        "id": "sahadaAlan",
+        "label": "Saha Alanı m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "sahaAlan"
+      },
+      {
+        "id": "catiTipiTrafo",
+        "label": "Bina Çatı Tipi (bina tipi ise)",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK_SAHA",
+          "TERAS_MEMBRAN",
+          "SANDVIC_PANEL",
+          "BETONARME"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      }
+    ]
+  },
+  "ENERJI_SANTRAL": {
+    "baslik": "GENEL SANTRAL (HES/BİYOKÜTLE/JEOTERMAL/DG)",
+    "kategori": "ENERJI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "TARLA",
+          "KUM",
+          "KIL",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "sebekeBaglanti",
+        "label": "Şebeke Bağlantısı",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK",
+          "BASVURU_YAPILDI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sebeke"
+      },
+      {
+        "id": "trafoMesafesi",
+        "label": "Trafo / Şebeke Mesafesi (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 10000,
+        "zorunlu": false,
+        "grokAnahtari": "trafoMesafe"
+      },
+      {
+        "id": "santralTipi",
+        "label": "Santral Tipi",
+        "tip": "select",
+        "secenekler": [
+          "HES",
+          "BIYOKUTLE",
+          "JEOTERMAL",
+          "DOGALGAZ",
+          "KOJENERASYON",
+          "BIYOGAZ"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "santralTipi"
+      },
+      {
+        "id": "kuruluGucSantral",
+        "label": "Kurulu Güç kW / MW",
+        "tip": "number",
+        "min": 100,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "guc"
+      },
+      {
+        "id": "yakitTipi",
+        "label": "Yakıt Tipi",
+        "tip": "select",
+        "secenekler": [
+          "DOGALGAZ",
+          "BIYOGAZ",
+          "KOMUR",
+          "BIYOKUTLE",
+          "JEOTERMAL_BUHAR",
+          "SU",
+          "YOK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yakit"
+      },
+      {
+        "id": "yakitTuketim",
+        "label": "Yakıt Tüketim / Debi",
+        "tip": "select",
+        "secenekler": [
+          "DUSUK",
+          "ORTA",
+          "YUKSEK",
+          "COK_YUKSEK"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "yakitTuketim"
+      },
+      {
+        "id": "turbinTipi",
+        "label": "Türbin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "FRANCIS",
+          "PELTON",
+          "KAPLAN",
+          "BUHAR_TURBINI",
+          "GAZ_TURBINI",
+          "YOK"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "turbinTipi"
+      },
+      {
+        "id": "debi",
+        "label": "Debi m³/s - HES için",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "debi"
+      },
+      {
+        "id": "binaAlani",
+        "label": "Bina / Makine Dairesi Alanı m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "binaAlan"
+      },
+      {
+        "id": "dusuYuksekligi",
+        "label": "Düşü Yüksekliği (m) - HES için",
+        "tip": "number",
+        "min": 1,
+        "max": 1000,
+        "zorunlu": false,
+        "grokAnahtari": "dusu",
+        "kosul": "santralTipi == HES ise"
+      },
+      {
+        "id": "kuyuDerinligi",
+        "label": "Kuyu Derinliği (m) - Jeotermal için",
+        "tip": "number",
+        "min": 100,
+        "max": 5000,
+        "zorunlu": false,
+        "grokAnahtari": "kuyuDerinlik",
+        "kosul": "santralTipi == JEOTERMAL ise"
+      }
+    ]
+  },
+  "ENERJI_DEPOLAMA": {
+    "baslik": "ENERJİ DEPOLAMA SİSTEMİ",
+    "kategori": "ENERJI",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "TARLA",
+          "KUM",
+          "KIL",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "sebekeBaglanti",
+        "label": "Şebeke Bağlantısı",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK",
+          "BASVURU_YAPILDI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sebeke"
+      },
+      {
+        "id": "trafoMesafesi",
+        "label": "Trafo / Şebeke Mesafesi (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 10000,
+        "zorunlu": false,
+        "grokAnahtari": "trafoMesafe"
+      },
+      {
+        "id": "depolamaTipi",
+        "label": "Depolama Tipi",
+        "tip": "select",
+        "secenekler": [
+          "LITYUM_ION",
+          "LFP",
+          "KURSU_ASIT",
+          "AKIS_BATARYA",
+          "HIDROJEN",
+          "SODYUM_ION"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "depolamaTipi"
+      },
+      {
+        "id": "depolamaKapasitesi",
+        "label": "Depolama Kapasitesi kWh",
+        "tip": "number",
+        "min": 10,
+        "max": 1000000,
+        "zorunlu": true,
+        "grokAnahtari": "depolamaKapasite"
+      },
+      {
+        "id": "depolamaGucu",
+        "label": "Şarj/Deşarj Gücü kW",
+        "tip": "number",
+        "min": 10,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "depolamaGucu"
+      },
+      {
+        "id": "konteynerSayisi",
+        "label": "Konteyner / Kabin Sayısı",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "konteyner"
+      },
+      {
+        "id": "sogutmaSistemi",
+        "label": "Soğutma Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "HAVA_SOGUTMALI",
+          "SIVI_SOGUTMALI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sogutma"
+      },
+      {
+        "id": "yanginSondurme",
+        "label": "Yangın Söndürme Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_AEROSOL",
+          "VAR_GAZLI",
+          "VAR_SULU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yangin"
+      },
+      {
+        "id": "catiTipiDepolama",
+        "label": "Üst Örtü / Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "YOK_ACIK_KONTEYNER",
+          "SANDVIC_PANEL",
+          "BETONARME_BINA",
+          "CELIK_CATI"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati"
+      }
+    ]
+  },
+  "ENERJI": {
+    "baslik": "GENEL ENERJİ YAPISI",
+    "kategori": "ENERJI",
+    "aciklama": "Genel tanım - spesifik tip seçiniz",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "zeminTipi",
+        "label": "Zemin Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KAYA",
+          "TARLA",
+          "KUM",
+          "KIL",
+          "DOLGU"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTipi"
+      },
+      {
+        "id": "sebekeBaglanti",
+        "label": "Şebeke Bağlantısı",
+        "tip": "select",
+        "secenekler": [
+          "VAR",
+          "YOK",
+          "BASVURU_YAPILDI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sebeke"
+      },
+      {
+        "id": "trafoMesafesi",
+        "label": "Trafo / Şebeke Mesafesi (m)",
+        "tip": "number",
+        "min": 0,
+        "max": 10000,
+        "zorunlu": false,
+        "grokAnahtari": "trafoMesafe"
+      },
+      {
+        "id": "enerjiTipiSecim",
+        "label": "Enerji Tipi Seçiniz",
+        "tip": "select",
+        "secenekler": [
+          "GES",
+          "RES",
+          "TRAFO",
+          "SANTRAL",
+          "DEPOLAMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "enerjiTipi"
+      },
+      {
+        "id": "kuruluGucGenel",
+        "label": "Kurulu Güç (Birim seçtiğiniz türe göre giriniz)",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "guc",
+        "aciklama": "GES:kWp, RES/SANTRAL:kW/MW, TRAFO:kVA, DEPOLAMA:kWh"
+      },
+      {
+        "id": "gucBirimi",
+        "label": "Güç Birimi",
+        "tip": "select",
+        "secenekler": [
+          "kWp",
+          "kW",
+          "MW",
+          "kVA",
+          "kWh"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "gucBirimi",
+        "aciklama": "Seçtiğiniz enerji tipine göre birim"
+      }
+    ]
+  }
+}

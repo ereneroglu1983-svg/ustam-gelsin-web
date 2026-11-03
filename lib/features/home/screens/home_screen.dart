@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -18,15 +17,15 @@ import 'package:ustam_gelsin/features/home/widgets/hizmetler_slider.dart';
 import 'package:ustam_gelsin/features/home/widgets/ilan_akisi_slider.dart';
 import 'package:ustam_gelsin/features/home/widgets/insaat_rehberi_slider.dart';
 import 'package:ustam_gelsin/features/hug_market/hug_market_homepage_app.dart';
+import 'package:ustam_gelsin/features/hug_pro/hug_pro_home.dart';
 import 'web_home_screen.dart';
 import 'nasil_calisir.dart';
 import 'destek_iletisim.dart';
 import 'insaat_rehberi.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-// --- SADECE EKLENEN IMPORT - ADMIN PANEL ---
 import '../../admin/screens/admin_dashboard.dart';
+import 'hug_proje_ilanlari.dart';
 
-// SADECE EKLENEN KISIM - Hiçbir yeri bozmaz
 String _normalizeRole(String? role) {
   if (role == null) return 'musteri';
   if (role == 'customer') return 'musteri';
@@ -207,7 +206,6 @@ class _HomeScreenState extends State<HomeScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
         title: Image.asset('assets/app_logo.png', height: 80, fit: BoxFit.contain),
         actions: [
-          // --- SADECE EKLENEN KISIM - ADMIN BUTONU - APPBAR ---
           if (!_roleYukleniyor && _userRole == 'admin')
             IconButton(
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboard())),
@@ -249,7 +247,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                       },
                     ),
-                    // --- SADECE EKLENEN KISIM - DRAWER ADMIN BUTONU ---
                     if (_userRole == 'admin')
                       ListTile(
                         leading: const Icon(Icons.admin_panel_settings, color: Color(0xFFFF7A00)),
@@ -305,7 +302,6 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.zero,
         child: Column(
           children: [
-            // --- ADMIN DUYURU BANNER - SADECE EKLENEN KISIM ---
             StreamBuilder<DocumentSnapshot>(
               stream: FirebaseFirestore.instance.collection('config').doc('app_status').snapshots(),
               builder: (context, snapshot) {
@@ -341,10 +337,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(children: [
                   Expanded(child: SizedBox(height: 58, child: ElevatedButton.icon(onPressed: _handleMusteriAction, icon: const Icon(Icons.add, color: Colors.white), label: Text("ÜCRETSİZ İLAN OLUŞTUR", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: ElevatedButton.styleFrom(backgroundColor: _normalizeRole(_userRole) == 'usta'? Colors.grey : Colors.red, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
                   const SizedBox(width: 10),
-                  Expanded(child: SizedBox(height: 58, child: OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePageAI())), icon: const Icon(Icons.calculate_outlined), label: Text("AI MALİYET HESAPLA", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: OutlinedButton.styleFrom(foregroundColor: Colors.black, side: const BorderSide(color: Colors.black, width: 1.3), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
+                  Expanded(child: SizedBox(height: 58, child: OutlinedButton.icon(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePageAI())), icon: const Icon(Icons.calculate_outlined), label: Text("HugAI MALİYET HESAPLA", textAlign: TextAlign.center, style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 12)), style: OutlinedButton.styleFrom(foregroundColor: Colors.black, side: const BorderSide(color: Colors.black, width: 1.3), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)))))),
                 ]),
                 const SizedBox(height: 20),
-                // DÜZELTME: İnşaat rehberi widget'ı alttaki bar ile aynı yere gidiyor - InsaatRehberiScreen - Ekran kilitlenmesi düzeltildi
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
@@ -352,33 +347,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   child: const InsaatRehberiSlider(),
                 ),
+                const SizedBox(height: 24),
+                _buildHugEkosistem(context),
               ]),
             ),
             const SizedBox(height: 20),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Image.asset('assets/kesinti_yok.png', fit: BoxFit.contain)),
             const SizedBox(height: 25),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const HugMarketAppHomepage()));
-                },
-                child: Image.asset('assets/hug_market/hugmarket.png', width: double.infinity, fit: BoxFit.contain),
-              ),
-            ),
-            const SizedBox(height: 25),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Align(alignment: Alignment.centerLeft, child: Text("HİZMETLERİMİZ", style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold)))),
             const SizedBox(height: 8),
             const HizmetlerSlider(),
-            const SizedBox(height: 20),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: Container(padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(.05), blurRadius: 10)]), child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [_buildStat(Icons.groups, "12.500+", "Tamamlanan İş"), _buildStat(Icons.verified_user, "3.200+", "Doğrulanmış Usta"), _buildStat(Icons.location_on, "81 İlde", "Hizmet")]))),
             const SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("SON İLANLAR", style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold)),
+                  Text("Tamirat ve Tadilat İlanları", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
                   InkWell(
                     onTap: _normalizeRole(_userRole) == 'musteri'? null : _handleUstaAction,
                     child: Text(
@@ -406,6 +391,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 25),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(width: 28, height: 1, color: const Color(0xFFC8A45D)),
+                      const SizedBox(width: 10),
+                      Text("HUG PROJE İLANLARI", style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: -0.3)),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: const Color(0xFFC8A45D), borderRadius: BorderRadius.circular(4)),
+                    child: Text("YENİ", style: GoogleFonts.poppins(fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 1, color: const Color(0xFF0B0B0B))),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            const HugProjeIlanlari(),
             const SizedBox(height: 15),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: Image.asset('assets/kesinti_yok_2.png', fit: BoxFit.contain)),
             const SizedBox(height: 30),
@@ -454,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.auto_awesome, "AI MALİYET", () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePageAI()))),
+              _buildNavItem(Icons.auto_awesome, "HugAI", () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePageAI()))),
               _buildNavItem(Icons.help_outline, "NASIL ÇALIŞIR", () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NasilCalisirPage()))),
               Column(
                 mainAxisSize: MainAxisSize.min,
@@ -479,31 +487,212 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildHugEkosistem(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE8E2D5), width: 1),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(width: 28, height: 1, color: const Color(0xFFC8A45D)),
+              const SizedBox(width: 10),
+              Text("HUG EKOSİSTEMİ", style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 2, color: const Color(0xFF8E8E8E))),
+              const SizedBox(width: 10),
+              Expanded(child: Container(height: 1, color: const Color(0xFFE8E2D5))),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Container(width: 3, height: 14, color: const Color(0xFFC8A45D)),
+              const SizedBox(width: 8),
+              Text("01 — MARKET", style: GoogleFonts.poppins(fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: const Color(0xFF0B0B0B))),
+              const SizedBox(width: 8),
+              Text("Malzeme & Tedarik", style: GoogleFonts.poppins(fontSize: 9, color: const Color(0xFF8E8E8E))),
+            ],
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HugMarketAppHomepage())),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.asset('assets/hug_market/hugmarket.png', width: double.infinity, fit: BoxFit.contain),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Container(width: 3, height: 14, color: const Color(0xFF0B0B0B)),
+              const SizedBox(width: 8),
+              Text("02 — PROJE", style: GoogleFonts.poppins(fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: const Color(0xFF0B0B0B))),
+              const SizedBox(width: 8),
+              Text("Büyük Ölçek & Teknik", style: GoogleFonts.poppins(fontSize: 9, color: const Color(0xFF8E8E8E))),
+              const Spacer(),
+              Container(width: 20, height: 1, color: const Color(0xFFC8A45D)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HugProHomePage())),
+            child: Container(
+              width: double.infinity,
+              height: 168,
+              decoration: BoxDecoration(color: const Color(0xFF0B0B0B), borderRadius: BorderRadius.circular(14)),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Image.asset('assets/hug_pro/hug_proje_banner.png', fit: BoxFit.cover, errorBuilder: (c, e, s) => Container(color: const Color(0xFF0B0B0B))),
+                    ),
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Colors.transparent, const Color(0xFF0B0B0B).withOpacity(0.2), const Color(0xFF0B0B0B).withOpacity(0.92)],
+                            stops: const [0.0, 0.4, 1.0],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // SADECE ALTTAKI ISILTILI YAZI KALIYOR - UST YAZI SILINDI
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(18, 24, 18, 14),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, const Color(0xFF0B0B0B).withOpacity(0.9)]),
+                        ),
+                        child: const _ShimmerGoldText(text: 'Büyük Projeler - Yapı - Teknik'),
+                      ),
+                    ),
+                    Positioned(
+                      right: 14,
+                      top: 14,
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white24, width: 0.8)),
+                        child: const Icon(Icons.arrow_outward, size: 14, color: Colors.white70),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSocialIcon(String assetPath, String url, {bool isBig = false}) {
     final double size = isBig? 72 : 54;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => _launchURL(url),
-      child: Image.asset(
-        assetPath,
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
-        filterQuality: FilterQuality.high,
-        errorBuilder: (c, e, s) => Icon(Icons.public, size: size, color: Colors.black54),
-      ),
+      child: Image.asset(assetPath, width: size, height: size, fit: BoxFit.contain, filterQuality: FilterQuality.high, errorBuilder: (c, e, s) => Icon(Icons.public, size: size, color: Colors.black54)),
     );
   }
 
   Widget _buildNavItem(IconData icon, String label, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Column(mainAxisSize: MainAxisSize.min, children: [const SizedBox(height: 10), Icon(icon, size: 24, color: Colors.black87), const SizedBox(height: 4), Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold))]),
-    );
+    return InkWell(onTap: onTap, child: Column(mainAxisSize: MainAxisSize.min, children: [const SizedBox(height: 10), Icon(icon, size: 24, color: Colors.black87), const SizedBox(height: 4), Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold))]));
   }
 
   Widget _buildStat(IconData icon, String value, String label) {
     return Column(children: [Icon(icon, color: Colors.red, size: 30), const SizedBox(height: 8), Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)), const SizedBox(height: 3), Text(label, style: const TextStyle(fontSize: 11))]);
+  }
+}
+
+class _LightSweepLine extends StatefulWidget {
+  final double width;
+  final double height;
+  const _LightSweepLine({this.width = 64, this.height = 1});
+  @override
+  State<_LightSweepLine> createState() => _LightSweepLineState();
+}
+
+class _LightSweepLineState extends State<_LightSweepLine> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))..repeat(period: const Duration(milliseconds: 4200));
+  }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(width: widget.width, height: 10, child: AnimatedBuilder(animation: _controller, builder: (_, __) => CustomPaint(painter: _LightSweepPainter(progress: _controller.value))));
+  }
+}
+
+class _LightSweepPainter extends CustomPainter {
+  final double progress;
+  _LightSweepPainter({required this.progress});
+  @override
+  void paint(Canvas canvas, Size size) {
+    final y = size.height / 2;
+    final basePaint = Paint()..color = const Color(0xFFC8A45D).withOpacity(0.7)..strokeWidth = 1;
+    canvas.drawLine(Offset(0, y), Offset(size.width, y), basePaint);
+    final lightX = progress * (size.width + 30) - 15;
+    final gradient = LinearGradient(colors: [Colors.transparent, const Color(0xFFC8A45D).withOpacity(0.08), const Color(0xFFC8A45D).withOpacity(0.6), Colors.white.withOpacity(0.75), const Color(0xFFC8A45D).withOpacity(0.6), const Color(0xFFC8A45D).withOpacity(0.08), Colors.transparent]);
+    final rect = Rect.fromCenter(center: Offset(lightX, y), width: 30, height: 1.5);
+    final lightPaint = Paint()..shader = gradient.createShader(rect)..strokeWidth = 1.5;
+    canvas.drawLine(Offset(lightX - 15, y), Offset(lightX + 15, y), lightPaint);
+  }
+  @override
+  bool shouldRepaint(covariant _LightSweepPainter oldDelegate) => oldDelegate.progress != progress;
+}
+
+class _ShimmerGoldText extends StatefulWidget {
+  final String text;
+  const _ShimmerGoldText({required this.text});
+  @override
+  State<_ShimmerGoldText> createState() => _ShimmerGoldTextState();
+}
+
+class _ShimmerGoldTextState extends State<_ShimmerGoldText> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 2200))..repeat(period: const Duration(milliseconds: 3800));
+  }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (_, __) {
+        return ShaderMask(
+          shaderCallback: (bounds) {
+            final lightX = _controller.value * (bounds.width + 80) - 40;
+            return LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: const [Color(0xFFC8A45D), Color(0xFFC8A45D), Colors.white, Color(0xFFC8A45D), Color(0xFFC8A45D)], stops: [0.0, (lightX - 20) / bounds.width, lightX / bounds.width, (lightX + 20) / bounds.width, 1.0].map((e) => e.clamp(0.0, 1.0)).toList()).createShader(bounds);
+          },
+          child: Text(widget.text.toUpperCase(), style: GoogleFonts.poppins(color: const Color(0xFFC8A45D), fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 2.2)),
+        );
+      },
+    );
   }
 }
 
@@ -533,12 +722,7 @@ class _InAppWebViewPageState extends State<InAppWebViewPage> {
     return Scaffold(
       appBar: AppBar(title: const Text("Tarayıcı"), backgroundColor: Colors.black, foregroundColor: Colors.white, leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => Navigator.pop(context))),
       body: Stack(children: [
-        InAppWebView(
-          initialUrlRequest: URLRequest(url: WebUri(widget.url)),
-          initialOptions: InAppWebViewGroupOptions(crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true, mediaPlaybackRequiresUserGesture: false, javaScriptEnabled: true, javaScriptCanOpenWindowsAutomatically: true, supportZoom: true), android: AndroidInAppWebViewOptions(useHybridComposition: true, thirdPartyCookiesEnabled: true)),
-          onLoadStart: (controller, url) { if (mounted) setState(() => isLoading = true); },
-          onLoadStop: (controller, url) { if (mounted) setState(() => isLoading = false); },
-        ),
+        InAppWebView(initialUrlRequest: URLRequest(url: WebUri(widget.url)), initialOptions: InAppWebViewGroupOptions(crossPlatform: InAppWebViewOptions(useShouldOverrideUrlLoading: true, mediaPlaybackRequiresUserGesture: false, javaScriptEnabled: true, javaScriptCanOpenWindowsAutomatically: true, supportZoom: true), android: AndroidInAppWebViewOptions(useHybridComposition: true, thirdPartyCookiesEnabled: true)), onLoadStart: (controller, url) { if (mounted) setState(() => isLoading = true); }, onLoadStop: (controller, url) { if (mounted) setState(() => isLoading = false); }),
         if (isLoading) const Center(child: CircularProgressIndicator(color: Colors.red)),
       ]),
     );

@@ -1,0 +1,1411 @@
+{
+  "ENDUSTRIYEL_FABRIKA": {
+    "baslik": "FABRİKA",
+    "kategori": "ENDUSTRIYEL",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapaliAlan",
+        "label": "Kapalı Alan m²",
+        "tip": "number",
+        "min": 50,
+        "max": 20000,
+        "zorunlu": true,
+        "grokAnahtari": "kapaliM2"
+      },
+      {
+        "id": "acikAlan",
+        "label": "Açık Alan m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "acikM2"
+      },
+      {
+        "id": "katYuksekligi",
+        "label": "Kat Yüksekliği",
+        "tip": "select",
+        "secenekler": [
+          "5m",
+          "6m",
+          "8m",
+          "10m",
+          "12m",
+          "15m",
+          "15m_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL_50mm",
+          "SANDVIC_PANEL_80mm",
+          "SANDVIC_PANEL_100mm",
+          "SANDVIC_PANEL_150mm",
+          "KENET_SAC",
+          "TRAPEZ_SAC",
+          "BETONARME"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "isikBandi",
+        "label": "Işık Bandı / Skylight",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_%10",
+          "VAR_%20",
+          "VAR_%30_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "isikBandi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK_BETON",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "TRAPEZ_SAC",
+          "KOMPOZIT"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "vincKapasitesi",
+        "label": "Vinç Kapasitesi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "5_TON",
+          "10_TON",
+          "20_TON",
+          "30_TON",
+          "50_TON_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "vinc"
+      },
+      {
+        "id": "zeminTasima",
+        "label": "Zemin Taşıma ton/m²",
+        "tip": "select",
+        "secenekler": [
+          "3_ton",
+          "5_ton",
+          "10_ton",
+          "20_ton",
+          "30_ton"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTasima"
+      },
+      {
+        "id": "elektrikGucu",
+        "label": "Elektrik İhtiyacı kW",
+        "tip": "number",
+        "min": 50,
+        "max": 5000,
+        "zorunlu": true,
+        "grokAnahtari": "elektrik"
+      },
+      {
+        "id": "ofisAlani",
+        "label": "İçinde Ofis Alanı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50m2",
+          "100m2",
+          "200m2",
+          "500m2_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "ofis"
+      },
+      {
+        "id": "yagmurSuyu",
+        "label": "Yağmur Suyu Hasadı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "yagmur"
+      }
+    ]
+  },
+  "ENDUSTRIYEL_URETIM": {
+    "baslik": "ÜRETİM TESİSİ",
+    "kategori": "ENDUSTRIYEL",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapaliAlan",
+        "label": "Kapalı Alan m²",
+        "tip": "number",
+        "min": 50,
+        "max": 20000,
+        "zorunlu": true,
+        "grokAnahtari": "kapaliM2"
+      },
+      {
+        "id": "acikAlan",
+        "label": "Açık Alan m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "acikM2"
+      },
+      {
+        "id": "katYuksekligi",
+        "label": "Kat Yüksekliği",
+        "tip": "select",
+        "secenekler": [
+          "5m",
+          "6m",
+          "8m",
+          "10m",
+          "12m",
+          "15m",
+          "15m_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL_50mm",
+          "SANDVIC_PANEL_80mm",
+          "SANDVIC_PANEL_100mm",
+          "SANDVIC_PANEL_150mm",
+          "KENET_SAC",
+          "TRAPEZ_SAC",
+          "BETONARME"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "isikBandi",
+        "label": "Işık Bandı / Skylight",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_%10",
+          "VAR_%20",
+          "VAR_%30_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "isikBandi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK_BETON",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "TRAPEZ_SAC",
+          "KOMPOZIT"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "uretimTipi",
+        "label": "Üretim Tipi",
+        "tip": "select",
+        "secenekler": [
+          "GIDA",
+          "TEKSTIL",
+          "METAL",
+          "PLASTIK",
+          "KIMYA",
+          "GENEL"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "uretimTipi"
+      },
+      {
+        "id": "vincKapasitesi",
+        "label": "Vinç Kapasitesi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "5_TON",
+          "10_TON",
+          "20_TON"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "vinc"
+      },
+      {
+        "id": "hijyenSinifi",
+        "label": "Hijyen Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "STANDART",
+          "GIDA_UYUMLU",
+          "STERIL"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "hijyen"
+      },
+      {
+        "id": "elektrikGucu",
+        "label": "Elektrik İhtiyacı kW",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "elektrik"
+      }
+    ]
+  },
+  "ENDUSTRIYEL_DEPO": {
+    "baslik": "DEPO",
+    "kategori": "ENDUSTRIYEL",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapaliAlan",
+        "label": "Kapalı Alan m²",
+        "tip": "number",
+        "min": 50,
+        "max": 20000,
+        "zorunlu": true,
+        "grokAnahtari": "kapaliM2"
+      },
+      {
+        "id": "acikAlan",
+        "label": "Açık Alan m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "acikM2"
+      },
+      {
+        "id": "katYuksekligi",
+        "label": "Kat Yüksekliği",
+        "tip": "select",
+        "secenekler": [
+          "5m",
+          "6m",
+          "8m",
+          "10m",
+          "12m",
+          "15m",
+          "15m_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL_50mm",
+          "SANDVIC_PANEL_80mm",
+          "SANDVIC_PANEL_100mm",
+          "SANDVIC_PANEL_150mm",
+          "KENET_SAC",
+          "TRAPEZ_SAC",
+          "BETONARME"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "isikBandi",
+        "label": "Işık Bandı / Skylight",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_%10",
+          "VAR_%20",
+          "VAR_%30_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "isikBandi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK_BETON",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "TRAPEZ_SAC",
+          "KOMPOZIT"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "rafSistemi",
+        "label": "Raf Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "STANDART_RAF",
+          "YUKSEK_RAF",
+          "OTOMATIK"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "raf"
+      },
+      {
+        "id": "rampaSayisi",
+        "label": "Yükleme Rampası Sayısı",
+        "tip": "number",
+        "min": 0,
+        "max": 20,
+        "zorunlu": false,
+        "grokAnahtari": "rampa"
+      },
+      {
+        "id": "zeminTasima",
+        "label": "Zemin Taşıma ton/m²",
+        "tip": "select",
+        "secenekler": [
+          "3_ton",
+          "5_ton",
+          "10_ton"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTasima"
+      }
+    ]
+  },
+  "ENDUSTRIYEL_HANGAR": {
+    "baslik": "HANGAR",
+    "kategori": "ENDUSTRIYEL",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapaliAlan",
+        "label": "Kapalı Alan m²",
+        "tip": "number",
+        "min": 50,
+        "max": 20000,
+        "zorunlu": true,
+        "grokAnahtari": "kapaliM2"
+      },
+      {
+        "id": "acikAlan",
+        "label": "Açık Alan m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "acikM2"
+      },
+      {
+        "id": "katYuksekligi",
+        "label": "Kat Yüksekliği",
+        "tip": "select",
+        "secenekler": [
+          "5m",
+          "6m",
+          "8m",
+          "10m",
+          "12m",
+          "15m",
+          "15m_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL_50mm",
+          "SANDVIC_PANEL_80mm",
+          "SANDVIC_PANEL_100mm",
+          "SANDVIC_PANEL_150mm",
+          "KENET_SAC",
+          "TRAPEZ_SAC",
+          "BETONARME"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "isikBandi",
+        "label": "Işık Bandı / Skylight",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_%10",
+          "VAR_%20",
+          "VAR_%30_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "isikBandi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK_BETON",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "TRAPEZ_SAC",
+          "KOMPOZIT"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "kapiTipi",
+        "label": "Kapı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SEKSIYONEL",
+          "HIZLI_SARMAL",
+          "RAYLI_BUYUK",
+          "HANGAR_KAPISI_OZEL"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapi"
+      },
+      {
+        "id": "kapiGenisligi",
+        "label": "Kapı Genişliği (m)",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "kapiGenislik"
+      },
+      {
+        "id": "kapiYuksekligi",
+        "label": "Kapı Yüksekliği (m)",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "kapiYukseklik"
+      },
+      {
+        "id": "vincKapasitesi",
+        "label": "Vinç Kapasitesi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "10_TON",
+          "20_TON",
+          "50_TON_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "vinc"
+      }
+    ]
+  },
+  "ENDUSTRIYEL_LOJISTIK": {
+    "baslik": "LOJİSTİK MERKEZİ",
+    "kategori": "ENDUSTRIYEL",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapaliAlan",
+        "label": "Kapalı Alan m²",
+        "tip": "number",
+        "min": 50,
+        "max": 20000,
+        "zorunlu": true,
+        "grokAnahtari": "kapaliM2"
+      },
+      {
+        "id": "acikAlan",
+        "label": "Açık Alan m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "acikM2"
+      },
+      {
+        "id": "katYuksekligi",
+        "label": "Kat Yüksekliği",
+        "tip": "select",
+        "secenekler": [
+          "5m",
+          "6m",
+          "8m",
+          "10m",
+          "12m",
+          "15m",
+          "15m_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL_50mm",
+          "SANDVIC_PANEL_80mm",
+          "SANDVIC_PANEL_100mm",
+          "SANDVIC_PANEL_150mm",
+          "KENET_SAC",
+          "TRAPEZ_SAC",
+          "BETONARME"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "isikBandi",
+        "label": "Işık Bandı / Skylight",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_%10",
+          "VAR_%20",
+          "VAR_%30_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "isikBandi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK_BETON",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "TRAPEZ_SAC",
+          "KOMPOZIT"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "rampaSayisiLoj",
+        "label": "Rampa Sayısı",
+        "tip": "number",
+        "zorunlu": true,
+        "grokAnahtari": "rampa"
+      },
+      {
+        "id": "tirPark",
+        "label": "TIR Park Alanı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "10_ARAC",
+          "30_ARAC",
+          "50_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "tirPark"
+      },
+      {
+        "id": "ofisAlani",
+        "label": "Ofis Alanı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50m2",
+          "100m2",
+          "200m2_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "ofis"
+      },
+      {
+        "id": "wmsSistemi",
+        "label": "WMS Sistemi Altyapısı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "wms"
+      }
+    ]
+  },
+  "ENDUSTRIYEL_ANTREPO": {
+    "baslik": "ANTREPO",
+    "kategori": "ENDUSTRIYEL",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapaliAlan",
+        "label": "Kapalı Alan m²",
+        "tip": "number",
+        "min": 50,
+        "max": 20000,
+        "zorunlu": true,
+        "grokAnahtari": "kapaliM2"
+      },
+      {
+        "id": "acikAlan",
+        "label": "Açık Alan m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "acikM2"
+      },
+      {
+        "id": "katYuksekligi",
+        "label": "Kat Yüksekliği",
+        "tip": "select",
+        "secenekler": [
+          "5m",
+          "6m",
+          "8m",
+          "10m",
+          "12m",
+          "15m",
+          "15m_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL_50mm",
+          "SANDVIC_PANEL_80mm",
+          "SANDVIC_PANEL_100mm",
+          "SANDVIC_PANEL_150mm",
+          "KENET_SAC",
+          "TRAPEZ_SAC",
+          "BETONARME"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "isikBandi",
+        "label": "Işık Bandı / Skylight",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_%10",
+          "VAR_%20",
+          "VAR_%30_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "isikBandi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK_BETON",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "TRAPEZ_SAC",
+          "KOMPOZIT"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "gumrukTipi",
+        "label": "Gümrük Tipi",
+        "tip": "select",
+        "secenekler": [
+          "A_TIPI",
+          "B_TIPI",
+          "C_TIPI",
+          "F_TIPI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "gumruk"
+      },
+      {
+        "id": "guvenlikSeviyesi",
+        "label": "Güvenlik Seviyesi",
+        "tip": "select",
+        "secenekler": [
+          "STANDART",
+          "YUKSEK",
+          "COK_YUKSEK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "guvenlik"
+      },
+      {
+        "id": "kameraSistemi",
+        "label": "Kamera / Alarm",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "TEMEL",
+          "FULL"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "kamera"
+      }
+    ]
+  },
+  "ENDUSTRIYEL_SOGUK_DEPO": {
+    "baslik": "SOĞUK HAVA DEPOSU",
+    "kategori": "ENDUSTRIYEL",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapaliAlan",
+        "label": "Kapalı Alan m²",
+        "tip": "number",
+        "min": 50,
+        "max": 20000,
+        "zorunlu": true,
+        "grokAnahtari": "kapaliM2"
+      },
+      {
+        "id": "acikAlan",
+        "label": "Açık Alan m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "acikM2"
+      },
+      {
+        "id": "katYuksekligi",
+        "label": "Kat Yüksekliği",
+        "tip": "select",
+        "secenekler": [
+          "5m",
+          "6m",
+          "8m",
+          "10m",
+          "12m",
+          "15m",
+          "15m_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL_50mm",
+          "SANDVIC_PANEL_80mm",
+          "SANDVIC_PANEL_100mm",
+          "SANDVIC_PANEL_150mm",
+          "KENET_SAC",
+          "TRAPEZ_SAC",
+          "BETONARME"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "isikBandi",
+        "label": "Işık Bandı / Skylight",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_%10",
+          "VAR_%20",
+          "VAR_%30_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "isikBandi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK_BETON",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "TRAPEZ_SAC",
+          "KOMPOZIT"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "sogukDerece",
+        "label": "Soğuk Oda Derecesi",
+        "tip": "select",
+        "secenekler": [
+          "+4_C",
+          "0_C",
+          "-18_C",
+          "-25_C",
+          "-40_C",
+          "COK_BOLGELI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "derece"
+      },
+      {
+        "id": "sogukPanelKal",
+        "label": "Soğuk Oda Panel Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "80mm",
+          "100mm",
+          "120mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "panelKal"
+      },
+      {
+        "id": "sogutmaTipi",
+        "label": "Soğutma Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "FREON",
+          "AMONYAK",
+          "CO2"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sogutmaTipi"
+      },
+      {
+        "id": "odaSayisiSoguk",
+        "label": "Soğuk Oda Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 20,
+        "zorunlu": true,
+        "grokAnahtari": "odaSayisi"
+      },
+      {
+        "id": "rafSistemiSoguk",
+        "label": "Raf Sistemi",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR",
+          "MOVABLE_RAF"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "raf"
+      }
+    ]
+  },
+  "ENDUSTRIYEL_TESIS": {
+    "baslik": "GENEL ENDÜSTRİYEL TESİS",
+    "kategori": "ENDUSTRIYEL",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "kapaliAlan",
+        "label": "Kapalı Alan m²",
+        "tip": "number",
+        "min": 50,
+        "max": 20000,
+        "zorunlu": true,
+        "grokAnahtari": "kapaliM2"
+      },
+      {
+        "id": "acikAlan",
+        "label": "Açık Alan m²",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "acikM2"
+      },
+      {
+        "id": "katYuksekligi",
+        "label": "Kat Yüksekliği",
+        "tip": "select",
+        "secenekler": [
+          "5m",
+          "6m",
+          "8m",
+          "10m",
+          "12m",
+          "15m",
+          "15m_PLUS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yukseklik"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL_50mm",
+          "SANDVIC_PANEL_80mm",
+          "SANDVIC_PANEL_100mm",
+          "SANDVIC_PANEL_150mm",
+          "KENET_SAC",
+          "TRAPEZ_SAC",
+          "BETONARME"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "isikBandi",
+        "label": "Işık Bandı / Skylight",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "VAR_%10",
+          "VAR_%20",
+          "VAR_%30_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "isikBandi"
+      },
+      {
+        "id": "tasiyiciSistem",
+        "label": "Taşıyıcı Sistem",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "PREFABRIK_BETON",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tasiyici"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "cepheTipi",
+        "label": "Cephe Tipi",
+        "tip": "select",
+        "secenekler": [
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "TRAPEZ_SAC",
+          "KOMPOZIT"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cephe"
+      },
+      {
+        "id": "tesisTipi",
+        "label": "Tesis Tipi",
+        "tip": "select",
+        "secenekler": [
+          "FABRIKA",
+          "DEPO",
+          "HANGAR",
+          "LOJISTIK",
+          "SOGUK_DEPO",
+          "KARISIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "tesisTipi"
+      },
+      {
+        "id": "elektrikGucu",
+        "label": "Elektrik İhtiyacı kW",
+        "tip": "number",
+        "zorunlu": false,
+        "grokAnahtari": "elektrik"
+      },
+      {
+        "id": "zeminTasima",
+        "label": "Zemin Taşıma",
+        "tip": "select",
+        "secenekler": [
+          "3_ton",
+          "5_ton",
+          "10_ton"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "zeminTasima"
+      }
+    ]
+  }
+}

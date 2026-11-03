@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { onDocumentCreated, onDocumentUpdated } from "firebase-functions/v2/firestore";
 
 admin.initializeApp();
 const TOPIC = "admin_notifications";
@@ -29,6 +29,43 @@ async function sendToAdmin(title: string, body: string, data: any = {}) {
     return res;
   } catch (e) {
     console.error("❌ [BAZ] HATA:", e);
+    return null;
+  }
+}
+
+async function sendToPro(fcmTokens: string | string[], title: string, body: string, data: any = {}) {
+  const tokens = Array.isArray(fcmTokens) ? fcmTokens : [fcmTokens];
+  if (!tokens || tokens.length === 0 || !tokens[0]) {
+    console.log("⚠️ [PRO] Token yok, push atılamadı");
+    return null;
+  }
+  try {
+    for (const token of tokens) {
+      if (!token) continue;
+      const message = {
+        token: token,
+        notification: { title, body },
+        android: {
+          priority: "high" as const,
+          notification: {
+            channelId: "hug_pro_channel",
+            priority: "high" as const,
+            visibility: "public" as const,
+            sound: "default",
+          },
+        },
+        data: {
+          ...(data as any),
+          click_action: "FLUTTER_NOTIFICATION_CLICK",
+          timestamp: Date.now().toString(),
+        },
+      };
+      const res = await admin.messaging().send(message);
+      console.log(`✅ [PRO] ${title} -> ${token.substring(0, 20)}... -> ${res}`);
+    }
+    return true;
+  } catch (e) {
+    console.error("❌ [PRO] HATA:", e);
     return null;
   }
 }
@@ -121,5 +158,40 @@ export const sistemMesajBildirimi = onDocumentCreated(
     if (data.type === "broadcast_success") return;
     const msg = data.msg || data.message || "Yeni mesaj";
     await sendToAdmin("💬 SİSTEM MESAJI!", msg.substring(0, 80), { type: "sistem_mesaj", messageId: event.params.messageId });
+  }
+);
+
+// === HUG PRO - 2 YENİ FONKSİYON - TEK PUSH MANTIĞI ===
+
+export const yeniProBildirimi = onDocumentCreated(
+  { document: "users_pro/{userId}", region: "europe-west3" },
+  async (event) => {
+    const data = event.data?.data();
+    if (!data) return;
+    const ad = data.ad || data.yetkiliAdSoyad || data.sirketUnvan || "Profesyonel";
+    const soyad = data.soyad || "";
+    const email = data.email || "";
+    const kayitTipi = data.kayitTipi || "sahis";
+    await sendToAdmin("🏗️ YENİ HUG PRO BAŞVURU!", `${ad} ${soyad} - ${kayitTipi} - ${email}`.substring(0, 120), { type: "yeni_pro", userId: event.params.userId, email: email });
+  }
+);
+
+export const proOnayBildirimi = onDocumentUpdated(
+  { document: "users_pro/{userId}", region: "europe-west3" },
+  async (event) => {
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    if (!before || !after) return;
+    // Sadece ONAY_BEKLIYOR -> ONAYLANDI geçişinde tek push - çift bildirim yok
+    if (before.durum === "ONAYLANDI" && after.durum === "ONAYLANDI") return;
+    if (after.durum !== "ONAYLANDI" && after.isActive !== true) return;
+    if (before.durum === "ONAYLANDI" || before.isActive === true) return;
+
+    const tokens = after.fcmTokens || (after.fcmToken ? [after.fcmToken] : []);
+    if (!tokens || tokens.length === 0) {
+      console.log(`⚠️ [PRO ONAY] Token yok userId: ${event.params.userId}`);
+      return;
+    }
+    await sendToPro(tokens, "✅ HUG PRO ONAYLANDI!", "Profesyonel hesabınız onaylandı. Artık ilanlara başvurabilirsiniz.", { type: "pro_onay", userId: event.params.userId });
   }
 );

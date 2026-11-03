@@ -1,0 +1,1373 @@
+{
+  "SISTEM_BETONARME": {
+    "baslik": "BETONARME SİSTEM",
+    "kategori": "SISTEM",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "alanM2",
+        "label": "Alan m²",
+        "tip": "number",
+        "min": 20,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "TERAS_MEMBRAN",
+          "TRAPEZ_SAC",
+          "AHSAP_SINDLE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "duvarTipi",
+        "label": "Duvar Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TUGLA",
+          "GAZBETON",
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "AHSAP",
+          "OSB"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvar"
+      },
+      {
+        "id": "duvarYalitim",
+        "label": "Duvar Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvarYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "temelTipi",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "RADYE",
+          "MUTEMADI",
+          "TEKIL",
+          "KAZIKLI",
+          "PLAK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temel",
+        "aciklama": "RADYE: geniş plak temel, PLAK: tekil plak temel"
+      },
+      {
+        "id": "montajYeri",
+        "label": "Montaj Yeri",
+        "tip": "select",
+        "secenekler": [
+          "SEHIR_ICI",
+          "SEHIR_DISI",
+          "KIRSAL",
+          "ZORLU_ERISIM"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "montaj"
+      },
+      {
+        "id": "betonSinifi",
+        "label": "Beton Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "C25",
+          "C30",
+          "C35",
+          "C40",
+          "C50"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "betonSinif"
+      },
+      {
+        "id": "donatiTipi",
+        "label": "Donatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "STANDART",
+          "YUKSEK_DAYANIMLI",
+          "PREFABRIK_DONATI"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "donati"
+      },
+      {
+        "id": "donatiMiktari",
+        "label": "Donatı Miktarı kg/m³ (yaklaşık)",
+        "tip": "select",
+        "secenekler": [
+          "BILMIYORUM",
+          "80kg",
+          "100kg",
+          "120kg",
+          "150kg",
+          "200kg_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "donatiMiktari",
+        "aciklama": "Bilmiyorsa Grok tahmin eder"
+      }
+    ]
+  },
+  "SISTEM_CELIK": {
+    "baslik": "ÇELİK SİSTEM",
+    "kategori": "SISTEM",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "alanM2",
+        "label": "Alan m²",
+        "tip": "number",
+        "min": 20,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "TERAS_MEMBRAN",
+          "TRAPEZ_SAC",
+          "AHSAP_SINDLE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "duvarTipi",
+        "label": "Duvar Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TUGLA",
+          "GAZBETON",
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "AHSAP",
+          "OSB"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvar"
+      },
+      {
+        "id": "duvarYalitim",
+        "label": "Duvar Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvarYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "temelTipi",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "RADYE",
+          "MUTEMADI",
+          "TEKIL",
+          "KAZIKLI",
+          "PLAK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temel",
+        "aciklama": "RADYE: geniş plak temel, PLAK: tekil plak temel"
+      },
+      {
+        "id": "montajYeri",
+        "label": "Montaj Yeri",
+        "tip": "select",
+        "secenekler": [
+          "SEHIR_ICI",
+          "SEHIR_DISI",
+          "KIRSAL",
+          "ZORLU_ERISIM"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "montaj"
+      },
+      {
+        "id": "celikTipi",
+        "label": "Çelik Tipi",
+        "tip": "select",
+        "secenekler": [
+          "S235",
+          "S275",
+          "S355",
+          "S460"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "celikTipi"
+      },
+      {
+        "id": "birlesimTipi",
+        "label": "Birleşim Tipi",
+        "tip": "select",
+        "secenekler": [
+          "BULONLU",
+          "KAYNAKLI",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "birlesim"
+      },
+      {
+        "id": "yanginKoruma",
+        "label": "Yangın Koruma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "BOYA",
+          "KAPLAMA",
+          "SPREY"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "yanginKoruma"
+      },
+      {
+        "id": "celikTonaj",
+        "label": "Çelik Tonajı ton (yaklaşık)",
+        "tip": "number",
+        "min": 1,
+        "max": 1000,
+        "zorunlu": false,
+        "grokAnahtari": "celikTonaj",
+        "aciklama": "Bilmiyorsa Grok hesaplar"
+      }
+    ]
+  },
+  "SISTEM_HAFIF_CELIK": {
+    "baslik": "HAFİF ÇELİK SİSTEM",
+    "kategori": "SISTEM",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "alanM2",
+        "label": "Alan m²",
+        "tip": "number",
+        "min": 20,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "TERAS_MEMBRAN",
+          "TRAPEZ_SAC",
+          "AHSAP_SINDLE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "duvarTipi",
+        "label": "Duvar Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TUGLA",
+          "GAZBETON",
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "AHSAP",
+          "OSB"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvar"
+      },
+      {
+        "id": "duvarYalitim",
+        "label": "Duvar Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvarYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "temelTipi",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "RADYE",
+          "MUTEMADI",
+          "TEKIL",
+          "KAZIKLI",
+          "PLAK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temel",
+        "aciklama": "RADYE: geniş plak temel, PLAK: tekil plak temel"
+      },
+      {
+        "id": "montajYeri",
+        "label": "Montaj Yeri",
+        "tip": "select",
+        "secenekler": [
+          "SEHIR_ICI",
+          "SEHIR_DISI",
+          "KIRSAL",
+          "ZORLU_ERISIM"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "montaj"
+      },
+      {
+        "id": "profilTipi",
+        "label": "Profil Tipi",
+        "tip": "select",
+        "secenekler": [
+          "C_PROFIL",
+          "U_PROFIL",
+          "Z_PROFIL",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "profil"
+      },
+      {
+        "id": "kaplamaTipi",
+        "label": "Kaplama Tipi",
+        "tip": "select",
+        "secenekler": [
+          "BETOPAN",
+          "OSB",
+          "ALCIPAN",
+          "SANDVIC"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kaplama"
+      },
+      {
+        "id": "profilKalinligi",
+        "label": "Profil Et Kalınlığı mm",
+        "tip": "select",
+        "secenekler": [
+          "0.8mm",
+          "1.0mm",
+          "1.2mm",
+          "1.5mm",
+          "2.0mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "profilKalinlik"
+      }
+    ]
+  },
+  "SISTEM_PREFABRIK": {
+    "baslik": "PREFABRİK SİSTEM",
+    "kategori": "SISTEM",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "alanM2",
+        "label": "Alan m²",
+        "tip": "number",
+        "min": 20,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "TERAS_MEMBRAN",
+          "TRAPEZ_SAC",
+          "AHSAP_SINDLE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "duvarTipi",
+        "label": "Duvar Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TUGLA",
+          "GAZBETON",
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "AHSAP",
+          "OSB"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvar"
+      },
+      {
+        "id": "duvarYalitim",
+        "label": "Duvar Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvarYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "temelTipi",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "RADYE",
+          "MUTEMADI",
+          "TEKIL",
+          "KAZIKLI",
+          "PLAK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temel",
+        "aciklama": "RADYE: geniş plak temel, PLAK: tekil plak temel"
+      },
+      {
+        "id": "montajYeri",
+        "label": "Montaj Yeri",
+        "tip": "select",
+        "secenekler": [
+          "SEHIR_ICI",
+          "SEHIR_DISI",
+          "KIRSAL",
+          "ZORLU_ERISIM"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "montaj"
+      },
+      {
+        "id": "prefabrikTipi",
+        "label": "Prefabrik Tipi",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME_PREFABRIK",
+          "CELIK_PREFABRIK",
+          "SANDVIC_PANEL_PREFABRIK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "prefabrikTipi"
+      },
+      {
+        "id": "montajSuresi",
+        "label": "Montaj Süresi Beklentisi",
+        "tip": "select",
+        "secenekler": [
+          "1_2_HAFTA",
+          "2_4_HAFTA",
+          "1_2_AY",
+          "2_AY_PLUS"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "montajSure",
+        "aciklama": "Takvim beklentisi, doğrudan maliyet değil"
+      }
+    ]
+  },
+  "SISTEM_MODULER": {
+    "baslik": "MODÜLER SİSTEM",
+    "kategori": "SISTEM",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "alanM2",
+        "label": "Alan m²",
+        "tip": "number",
+        "min": 20,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "TERAS_MEMBRAN",
+          "TRAPEZ_SAC",
+          "AHSAP_SINDLE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "duvarTipi",
+        "label": "Duvar Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TUGLA",
+          "GAZBETON",
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "AHSAP",
+          "OSB"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvar"
+      },
+      {
+        "id": "duvarYalitim",
+        "label": "Duvar Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvarYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "temelTipi",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "RADYE",
+          "MUTEMADI",
+          "TEKIL",
+          "KAZIKLI",
+          "PLAK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temel",
+        "aciklama": "RADYE: geniş plak temel, PLAK: tekil plak temel"
+      },
+      {
+        "id": "montajYeri",
+        "label": "Montaj Yeri",
+        "tip": "select",
+        "secenekler": [
+          "SEHIR_ICI",
+          "SEHIR_DISI",
+          "KIRSAL",
+          "ZORLU_ERISIM"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "montaj"
+      },
+      {
+        "id": "modulSayisi",
+        "label": "Modül Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 50,
+        "zorunlu": true,
+        "grokAnahtari": "modulSayisi"
+      },
+      {
+        "id": "modulBoyutu",
+        "label": "Modül Boyutu",
+        "tip": "select",
+        "secenekler": [
+          "3x6m",
+          "3x7m",
+          "3x8m",
+          "4x8m",
+          "OZEL"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "modulBoyut"
+      },
+      {
+        "id": "tasimaTipi",
+        "label": "Taşıma Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TIR",
+          "KAMYON",
+          "YERINDE_MONTAJ"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "tasima"
+      },
+      {
+        "id": "ozelModulOlcu",
+        "label": "Özel Modül Ölçüsü (örn: 4x10m)",
+        "tip": "text",
+        "zorunlu": false,
+        "grokAnahtari": "ozelOlcu",
+        "kosul": "modulBoyutu == OZEL ise",
+        "aciklama": "OZEL seçildiğinde giriniz"
+      }
+    ]
+  },
+  "SISTEM_AHSAP": {
+    "baslik": "AHŞAP SİSTEM",
+    "kategori": "SISTEM",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "alanM2",
+        "label": "Alan m²",
+        "tip": "number",
+        "min": 20,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "TERAS_MEMBRAN",
+          "TRAPEZ_SAC",
+          "AHSAP_SINDLE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "duvarTipi",
+        "label": "Duvar Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TUGLA",
+          "GAZBETON",
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "AHSAP",
+          "OSB"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvar"
+      },
+      {
+        "id": "duvarYalitim",
+        "label": "Duvar Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvarYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "temelTipi",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "RADYE",
+          "MUTEMADI",
+          "TEKIL",
+          "KAZIKLI",
+          "PLAK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temel",
+        "aciklama": "RADYE: geniş plak temel, PLAK: tekil plak temel"
+      },
+      {
+        "id": "montajYeri",
+        "label": "Montaj Yeri",
+        "tip": "select",
+        "secenekler": [
+          "SEHIR_ICI",
+          "SEHIR_DISI",
+          "KIRSAL",
+          "ZORLU_ERISIM"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "montaj"
+      },
+      {
+        "id": "ahsapTuru",
+        "label": "Ahşap Türü",
+        "tip": "select",
+        "secenekler": [
+          "CAM",
+          "LADIN",
+          "MESE",
+          "KERESTE_LAMINE",
+          "CLT"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "ahsapTuru"
+      },
+      {
+        "id": "birlesimTipiAhsap",
+        "label": "Birleşim Tipi",
+        "tip": "select",
+        "secenekler": [
+          "CIVILI",
+          "VIDALI",
+          "TUTKALLI",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "birlesimAhsap"
+      },
+      {
+        "id": "korumaTipi",
+        "label": "Ahşap Koruma",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "EMPRENYE",
+          "VERNIK",
+          "YANGIN_GECIKTIRICI"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "koruma"
+      }
+    ]
+  },
+  "SISTEM_KARMA": {
+    "baslik": "KARMA SİSTEM",
+    "kategori": "SISTEM",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "alanM2",
+        "label": "Alan m²",
+        "tip": "number",
+        "min": 20,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "TERAS_MEMBRAN",
+          "TRAPEZ_SAC",
+          "AHSAP_SINDLE"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "cati"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "catiYalitim"
+      },
+      {
+        "id": "duvarTipi",
+        "label": "Duvar Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TUGLA",
+          "GAZBETON",
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "AHSAP",
+          "OSB"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvar"
+      },
+      {
+        "id": "duvarYalitim",
+        "label": "Duvar Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "duvarYalitim"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "temelTipi",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "RADYE",
+          "MUTEMADI",
+          "TEKIL",
+          "KAZIKLI",
+          "PLAK"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "temel",
+        "aciklama": "RADYE: geniş plak temel, PLAK: tekil plak temel"
+      },
+      {
+        "id": "montajYeri",
+        "label": "Montaj Yeri",
+        "tip": "select",
+        "secenekler": [
+          "SEHIR_ICI",
+          "SEHIR_DISI",
+          "KIRSAL",
+          "ZORLU_ERISIM"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "montaj"
+      },
+      {
+        "id": "karmaDetay",
+        "label": "Karma Detayı",
+        "tip": "multi_select",
+        "secenekler": [
+          "BETONARME_CELIK",
+          "CELIK_AHSAP",
+          "BETONARME_AHSAP",
+          "PREFABRIK_BETONARME",
+          "HEPSI_KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "karmaDetay"
+      }
+    ]
+  },
+  "SISTEM": {
+    "baslik": "GENEL SİSTEM",
+    "kategori": "SISTEM",
+    "alanlar": [
+      {
+        "id": "insaatKapsami",
+        "label": "İnşaat Kapsamı",
+        "tip": "select",
+        "secenekler": [
+          "KABA_INSAAT",
+          "INCE_INSAAT",
+          "ANAHTAR_TESLIM"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "kapsam"
+      },
+      {
+        "id": "alanM2",
+        "label": "Alan m²",
+        "tip": "number",
+        "min": 20,
+        "max": 100000,
+        "zorunlu": true,
+        "grokAnahtari": "alan"
+      },
+      {
+        "id": "katSayisi",
+        "label": "Kat Sayısı",
+        "tip": "number",
+        "min": 1,
+        "max": 10,
+        "zorunlu": true,
+        "grokAnahtari": "kat"
+      },
+      {
+        "id": "catiTipi",
+        "label": "Çatı Tipi",
+        "tip": "select",
+        "secenekler": [
+          "KIREMIT",
+          "SHINGLE",
+          "KENET_METAL",
+          "SANDVIC_PANEL",
+          "TERAS_MEMBRAN",
+          "TRAPEZ_SAC",
+          "AHSAP_SINDLE"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "cati",
+        "kosul": "Alt sistem seçildiğinde geçerli, genel seçimde opsiyonel"
+      },
+      {
+        "id": "catiYalitim",
+        "label": "Çatı Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm",
+          "200mm"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "catiYalitim",
+        "kosul": "Alt sistem seçildiğinde geçerli, genel seçimde opsiyonel"
+      },
+      {
+        "id": "duvarTipi",
+        "label": "Duvar Tipi",
+        "tip": "select",
+        "secenekler": [
+          "TUGLA",
+          "GAZBETON",
+          "SANDVIC_PANEL",
+          "BETONARME_PANEL",
+          "AHSAP",
+          "OSB"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "duvar",
+        "kosul": "Alt sistem seçildiğinde geçerli, genel seçimde opsiyonel"
+      },
+      {
+        "id": "duvarYalitim",
+        "label": "Duvar Yalıtım Kalınlığı",
+        "tip": "select",
+        "secenekler": [
+          "YOK",
+          "50mm",
+          "80mm",
+          "100mm",
+          "150mm"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "duvarYalitim",
+        "kosul": "Alt sistem seçildiğinde geçerli, genel seçimde opsiyonel"
+      },
+      {
+        "id": "yapiSinifi",
+        "label": "Yapı Sınıfı",
+        "tip": "select",
+        "secenekler": [
+          "EKONOMIK",
+          "ORTA",
+          "LUKS",
+          "ULTRA_LUKS"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sinif"
+      },
+      {
+        "id": "temelTipi",
+        "label": "Temel Tipi",
+        "tip": "select",
+        "secenekler": [
+          "RADYE",
+          "MUTEMADI",
+          "TEKIL",
+          "KAZIKLI",
+          "PLAK"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "temel",
+        "aciklama": "RADYE: geniş plak temel, PLAK: tekil plak temel",
+        "kosul": "Alt sistem seçildiğinde geçerli, genel seçimde opsiyonel"
+      },
+      {
+        "id": "montajYeri",
+        "label": "Montaj Yeri",
+        "tip": "select",
+        "secenekler": [
+          "SEHIR_ICI",
+          "SEHIR_DISI",
+          "KIRSAL",
+          "ZORLU_ERISIM"
+        ],
+        "zorunlu": false,
+        "grokAnahtari": "montaj"
+      },
+      {
+        "id": "sistemTipi",
+        "label": "Sistem Tipi Seçiniz",
+        "tip": "select",
+        "secenekler": [
+          "BETONARME",
+          "CELIK",
+          "HAFIF_CELIK",
+          "PREFABRIK",
+          "MODULER",
+          "AHSAP",
+          "KARMA"
+        ],
+        "zorunlu": true,
+        "grokAnahtari": "sistemTipi"
+      }
+    ]
+  }
+}
