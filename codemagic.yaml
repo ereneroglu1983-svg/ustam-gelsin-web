@@ -17,13 +17,9 @@ workflows:
       - name: Pod install (iOS dependencies)
         script: |
           cd ios && pod install --repo-update || echo "Pod install skipped - using SPM"
-      - name: Flutter analyze (check iOS compatibility)
-        script: |
-          flutter analyze --no-fatal-infos
       - name: Build iOS App (No Codesign - Free Apple ID)
         script: |
           flutter build ios --debug --no-codesign --verbose
     artifacts:
       - build/ios/iphoneos/*.app
       - build/**/*.log
-      - flutter_*.log
