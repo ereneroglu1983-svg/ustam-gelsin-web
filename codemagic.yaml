@@ -5,7 +5,7 @@ workflows:
     max_build_duration: 60
     environment:
       flutter: 3.47.7
-      xcode: 16.2
+      xcode: 26.0
       cocoapods: default
     scripts:
       - name: 1. Flutter 3.47.7 strict
@@ -93,48 +93,30 @@ workflows:
           python3 << 'PY'
           import re
           import sys
-
           pbx_path = "ios/Runner.xcodeproj/project.pbxproj"
-
           with open(pbx_path, "r") as f:
               content = f.read()
-
           real_test_line = "A1B2C3D4E5F6A7B8C9D0E1F2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F2E1D0C9B8A7F6E5D4C3B2A1 /* GoogleService-Info.plist */; };"
-
           pattern = r'([A-F0-9]{24})\s+/\*\s*GoogleService-Info\.plist in Resources\s*\*/\s*=\s*\{isa\s*=\s*PBXBuildFile\b'
-
+          phase_pattern = r'/\* Begin PBXResourcesBuildPhase section \*/(.*?)/\* End PBXResourcesBuildPhase section \*/'
+          files_pattern = r'files\s*=\s*\((.*?)\);'
           m_test = re.search(pattern, real_test_line)
-
           if not m_test:
               print("REGEX TEST FAILED")
               sys.exit(1)
-
           print("Regex test passed:", m_test.group(1))
-
           buildfile_ids = re.findall(pattern, content)
-
           if not buildfile_ids:
               print("GoogleService PBXBuildFile not found")
               sys.exit(1)
-
           print("Found BuildFile IDs:", buildfile_ids)
-
-          phase_pattern = r'/\* Begin PBXResourcesBuildPhase section \*/(.*?)/\* End PBXResourcesBuildPhase section \*/'
-
           m_phase = re.search(phase_pattern, content, re.DOTALL)
-
           if not m_phase:
               print("PBXResourcesBuildPhase section not found")
               sys.exit(1)
-
-          files_pattern = r'files\s*=\s*\((.*?)\);'
-
           all_lists = re.findall(files_pattern, m_phase.group(1), re.DOTALL)
-
           print("Resources files lists:", len(all_lists))
-
           found = False
-
           for idx, files_list in enumerate(all_lists):
               for bf_id in buildfile_ids:
                   if re.search(r'\b' + re.escape(bf_id) + r'\b', files_list):
@@ -143,11 +125,9 @@ workflows:
                       break
               if found:
                   break
-
           if not found:
               print("Firebase plist BuildFile ID is not in any Resources files list")
               sys.exit(1)
-
           print("Firebase plist Resources verification PASSED")
           PY
 
