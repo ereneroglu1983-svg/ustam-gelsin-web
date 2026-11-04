@@ -238,5 +238,7 @@ workflows:
           echo "=== Final artifacts ==="
           ls -lh build/artifacts/
     artifacts:
+      - build/ios/iphoneos/Runner.app
+      - ios/output/Build/Products/Debug-iphonesimulator/Runner.app
       - build/artifacts/*.zip
       - build/**/*.log
