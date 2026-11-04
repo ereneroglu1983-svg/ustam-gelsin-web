@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
+<!DOCTYPE html><html><head>
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
@@ -11,9 +9,9 @@
   <link rel="preload" as="image" href="splash/img/light-2x.png" imagesrcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" fetchpriority="high">
 
   <!-- Firebase kritik zincirini hızlandır -->
-  <link rel="preconnect" href="https://device-streaming-6f29b03c.firebaseapp.com" crossorigin>
-  <link rel="preconnect" href="https://www.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://device-streaming-6f29b03c.firebaseapp.com" crossorigin="">
+  <link rel="preconnect" href="https://www.googleapis.com" crossorigin="">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin="">
   <link rel="dns-prefetch" href="https://device-streaming-6f29b03c.firebaseapp.com">
   <link rel="dns-prefetch" href="https://www.googleapis.com">
 
@@ -22,11 +20,11 @@
   <meta name="keywords" content="usta, tadilat, dekorasyon, inşaat, boya, banyo tadilatı, mutfak yenileme, güneş enerjisi, usta bul, android uygulama, hemen ustam gelsin play store, hug market, hug proje, proje geliştirme, mimar, mühendis, müteahhit">
   <meta name="author" content="Hemen Ustam Gelsin">
   <meta name="robots" content="index, follow">
-  <meta name="google-site-verification" content="ku5_LkI48Fzj2hzl3exmyBz-bsRjEohwjITO6GTxrLo" />
-  <meta name="yandex-verification" content="1992acbf758234c0" />
+  <meta name="google-site-verification" content="ku5_LkI48Fzj2hzl3exmyBz-bsRjEohwjITO6GTxrLo">
+  <meta name="yandex-verification" content="1992acbf758234c0">
 
   <!-- ANDROID APP -->
-  <link rel="alternate" href="android-app://com.hemenustamgelsin.android/https/hemenustamgelsin.com/" />
+  <link rel="alternate" href="android-app://com.hemenustamgelsin.android/https/hemenustamgelsin.com/">
   <meta name="google-play-app" content="app-id=com.hemenustamgelsin.android">
 
   <meta property="og:type" content="website">
@@ -162,16 +160,65 @@
 
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
+  
+  
   <style id="splash-screen-style">
-    html { height: 100% }
-    body { margin: 0; min-height: 100%; background-color: #FFFFFF; background-size: 100% 100%; }
-    .center { margin: 0; position: absolute; top: 50%; left: 50%; -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%); }
-    .contain { display:block; width:100%; height:100%; object-fit: contain; }
-    .stretch { display:block; width:100%; height:100%; }
-    .cover { display:block; width:100%; height:100%; object-fit: cover; }
-    .bottom { position: absolute; bottom: 0; left: 50%; -ms-transform: translate(-50%, 0); transform: translate(-50%, 0); }
-    .bottomLeft { position: absolute; bottom: 0; left: 0; }
-    .bottomRight { position: absolute; bottom: 0; right: 0; }
+    html {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background-color: #FFFFFF;
+          background-size: 100% 100%;
+    }
+
+    .center {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+
+    .contain {
+      display:block;
+      width:100%; height:100%;
+      object-fit: contain;
+    }
+
+    .stretch {
+      display:block;
+      width:100%; height:100%;
+    }
+
+    .cover {
+      display:block;
+      width:100%; height:100%;
+      object-fit: cover;
+    }
+
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      -ms-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+    }
+
+    .bottomLeft {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .bottomRight {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
   </style>
   <script id="splash-screen-script">
     function removeSplashFromWeb() {
@@ -180,8 +227,14 @@
       document.body.style.background = "transparent";
     }
   </script>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 </head>
 <body>
+  <picture id="splash">
+      <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
+      <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
+      <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
+  </picture>
 
 <!-- ========== noscript ========== -->
 <noscript>
@@ -261,14 +314,8 @@
   </div>
 </noscript>
 
-<picture id="splash">
-  <source srcset="splash/img/light-1x.webp 1x, splash/img/light-2x.webp 2x, splash/img/light-3x.webp 3x, splash/img/light-4x.webp 4x" type="image/webp" media="(prefers-color-scheme: light)">
-  <source srcset="splash/img/dark-1x.webp 1x, splash/img/dark-2x.webp 2x, splash/img/dark-3x.webp 3x, splash/img/dark-4x.webp 4x" type="image/webp" media="(prefers-color-scheme: dark)">
-  <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
-  <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
-  <img class="center" aria-hidden="true" src="splash/img/light-1x.webp" alt="" fetchpriority="high" loading="eager" decoding="async">
-</picture>
 
-<script src="flutter_bootstrap.js" async></script>
-</body>
-</html>
+
+<script src="flutter_bootstrap.js" async=""></script>
+
+</body></html>
