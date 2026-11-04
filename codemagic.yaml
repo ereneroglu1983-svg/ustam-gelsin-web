@@ -11,20 +11,19 @@ workflows:
       - name: Flutter version
         script: |
           flutter --version
-      - name: Fix corrupted Xcode project (Auto Regenerate)
+      - name: Fix ALL iOS issues (Project + Podfile + Firebase + Info.plist)
         script: |
-          echo "Checking ios/Runner.xcodeproj/project.pbxproj..."
+          echo "=== 1. Check project.pbxproj ==="
           if ! plutil -lint ios/Runner.xcodeproj/project.pbxproj &>/dev/null; then
-            echo "⚠️ project.pbxproj is DAMAGED - regenerating iOS folder"
+            echo "⚠️ DAMAGED - regenerating ios folder"
             rm -rf ios
             flutter create . --platforms=ios --project-name ustam_gelsin
           else
-            echo "✅ project.pbxproj looks OK - keeping existing"
+            echo "✅ project.pbxproj OK"
           fi
           
-          # Podfile yoksa oluştur - Flutter 3.32'de yok, Firebase için şart
+          echo "=== 2. Ensure Podfile with iOS 15.0 ==="
           if [ ! -f "ios/Podfile" ]; then
-            echo "Creating Podfile with iOS 15.0..."
             cat > ios/Podfile <<'PODFILE'
           platform :ios, '15.0'
           ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -36,13 +35,13 @@ workflows:
           def flutter_root
             generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
             unless File.exist?(generated_xcode_build_settings_path)
-              raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+              raise "#{generated_xcode_build_settings_path} must exist."
             end
             File.foreach(generated_xcode_build_settings_path) do |line|
               matches = line.match(/FLUTTER_ROOT\=(.*)/)
               return matches[1].strip if matches
             end
-            raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+            raise "FLUTTER_ROOT not found"
           end
           require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
           flutter_ios_podfile_setup
@@ -65,29 +64,48 @@ workflows:
           PODFILE
           fi
           
-          # Bundle ID düzelt
-          echo "Fixing Bundle ID..."
+          echo "=== 3. Fix Bundle ID ==="
           sed -i '' 's/com.example.ustamGelsin/com.ustamgelsin.app.ustamGelsin/g' ios/Runner.xcodeproj/project.pbxproj || true
           sed -i '' 's/com.hemenustamgelsin.ustamGelsin/com.ustamgelsin.app.ustamGelsin/g' ios/Runner.xcodeproj/project.pbxproj || true
+          sed -i '' 's/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;/g' ios/Runner.xcodeproj/project.pbxproj || true
           
-          # GoogleService varsa geri koy
-          if [ -f "ios_backup_04kasim/Runner/GoogleService-Info.plist" ]; then
+          echo "=== 4. Check GoogleService-Info.plist ==="
+          if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
+            echo "✅ GoogleService-Info.plist exists"
+          elif [ -f "ios_backup_04kasim/Runner/GoogleService-Info.plist" ]; then
             cp ios_backup_04kasim/Runner/GoogleService-Info.plist ios/Runner/GoogleService-Info.plist
-            echo "GoogleService-Info.plist restored"
+            echo "✅ Restored from backup"
+          else
+            echo "⚠️ WARNING: GoogleService-Info.plist YOK! Firebase Messaging çalışmaz ama build geçer"
           fi
           
-          # Icon hatası düzelt
-          sed -i '' 's/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;/g' ios/Runner.xcodeproj/project.pbxproj || true
+          echo "=== 5. Fix Info.plist permissions ==="
+          INFO_PLIST="ios/Runner/Info.plist"
+          if [ -f "$INFO_PLIST" ]; then
+            /usr/libexec/PlistBuddy -c "Delete :NSLocationWhenInUseUsageDescription" "$INFO_PLIST" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :NSLocationWhenInUseUsageDescription string 'Konum tabanlı usta önerileri için konum izni gereklidir.'" "$INFO_PLIST"
+            /usr/libexec/PlistBuddy -c "Delete :NSLocationAlwaysAndWhenInUseUsageDescription" "$INFO_PLIST" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :NSLocationAlwaysAndWhenInUseUsageDescription string 'Arka planda konum takibi için izin gereklidir.'" "$INFO_PLIST"
+            /usr/libexec/PlistBuddy -c "Delete :NSPhotoLibraryUsageDescription" "$INFO_PLIST" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'Profil fotoğrafı seçmek için galeri erişimi gereklidir.'" "$INFO_PLIST"
+            /usr/libexec/PlistBuddy -c "Delete :NSCameraUsageDescription" "$INFO_PLIST" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 'Fotoğraf çekmek için kamera erişimi gereklidir.'" "$INFO_PLIST"
+            /usr/libexec/PlistBuddy -c "Delete :NSMicrophoneUsageDescription" "$INFO_PLIST" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :NSMicrophoneUsageDescription string 'Sesli mesaj için mikrofon erişimi gereklidir.'" "$INFO_PLIST"
+            echo "✅ Info.plist permissions fixed"
+          fi
+          
           plutil -lint ios/Runner.xcodeproj/project.pbxproj
+          cat ios/Podfile | head -5
       - name: Get Flutter packages
         script: |
           flutter pub get
-      - name: Pod install (iOS dependencies)
+      - name: Pod install
         script: |
           cd ios
           rm -rf Pods Podfile.lock
           pod install --repo-update --verbose
-      - name: Build iOS App (No Codesign - Free Apple ID)
+      - name: Build iOS App (No Codesign)
         script: |
           flutter build ios --debug --no-codesign --no-pub --verbose
     artifacts:
