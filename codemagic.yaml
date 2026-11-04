@@ -11,6 +11,32 @@ workflows:
       - name: Flutter version
         script: |
           flutter --version
+      - name: Fix corrupted Xcode project (Auto Regenerate)
+        script: |
+          echo "Checking ios/Runner.xcodeproj/project.pbxproj..."
+          if ! plutil -lint ios/Runner.xcodeproj/project.pbxproj &>/dev/null; then
+            echo "⚠️ project.pbxproj is DAMAGED - regenerating iOS folder"
+            rm -rf ios
+            flutter create . --platforms=ios --project-name ustam_gelsin
+          else
+            echo "✅ project.pbxproj looks OK"
+          fi
+          
+          # Bundle ID'i Firebase'deki ile eşitle: com.ustamgelsin.app.ustamGelsin
+          echo "Fixing Bundle ID..."
+          sed -i '' 's/com.example.ustamGelsin/com.ustamgelsin.app.ustamGelsin/g' ios/Runner.xcodeproj/project.pbxproj || true
+          sed -i '' 's/com.hemenustamgelsin.ustamGelsin/com.ustamgelsin.app.ustamGelsin/g' ios/Runner.xcodeproj/project.pbxproj || true
+          
+          # GoogleService-Info.plist varsa geri koy (yoksa build Firebase'siz devam eder)
+          if [ -f "ios_backup_04kasim/Runner/GoogleService-Info.plist" ]; then
+            cp ios_backup_04kasim/Runner/GoogleService-Info.plist ios/Runner/GoogleService-Info.plist
+            echo "GoogleService-Info.plist restored from backup"
+          fi
+          
+          # ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS hatasını düzelt
+          sed -i '' 's/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;/g' ios/Runner.xcodeproj/project.pbxproj || true
+
+          plutil -lint ios/Runner.xcodeproj/project.pbxproj
       - name: Get Flutter packages
         script: |
           flutter pub get
