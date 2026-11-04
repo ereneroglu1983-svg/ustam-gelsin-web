@@ -1,6 +1,6 @@
 workflows:
   ios-free-development:
-    name: HUG - iPhone Debug (Free 【entity-Apple¦canonical_name=Apple】 Account)
+    name: HUG - iPhone Debug (Free Apple Account)
     instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
@@ -168,10 +168,20 @@ workflows:
           set -e
           flutter build ios --debug --no-codesign --no-pub --verbose
 
-      - name: 11. Build iOS Simulator for Preview
+      - name: 11. Diagnose iOS Simulator Runtime
         script: |
           set -e
-          flutter build ios --debug --simulator --no-codesign --no-pub --verbose
+          echo "===== XCODE VERSION ====="
+          xcodebuild -version
+          echo ""
+          echo "===== AVAILABLE RUNTIMES ====="
+          xcrun simctl list runtimes
+          echo ""
+          echo "===== AVAILABLE DEVICES ====="
+          xcrun simctl list devices available
+          echo ""
+          echo "===== RUNNER DESTINATIONS ====="
+          xcodebuild -project ios/Runner.xcodeproj -scheme Runner -showdestinations || true
 
     artifacts:
       - build/ios/iphoneos/*.app
