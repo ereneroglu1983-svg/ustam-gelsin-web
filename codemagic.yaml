@@ -1,6 +1,6 @@
 workflows:
   ios-free-development:
-    name: HUG - iPhone Debug (Free 【entity-Apple¦canonical_name=Apple】 Account)
+    name: HUG - iPhone Debug (Free Apple Account)
     instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
@@ -15,14 +15,12 @@ workflows:
           FLUTTER_VER=$(flutter --version | head -1)
           [[ "$FLUTTER_VER" == *"3.47.7"* ]] || { echo "❌ Expected 3.47.7"; exit 1; }
           echo "✅ Flutter 3.47.7"
-
       - name: 2. Verify structure
         script: |
           set -e
           [ -f "ios/Runner.xcodeproj/project.pbxproj" ] || { echo "❌ pbxproj missing"; exit 1; }
           grep -q "com.ustamgelsin.app.ustamGelsin" ios/Runner.xcodeproj/project.pbxproj || { echo "❌ Bundle ID missing"; exit 1; }
           echo "✅ Structure OK"
-
       - name: 3. Fix AppIcon only if broken
         script: |
           set -e
@@ -31,7 +29,6 @@ workflows:
             sed -i '' 's/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;/g' "$PBX"
           fi
           plutil -lint "$PBX"
-
       - name: 4. FORCE Podfile iOS 15.0
         script: |
           set -e
@@ -71,7 +68,6 @@ workflows:
             end
           end
           PODFILE
-
       - name: 5. Firebase plist BUNDLE_ID check
         script: |
           set -e
@@ -86,7 +82,6 @@ workflows:
             cp "$SRC" ios/Runner/GoogleService-Info.plist
           fi
           echo "✅ Firebase plist BUNDLE_ID OK"
-
       - name: 6. Verify GoogleService in Resources - REAL FORMAT
         script: |
           set -e
@@ -130,11 +125,9 @@ workflows:
               sys.exit(1)
           print("Firebase plist Resources verification PASSED")
           PY
-
       - name: 7. Get packages
         script: |
           flutter pub get
-
       - name: 8. Info.plist preserve Turkish
         script: |
           set -e
@@ -155,19 +148,16 @@ workflows:
           check_and_add "NSCameraUsageDescription" "Profil ve is fotograflari cekmek icin kamera erisimi gerekiyor."
           check_and_add "NSMicrophoneUsageDescription" "Video ve sesli mesajlar icin mikrofon erisimi gerekiyor."
           plutil -lint "$INFO"
-
       - name: 9. Pod install keep lock
         script: |
           set -e
           cd ios
           rm -rf Pods
           pod install --repo-update
-
       - name: 10. Build iOS Debug No-Codesign - Physical
         script: |
           set -e
           flutter build ios --debug --no-codesign --no-pub --verbose
-
       - name: 11. Build Simulator .app - Patch + xcodebuild + Guaranteed Restore
         script: |
           set -e
@@ -218,7 +208,6 @@ workflows:
           echo "=== Simulator .app check ==="
           ls -lh ios/output/Build/Products/Debug-iphonesimulator/Runner.app
           echo "✅ Simulator build finished - trap will restore pbxproj"
-
       - name: 12. Ensure original pbxproj restored - Final safety
         script: |
           set -e
@@ -232,8 +221,22 @@ workflows:
           fi
           echo "Final check - should be 3 lines iphoneos only:"
           grep -c "SUPPORTED_PLATFORMS = iphoneos;" "$PBX"
-
+      - name: 13. Create distinct artifacts for Physical and Simulator
+        script: |
+          set -e
+          mkdir -p build/artifacts
+          echo "=== Physical .app ==="
+          ls -lh build/ios/iphoneos/Runner.app
+          cd build/ios/iphoneos
+          zip -r -y ../../artifacts/Runner-Physical-iPhone.app.zip Runner.app
+          cd ../../../
+          echo "=== Simulator .app ==="
+          ls -lh ios/output/Build/Products/Debug-iphonesimulator/Runner.app
+          cd ios/output/Build/Products/Debug-iphonesimulator
+          zip -r -y ../../../../../build/artifacts/Runner-Simulator-iPhone.app.zip Runner.app
+          cd ../../../../../
+          echo "=== Final artifacts ==="
+          ls -lh build/artifacts/
     artifacts:
-      - build/ios/iphoneos/*.app
-      - ios/output/Build/Products/Debug-iphonesimulator/Runner.app
+      - build/artifacts/*.zip
       - build/**/*.log
