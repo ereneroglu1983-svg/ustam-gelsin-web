@@ -1,3 +1,4 @@
+git status
 // lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX + HUG MARKET ROUTE FIX + B ŞIKKI ADMIN EKLENDI - IMPORT FIX + KOMSU HELPER EKLENDI + ANALYTICS EKLENDI + HUG PROJE ROUTE EKLENDI
 import 'dart:async';
 import 'package:flutter/foundation.dart';
