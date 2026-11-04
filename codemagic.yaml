@@ -1,30 +1,41 @@
 workflows:
   ios-free-development:
-    name: iOS - Free Development (No Paid Apple Account)
+    name: HUG - iPhone Debug (Free Apple Account)
     instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
-      flutter: 3.32.0
+      flutter: 3.47.7
       xcode: 16.2
       cocoapods: default
     scripts:
-      - name: Flutter version
+      - name: 1. Flutter 3.47.7 strict
         script: |
+          set -e
           flutter --version
-      - name: Fix ALL iOS issues (Project + Podfile + Firebase + Info.plist)
+          FLUTTER_VER=$(flutter --version | head -1)
+          [[ "$FLUTTER_VER" == *"3.47.7"* ]] || { echo "❌ Expected 3.47.7"; exit 1; }
+          echo "✅ Flutter 3.47.7"
+
+      - name: 2. Verify structure
         script: |
-          echo "=== 1. Check project.pbxproj ==="
-          if ! plutil -lint ios/Runner.xcodeproj/project.pbxproj &>/dev/null; then
-            echo "⚠️ DAMAGED - regenerating ios folder"
-            rm -rf ios
-            flutter create . --platforms=ios --project-name ustam_gelsin
-          else
-            echo "✅ project.pbxproj OK"
+          set -e
+          [ -f "ios/Runner.xcodeproj/project.pbxproj" ] || { echo "❌ pbxproj missing"; exit 1; }
+          grep -q "com.ustamgelsin.app.ustamGelsin" ios/Runner.xcodeproj/project.pbxproj || { echo "❌ Bundle ID missing"; exit 1; }
+          echo "✅ Structure OK"
+
+      - name: 3. Fix AppIcon only if broken
+        script: |
+          set -e
+          PBX="ios/Runner.xcodeproj/project.pbxproj"
+          if grep -q "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;" "$PBX"; then
+            sed -i '' 's/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;/g' "$PBX"
           fi
-          
-          echo "=== 2. Ensure Podfile with iOS 15.0 ==="
-          if [ ! -f "ios/Podfile" ]; then
-            cat > ios/Podfile <<'PODFILE'
+          plutil -lint "$PBX"
+
+      - name: 4. FORCE Podfile iOS 15.0
+        script: |
+          set -e
+          cat > ios/Podfile <<'PODFILE'
           platform :ios, '15.0'
           ENV['COCOAPODS_DISABLE_STATS'] = 'true'
           project 'Runner', {
@@ -35,7 +46,7 @@ workflows:
           def flutter_root
             generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
             unless File.exist?(generated_xcode_build_settings_path)
-              raise "#{generated_xcode_build_settings_path} must exist."
+              raise "#{generated_xcode_build_settings_path} must exist"
             end
             File.foreach(generated_xcode_build_settings_path) do |line|
               matches = line.match(/FLUTTER_ROOT\=(.*)/)
@@ -49,65 +60,134 @@ workflows:
             use_frameworks!
             use_modular_headers!
             flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-            target 'RunnerTests' do
-              inherit! :search_paths
-            end
           end
           post_install do |installer|
             installer.pods_project.targets.each do |target|
               flutter_additional_ios_build_settings(target)
               target.build_configurations.each do |config|
                 config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+                config.build_settings['ENABLE_BITCODE'] = 'NO'
               end
             end
           end
           PODFILE
+
+      - name: 5. Firebase plist BUNDLE_ID check
+        script: |
+          set -e
+          EXPECTED="com.ustamgelsin.app.ustamGelsin"
+          SRC=""
+          if [ -f "ios/Runner/GoogleService-Info.plist" ]; then SRC="ios/Runner/GoogleService-Info.plist"
+          elif [ -f "ios_backup_04kasim/Runner/GoogleService-Info.plist" ]; then SRC="ios_backup_04kasim/Runner/GoogleService-Info.plist"
+          else echo "❌ GoogleService-Info.plist not found"; exit 1; fi
+          PLIST_BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :BUNDLE_ID" "$SRC")
+          [ "$PLIST_BUNDLE" = "$EXPECTED" ] || { echo "❌ BUNDLE_ID mismatch $PLIST_BUNDLE vs $EXPECTED"; exit 1; }
+          if [ "$SRC" != "ios/Runner/GoogleService-Info.plist" ]; then
+            cp "$SRC" ios/Runner/GoogleService-Info.plist
           fi
-          
-          echo "=== 3. Fix Bundle ID ==="
-          sed -i '' 's/com.example.ustamGelsin/com.ustamgelsin.app.ustamGelsin/g' ios/Runner.xcodeproj/project.pbxproj || true
-          sed -i '' 's/com.hemenustamgelsin.ustamGelsin/com.ustamgelsin.app.ustamGelsin/g' ios/Runner.xcodeproj/project.pbxproj || true
-          sed -i '' 's/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;/g' ios/Runner.xcodeproj/project.pbxproj || true
-          
-          echo "=== 4. Check GoogleService-Info.plist ==="
-          if [ -f "ios/Runner/GoogleService-Info.plist" ]; then
-            echo "✅ GoogleService-Info.plist exists"
-          elif [ -f "ios_backup_04kasim/Runner/GoogleService-Info.plist" ]; then
-            cp ios_backup_04kasim/Runner/GoogleService-Info.plist ios/Runner/GoogleService-Info.plist
-            echo "✅ Restored from backup"
-          else
-            echo "⚠️ WARNING: GoogleService-Info.plist YOK! Firebase Messaging çalışmaz ama build geçer"
-          fi
-          
-          echo "=== 5. Fix Info.plist permissions ==="
-          INFO_PLIST="ios/Runner/Info.plist"
-          if [ -f "$INFO_PLIST" ]; then
-            /usr/libexec/PlistBuddy -c "Delete :NSLocationWhenInUseUsageDescription" "$INFO_PLIST" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Add :NSLocationWhenInUseUsageDescription string 'Konum tabanlı usta önerileri için konum izni gereklidir.'" "$INFO_PLIST"
-            /usr/libexec/PlistBuddy -c "Delete :NSLocationAlwaysAndWhenInUseUsageDescription" "$INFO_PLIST" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Add :NSLocationAlwaysAndWhenInUseUsageDescription string 'Arka planda konum takibi için izin gereklidir.'" "$INFO_PLIST"
-            /usr/libexec/PlistBuddy -c "Delete :NSPhotoLibraryUsageDescription" "$INFO_PLIST" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string 'Profil fotoğrafı seçmek için galeri erişimi gereklidir.'" "$INFO_PLIST"
-            /usr/libexec/PlistBuddy -c "Delete :NSCameraUsageDescription" "$INFO_PLIST" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string 'Fotoğraf çekmek için kamera erişimi gereklidir.'" "$INFO_PLIST"
-            /usr/libexec/PlistBuddy -c "Delete :NSMicrophoneUsageDescription" "$INFO_PLIST" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Add :NSMicrophoneUsageDescription string 'Sesli mesaj için mikrofon erişimi gereklidir.'" "$INFO_PLIST"
-            echo "✅ Info.plist permissions fixed"
-          fi
-          
-          plutil -lint ios/Runner.xcodeproj/project.pbxproj
-          cat ios/Podfile | head -5
-      - name: Get Flutter packages
+          echo "✅ Firebase plist BUNDLE_ID OK"
+
+      - name: 6. Verify GoogleService in Resources - REAL FORMAT
+        script: |
+          set -e
+          python3 << 'PY'
+          import re
+          import sys
+
+          pbx_path = "ios/Runner.xcodeproj/project.pbxproj"
+
+          with open(pbx_path, "r") as f:
+              content = f.read()
+
+          real_test_line = "A1B2C3D4E5F6A7B8C9D0E1F2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F2E1D0C9B8A7F6E5D4C3B2A1 /* GoogleService-Info.plist */; };"
+
+          pattern = r'([A-F0-9]{24})\s+/\*\s*GoogleService-Info\.plist in Resources\s*\*/\s*=\s*\{isa\s*=\s*PBXBuildFile\b'
+
+          m_test = re.search(pattern, real_test_line)
+
+          if not m_test:
+              print("REGEX TEST FAILED")
+              sys.exit(1)
+
+          print("Regex test passed:", m_test.group(1))
+
+          buildfile_ids = re.findall(pattern, content)
+
+          if not buildfile_ids:
+              print("GoogleService PBXBuildFile not found")
+              sys.exit(1)
+
+          print("Found BuildFile IDs:", buildfile_ids)
+
+          phase_pattern = r'/\* Begin PBXResourcesBuildPhase section \*/(.*?)/\* End PBXResourcesBuildPhase section \*/'
+
+          m_phase = re.search(phase_pattern, content, re.DOTALL)
+
+          if not m_phase:
+              print("PBXResourcesBuildPhase section not found")
+              sys.exit(1)
+
+          files_pattern = r'files\s*=\s*\((.*?)\);'
+
+          all_lists = re.findall(files_pattern, m_phase.group(1), re.DOTALL)
+
+          print("Resources files lists:", len(all_lists))
+
+          found = False
+
+          for idx, files_list in enumerate(all_lists):
+              for bf_id in buildfile_ids:
+                  if re.search(r'\b' + re.escape(bf_id) + r'\b', files_list):
+                      print("Firebase plist found in Resources list:", idx + 1)
+                      found = True
+                      break
+              if found:
+                  break
+
+          if not found:
+              print("Firebase plist BuildFile ID is not in any Resources files list")
+              sys.exit(1)
+
+          print("Firebase plist Resources verification PASSED")
+          PY
+
+      - name: 7. Get packages
         script: |
           flutter pub get
-      - name: Pod install
+
+      - name: 8. Info.plist preserve Turkish
         script: |
+          set -e
+          INFO="ios/Runner/Info.plist"
+          check_and_add() {
+            KEY=$1
+            VALUE=$2
+            if /usr/libexec/PlistBuddy -c "Print :$KEY" "$INFO" >/dev/null 2>&1; then
+              echo "✅ $KEY exists, preserving"
+            else
+              /usr/libexec/PlistBuddy -c "Add :$KEY string '$VALUE'" "$INFO"
+              echo "✅ Added $KEY"
+            fi
+          }
+          check_and_add "NSLocationWhenInUseUsageDescription" "Size en yakin ustalari bulmak icin konumunuza ihtiyacimiz var."
+          check_and_add "NSLocationAlwaysAndWhenInUseUsageDescription" "Arka planda size daha iyi hizmet verebilmek icin konum izni gerekiyor."
+          check_and_add "NSPhotoLibraryUsageDescription" "Profil fotografi ve is fotograflari yuklemek icin galeri erisimi gerekiyor."
+          check_and_add "NSCameraUsageDescription" "Profil ve is fotograflari cekmek icin kamera erisimi gerekiyor."
+          check_and_add "NSMicrophoneUsageDescription" "Video ve sesli mesajlar icin mikrofon erisimi gerekiyor."
+          plutil -lint "$INFO"
+
+      - name: 9. Pod install keep lock
+        script: |
+          set -e
           cd ios
-          rm -rf Pods Podfile.lock
-          pod install --repo-update --verbose
-      - name: Build iOS App (No Codesign)
+          rm -rf Pods
+          pod install --repo-update
+
+      - name: 10. Build iOS Debug No-Codesign
         script: |
+          set -e
           flutter build ios --debug --no-codesign --no-pub --verbose
+
     artifacts:
       - build/ios/iphoneos/*.app
       - build/**/*.log
