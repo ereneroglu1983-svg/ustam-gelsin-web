@@ -1,6 +1,6 @@
 workflows:
   ios-free-development:
-    name: HUG - iPhone Debug (Free Apple Account)
+    name: HUG - iPhone Debug (Free 【entity-Apple¦canonical_name=Apple】 Account)
     instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
@@ -163,27 +163,77 @@ workflows:
           rm -rf Pods
           pod install --repo-update
 
-      - name: 10. Build iOS Debug No-Codesign
+      - name: 10. Build iOS Debug No-Codesign - Physical
         script: |
           set -e
           flutter build ios --debug --no-codesign --no-pub --verbose
 
-      - name: 11. Diagnose iOS Simulator Runtime
+      - name: 11. Build Simulator .app - Patch + xcodebuild + Guaranteed Restore
         script: |
           set -e
-          echo "===== XCODE VERSION ====="
-          xcodebuild -version
+          set -o pipefail
+          PBX="ios/Runner.xcodeproj/project.pbxproj"
+          cp "$PBX" "$PBX.bak"
+          restore() {
+            echo "=== RESTORING ORIGINAL PBX ==="
+            if [ -f "$PBX.bak" ]; then
+              cp "$PBX.bak" "$PBX"
+              rm "$PBX.bak"
+              echo "✅ Restored original project.pbxproj"
+            fi
+          }
+          trap restore EXIT
+          ORIGINAL_COUNT=$(grep -c "SUPPORTED_PLATFORMS = iphoneos;" "$PBX" || true)
+          echo "Original count: $ORIGINAL_COUNT"
+          [ "$ORIGINAL_COUNT" -eq 3 ] || {
+            echo "❌ Beklenen 3 SUPPORTED_PLATFORMS satırı bulunamadı"
+            exit 1
+          }
+          echo "=== PATCHING ONLY EXISTING LINES (3 configs) ==="
+          sed -i '' 's/SUPPORTED_PLATFORMS = iphoneos;/SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";/g' "$PBX"
+          PATCHED_COUNT=$(grep -c 'SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";' "$PBX" || true)
+          echo "Patched count: $PATCHED_COUNT"
+          [ "$PATCHED_COUNT" -eq 3 ] || {
+            echo "❌ Patch sayısı 3 değil"
+            exit 1
+          }
+          echo "✅ Patched to iphoneos iphonesimulator - NO duplicate, SDKROOT untouched"
+          plutil -lint "$PBX"
           echo ""
-          echo "===== AVAILABLE RUNTIMES ====="
-          xcrun simctl list runtimes
+          echo "=== Available Runtimes (Xcode 26.0 has iOS 26.0) ==="
+          xcrun simctl list runtimes || true
           echo ""
-          echo "===== AVAILABLE DEVICES ====="
-          xcrun simctl list devices available
+          echo "=== Building unsigned Simulator .app with xcodebuild (generic destination) ==="
+          xcodebuild \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath ios/output \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
           echo ""
-          echo "===== RUNNER DESTINATIONS ====="
-          xcodebuild -project ios/Runner.xcodeproj -scheme Runner -showdestinations || true
+          echo "=== Simulator .app check ==="
+          ls -lh ios/output/Build/Products/Debug-iphonesimulator/Runner.app
+          echo "✅ Simulator build finished - trap will restore pbxproj"
+
+      - name: 12. Ensure original pbxproj restored - Final safety
+        script: |
+          set -e
+          PBX="ios/Runner.xcodeproj/project.pbxproj"
+          if [ -f "$PBX.bak" ]; then
+            cp "$PBX.bak" "$PBX"
+            rm "$PBX.bak"
+            echo "✅ Final restore done"
+          else
+            echo "✅ Already restored by trap"
+          fi
+          echo "Final check - should be 3 lines iphoneos only:"
+          grep -c "SUPPORTED_PLATFORMS = iphoneos;" "$PBX"
 
     artifacts:
       - build/ios/iphoneos/*.app
-      - build/ios/iphonesimulator/*.app
+      - ios/output/Build/Products/Debug-iphonesimulator/Runner.app
       - build/**/*.log
