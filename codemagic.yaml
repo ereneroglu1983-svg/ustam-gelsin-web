@@ -18,25 +18,28 @@ workflows:
         script: |
           flutter clean
           flutter pub get
+
       - name: 2. Verify PAID Bundle ID - lowercase + DisplayName
         script: |
           set -e
           PBX="ios/Runner.xcodeproj/project.pbxproj"
-          grep -q "com.ustamgelsin.app.ustamgelsin" "$PBX" || { echo "❌ Bundle ID lowercase olmalı"; exit 1; }
-          if grep -q "com.ustamgelsin.app.ustamGelsin" "$PBX"; then echo "❌ Büyük G bulundu!"; exit 1; fi
+          grep -q "com.ustamgelsin.app.ustamgelsin" "$PBX" || { echo "Bundle ID lowercase olmali"; exit 1; }
+          if grep -q "com.ustamgelsin.app.ustamGelsin" "$PBX"; then echo "Buyuk G bulundu!"; exit 1; fi
           INFO="ios/Runner/Info.plist"
           DISPLAY_NAME=$(/usr/libexec/PlistBuddy -c "Print :CFBundleDisplayName" "$INFO")
-          [ "$DISPLAY_NAME" = "Hemen Ustam Gelsin" ] || { echo "❌ DisplayName Hemen Ustam Gelsin olmalı"; exit 1; }
-          echo "✅ Bundle ID ve DisplayName OK"
+          [ "$DISPLAY_NAME" = "Hemen Ustam Gelsin" ] || { echo "DisplayName Hemen Ustam Gelsin olmali"; exit 1; }
+          echo "Bundle ID ve DisplayName OK"
+
       - name: 3. Verify Firebase GoogleService-Info.plist Bundle ID
         script: |
           set -e
           EXPECTED="com.ustamgelsin.app.ustamgelsin"
           PLIST_PATH="ios/Runner/GoogleService-Info.plist"
-          [ -f "$PLIST_PATH" ] || { echo "❌ GoogleService-Info.plist yok"; exit 1; }
+          [ -f "$PLIST_PATH" ] || { echo "GoogleService-Info.plist yok"; exit 1; }
           PLIST_BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :BUNDLE_ID" "$PLIST_PATH")
-          [ "$PLIST_BUNDLE" = "$EXPECTED" ] || { echo "❌ Firebase BUNDLE_ID mismatch: $PLIST_BUNDLE"; exit 1; }
-          echo "✅ Firebase plist OK: $PLIST_BUNDLE"
+          [ "$PLIST_BUNDLE" = "$EXPECTED" ] || { echo "Firebase BUNDLE_ID mismatch: $PLIST_BUNDLE"; exit 1; }
+          echo "Firebase plist OK: $PLIST_BUNDLE"
+
       - name: 4. FORCE Podfile iOS 15.0 - keep lock
         script: |
           set -e
@@ -76,16 +79,17 @@ workflows:
             end
           end
           PODFILE
-      - name: 5. Pod install - keep Podfile.lock
+
+      - name: 5. Pod install
         script: |
           set -e
           cd ios
           rm -rf Pods
-          pod install --repo-update
+          pod install
+
       - name: 6. Set up keychain and fetch signing files
         script: |
           set -e
-
           echo "=== INITIALIZE KEYCHAIN ==="
           keychain initialize
 
@@ -101,9 +105,8 @@ workflows:
           echo "=== CHECK CODE SIGNING IDENTITIES ==="
           IDENTITY_OUTPUT="$(security find-identity -v -p codesigning 2>&1)"
           echo "$IDENTITY_OUTPUT"
-
           if ! echo "$IDENTITY_OUTPUT" | grep -Eq '[1-9][0-9]* valid identities found'; then
-            echo "❌ Geçerli Apple signing identity bulunamadı"
+            echo "Gecerli Apple signing identity bulunamadi"
             exit 1
           fi
 
@@ -112,17 +115,53 @@ workflows:
           ls -lh "$HOME/Library/MobileDevice/Provisioning Profiles" 2>/dev/null || true
 
           echo "=== APPLY SIGNING TO RUNNER PROJECT ==="
-          xcode-project use-profiles --project ios/Runner.xcodeproj
+          xcode-project use-profiles \
+            --project ios/Runner.xcodeproj \
+            --export-options-plist /Users/builder/export_options.plist
+
+          echo "=== VERIFY EXPORT OPTIONS PLIST ==="
+          EXPORT_PLIST="/Users/builder/export_options.plist"
+          if [ ! -f "$EXPORT_PLIST" ]; then
+            echo "HATA: $EXPORT_PLIST dosyasi olusmadi! xcode-project use-profiles basarisiz."
+            exit 1
+          fi
+          echo "Export plist mevcut: $EXPORT_PLIST"
+          ls -l "$EXPORT_PLIST"
+          plutil -lint "$EXPORT_PLIST" || { echo "Export plist gecersiz!"; cat "$EXPORT_PLIST"; exit 1; }
+          cat "$EXPORT_PLIST"
+
+          echo "=== CHECK BUNDLE ID MAPPING (STRICT) ==="
+          /usr/libexec/PlistBuddy -c "Print :provisioningProfiles:com.ustamgelsin.app.ustamgelsin" "$EXPORT_PLIST" > /dev/null 2>&1 || {
+            echo "HATA: provisioningProfiles altinda com.ustamgelsin.app.ustamgelsin bulunamadi!"
+            cat "$EXPORT_PLIST"
+            exit 1
+          }
+          echo "Bundle ID mapping dogrulandi"
+
+          echo "=== FINAL CODE SIGNING CHECK ==="
+          xcodebuild -showBuildSettings -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release 2>/dev/null | grep -E "CODE_SIGN_STYLE|PROVISIONING_PROFILE|DEVELOPMENT_TEAM|PRODUCT_BUNDLE_IDENTIFIER" || true
 
           echo "=== SIGNING CONFIGURATION COMPLETED ==="
+
       - name: 7. Build IPA Release App Store
         script: |
           set -e
-          flutter build ipa --release --export-method app-store --verbose
+          echo "=== EXPORT OPTIONS ==="
+          ls -l /Users/builder/export_options.plist
+          plutil -lint /Users/builder/export_options.plist
+          cat /Users/builder/export_options.plist
+
+          echo "=== BUILD IPA WITH XCODE-PROJECT ==="
+          xcode-project build-ipa \
+            --workspace "ios/Runner.xcworkspace" \
+            --scheme "Runner" \
+            --export-options-plist /Users/builder/export_options.plist
+
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - flutter_*.log
+
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
