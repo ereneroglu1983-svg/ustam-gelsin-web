@@ -5,7 +5,7 @@ workflows:
     max_build_duration: 60
     environment:
       flutter: 3.32.8
-      xcode: 16.2
+      xcode: 26.6
       cocoapods: default
       groups:
         - app_store_credentials
@@ -151,11 +151,33 @@ workflows:
           plutil -lint /Users/builder/export_options.plist
           cat /Users/builder/export_options.plist
 
+          echo "=== VERIFY FLUTTER FRAMEWORK MINIMUM OS ==="
+          /usr/libexec/PlistBuddy -c "Print :MinimumOSVersion" ios/Flutter/AppFrameworkInfo.plist
+
           echo "=== BUILD IPA WITH XCODE-PROJECT ==="
           xcode-project build-ipa \
             --workspace "ios/Runner.xcworkspace" \
             --scheme "Runner" \
             --export-options-plist /Users/builder/export_options.plist
+
+          echo "=== VERIFY BUILT IPA MINIMUM OS ==="
+          IPA="$(find build/ios/ipa -maxdepth 1 -name '*.ipa' -print -quit)"
+          [ -n "$IPA" ] || { echo "IPA bulunamadi"; exit 1; }
+          TMP_DIR="$(mktemp -d)"
+          unzip -q "$IPA" -d "$TMP_DIR"
+          FRAMEWORK_PLIST="$TMP_DIR/Payload/Runner.app/Frameworks/App.framework/Info.plist"
+          [ -f "$FRAMEWORK_PLIST" ] || {
+            echo "App.framework Info.plist bulunamadi"
+            exit 1
+          }
+          BUILT_MIN_OS=$(/usr/libexec/PlistBuddy -c "Print :MinimumOSVersion" "$FRAMEWORK_PLIST")
+          echo "App.framework MinimumOSVersion: $BUILT_MIN_OS"
+          [ "$BUILT_MIN_OS" = "15.0" ] || {
+            echo "HATA: App.framework MinimumOSVersion 15.0 degil!"
+            exit 1
+          }
+          rm -rf "$TMP_DIR"
+          echo "=== BUILT IPA MINIMUM OS CHECK COMPLETED ==="
 
     artifacts:
       - build/ios/ipa/*.ipa
