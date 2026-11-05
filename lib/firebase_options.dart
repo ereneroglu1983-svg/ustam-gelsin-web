@@ -46,10 +46,10 @@ class DefaultFirebaseOptions {
 
   static FirebaseOptions get ios => FirebaseOptions(
     apiKey: Env.firebaseApiKeyIos,
-    appId: '1:715610995273:ios:04d8b52ac3ada20a5a1d98',
+    appId: '1:715610995273:ios:72cdc054e9c618b95a1d98',
     messagingSenderId: '715610995273',
     projectId: 'device-streaming-6f29b03c',
     storageBucket: 'device-streaming-6f29b03c.firebasestorage.app',
-    iosBundleId: 'com.ustamgelsin.app.ustamGelsin',
+    iosBundleId: 'com.ustamgelsin.app.ustamgelsin',
   );
 }
