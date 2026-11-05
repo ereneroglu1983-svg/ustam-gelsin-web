@@ -1,35 +1,46 @@
 workflows:
-  ios-free-development:
-    name: HUG - iPhone Debug (Free 【entity-Apple¦canonical_name=Apple】 Account)
+  ios-paid-release:
+    name: HUG - iOS Release PAID - App Store
     instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
-      flutter: 3.47.7
-      xcode: 26.0
+      flutter: 3.32.8
+      xcode: 16.2
       cocoapods: default
+      groups:
+        - app_store_credentials
+      vars:
+        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+        BUNDLE_ID: "com.ustamgelsin.app.ustamgelsin"
     scripts:
-      - name: 1. Flutter 3.47.7 strict
+      - name: 1. Flutter clean & pub get
         script: |
-          set -e
-          flutter --version
-          FLUTTER_VER=$(flutter --version | head -1)
-          [[ "$FLUTTER_VER" == *"3.47.7"* ]] || { echo "❌ Expected 3.47.7"; exit 1; }
-          echo "✅ Flutter 3.47.7"
-      - name: 2. Verify structure
-        script: |
-          set -e
-          [ -f "ios/Runner.xcodeproj/project.pbxproj" ] || { echo "❌ pbxproj missing"; exit 1; }
-          grep -q "com.ustamgelsin.app.ustamGelsin" ios/Runner.xcodeproj/project.pbxproj || { echo "❌ Bundle ID missing"; exit 1; }
-          echo "✅ Structure OK"
-      - name: 3. Fix AppIcon only if broken
+          flutter clean
+          flutter pub get
+
+      - name: 2. Verify PAID Bundle ID - lowercase + DisplayName
         script: |
           set -e
           PBX="ios/Runner.xcodeproj/project.pbxproj"
-          if grep -q "ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;" "$PBX"; then
-            sed -i '' 's/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = AppIcon;/ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;/g' "$PBX"
-          fi
-          plutil -lint "$PBX"
-      - name: 4. FORCE Podfile iOS 15.0
+          grep -q "com.ustamgelsin.app.ustamgelsin" "$PBX" || { echo "❌ Bundle ID lowercase olmalı"; exit 1; }
+          if grep -q "com.ustamgelsin.app.ustamGelsin" "$PBX"; then echo "❌ Büyük G bulundu!"; exit 1; fi
+          INFO="ios/Runner/Info.plist"
+          DISPLAY_NAME=$(/usr/libexec/PlistBuddy -c "Print :CFBundleDisplayName" "$INFO")
+          [ "$DISPLAY_NAME" = "Hemen Ustam Gelsin" ] || { echo "❌ DisplayName Hemen Ustam Gelsin olmalı"; exit 1; }
+          echo "✅ Bundle ID ve DisplayName OK"
+
+      - name: 3. Verify Firebase GoogleService-Info.plist Bundle ID
+        script: |
+          set -e
+          EXPECTED="com.ustamgelsin.app.ustamgelsin"
+          PLIST_PATH="ios/Runner/GoogleService-Info.plist"
+          [ -f "$PLIST_PATH" ] || { echo "❌ GoogleService-Info.plist yok"; exit 1; }
+          PLIST_BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :BUNDLE_ID" "$PLIST_PATH")
+          [ "$PLIST_BUNDLE" = "$EXPECTED" ] || { echo "❌ Firebase BUNDLE_ID mismatch"; exit 1; }
+          echo "✅ Firebase plist OK"
+
+      - name: 4. FORCE Podfile iOS 15.0 - keep lock
         script: |
           set -e
           cat > ios/Podfile <<'PODFILE'
@@ -68,180 +79,37 @@ workflows:
             end
           end
           PODFILE
-      - name: 5. Firebase plist BUNDLE_ID check
-        script: |
-          set -e
-          EXPECTED="com.ustamgelsin.app.ustamGelsin"
-          SRC=""
-          if [ -f "ios/Runner/GoogleService-Info.plist" ]; then SRC="ios/Runner/GoogleService-Info.plist"
-          elif [ -f "ios_backup_04kasim/Runner/GoogleService-Info.plist" ]; then SRC="ios_backup_04kasim/Runner/GoogleService-Info.plist"
-          else echo "❌ GoogleService-Info.plist not found"; exit 1; fi
-          PLIST_BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :BUNDLE_ID" "$SRC")
-          [ "$PLIST_BUNDLE" = "$EXPECTED" ] || { echo "❌ BUNDLE_ID mismatch $PLIST_BUNDLE vs $EXPECTED"; exit 1; }
-          if [ "$SRC" != "ios/Runner/GoogleService-Info.plist" ]; then
-            cp "$SRC" ios/Runner/GoogleService-Info.plist
-          fi
-          echo "✅ Firebase plist BUNDLE_ID OK"
-      - name: 6. Verify GoogleService in Resources - REAL FORMAT
-        script: |
-          set -e
-          python3 << 'PY'
-          import re
-          import sys
-          pbx_path = "ios/Runner.xcodeproj/project.pbxproj"
-          with open(pbx_path, "r") as f:
-              content = f.read()
-          real_test_line = "A1B2C3D4E5F6A7B8C9D0E1F2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F2E1D0C9B8A7F6E5D4C3B2A1 /* GoogleService-Info.plist */; };"
-          pattern = r'([A-F0-9]{24})\s+/\*\s*GoogleService-Info\.plist in Resources\s*\*/\s*=\s*\{isa\s*=\s*PBXBuildFile\b'
-          phase_pattern = r'/\* Begin PBXResourcesBuildPhase section \*/(.*?)/\* End PBXResourcesBuildPhase section \*/'
-          files_pattern = r'files\s*=\s*\((.*?)\);'
-          m_test = re.search(pattern, real_test_line)
-          if not m_test:
-              print("REGEX TEST FAILED")
-              sys.exit(1)
-          print("Regex test passed:", m_test.group(1))
-          buildfile_ids = re.findall(pattern, content)
-          if not buildfile_ids:
-              print("GoogleService PBXBuildFile not found")
-              sys.exit(1)
-          print("Found BuildFile IDs:", buildfile_ids)
-          m_phase = re.search(phase_pattern, content, re.DOTALL)
-          if not m_phase:
-              print("PBXResourcesBuildPhase section not found")
-              sys.exit(1)
-          all_lists = re.findall(files_pattern, m_phase.group(1), re.DOTALL)
-          print("Resources files lists:", len(all_lists))
-          found = False
-          for idx, files_list in enumerate(all_lists):
-              for bf_id in buildfile_ids:
-                  if re.search(r'\b' + re.escape(bf_id) + r'\b', files_list):
-                      print("Firebase plist found in Resources list:", idx + 1)
-                      found = True
-                      break
-              if found:
-                  break
-          if not found:
-              print("Firebase plist BuildFile ID is not in any Resources files list")
-              sys.exit(1)
-          print("Firebase plist Resources verification PASSED")
-          PY
-      - name: 7. Get packages
-        script: |
-          flutter pub get
-      - name: 8. Info.plist preserve Turkish
-        script: |
-          set -e
-          INFO="ios/Runner/Info.plist"
-          check_and_add() {
-            KEY=$1
-            VALUE=$2
-            if /usr/libexec/PlistBuddy -c "Print :$KEY" "$INFO" >/dev/null 2>&1; then
-              echo "✅ $KEY exists, preserving"
-            else
-              /usr/libexec/PlistBuddy -c "Add :$KEY string '$VALUE'" "$INFO"
-              echo "✅ Added $KEY"
-            fi
-          }
-          check_and_add "NSLocationWhenInUseUsageDescription" "Size en yakin ustalari bulmak icin konumunuza ihtiyacimiz var."
-          check_and_add "NSLocationAlwaysAndWhenInUseUsageDescription" "Arka planda size daha iyi hizmet verebilmek icin konum izni gerekiyor."
-          check_and_add "NSPhotoLibraryUsageDescription" "Profil fotografi ve is fotograflari yuklemek icin galeri erisimi gerekiyor."
-          check_and_add "NSCameraUsageDescription" "Profil ve is fotograflari cekmek icin kamera erisimi gerekiyor."
-          check_and_add "NSMicrophoneUsageDescription" "Video ve sesli mesajlar icin mikrofon erisimi gerekiyor."
-          plutil -lint "$INFO"
-      - name: 9. Pod install keep lock
+
+      - name: 5. Pod install - keep Podfile.lock
         script: |
           set -e
           cd ios
           rm -rf Pods
           pod install --repo-update
-      - name: 10. Build iOS Debug No-Codesign - Physical
+
+      - name: 6. Set up keychain and fetch signing files
         script: |
           set -e
-          flutter build ios --debug --no-codesign --no-pub --verbose
-      - name: 11. Build Simulator .app - Patch + xcodebuild + Guaranteed Restore
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles
+
+      - name: 7. Build IPA Release App Store
         script: |
           set -e
-          set -o pipefail
-          PBX="ios/Runner.xcodeproj/project.pbxproj"
-          cp "$PBX" "$PBX.bak"
-          restore() {
-            echo "=== RESTORING ORIGINAL PBX ==="
-            if [ -f "$PBX.bak" ]; then
-              cp "$PBX.bak" "$PBX"
-              rm "$PBX.bak"
-              echo "✅ Restored original project.pbxproj"
-            fi
-          }
-          trap restore EXIT
-          ORIGINAL_COUNT=$(grep -c "SUPPORTED_PLATFORMS = iphoneos;" "$PBX" || true)
-          echo "Original count: $ORIGINAL_COUNT"
-          [ "$ORIGINAL_COUNT" -eq 3 ] || {
-            echo "❌ Beklenen 3 SUPPORTED_PLATFORMS satırı bulunamadı"
-            exit 1
-          }
-          echo "=== PATCHING ONLY EXISTING LINES (3 configs) ==="
-          sed -i '' 's/SUPPORTED_PLATFORMS = iphoneos;/SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";/g' "$PBX"
-          PATCHED_COUNT=$(grep -c 'SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";' "$PBX" || true)
-          echo "Patched count: $PATCHED_COUNT"
-          [ "$PATCHED_COUNT" -eq 3 ] || {
-            echo "❌ Patch sayısı 3 değil"
-            exit 1
-          }
-          echo "✅ Patched to iphoneos iphonesimulator - NO duplicate, SDKROOT untouched"
-          plutil -lint "$PBX"
-          echo ""
-          echo "=== Available Runtimes (Xcode 26.0 has iOS 26.0) ==="
-          xcrun simctl list runtimes || true
-          echo ""
-          echo "=== Building Flutter App.framework for SIMULATOR ==="
-          flutter build ios --debug --simulator --no-codesign --no-pub --verbose
-          echo ""
-          echo "=== Building unsigned Simulator .app with xcodebuild (generic destination) ==="
-          xcodebuild \
-            -workspace ios/Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath ios/output \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
-          echo ""
-          echo "=== Simulator .app check ==="
-          ls -lh ios/output/Build/Products/Debug-iphonesimulator/Runner.app
-          echo "✅ Simulator build finished - trap will restore pbxproj"
-      - name: 12. Ensure original pbxproj restored - Final safety
-        script: |
-          set -e
-          PBX="ios/Runner.xcodeproj/project.pbxproj"
-          if [ -f "$PBX.bak" ]; then
-            cp "$PBX.bak" "$PBX"
-            rm "$PBX.bak"
-            echo "✅ Final restore done"
-          else
-            echo "✅ Already restored by trap"
-          fi
-          echo "Final check - should be 3 lines iphoneos only:"
-          grep -c "SUPPORTED_PLATFORMS = iphoneos;" "$PBX"
-      - name: 13. Create distinct artifacts for Physical and Simulator
-        script: |
-          set -e
-          mkdir -p build/artifacts
-          echo "=== Physical .app ==="
-          ls -lh build/ios/iphoneos/Runner.app
-          cd build/ios/iphoneos
-          zip -r -y ../../artifacts/Runner-Physical-iPhone.app.zip Runner.app
-          cd ../../../
-          echo "=== Simulator .app ==="
-          ls -lh ios/output/Build/Products/Debug-iphonesimulator/Runner.app
-          cd ios/output/Build/Products/Debug-iphonesimulator
-          zip -r -y ../../../../../build/artifacts/Runner-Simulator-iPhone.app.zip Runner.app
-          cd ../../../../../
-          echo "=== Final artifacts ==="
-          ls -lh build/artifacts/
+          flutter build ipa --release --export-method app-store --verbose
+
     artifacts:
-      - build/ios/iphoneos/Runner.app
-      - ios/output/Build/Products/Debug-iphonesimulator/Runner.app
-      - build/artifacts/*.zip
-      - build/**/*.log
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_*.log
+
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+        beta_groups:
+          - HUG Testers
