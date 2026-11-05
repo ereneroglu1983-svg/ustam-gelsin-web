@@ -18,7 +18,6 @@ workflows:
         script: |
           flutter clean
           flutter pub get
-
       - name: 2. Verify PAID Bundle ID - lowercase + DisplayName
         script: |
           set -e
@@ -29,7 +28,6 @@ workflows:
           DISPLAY_NAME=$(/usr/libexec/PlistBuddy -c "Print :CFBundleDisplayName" "$INFO")
           [ "$DISPLAY_NAME" = "Hemen Ustam Gelsin" ] || { echo "❌ DisplayName Hemen Ustam Gelsin olmalı"; exit 1; }
           echo "✅ Bundle ID ve DisplayName OK"
-
       - name: 3. Verify Firebase GoogleService-Info.plist Bundle ID
         script: |
           set -e
@@ -39,7 +37,6 @@ workflows:
           PLIST_BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :BUNDLE_ID" "$PLIST_PATH")
           [ "$PLIST_BUNDLE" = "$EXPECTED" ] || { echo "❌ Firebase BUNDLE_ID mismatch: $PLIST_BUNDLE"; exit 1; }
           echo "✅ Firebase plist OK: $PLIST_BUNDLE"
-
       - name: 4. FORCE Podfile iOS 15.0 - keep lock
         script: |
           set -e
@@ -79,14 +76,12 @@ workflows:
             end
           end
           PODFILE
-
       - name: 5. Pod install - keep Podfile.lock
         script: |
           set -e
           cd ios
           rm -rf Pods
           pod install --repo-update
-
       - name: 6. Set up keychain and fetch signing files
         script: |
           set -e
@@ -97,12 +92,17 @@ workflows:
           echo "=== DEBUG ENV VARS (names only) ==="
           env | grep -E "ISSUER_ID|KEY_IDENTIFIER|PRIVATE_KEY|CERTIFICATE" | cut -d= -f1 | sort || true
 
+          echo "=== PREPARE CERTIFICATE PRIVATE KEY ==="
+          if ! echo "${CERTIFICATE_PRIVATE_KEY:-}" | grep -q "BEGIN.*PRIVATE KEY"; then
+            echo "Generating new RSA private key for certificate..."
+            openssl genrsa -out /tmp/cert_private_key.pem 2048
+            export CERTIFICATE_PRIVATE_KEY="$(cat /tmp/cert_private_key.pem)"
+          else
+            echo "$CERTIFICATE_PRIVATE_KEY" > /tmp/cert_private_key.pem
+          fi
+
           echo "=== FETCH APP STORE SIGNING FILES ==="
-          # CERTIFICATE_PRIVATE_KEY fetch ile çakışıyor, geçici gizle
-          CERT_TMP="$CERTIFICATE_PRIVATE_KEY"
-          unset CERTIFICATE_PRIVATE_KEY
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
-          export CERTIFICATE_PRIVATE_KEY="$CERT_TMP"
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create --certificate-key /tmp/cert_private_key.pem
 
           echo "=== IMPORT CERTIFICATES ==="
           keychain add-certificates
@@ -124,17 +124,14 @@ workflows:
           xcode-project use-profiles --project ios/Runner.xcodeproj
 
           echo "=== SIGNING CONFIGURATION COMPLETED ==="
-
       - name: 7. Build IPA Release App Store
         script: |
           set -e
           flutter build ipa --release --export-method app-store --verbose
-
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - flutter_*.log
-
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
