@@ -1,4 +1,4 @@
-// lib/features/admin/screens/usta_poster.dart - V3 FINAL - BEYAZDA OKUNAN - TAM
+// lib/features/admin/screens/usta_poster.dart - V3 FINAL - BEYAZDA OKUNAN - TAM - FIXED b815
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,7 +37,19 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
   @override
   void initState() {
     super.initState();
+    _configureFirestore();
     _loadLocationData();
+  }
+
+  void _configureFirestore() {
+    try {
+      FirebaseFirestore.instance.settings = const Settings(
+        persistenceEnabled: false,
+        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+      );
+    } catch (_) {
+      // Settings sadece 1 kere set edilebilir, zaten set edildiyse yoksay
+    }
   }
 
   @override
@@ -62,10 +74,10 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
   }
 
   String _getName(dynamic data, dynamic id, String idKey, String nameKey) {
-    if (id == null || data == null || data is! List) return id?.toString()?? "";
+    if (id == null || data == null || data is! List) return id?.toString() ?? "";
     for (var item in data) {
       if (item[idKey]?.toString() == id.toString()) {
-        return item[nameKey]?.toString()?? id.toString();
+        return item[nameKey]?.toString() ?? id.toString();
       }
     }
     return id.toString();
@@ -92,14 +104,14 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
         return;
       }
       final data = doc.data() as Map<String, dynamic>;
-      final firstName = data['firstName']?? data['name']?? "";
-      final lastName = data['lastName']?? "";
+      final firstName = data['firstName'] ?? data['name'] ?? "";
+      final lastName = data['lastName'] ?? "";
       final adSoyad = "$firstName $lastName".trim();
       String sehirIsmi = _getName(_sehirler, data['sehir_id'], 'sehir_id', 'sehir_adi');
       String ilceIsmi = _getName(_ilceler, data['ilce_id'], 'ilce_id', 'ilce_adi');
-      if (sehirIsmi.isEmpty) sehirIsmi = data['sehir']?? data['il']?? "";
-      if (ilceIsmi.isEmpty) ilceIsmi = data['ilce']?? "";
-      List<dynamic> uzmanliklar = data['uzmanliklar']?? [];
+      if (sehirIsmi.isEmpty) sehirIsmi = data['sehir'] ?? data['il'] ?? "";
+      if (ilceIsmi.isEmpty) ilceIsmi = data['ilce'] ?? "";
+      List<dynamic> uzmanliklar = data['uzmanliklar'] ?? [];
       setState(() {
         aktifUstaDocId = doc.id;
         adController.text = adSoyad;
@@ -141,7 +153,7 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
       final slug = slugify(adController.text.trim(), lowercase: true, delimiter: '-');
       final ts = DateTime.now().millisecondsSinceEpoch;
       final imagePath = await resimYukle(slug, ts);
-      final docId = duzenlenenDocId?? slug;
+      final docId = duzenlenenDocId ?? slug;
       final data = {
         'baslik': adController.text.trim(),
         'slug': slug,
@@ -156,11 +168,11 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
         'tarih': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
         'aktif': true,
-        'ustaRefId': aktifUstaDocId?? idController.text.trim(),
+        'ustaRefId': aktifUstaDocId ?? idController.text.trim(),
       };
       await FirebaseFirestore.instance.collection('karisik_slider').doc(docId).set(data, SetOptions(merge: true));
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(duzenlenenDocId == null? 'YAYINDA: $slug OK' : 'GÜNCELLENDİ: $slug')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(duzenlenenDocId == null ? 'YAYINDA: $slug OK' : 'GÜNCELLENDİ: $slug')));
       temizleForm();
     } catch (e) {
       if (!mounted) return;
@@ -189,11 +201,11 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
     setState(() {
       duzenlenenDocId = doc.id;
       aktifUstaDocId = data['ustaRefId'];
-      idController.text = data['ustaRefId']?? "";
-      adController.text = data['baslik']?? '';
-      ilController.text = data['ilRaw']?? data['il']?? '';
-      ilceController.text = data['ilceRaw']?? data['ilce']?? '';
-      hizmetController.text = data['hizmetlerRaw']?? (data['hizmetler'] as List?)?.join(', ')?? '';
+      idController.text = data['ustaRefId'] ?? "";
+      adController.text = data['baslik'] ?? '';
+      ilController.text = data['ilRaw'] ?? data['il'] ?? '';
+      ilceController.text = data['ilceRaw'] ?? data['ilce'] ?? '';
+      hizmetController.text = data['hizmetlerRaw'] ?? (data['hizmetler'] as List?)?.join(', ') ?? '';
       mevcutImagePath = data['imagePath'];
       secilenResim = null;
     });
@@ -210,13 +222,13 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Text(duzenlenenDocId == null? 'Usta Posterleri - ID ile Çek' : 'Düzenleniyor: $duzenlenenDocId',
+          title: Text(duzenlenenDocId == null ? 'Usta Posterleri - ID ile Çek' : 'Düzenleniyor: $duzenlenenDocId',
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white)),
           backgroundColor: const Color(0xFF111111),
           foregroundColor: Colors.white,
           elevation: 0,
           actions: [
-            if (widget.onNavigateHome!= null)
+            if (widget.onNavigateHome != null)
               IconButton(icon: const Icon(Icons.home, color: Colors.white), onPressed: widget.onNavigateHome),
           ],
         ),
@@ -253,7 +265,7 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(duzenlenenDocId == null? 'Yeni Usta Ekle' : 'Düzenle: $duzenlenenDocId',
+        Text(duzenlenenDocId == null ? 'Yeni Usta Ekle' : 'Düzenle: $duzenlenenDocId',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
         const SizedBox(height: 16),
         Row(children: [
@@ -355,12 +367,12 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
           child: OutlinedButton.icon(
             onPressed: () async {
               final resim = await ImagePicker().pickImage(source: ImageSource.gallery);
-              if (resim!= null) setState(() => secilenResim = resim);
+              if (resim != null) setState(() => secilenResim = resim);
             },
-            icon: Icon(secilenResim!= null? Icons.check_circle : Icons.image, color: secilenResim!= null? Colors.green : Colors.black),
+            icon: Icon(secilenResim != null ? Icons.check_circle : Icons.image, color: secilenResim != null ? Colors.green : Colors.black),
             label: Text(
               secilenResim == null
-                  ? (mevcutImagePath == null? 'Poster Resmi Seç *' : 'Mevcut: ${mevcutImagePath!.split('/').last} - Değiştir')
+                  ? (mevcutImagePath == null ? 'Poster Resmi Seç *' : 'Mevcut: ${mevcutImagePath!.split('/').last} - Değiştir')
                   : 'Resim Seçildi ✓ ${secilenResim!.name}',
               style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 12),
             ),
@@ -372,10 +384,10 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
             ),
           ),
         ),
-        if (secilenResim!= null || mevcutImagePath!= null)
+        if (secilenResim != null || mevcutImagePath != null)
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: Text(secilenResim!= null? 'Yeni resim yüklenecek: ${secilenResim!.name}' : 'Mevcut resim kullanılacak: $mevcutImagePath',
+            child: Text(secilenResim != null ? 'Yeni resim yüklenecek: ${secilenResim!.name}' : 'Mevcut resim kullanılacak: $mevcutImagePath',
                 style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.w600)),
           ),
         const SizedBox(height: 24),
@@ -387,11 +399,11 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
               onPressed: kaydet,
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black, foregroundColor: Colors.white, minimumSize: const Size(double.infinity, 50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-              child: Text(duzenlenenDocId == null? 'POSTERİ YAYINLA' : 'GÜNCELLE',
+              child: Text(duzenlenenDocId == null ? 'POSTERİ YAYINLA' : 'GÜNCELLE',
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white)),
             ),
           ),
-          if (duzenlenenDocId!= null)...[
+          if (duzenlenenDocId != null) ...[
             const SizedBox(width: 12),
             ElevatedButton(
               onPressed: temizleForm,
@@ -424,13 +436,43 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
 
   Widget _sagListeContent({required bool isMobile}) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('karisik_slider').orderBy('tarih', descending: true).snapshots(),
+      // FIX: orderBy kaldırıldı, b815 INTERNAL ASSERTION bug fix
+      stream: FirebaseFirestore.instance.collection('karisik_slider').snapshots(),
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 32),
+                  const SizedBox(height: 12),
+                  Text('Liste hatası: ${snapshot.error}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 12)),
+                  const SizedBox(height: 8),
+                  const Text('Sayfayı yenile kanka', style: TextStyle(color: Colors.black54, fontSize: 11)),
+                ],
+              ),
+            ),
+          );
+        }
         if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator(color: Colors.black));
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Center(child: Padding(padding: EdgeInsets.all(24), child: Text('Henüz poster yok kanka', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600))));
         }
-        final docs = snapshot.data!.docs;
+        // FIX: Client-side sort, null-safe, serverTimestamp null olabilir
+        final docs = snapshot.data!.docs.toList()
+          ..sort((a, b) {
+            final aData = a.data() as Map<String, dynamic>;
+            final bData = b.data() as Map<String, dynamic>;
+            final aTarih = aData['tarih'] as Timestamp?;
+            final bTarih = bData['tarih'] as Timestamp?;
+            if (aTarih == null && bTarih == null) return 0;
+            if (aTarih == null) return 1;
+            if (bTarih == null) return -1;
+            return bTarih.compareTo(aTarih);
+          });
+
         return isMobile
             ? ListView.separated(
           shrinkWrap: true,
@@ -439,10 +481,10 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
           separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFEEEEEE)),
           itemBuilder: (context, i) {
             final data = docs[i].data() as Map<String, dynamic>;
-            final baslik = data['baslik']?? 'İsimsiz';
-            final ilRaw = data['ilRaw']?? data['il']?? '';
-            final ilceRaw = data['ilceRaw']?? data['ilce']?? '';
-            final konum = (ilRaw.toString().isEmpty && ilceRaw.toString().isEmpty)? 'Şehir boş' : '$ilRaw / $ilceRaw';
+            final baslik = data['baslik'] ?? 'İsimsiz';
+            final ilRaw = data['ilRaw'] ?? data['il'] ?? '';
+            final ilceRaw = data['ilceRaw'] ?? data['ilce'] ?? '';
+            final konum = (ilRaw.toString().isEmpty && ilceRaw.toString().isEmpty) ? 'Şehir boş' : '$ilRaw / $ilceRaw';
             return _buildTile(baslik, konum, data, docs[i]);
           },
         )
@@ -451,10 +493,10 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
           separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFEEEEEE)),
           itemBuilder: (context, i) {
             final data = docs[i].data() as Map<String, dynamic>;
-            final baslik = data['baslik']?? 'İsimsiz';
-            final ilRaw = data['ilRaw']?? data['il']?? '';
-            final ilceRaw = data['ilceRaw']?? data['ilce']?? '';
-            final konum = (ilRaw.toString().isEmpty && ilceRaw.toString().isEmpty)? 'Şehir boş' : '$ilRaw / $ilceRaw';
+            final baslik = data['baslik'] ?? 'İsimsiz';
+            final ilRaw = data['ilRaw'] ?? data['il'] ?? '';
+            final ilceRaw = data['ilceRaw'] ?? data['ilce'] ?? '';
+            final konum = (ilRaw.toString().isEmpty && ilceRaw.toString().isEmpty) ? 'Şehir boş' : '$ilRaw / $ilceRaw';
             return _buildTile(baslik, konum, data, docs[i]);
           },
         );
@@ -472,7 +514,7 @@ class _UstaPosterScreenState extends State<UstaPosterScreen> {
         title: Text(baslik, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.black)),
         subtitle: Text(konum, style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.w500)),
         trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (data['ustaRefId']!= null)
+          if (data['ustaRefId'] != null)
             Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)),
