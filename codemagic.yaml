@@ -98,24 +98,7 @@ workflows:
           env | grep -E "ISSUER_ID|KEY_IDENTIFIER|PRIVATE_KEY|CERTIFICATE" | cut -d= -f1 | sort || true
 
           echo "=== FETCH APP STORE SIGNING FILES ==="
-          ISSUER_VAL="${APP_STORE_CONNECT_ISSUER_ID:-${ISSUER_ID:-}}"
-          KEY_VAL="${APP_STORE_CONNECT_KEY_IDENTIFIER:-${KEY_IDENTIFIER:-}}"
-          PRIV_VAL="${APP_STORE_CONNECT_PRIVATE_KEY:-${PRIVATE_KEY:-}}"
-
-          FETCH_ARGS=""
-
-          if [ -n "$ISSUER_VAL" ]; then
-            FETCH_ARGS="$FETCH_ARGS --issuer-id $ISSUER_VAL"
-          fi
-          if [ -n "$KEY_VAL" ]; then
-            FETCH_ARGS="$FETCH_ARGS --key-id $KEY_VAL"
-          fi
-          if [ -n "$PRIV_VAL" ]; then
-            FETCH_ARGS="$FETCH_ARGS --private-key $PRIV_VAL"
-          fi
-
-          echo "Fetching with args: $FETCH_ARGS (values masked)"
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create $FETCH_ARGS
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
 
           echo "=== IMPORT CERTIFICATES ==="
           keychain add-certificates
