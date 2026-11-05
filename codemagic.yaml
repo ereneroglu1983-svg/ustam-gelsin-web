@@ -92,17 +92,8 @@ workflows:
           echo "=== DEBUG ENV VARS (names only) ==="
           env | grep -E "ISSUER_ID|KEY_IDENTIFIER|PRIVATE_KEY|CERTIFICATE" | cut -d= -f1 | sort || true
 
-          echo "=== PREPARE CERTIFICATE PRIVATE KEY ==="
-          if ! echo "${CERTIFICATE_PRIVATE_KEY:-}" | grep -q "BEGIN.*PRIVATE KEY"; then
-            echo "Generating new RSA private key for certificate..."
-            openssl genrsa -out /tmp/cert_private_key.pem 2048
-            export CERTIFICATE_PRIVATE_KEY="$(cat /tmp/cert_private_key.pem)"
-          else
-            echo "$CERTIFICATE_PRIVATE_KEY" > /tmp/cert_private_key.pem
-          fi
-
           echo "=== FETCH APP STORE SIGNING FILES ==="
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create --certificate-key /tmp/cert_private_key.pem
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
 
           echo "=== IMPORT CERTIFICATES ==="
           keychain add-certificates
