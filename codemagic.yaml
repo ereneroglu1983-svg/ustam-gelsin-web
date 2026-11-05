@@ -37,8 +37,8 @@ workflows:
           PLIST_PATH="ios/Runner/GoogleService-Info.plist"
           [ -f "$PLIST_PATH" ] || { echo "❌ GoogleService-Info.plist yok"; exit 1; }
           PLIST_BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :BUNDLE_ID" "$PLIST_PATH")
-          [ "$PLIST_BUNDLE" = "$EXPECTED" ] || { echo "❌ Firebase BUNDLE_ID mismatch"; exit 1; }
-          echo "✅ Firebase plist OK"
+          [ "$PLIST_BUNDLE" = "$EXPECTED" ] || { echo "❌ Firebase BUNDLE_ID mismatch: $PLIST_BUNDLE"; exit 1; }
+          echo "✅ Firebase plist OK: $PLIST_BUNDLE"
 
       - name: 4. FORCE Podfile iOS 15.0 - keep lock
         script: |
@@ -90,10 +90,33 @@ workflows:
       - name: 6. Set up keychain and fetch signing files
         script: |
           set -e
+
+          echo "=== INITIALIZE KEYCHAIN ==="
           keychain initialize
+
+          echo "=== FETCH APP STORE SIGNING FILES ==="
           app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+
+          echo "=== IMPORT CERTIFICATES ==="
           keychain add-certificates
-          xcode-project use-profiles
+
+          echo "=== CHECK CODE SIGNING IDENTITIES ==="
+          IDENTITY_OUTPUT="$(security find-identity -v -p codesigning 2>&1)"
+          echo "$IDENTITY_OUTPUT"
+
+          if ! echo "$IDENTITY_OUTPUT" | grep -Eq '[1-9][0-9]* valid identities found'; then
+            echo "❌ Geçerli Apple signing identity bulunamadı"
+            exit 1
+          fi
+
+          echo "=== CHECK PROVISIONING PROFILES ==="
+          find "$HOME/Library/MobileDevice/Provisioning Profiles" -maxdepth 1 -type f -print 2>/dev/null || true
+          ls -lh "$HOME/Library/MobileDevice/Provisioning Profiles" 2>/dev/null || true
+
+          echo "=== APPLY SIGNING TO RUNNER PROJECT ==="
+          xcode-project use-profiles --project ios/Runner.xcodeproj
+
+          echo "=== SIGNING CONFIGURATION COMPLETED ==="
 
       - name: 7. Build IPA Release App Store
         script: |
