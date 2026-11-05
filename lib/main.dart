@@ -1,4 +1,4 @@
-// lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX + HUG MARKET ROUTE FIX + B ŞIKKI ADMIN EKLENDI - IMPORT FIX + KOMSU HELPER EKLENDI + ANALYTICS EKLENDI + HUG PROJE ROUTE EKLENDI
+// lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX + HUG MARKET ROUTE FIX + B ŞIKKI ADMIN EKLENDI - IMPORT FIX + KOMSU HELPER EKLENDI + ANALYTICS EKLENDI + HUG PROJE ROUTE EKLENDI + FIRESTORE WEB FIX b815
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +25,7 @@ import 'package:ustam_gelsin/core/theme/usta_theme.dart';
 import 'package:ustam_gelsin/services/yorum_service.dart';
 import 'package:ustam_gelsin/features/admin/screens/blog_ekle_screen.dart';
 import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // <-- FIX ICIN EKLENDI
 
 // HUG MARKET IMPORTLARI EKLENDI
 import 'package:ustam_gelsin/features/hug_market/hug_market_homepage.dart';
@@ -183,6 +184,18 @@ void main() async {
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     debugPrint("✅ Firebase başlatıldı");
+    // FIX b815 - WEB FIRESTORE CACHE KAPAT - INTERNAL ASSERTION BITIRIR
+    if (kIsWeb) {
+      try {
+        FirebaseFirestore.instance.settings = const Settings(
+          persistenceEnabled: false,
+          cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+        );
+        debugPrint("✅ Firestore Web persistence KAPATILDI - b815 fix");
+      } catch (e) {
+        debugPrint("Firestore settings zaten setli: $e");
+      }
+    }
     // ANALYTICS - CANLI SAYAC ICIN EKLENDI
     await FirebaseAnalytics.instance.logAppOpen();
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
