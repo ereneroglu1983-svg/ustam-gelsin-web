@@ -98,7 +98,11 @@ workflows:
           env | grep -E "ISSUER_ID|KEY_IDENTIFIER|PRIVATE_KEY|CERTIFICATE" | cut -d= -f1 | sort || true
 
           echo "=== FETCH APP STORE SIGNING FILES ==="
+          # CERTIFICATE_PRIVATE_KEY fetch ile çakışıyor, geçici gizle
+          CERT_TMP="$CERTIFICATE_PRIVATE_KEY"
+          unset CERTIFICATE_PRIVATE_KEY
           app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          export CERTIFICATE_PRIVATE_KEY="$CERT_TMP"
 
           echo "=== IMPORT CERTIFICATES ==="
           keychain add-certificates
