@@ -1,5 +1,4 @@
 // lib/features/usta/screens/yeni_is_firsatlari_sayfasi.dart - REVİZE: YENİDEN ESKİYE
-
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,6 +24,7 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
   String _seciliSirala = "Konuma Göre Yakın";
   String _seciliKategori = "Hepsi";
   List<String> _teklifVerilenIlanlar = [];
+  Set<String> _engellenenMusteriler = {};
 
   double _ustaLat = 0.0;
   double _ustaLng = 0.0;
@@ -38,6 +38,7 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
     super.initState();
     _teklifleriGetir();
     _kullaniciKonumuYukle();
+    _engellenenleriGetir();
   }
 
   bool _isAcil(IlanModel ilan) => ilan.isAcil == true || (ilan.teknikDetaylar['isAcil'] == true);
@@ -65,6 +66,112 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
       setState(() {
         _teklifVerilenIlanlar = snapshot.docs.map((doc) => doc.get('ilanId') as String).toList();
       });
+    }
+  }
+
+  // ADIM 1 - 【entity-APPLE¦canonical_name=Apple】 1.2: Engelledigim musterileri getir, onlarin ilanlarini gizle
+  Future<void> _engellenenleriGetir() async {
+    final ustaId = FirebaseAuth.instance.currentUser?.uid;
+    if (ustaId == null) return;
+    final snap = await FirebaseFirestore.instance
+        .collection('blocked_users')
+        .where('blockerId', isEqualTo: ustaId)
+        .get();
+    if (mounted) {
+      setState(() {
+        _engellenenMusteriler = snap.docs
+            .map((d) => (d.data()['blockedId'] ?? '').toString())
+            .where((id) => id.isNotEmpty)
+            .toSet();
+      });
+    }
+  }
+
+  // ADIM 1 - 【entity-APPLE¦canonical_name=Apple】 1.2: Ilani sikayet et
+  Future<void> _sikayetEt(IlanModel ilan) async {
+    final ustaId = FirebaseAuth.instance.currentUser?.uid;
+    if (ustaId == null) return;
+    final sebep = await showDialog<String>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('İlanı Şikayet Et'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Bu ilanı neden şikayet ediyorsun?', style: TextStyle(fontSize: 13)),
+            const SizedBox(height: 12),
+            ListTile(title: const Text('Sahte / Yanıltıcı ilan'), onTap: () => Navigator.pop(c, 'Sahte / Yanıltıcı ilan')),
+            ListTile(title: const Text('Küfür / Hakaret'), onTap: () => Navigator.pop(c, 'Küfür / Hakaret')),
+            ListTile(title: const Text('Dolandırıcılık'), onTap: () => Navigator.pop(c, 'Dolandırıcılık')),
+            ListTile(title: const Text('Diğer'), onTap: () => Navigator.pop(c, 'Diğer')),
+          ],
+        ),
+        actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('İptal'))],
+      ),
+    );
+    if (sebep == null) return;
+    try {
+      await FirebaseFirestore.instance.collection('reports').add({
+        'reporterId': ustaId,
+        'reporterRole': 'usta',
+        'reportedUserId': ilan.userId,
+        'ilanId': ilan.id,
+        'ilanBaslik': ilan.baslik,
+        'sebep': sebep,
+        'type': 'ilan',
+        'status': 'bekliyor',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Şikayetiniz alındı, moderasyon inceleyecek.'), backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
+    }
+  }
+
+  // ADIM 1 - 【entity-APPLE¦canonical_name=Apple】 1.2: Musteriyi engelle - bir daha onun ilanlarini gorme
+  Future<void> _musteriyiEngelle(IlanModel ilan) async {
+    final ustaId = FirebaseAuth.instance.currentUser?.uid;
+    if (ustaId == null) return;
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Müşteriyi Engelle?'),
+        content: const Text('Bu müşterinin ilanlarını bir daha görmeyeceksin. Emin misin?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('İptal')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text('Engelle'),
+          ),
+        ],
+      ),
+    );
+    if (onay != true) return;
+    try {
+      await FirebaseFirestore.instance
+          .collection('blocked_users')
+          .doc('${ustaId}_${ilan.userId}')
+          .set({
+        'blockerId': ustaId,
+        'blockerRole': 'usta',
+        'blockedId': ilan.userId,
+        'blockedRole': 'musteri',
+        'ilanId': ilan.id,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      if (mounted) {
+        setState(() => _engellenenMusteriler.add(ilan.userId));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Müşteri engellendi.'), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hata: $e')));
     }
   }
 
@@ -117,7 +224,7 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
                     if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
 
                     List<IlanModel> ilanlar = (snapshot.data?? [])
-                        .where((i) =>!_isAcil(i) &&!_teklifVerilenIlanlar.contains(i.id))
+                        .where((i) =>!_isAcil(i) &&!_teklifVerilenIlanlar.contains(i.id) && !_engellenenMusteriler.contains(i.userId))
                         .toList();
 
                     if (_seciliKategori!= "Hepsi") {
@@ -179,7 +286,23 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
                       child: Text(s.data?? "MÜŞTERİ", style: const TextStyle(color: Color(0xFFFFA500), fontSize: 11, fontWeight: FontWeight.bold)),
                     ),
                   ),
-                  Text(ilan.tarih.contains('T')? ilan.tarih.split('T')[0] : ilan.tarih, style: const TextStyle(color: Colors.white60)),
+                  Row(
+                    children: [
+                      Text(ilan.tarih.contains('T')? ilan.tarih.split('T')[0] : ilan.tarih, style: const TextStyle(color: Colors.white60)),
+                      PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert, color: Colors.white70, size: 20),
+                        color: const Color(0xFF2A2A2A),
+                        onSelected: (val) {
+                          if (val == 'sikayet') _sikayetEt(ilan);
+                          if (val == 'engelle') _musteriyiEngelle(ilan);
+                        },
+                        itemBuilder: (c) => [
+                          const PopupMenuItem(value: 'sikayet', child: Row(children: [Icon(Icons.flag, color: Colors.orange, size: 18), SizedBox(width: 8), Text('İlanı Şikayet Et', style: TextStyle(color: Colors.white))])),
+                          const PopupMenuItem(value: 'engelle', child: Row(children: [Icon(Icons.block, color: Colors.red, size: 18), SizedBox(width: 8), Text('Müşteriyi Engelle', style: TextStyle(color: Colors.white))])),
+                        ],
+                      ),
+                    ],
+                  ),
                 ],
               ),
               const SizedBox(height: 16),

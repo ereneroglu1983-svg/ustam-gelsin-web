@@ -1,0 +1,399 @@
+/* HUG PROJE - app/globals.css - Attigin Tasarimin Aynisi */
+/* Renkler, yazilar, duzen: kullanicinin onayladigi tasarimdan alinmistir, baska tasarim yok. */
+/* - Zemin: #0A0A0A siyah - logo siyah zeminli, kutu gibi durmaz */
+/* - Yazi: #F5F2EB beyaz, alt yazi #A8A29E gri */
+/* - Altin: #C9A86A - logodaki altin cizgiyle ayni */
+/* - Font: Fraunces (baslik) + Manrope (govde) - layout.tsx'te next/font ile yuklenir, */
+/*   subsets ['latin', 'latin-ext'] - Turkce karakterler dogru fonttan gelir. */
+/* - Tailwind v4: @import "tailwindcss" + @theme */
+
+@import "tailwindcss";
+
+@theme {
+  --color-hug-black: #0A0A0A;
+  --color-hug-black-2: #111111;
+  --color-hug-card: #171717;
+  --color-hug-card-2: #1C1C1C;
+  --color-hug-white: #F5F2EB;
+  --color-hug-muted: #A8A29E;
+  --color-hug-gold: #C9A86A;
+  --color-hug-gold-2: #D9BC82;
+  --color-hug-line: #2A2A2A;
+  --font-hug-display: "Fraunces", Georgia, serif;
+  --font-hug-body: "Manrope", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #0A0A0A;
+  color: #F5F2EB;
+  font-family: var(--font-hug-body, "Manrope", system-ui, sans-serif);
+  margin: 0;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* --- Klavye erisilebilirligi: :focus-visible - siyah-altin kimlik korundu --- */
+/* Sadece klavye ile gezinirken gorunur, fare ile tiklayinca cerceve cikmaz. */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #C9A86A;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Atlama baglantisi: normalde gizli, klavye ile odaklaninca gorunur */
+a[href="#hug-proje-icerik"] {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: #C9A86A;
+  color: #0A0A0A;
+  font-weight: 800;
+  padding: 10px 16px;
+  border-radius: 0 0 12px 0;
+  z-index: 100;
+}
+
+a[href="#hug-proje-icerik"]:focus-visible {
+  left: 0;
+  outline: 2px solid #F5F2EB;
+  outline-offset: 2px;
+}
+
+/* --- Header: tasarimdaki gibi - ustte ince altin cizgi, logo solda, nav ortada, buton sagda --- */
+.hug-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #2A2A2A;
+}
+
+.hug-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.hug-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-hug-display, "Fraunces", Georgia, serif);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #F5F2EB;
+}
+
+.hug-logo img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  background: #0A0A0A;
+}
+
+.hug-nav ul {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hug-nav a {
+  font-size: 14px;
+  font-weight: 600;
+  color: #A8A29E;
+}
+
+.hug-nav a:hover {
+  color: #F5F2EB;
+}
+
+/* Mobil nav: <details> - varsayilanda kapali, mobilde gorunur, masaustunde gizli */
+.hug-mobile-nav summary {
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+  color: #F5F2EB;
+  list-style: none;
+}
+
+.hug-mobile-nav summary::-webkit-details-marker {
+  display: none;
+}
+
+.hug-mobile-nav nav {
+  padding-top: 12px;
+}
+
+.hug-mobile-nav .hug-nav ul {
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* --- Butonlar: tasarimdaki gibi --- */
+.hug-btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #C9A86A;
+  color: #0A0A0A;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 1px solid #C9A86A;
+}
+
+.hug-btn-gold:hover {
+  background: #D9BC82;
+}
+
+.hug-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #F5F2EB;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 1px solid #2A2A2A;
+}
+
+.hug-btn-outline:hover {
+  border-color: #C9A86A;
+  color: #C9A86A;
+}
+
+/* --- Hero: tasarimdaki gibi - ortali, buyuk HUG PROJE, altin cizgi, alt baslik --- */
+.hug-hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 72px 24px 56px;
+  text-align: center;
+}
+
+.hug-hero-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  color: #C9A86A;
+  font-weight: 700;
+  margin: 0 0 20px;
+}
+
+.hug-hero-title {
+  font-family: var(--font-hug-display, "Fraunces", Georgia, serif);
+  font-size: clamp(56px, 9vw, 110px);
+  line-height: 0.95;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  margin: 0;
+  color: #F5F2EB;
+}
+
+.hug-hero-gold-line {
+  width: min(560px, 80%);
+  height: 1px;
+  background: #C9A86A;
+  margin: 28px auto;
+}
+
+.hug-hero-sub {
+  font-size: 13px;
+  letter-spacing: 0.32em;
+  color: #A8A29E;
+  margin: 0 0 28px;
+}
+
+.hug-hero-desc {
+  max-width: 680px;
+  margin: 0 auto 32px;
+  color: #A8A29E;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.hug-hero-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* --- Bolumler: tasarimdaki gibi --- */
+.hug-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.hug-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.hug-section-kicker {
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  color: #C9A86A;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.hug-section-title {
+  font-family: var(--font-hug-display, "Fraunces", Georgia, serif);
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.1;
+  margin: 0;
+  color: #F5F2EB;
+}
+
+.hug-section-desc {
+  color: #A8A29E;
+  margin: 8px 0 0;
+  max-width: 560px;
+}
+
+/* --- Kartlar: tasarimdaki gibi - koyu kart, ince cizgi, altin vurgu --- */
+.hug-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hug-card {
+  background: #171717;
+  border: 1px solid #2A2A2A;
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.hug-card:hover {
+  border-color: #C9A86A;
+}
+
+.hug-card h3 {
+  font-family: var(--font-hug-display, "Fraunces", Georgia, serif);
+  font-size: 20px;
+  margin: 0 0 8px;
+  color: #F5F2EB;
+}
+
+.hug-card p {
+  color: #A8A29E;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.hug-card a {
+  color: #C9A86A;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* --- Il listesi: tasarimdaki gibi - kucuk haplar --- */
+.hug-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hug-pill-list a {
+  display: inline-flex;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #2A2A2A;
+  background: #111111;
+  font-size: 13px;
+  font-weight: 600;
+  color: #F5F2EB;
+}
+
+.hug-pill-list a:hover {
+  border-color: #C9A86A;
+  color: #C9A86A;
+}
+
+/* --- Footer: tasarimdaki gibi --- */
+.hug-footer {
+  border-top: 1px solid #2A2A2A;
+  margin-top: 48px;
+}
+
+.hug-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+/* --- Mobil / Masaustu: iki nav ayni anda gorunmez --- */
+/* Mobilde: masaustu nav gizli, mobil nav gorunur */
+@media (max-width: 768px) {
+  .hug-desktop-nav {
+    display: none;
+  }
+  .hug-mobile-nav {
+    display: block;
+  }
+  .hug-grid {
+    grid-template-columns: 1fr;
+  }
+  .hug-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Masaustunde: mobil nav gizli, masaustu nav gorunur */
+@media (min-width: 769px) {
+  .hug-desktop-nav {
+    display: block;
+  }
+  .hug-mobile-nav {
+    display: none;
+  }
+}
+
+/* --- Hareket hassasiyeti: prefers-reduced-motion --- */
+/* Kullanici cihazinda "hareketi azalt" aciksa animasyon / gecis / smooth scroll kapatilir. */
+/* 0.01ms: 0 degil, cunku 0 bazi tarayicida animasyonu bitirmeyip takili birakir. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

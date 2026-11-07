@@ -1,4 +1,3 @@
-
 // lib/features/admin/screens/moderasyon_view.dart - V2 SADE - CONST UYUMLU - OPTIMIZE
 
 import 'package:flutter/material.dart';
@@ -374,6 +373,9 @@ class _ModerasyonViewState extends State<ModerasyonView> {
                 onPressed: () async {
                   if (seciliSehirId == null) return;
                   try {
+                    // DUZELTME: serverTimestamp() arrayUnion icindeki map'in icinde OLAMAZ.
+                    // Firestore: "can only be used with set() and update()" hatasi bu yuzden.
+                    // Cozum: Timestamp'i en ust seviyede ayri alan olarak yaz, liste temiz kalsin.
                     await FirebaseFirestore.instance
                         .collection('settings')
                         .doc('moderasyon_ayarlari')
@@ -383,9 +385,9 @@ class _ModerasyonViewState extends State<ModerasyonView> {
                           'sehir_id': seciliSehirId,
                           'sehir_adi': seciliSehirAdi,
                           'ilceler': seciliIlceler,
-                          'createdAt': FieldValue.serverTimestamp(),
                         }
-                      ])
+                      ]),
+                      'updatedAt': FieldValue.serverTimestamp(),
                     }, SetOptions(merge: true));
                     if (context.mounted) Navigator.pop(context);
                   } catch (e) {

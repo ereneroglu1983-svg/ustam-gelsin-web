@@ -1,4 +1,4 @@
-// lib/features/admin/screens/admin_dashboard.dart - V9 HUG PRO ONAY BAĞLI - TAM
+// lib/features/admin/screens/admin_dashboard.dart - V10 İLANLAR İL BAZLI EKLENDİ - TAM
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'moderasyon_view.dart';
@@ -15,6 +15,7 @@ import 'usta_poster.dart';
 import 'system_messages_view.dart';
 import 'bakiye_yukle_view.dart';
 import 'hug_pro.dart'; // HUG PRO ONAY - YENİ! TEK DART AÇILIR EKRAN
+import 'ilanlar.dart'; // İLANLAR - İL BAZLI - YENİ! SADECE AKTİF İLAN OLAN İLLER
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -53,12 +54,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 11: return const SystemMessagesView();
       case 12: return const BakiyeYukleView();
       case 13: return const HugProAdminScreen(); // HUG PRO ONAY - TEK DART AÇILIR KARTLI
+      case 14: return const AdminIlanlarView(); // İLANLAR - İL BAZLI - YENİ! SADECE AKTİF İLAN OLAN İLLER
       default: return StatsView(onNavigateToUsers: _handleStatsUserTap, onNavigateToRobot: _handleNavigateToRobot, onNavigateToFinans: _handleNavigateToFinans, onNavigateToB2B: _handleNavigateToB2B, onNavigateToSystemMessages: _handleNavigateToSystemMessages);
     }
   }
 
   String _getTitle(int index) {
-    const titles = ["Ana Sayfa","Kullanıcılar","Yeni Katılanlar","İçerik","Finans","Modere","B2B","Blog","Reklam","Kategori","Usta Poster","Sistem Mesajları","Bakiye Yükle","HUG PRO"];
+    const titles = ["Ana Sayfa","Kullanıcılar","Yeni Katılanlar","İçerik","Finans","Modere","B2B","Blog","Reklam","Kategori","Usta Poster","Sistem Mesajları","Bakiye Yükle","HUG PRO","İlanlar"];
     return titles[index];
   }
 
@@ -97,6 +99,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         NavigationRailDestination(icon: Icon(Icons.mail_outline), label: Text("Sistem Msj")),
         NavigationRailDestination(icon: Icon(Icons.account_balance_wallet, color: Colors.green), label: Text("Bakiye Yükle")),
         NavigationRailDestination(icon: Icon(Icons.apartment_rounded, color: Colors.red), label: Text("HUG PRO")),
+        NavigationRailDestination(icon: Icon(Icons.list_alt_rounded, color: Colors.blue), label: Text("İlanlar")),
       ],
     );
   }
@@ -125,29 +128,33 @@ class _AdminDashboardState extends State<AdminDashboard> {
           const Divider(color: Colors.white10),
           _drawerItem(13, Icons.apartment_rounded, "HUG PRO", isRed: true),
           const Divider(color: Colors.white10),
+          _drawerItem(14, Icons.list_alt_rounded, "İlanlar", isBlue: true),
+          const Divider(color: Colors.white10),
           ListTile(leading: const Icon(Icons.logout, color: Colors.grey), title: const Text("Çıkış Yap (Firebase)", style: TextStyle(color: Colors.grey, fontSize: 12)), onTap: () => FirebaseAuth.instance.signOut()),
         ],
       ),
     );
   }
 
-  ListTile _drawerItem(int index, IconData icon, String title, {bool isGreen = false, bool isRed = false}) {
+  ListTile _drawerItem(int index, IconData icon, String title, {bool isGreen = false, bool isRed = false, bool isBlue = false}) {
     final bool selected = _selectedIndex == index;
     Color iconColor = Colors.grey;
     if (selected) iconColor = primaryOrange;
     else if (isGreen) iconColor = Colors.green;
     else if (isRed) iconColor = Colors.red;
+    else if (isBlue) iconColor = Colors.blue;
 
     Color textColor = Colors.white70;
     if (selected) textColor = primaryOrange;
     else if (isGreen) textColor = Colors.green.shade300;
     else if (isRed) textColor = Colors.red.shade300;
+    else if (isBlue) textColor = Colors.blue.shade300;
 
     return ListTile(
         leading: Icon(icon, color: iconColor),
         title: Text(title, style: TextStyle(color: textColor, fontWeight: selected? FontWeight.bold : FontWeight.normal)),
         selected: selected,
-        selectedTileColor: isRed? Colors.red.withOpacity(0.15) : (isGreen? Colors.green.withOpacity(0.1) : primaryOrange.withOpacity(0.1)),
+        selectedTileColor: isBlue? Colors.blue.withOpacity(0.15) : (isRed? Colors.red.withOpacity(0.15) : (isGreen? Colors.green.withOpacity(0.1) : primaryOrange.withOpacity(0.1))),
         onTap: () { setState(() { _selectedIndex = index; if (index!= 1) _userRoleFilter = null; }); Navigator.pop(context); }
     );
   }

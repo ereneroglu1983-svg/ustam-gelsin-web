@@ -16,15 +16,14 @@ seo/.next/
 seo/out/
 seo/.vercel/
 
+# HUG PROJE SEO - NEXT.JS
+hug-proje-seo/node_modules/
+hug-proje-seo/.next/
+hug-proje-seo/out/
+hug-proje-seo/.vercel/
+
 # Firebase / Functions - TÜM CODEBASE'LER
-firebase_functions/node_modules/
-firebase_functions/lib/
-ustam-gelsin-ai/node_modules/
-ustam-gelsin-ai/lib/
-ustam-gelsin-backend/node_modules/
-ustam-gelsin-backend/lib/
-iyzico/node_modules/
-iyzico/lib/
+[STRIPPED 194 bytes]
 
 # ESKİ ÇÖP KLASÖRLER - BİR DAHA GİT'E GİRMESİN
 functions/
