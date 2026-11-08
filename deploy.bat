@@ -89,9 +89,11 @@ echo # LLM DOSYALARI - SPA'YA EZDIRME!
 echo /llms.txt /llms.txt 200
 echo /llms-full.txt /llms-full.txt 200
 echo /llms-hug-full.txt /llms-hug-full.txt 200
+echo /llms-hug-proje-full.txt /llms-hug-proje-full.txt 200
 echo /ai.txt /ai.txt 200
 echo /sitemap.xml /sitemap.xml 200
 echo /hug-market-sitemap.xml /hug-market-sitemap.xml 200
+echo /hug-proje-sitemap.xml /hug-proje-sitemap.xml 200
 echo /usta-sitemap.xml /usta-sitemap.xml 200
 echo /robots.txt /robots.txt 200
 echo.
@@ -180,6 +182,7 @@ echo /bilecik/* /bilecik/:splat 200
 echo /mus/* /mus/:splat 200
 echo /rehber/* /rehber/:splat 200
 echo /hug-market/* /hug-market/:splat 200
+echo /hug-proje/* /hug-proje/:splat 200
 echo /usta-is-ilanlari/* /usta-is-ilanlari/:splat 200
 echo /404/* /404/:splat 200
 echo /_next/* /_next/:splat 200
@@ -220,6 +223,8 @@ del /f /q "build\web\_routes.json" >nul 2>&1
 echo.
 
 :DEPLOY
+echo [3.5/5] Next RSC copu temizleniyor - index.txt siliniyor...
+for /R "build\web" %%F in (index.txt) do del /F /Q "%%F" >nul 2>&1
 echo [4/5] Cloudflare PRODUCTION deploy...
 echo.
 call wrangler pages deploy build/web --project-name=ustam-web-deploy --branch=main --commit-dirty=true

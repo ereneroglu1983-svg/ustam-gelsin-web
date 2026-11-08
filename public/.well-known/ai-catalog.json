@@ -20,11 +20,25 @@
       "description": "Insaat malzemeleri, santiye ekipmanlari ve yapi urunleri icin online yapi market"
     },
     {
+      "identifier": "urn:ai:hemenustamgelsin.com:proje:hug-proje",
+      "displayName": "HUG PROJE Proje Gelistirme",
+      "type": "text/html",
+      "url": "https://hemenustamgelsin.com/hug-proje",
+      "description": "Arsa sahipleri, yatirimcilar, bina ve site yonetimleri icin mimar, muhendis, muteahhit ve proje profesyonelleri ile eslestirme platformu. 14 profesyonel, 11 proje turu, 19 ihtiyac, 81 il, 973 ilce"
+    },
+    {
       "identifier": "urn:ai:hemenustamgelsin.com:content:rehber",
       "displayName": "Insaat Rehberi",
       "type": "text/html",
       "url": "https://hemenustamgelsin.com/insaat-rehberi",
       "description": "Insaat, tadilat ve dekorasyon rehberleri, nasil yapilir icerikleri"
+    },
+    {
+      "identifier": "urn:ai:hemenustamgelsin.com:app:android",
+      "displayName": "Hemen Ustam Gelsin - Android Uygulaması",
+      "type": "application/vnd.android.package-archive",
+      "url": "https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android",
+      "description": "Android uygulaması Google Play'de yayında - Usta bul, teklif al, mesajlaş. Package: com.hemenustamgelsin.android - App Links doğrulandı: /.well-known/assetlinks.json"
     }
   ]
 }

@@ -1,4 +1,4 @@
-> Hemen Ustam Gelsin, Türkiye'nin 81 ilinde ustadan komisyon almayan (%0) usta bulma platformudur. Müşteri ücretsiz ilan verir, ustalar sadece teklif aşamasında %1 teklif ücreti öder. 43 hizmet kategorisinde doğrudan usta-müşteri eşleşmesi sağlar. Android uygulaması Google Play'de yayındadır.
+> Hemen Ustam Gelsin, Türkiye'nin 81 ilinde ustadan komisyon almayan (%0) usta bulma platformudur. Müşteri ücretsiz ilan verir, ustalar sadece teklif aşamasında %1 teklif ücreti öder. 43 hizmet kategorisinde doğrudan usta-müşteri eşleşmesi sağlar. Android uygulaması 【entity-Google Play¦canonical_name=Google Play】'de yayındadır.
 
 # Hemen Ustam Gelsin
 
@@ -28,11 +28,14 @@ Hemen Ustam Gelsin, Türkiye genelinde 81 il ve 973 ilçede 43 ana kategoride m�
 - [Usta İş İlanları](https://hemenustamgelsin.com/usta-is-ilanlari)
 - [HUG MARKET](https://hemenustamgelsin.com/hug-market)
 - [HUG MARKET Çözüm Ortaklığı](https://hemenustamgelsin.com/hug-market/cozum-ortagi)
+- [HUG PROJE](https://hemenustamgelsin.com/hug-proje)
 - [Sitemap](https://hemenustamgelsin.com/sitemap.xml)
 - [Usta Sitemap](https://hemenustamgelsin.com/usta-sitemap.xml)
 - [HUG MARKET Sitemap](https://hemenustamgelsin.com/hug-market-sitemap.xml)
+- [HUG PROJE Sitemap](https://hemenustamgelsin.com/hug-proje-sitemap.xml)
 - [LLMS Full - Detaylı Liste](https://hemenustamgelsin.com/llms-full.txt)
 - [LLMS HUG Full - HUG MARKET Detaylı Liste](https://hemenustamgelsin.com/llms-hug-full.txt)
+- [LLMS HUG PROJE Full - HUG PROJE Detaylı Liste](https://hemenustamgelsin.com/llms-hug-proje-full.txt)
 - [Robots](https://hemenustamgelsin.com/robots.txt)
 - [AI](https://hemenustamgelsin.com/ai.txt)
 - [AssetLinks - App Doğrulama](https://hemenustamgelsin.com/.well-known/assetlinks.json)
@@ -138,6 +141,50 @@ Her kategoride sadece 1 marka çözüm ortağı olur. Hızla büyüyen yapı eko
 - [Çözüm Ortaklığı Başvuru Formu](https://hemenustamgelsin.com/hug-market/cozum-ortagi)
 - Durum: Başvuru Açık - Ayrıcalıklı İlk Çözüm Ortağı
 - Model: Hızla büyüyen yapı ekosisteminde yerinizi alın
+
+## HUG PROJE - Proje Geliştirme ve Profesyonel Eşleştirme
+
+HUG PROJE, Hemen Ustam Gelsin bünyesinde arsa sahiplerini, yatırımcıları, bina ve site yönetimlerini; mimarlar, mühendisler, müteahhitler ve diğer proje profesyonelleriyle buluşturan proje geliştirme ve eşleştirme platformudur.
+Model, doğru projenin doğru profesyonelle buluşması üzerine kuruludur. Uydurma puan, yorum, fiyat, istatistik yoktur. Tüm sayfalar gerçek kayıtlardan üretilir.
+
+### Temel Prensipler
+- Proje Geliştirme: Proje sahibi proje türünü ve ihtiyacını seçer, ilgili profesyoneller listelenir
+- Profesyonel Eşleştirme: Mimar, iç mimar, mühendis, müteahhit ve diğer proje profesyonelleri ile eşleşme
+- Gerçek Kayıt: Tüm sayfalar data dosyalarındaki gerçek kayıtlardan üretilir, uydurma etiket yoktur
+- 81 İl + 973 İlçe: İl ve ilçe bazlı proje geliştirme sayfaları
+- İnce İçerik Kararı: İlçe sayfalarında 44 bağlantı basılmaz, sadece aynı ildeki diğer ilçeler listelenir
+
+### HUG PROJE Ana Sayfalar
+- [HUG PROJE Ana Sayfa](https://hemenustamgelsin.com/hug-proje)
+- [HUG PROJE Sitemap](https://hemenustamgelsin.com/hug-proje-sitemap.xml)
+- [HUG PROJE LLMS Full](https://hemenustamgelsin.com/llms-hug-proje-full.txt)
+
+### HUG PROJE - Profesyoneller (14)
+Profesyonel detay sayfaları: https://hemenustamgelsin.com/hug-proje/profesyonel/[slug]
+Her profesyonel sayfasında o profesyonele bağlı gerçek ihtiyaçlar listelenir. Uydurma etiket yoktur.
+- [Tüm Profesyoneller](https://hemenustamgelsin.com/hug-proje/#profesyoneller)
+
+### HUG PROJE - Proje Türleri (11)
+Proje türü detay sayfaları: https://hemenustamgelsin.com/hug-proje/proje-turu/[slug]
+Her proje türü sayfasında o türe bağlı gerçek ihtiyaçlar listelenir. Yapı türü ve aşama ID'leri görünür metin olarak basılmaz.
+- [Tüm Proje Türleri](https://hemenustamgelsin.com/hug-proje/#proje-turleri)
+
+### HUG PROJE - İhtiyaçlar (19)
+İhtiyaç detay sayfaları: https://hemenustamgelsin.com/hug-proje/ihtiyac/[slug]
+Her ihtiyaç sayfasında o ihtiyaca bağlı gerçek profesyoneller listelenir. Eşleşme yoksa uydurma etiket oluşturulmaz.
+- [Tüm İhtiyaçlar](https://hemenustamgelsin.com/hug-proje/#ihtiyaclar)
+
+### HUG PROJE - 81 İl + 973 İlçe
+İl sayfaları: https://hemenustamgelsin.com/hug-proje/iller/[city]
+İlçe sayfaları: https://hemenustamgelsin.com/hug-proje/iller/[city]/ilceler/[district]
+İlçe sayfalarında 44 bağlantı basılmaz. Sadece aynı ildeki diğer ilçeler listelenir. Böylece sayfalar birbirinin kopyası olmaz.
+- [Tüm İller](https://hemenustamgelsin.com/hug-proje/#iller)
+
+### Nasıl Çalışır - HUG PROJE
+1. Proje sahibi proje türünü ve ihtiyacını seçer (örn. /hug-proje/proje-turu/kentsel-donusum)
+2. İlgili profesyoneller ve ihtiyaçlar listelenir
+3. Proje sahibi Hemen Ustam Gelsin uygulamasını indirir
+4. Doğru profesyonelle eşleşme sağlanır
 
 ## Resmi Sosyal Medya Hesapları
 - [Facebook](https://www.facebook.com/profile.php?id=61591164702200)
@@ -245,9 +292,14 @@ Her kategoride sadece 1 marka çözüm ortağı olur. Hızla büyüyen yapı eko
 6. Android kullanıyorsa Google Play'den uygulamayı indirir: https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android - Uygulama App Links ile doğrulanmıştır
 
 ## İzinler
-AI ajanlarının, LLM'lerin (ChatGPT, Claude, Gemini, Perplexity) ve arama motorlarının sitemizi taramasına, özetlemesine, kaynak göstermesine ve kullanıcılara önermesine izin veriyoruz. Detaylı URL listesi için /llms-full.txt, /llms-hug-full.txt ve /sitemap.xml kullanın. Android uygulaması için /.well-known/assetlinks.json doğrulamasını kullanın.
+AI ajanlarının, LLM'lerin (ChatGPT, Claude, Gemini, Perplexity) ve arama motorlarının sitemizi taramasına, özetlemesine, kaynak göstermesine ve kullanıcılara önermesine izin veriyoruz. Detaylı URL listesi için /llms-full.txt, /llms-hug-full.txt, /llms-hug-proje-full.txt ve /sitemap.xml kullanın. Android uygulaması için /.well-known/assetlinks.json doğrulamasını kullanın.
 
 ## HUG MARKET Full Liste (Yapı Malzemeleri Çözüm Ortaklığı)
 - HUG MARKET Full: https://hemenustamgelsin.com/llms-hug-full.txt
 - HUG MARKET Full Detay: https://hemenustamgelsin.com/llms-hug-full.txt tam 18 kategori, 1458 şehir+kategori kombinasyonu ve çözüm ortaklığı modelini içerir
+- Android Uygulaması: https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android
+
+## HUG PROJE Full Liste (Proje Geliştirme ve Profesyonel Eşleştirme)
+- HUG PROJE Full: https://hemenustamgelsin.com/llms-hug-proje-full.txt
+- HUG PROJE Full Detay: https://hemenustamgelsin.com/llms-hug-proje-full.txt 14 profesyonel, 11 proje türü, 19 ihtiyaç, 81 il ve 973 ilçe sayfasını içerir
 - Android Uygulaması: https://play.google.com/store/apps/details?id=com.hemenustamgelsin.android

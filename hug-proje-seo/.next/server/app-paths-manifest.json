@@ -1,0 +1,11 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/robots.txt/route": "app/robots.txt/route.js",
+  "/sitemap.xml/route": "app/sitemap.xml/route.js",
+  "/page": "app/page.js",
+  "/ihtiyac/[slug]/page": "app/ihtiyac/[slug]/page.js",
+  "/iller/[city]/page": "app/iller/[city]/page.js",
+  "/iller/[city]/ilceler/[district]/page": "app/iller/[city]/ilceler/[district]/page.js",
+  "/profesyonel/[slug]/page": "app/profesyonel/[slug]/page.js",
+  "/proje-turu/[slug]/page": "app/proje-turu/[slug]/page.js"
+}

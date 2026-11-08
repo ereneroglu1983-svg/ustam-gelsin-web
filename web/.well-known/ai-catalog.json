@@ -20,6 +20,13 @@
       "description": "Insaat malzemeleri, santiye ekipmanlari ve yapi urunleri icin online yapi market"
     },
     {
+      "identifier": "urn:ai:hemenustamgelsin.com:proje:hug-proje",
+      "displayName": "HUG PROJE Proje Gelistirme",
+      "type": "text/html",
+      "url": "https://hemenustamgelsin.com/hug-proje",
+      "description": "Arsa sahipleri, yatirimcilar, bina ve site yonetimleri icin mimar, muhendis, muteahhit ve proje profesyonelleri ile eslestirme platformu. 14 profesyonel, 11 proje turu, 19 ihtiyac, 81 il, 973 ilce"
+    },
+    {
       "identifier": "urn:ai:hemenustamgelsin.com:content:rehber",
       "displayName": "Insaat Rehberi",
       "type": "text/html",

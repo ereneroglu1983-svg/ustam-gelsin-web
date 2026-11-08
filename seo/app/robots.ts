@@ -14,6 +14,7 @@ export default function robots(): MetadataRoute.Robots {
       'https://hemenustamgelsin.com/sitemap.xml',
       'https://hemenustamgelsin.com/usta-sitemap.xml',
       'https://hemenustamgelsin.com/hug-market-sitemap.xml',
+      'https://hemenustamgelsin.com/hug-proje-sitemap.xml',
     ],
   }
 }

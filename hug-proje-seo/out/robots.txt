@@ -1,0 +1,20 @@
+User-Agent: *
+Allow: /
+
+User-Agent: Meta-ExternalAgent
+User-Agent: Meta-ExternalFetcher
+User-Agent: FacebookBot
+User-Agent: GPTBot
+User-Agent: ChatGPT-User
+User-Agent: OAI-SearchBot
+User-Agent: ClaudeBot
+User-Agent: anthropic-ai
+User-Agent: Grokbot
+User-Agent: PerplexityBot
+User-Agent: Google-Extended
+User-Agent: Applebot-Extended
+User-Agent: CCBot
+User-Agent: cohere-ai
+Allow: /
+
+Sitemap: https://hemenustamgelsin.com/hug-proje/sitemap.xml/

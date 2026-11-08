@@ -1,0 +1,75 @@
+{
+  "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/chunks/app/_not-found/page-b85661b2745ccd0d.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/css/53bf7f91f20bb907.css",
+      "static/chunks/app/layout-f8526700ebbc7bb8.js"
+    ],
+    "/robots.txt/route": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/chunks/app/robots.txt/route-2ee105fc5c30778f.js"
+    ],
+    "/sitemap.xml/route": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/chunks/app/sitemap.xml/route-2ee105fc5c30778f.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/chunks/app/page-2ee105fc5c30778f.js"
+    ],
+    "/ihtiyac/[slug]/page": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/chunks/app/ihtiyac/[slug]/page-2ee105fc5c30778f.js"
+    ],
+    "/iller/[city]/page": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/chunks/app/iller/[city]/page-2ee105fc5c30778f.js"
+    ],
+    "/iller/[city]/ilceler/[district]/page": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/chunks/app/iller/[city]/ilceler/[district]/page-2ee105fc5c30778f.js"
+    ],
+    "/profesyonel/[slug]/page": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/chunks/app/profesyonel/[slug]/page-2ee105fc5c30778f.js"
+    ],
+    "/proje-turu/[slug]/page": [
+      "static/chunks/webpack-4341d085ee5f2770.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-b5f745c6b26446a5.js",
+      "static/chunks/main-app-2a82d9bbab796f90.js",
+      "static/chunks/app/proje-turu/[slug]/page-2ee105fc5c30778f.js"
+    ]
+  }
+}

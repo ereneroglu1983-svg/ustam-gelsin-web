@@ -1,0 +1,7 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/iller/layout,_N_T_/iller/[city]/layout,_N_T_/iller/[city]/ilceler/layout,_N_T_/iller/[city]/ilceler/[district]/layout,_N_T_/iller/[city]/ilceler/[district]/page,_N_T_/iller/ankara/ilceler/pursaklar/"
+  }
+}

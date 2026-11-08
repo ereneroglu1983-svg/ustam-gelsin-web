@@ -24,3 +24,4 @@ Allow: /
 Sitemap: https://hemenustamgelsin.com/sitemap.xml
 Sitemap: https://hemenustamgelsin.com/usta-sitemap.xml
 Sitemap: https://hemenustamgelsin.com/hug-market-sitemap.xml
+Sitemap: https://hemenustamgelsin.com/hug-proje-sitemap.xml

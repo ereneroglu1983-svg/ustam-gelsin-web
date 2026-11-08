@@ -1,0 +1,11 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/robots.txt/route": "/robots.txt",
+  "/sitemap.xml/route": "/sitemap.xml",
+  "/page": "/",
+  "/ihtiyac/[slug]/page": "/ihtiyac/[slug]",
+  "/iller/[city]/page": "/iller/[city]",
+  "/iller/[city]/ilceler/[district]/page": "/iller/[city]/ilceler/[district]",
+  "/profesyonel/[slug]/page": "/profesyonel/[slug]",
+  "/proje-turu/[slug]/page": "/proje-turu/[slug]"
+}
