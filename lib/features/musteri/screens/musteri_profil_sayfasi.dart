@@ -45,7 +45,6 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
 
       if (!mounted) return;
 
-      // 1- Mesajı FIRLAT
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("✅ Başarıyla çıkış yapıldı"),
@@ -54,14 +53,89 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
         ),
       );
 
-      // 2- KESIN ANA SAYFAYA ATMA - GoRouter + Navigator ikisi birlikte
-      // Önce tüm push'lanan sayfaları kapat
       if (Navigator.canPop(context)) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
-      // Sonra GoRouter ile home'a fırlat
       GoRouter.of(context).go('/home');
 
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Hata: $e"), backgroundColor: Colors.redAccent),
+      );
+    }
+  }
+
+  // --- APPLE 5.1.1 - HESABI KALICI OLARAK SIL ---
+  Future<void> _hesabiSil() async {
+    final onay1 = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E3A4A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Hesabımı Kalıcı Olarak Sil", style: TextStyle(color: Colors.white)),
+        content: const Text("Hesabın ve tüm verilerin (ilanların, mesajların, kişisel bilgilerin) kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam etmek istiyor musun?", style: TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Vazgeç", style: TextStyle(color: Colors.white54))),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("Devam Et"),
+          ),
+        ],
+      ),
+    );
+    if (onay1 != true) return;
+
+    final onay2 = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E3A4A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Emin misin?", style: TextStyle(color: Colors.white)),
+        content: const Text("Son kez soruyoruz: Hesabını kalıcı olarak silmek istediğine emin misin?", style: TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Vazgeç", style: TextStyle(color: Colors.white54))),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("Evet, Hesabımı Sil"),
+          ),
+        ],
+      ),
+    );
+    if (onay2 != true) return;
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final uid = user.uid;
+
+      // Firestore verisini sil
+      await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+
+      // Auth hesabını sil
+      await user.delete();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Hesabın kalıcı olarak silindi."), backgroundColor: Colors.redAccent, behavior: SnackBarBehavior.floating),
+      );
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+      GoRouter.of(context).go('/home');
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      if (e.code == 'requires-recent-login') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Güvenlik için tekrar giriş yapıp öyle silmen lazım. Önce çıkış yap, tekrar giriş yap."), backgroundColor: Colors.orange),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Hata: ${e.message}"), backgroundColor: Colors.redAccent),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -185,6 +259,12 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
                 onPressed: _cikisYap,
                 icon: const Icon(Icons.logout, color: Colors.redAccent, size: 20),
                 label: const Text("Hesaptan Çıkış Yap", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: _hesabiSil,
+                icon: const Icon(Icons.delete_forever, color: Colors.red, size: 20),
+                label: const Text("Hesabımı Kalıcı Olarak Sil", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14)),
               ),
               const SizedBox(height: 20),
             ],

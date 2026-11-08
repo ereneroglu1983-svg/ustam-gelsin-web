@@ -130,7 +130,7 @@ class _ProProfilScreenState extends State<ProProfilScreen> {
                             if (isActive && bitisTarihi != null)
                               Text('BİTİŞ: ${bitisTarihi.day.toString().padLeft(2, '0')}.${bitisTarihi.month.toString().padLeft(2, '0')}.${bitisTarihi.year} • $kalanGun GÜN KALDI', style: const TextStyle(color: Colors.white54, fontSize: 9, letterSpacing: 0.5))
                             else
-                              const Text('ABONELİK ALMAK İÇİN CÜZDAN\'A GİT', style: TextStyle(color: Colors.white30, fontSize: 9, letterSpacing: 0.5)),
+                              const Text('ABONELİK ALMAK İÇİN CÜZDAN\'A GİT', style: const TextStyle(color: Colors.white30, fontSize: 9, letterSpacing: 0.5)),
                             if (lastPaymentAmount != null && isActive)
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),
@@ -222,7 +222,43 @@ class _ProProfilScreenState extends State<ProProfilScreen> {
   }
 
   void _showDeleteDialog() {
-    showDialog(context: context, builder: (_) => AlertDialog(backgroundColor: _dark, title: const Text('Hesabı sil?', style: TextStyle(color: Colors.white, fontSize: 13)), content: const Text('Tüm projelerin, tekliflerin ve belgelerin kalıcı olarak silinecek. Bu işlem geri alınamaz.', style: TextStyle(color: Colors.white70, fontSize: 11)), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('VAZGEÇ', style: TextStyle(color: _gray))), TextButton(onPressed: () async { final uid = FirebaseAuth.instance.currentUser?.uid; if (uid != null) { await FirebaseFirestore.instance.collection('users_pro').doc(uid).update({'durum': 'SILINDI', 'isActive': false, 'silindiTarihi': FieldValue.serverTimestamp()}); await FirebaseAuth.instance.currentUser?.delete(); } if (mounted) Navigator.popUntil(context, (r) => r.isFirst); }, child: const Text('KALICI SİL', style: TextStyle(color: Colors.red)))]));
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: _dark,
+        title: const Text('Hesabı sil?', style: TextStyle(color: Colors.white, fontSize: 13)),
+        content: const Text('Tüm projelerin, tekliflerin ve belgelerin kalıcı olarak silinecek. Bu işlem geri alınamaz.', style: TextStyle(color: Colors.white70, fontSize: 11)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('VAZGEÇ', style: TextStyle(color: _gray))),
+          TextButton(
+            onPressed: () async {
+              final user = FirebaseAuth.instance.currentUser;
+              final uid = user?.uid;
+              if (uid == null) return;
+              try {
+                final teklifler1 = await FirebaseFirestore.instance.collection('hug_pro_teklifler').where('profesyonelId', isEqualTo: uid).get();
+                final teklifler2 = await FirebaseFirestore.instance.collection('hug_pro_teklifler').where('proId', isEqualTo: uid).get();
+                final batch = FirebaseFirestore.instance.batch();
+                for (final d in teklifler1.docs) batch.delete(d.reference);
+                for (final d in teklifler2.docs) batch.delete(d.reference);
+                batch.delete(FirebaseFirestore.instance.collection('users_pro').doc(uid));
+                await batch.commit();
+                await user?.delete();
+                if (mounted) Navigator.popUntil(context, (r) => r.isFirst);
+              } catch (e) {
+                if (mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Silmek için tekrar giriş yapman gerekli, çıkıp tekrar girip dene.')),
+                  );
+                }
+              }
+            },
+            child: const Text('KALICI SİL', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 }
 

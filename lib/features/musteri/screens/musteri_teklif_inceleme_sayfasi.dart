@@ -19,6 +19,68 @@ class MusteriTeklifIncelemeSayfasi extends StatelessWidget {
     required this.ilanBaslik,
   });
 
+  // --- APPLE 1.2 - SIKAYET ET ---
+  Future<void> _sikayetEt(BuildContext context, String ustaId, String offerId) async {
+    final neden = await showDialog<String>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text("Şikayet Et"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            "Uygunsuz içerik",
+            "Sahte teklif",
+            "Hakaret / Küfür",
+            "Dolandırıcılık",
+            "Diğer",
+          ].map((e) => ListTile(title: Text(e), onTap: () => Navigator.pop(c, e))).toList(),
+        ),
+      ),
+    );
+    if (neden == null) return;
+    final me = FirebaseAuth.instance.currentUser;
+    if (me == null) return;
+    await FirebaseFirestore.instance.collection('sikayetler').add({
+      'sikayetEdenId': me.uid,
+      'sikayetEdilenUserId': ustaId,
+      'ilanId': ilanId,
+      'offerId': offerId,
+      'neden': neden,
+      'tarih': DateTime.now().toIso8601String(),
+      'durum': 'beklemede',
+      'tip': 'teklif',
+    });
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Şikayetiniz alındı, incelenecek.")));
+    }
+  }
+
+  // --- APPLE 1.2 - ENGELLE ---
+  Future<void> _engelle(BuildContext context, String ustaId, String ustaAd) async {
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text("Kullanıcıyı Engelle"),
+        content: Text("$ustaAd adlı ustayı engellemek istiyor musun? Bu ustanın tekliflerini bir daha görmeyeceksin."),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text("Vazgeç")),
+          TextButton(onPressed: () => Navigator.pop(c, true), child: const Text("Engelle")),
+        ],
+      ),
+    );
+    if (onay != true) return;
+    final me = FirebaseAuth.instance.currentUser;
+    if (me == null) return;
+    await FirebaseFirestore.instance.collection('engellenenler').add({
+      'engelleyenId': me.uid,
+      'engellenenUserId': ustaId,
+      'tarih': DateTime.now().toIso8601String(),
+    });
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Kullanıcı engellendi.")));
+    }
+  }
+
   Future<void> _puanlamaDialogGoster(BuildContext context, String ustaId) async {
     int secilenPuan = 5;
     showDialog(
@@ -160,28 +222,47 @@ class MusteriTeklifIncelemeSayfasi extends StatelessWidget {
             itemBuilder: (context, index) {
               final doc = snapshot.data!.docs[index];
               final data = doc.data() as Map<String, dynamic>;
+              final String ustaId = data['ustaId'] ?? "";
+              final String ustaAd = data['ustaAd'] ?? "İsimsiz Usta";
 
               return ListTile(
-                title: Text(data['ustaAd'] ?? "İsimsiz Usta"),
+                title: Text(ustaAd),
                 subtitle: Text("Fiyat: ${data['teklifFiyat'] ?? 0}₺"),
-                trailing: data['durum'] == 'tamamlandi'
-                    ? ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                  onPressed: () => _puanlamaDialogGoster(context, data['ustaId']),
-                  child: const Text("PUAN VER"),
-                )
-                    : data['durum'] == 'onaylandi'
-                    ? const Text("TEKLİFİ ONAYLADINIZ", style: TextStyle(color: Colors.green))
-                    : Row(
+                trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextButton(
-                      onPressed: () => _showDialog(context, doc.id, 'reddedildi', data),
-                      child: const Text("Reddet", style: TextStyle(color: Colors.red)),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => _showDialog(context, doc.id, 'onaylandi', data),
-                      child: const Text("Onayla"),
+                    if (data['durum'] == 'tamamlandi')
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                        onPressed: () => _puanlamaDialogGoster(context, ustaId),
+                        child: const Text("PUAN VER"),
+                      )
+                    else if (data['durum'] == 'onaylandi')
+                      const Text("TEKLİFİ ONAYLADINIZ", style: TextStyle(color: Colors.green))
+                    else
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextButton(
+                            onPressed: () => _showDialog(context, doc.id, 'reddedildi', data),
+                            child: const Text("Reddet", style: TextStyle(color: Colors.red)),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _showDialog(context, doc.id, 'onaylandi', data),
+                            child: const Text("Onayla"),
+                          ),
+                        ],
+                      ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (v) {
+                        if (v == 'sikayet') _sikayetEt(context, ustaId, doc.id);
+                        if (v == 'engelle') _engelle(context, ustaId, ustaAd);
+                      },
+                      itemBuilder: (c) => const [
+                        PopupMenuItem(value: 'sikayet', child: Text("Şikayet Et")),
+                        PopupMenuItem(value: 'engelle', child: Text("Kullanıcıyı Engelle")),
+                      ],
                     ),
                   ],
                 ),

@@ -12,7 +12,7 @@ import 'package:intl/intl.dart';
 
 class UstaIlanDetaySayfasi extends StatefulWidget {
   final IlanModel ilan;
-  final UserModel? usta; // UserModel opsiyonel yapıldı
+  final UserModel? usta;
 
   const UstaIlanDetaySayfasi({super.key, required this.ilan, this.usta});
 
@@ -71,6 +71,66 @@ class _UstaIlanDetaySayfasiState extends State<UstaIlanDetaySayfasi> with Single
     return raw;
   }
 
+  // --- APPLE 1.2 - SIKAYET ET ---
+  Future<void> _sikayetEt() async {
+    final neden = await showDialog<String>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text("Şikayet Et"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            "Uygunsuz içerik",
+            "Sahte ilan",
+            "Hakaret / Küfür",
+            "Dolandırıcılık",
+            "Diğer",
+          ].map((e) => ListTile(title: Text(e), onTap: () => Navigator.pop(c, e))).toList(),
+        ),
+      ),
+    );
+    if (neden == null) return;
+    final me = FirebaseAuth.instance.currentUser;
+    if (me == null) return;
+    await FirebaseFirestore.instance.collection('sikayetler').add({
+      'sikayetEdenId': me.uid,
+      'sikayetEdilenUserId': widget.ilan.userId,
+      'ilanId': widget.ilan.id,
+      'neden': neden,
+      'tarih': DateTime.now().toIso8601String(),
+      'durum': 'beklemede',
+      'tip': 'ilan',
+    });
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Şikayetiniz alındı, incelenecek.")));
+  }
+
+  // --- APPLE 1.2 - ENGELLE ---
+  Future<void> _engelle() async {
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text("Kullanıcıyı Engelle"),
+        content: Text("$_maskeliAd adlı kullanıcıyı engellemek istiyor musun? Bu kişinin ilanlarını bir daha görmeyeceksin."),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text("Vazgeç")),
+          TextButton(onPressed: () => Navigator.pop(c, true), child: const Text("Engelle")),
+        ],
+      ),
+    );
+    if (onay != true) return;
+    final me = FirebaseAuth.instance.currentUser;
+    if (me == null) return;
+    await FirebaseFirestore.instance.collection('engellenenler').add({
+      'engelleyenId': me.uid,
+      'engellenenUserId': widget.ilan.userId,
+      'tarih': DateTime.now().toIso8601String(),
+    });
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Kullanıcı engellendi.")));
+    Navigator.pop(context);
+  }
+
   Future<void> _teklifVer() async {
     final ustaId = FirebaseAuth.instance.currentUser!.uid;
     final double komisyon = widget.ilan.komisyonTutari;
@@ -119,6 +179,19 @@ class _UstaIlanDetaySayfasiState extends State<UstaIlanDetaySayfasi> with Single
       appBar: AppBar(
         title: const Text("İlan Detayı", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            onSelected: (v) {
+              if (v == 'sikayet') _sikayetEt();
+              if (v == 'engelle') _engelle();
+            },
+            itemBuilder: (c) => const [
+              PopupMenuItem(value: 'sikayet', child: Text("Şikayet Et")),
+              PopupMenuItem(value: 'engelle', child: Text("Kullanıcıyı Engelle")),
+            ],
+          ),
+        ],
         bottom: TabBar(controller: _tabController, indicatorColor: _ustaRengi, tabs: const [Tab(text: "Detay"), Tab(text: "Mesajlar")]),
       ),
       body: TabBarView(

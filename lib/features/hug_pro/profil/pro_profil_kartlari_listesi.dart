@@ -1,5 +1,5 @@
 // lib/features/hug_pro/profil/pro_profil_kartlari_listesi.dart
-// PRO PROFIL KARTLARI LISTESI v1.2 FIXED - MÜŞTERİ PARA GÖRMEZ - BUDAMA YOK
+// PRO PROFIL KARTLARI LISTESI v1.3 - MÜŞTERİ PARA GÖRMEZ - ŞİKAYET / ENGELLE EKLENDİ - APPLE 1.2 / 5.1.1
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,6 +34,7 @@ class ProProfilKartlariListesiScreen extends StatefulWidget {
 class _ProProfilKartlariListesiScreenState extends State<ProProfilKartlariListesiScreen> {
   final Set<String> _secilenProIds = {};
   final Map<String, Map<String, dynamic>> _secilenProData = {};
+  final Set<String> _engellenenIds = {};
   bool _gonderiliyor = false;
 
   String _mapAltDalToServiceId(String altDalId) {
@@ -104,6 +105,74 @@ class _ProProfilKartlariListesiScreenState extends State<ProProfilKartlariListes
       if (proKodlari.contains(ihtiyac.replaceAll('.', '_'))) return true;
     }
     return false;
+  }
+
+  // --- YENİ: ŞİKAYET ET ---
+  Future<void> _sikayetEt(String proId) async {
+    final sebepCtrl = TextEditingController();
+    final sebep = await showDialog<String>(
+      context: context,
+      builder: (c) => AlertDialog(
+        backgroundColor: _dark,
+        title: const Text("Profesyoneli Şikayet Et", style: TextStyle(color: Colors.white, fontSize: 13)),
+        content: TextField(controller: sebepCtrl, maxLines: 3, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: "Şikayet sebebini yaz...", hintStyle: TextStyle(color: Colors.white38), enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)))),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c), child: const Text("İptal", style: TextStyle(color: _gray))),
+          TextButton(onPressed: () => Navigator.pop(c, sebepCtrl.text.trim()), child: const Text("GÖNDER", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold))),
+        ],
+      ),
+    );
+    if (sebep == null || sebep.isEmpty) return;
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      await FirebaseFirestore.instance.collection('sikayetler').add({
+        'sikayetEdenId': uid,
+        'sikayetEdilenId': proId,
+        'projeId': widget.projeId ?? widget.davetId ?? 'GENEL',
+        'tur': 'hug_pro',
+        'sebep': sebep,
+        'createdAt': FieldValue.serverTimestamp(),
+        'durum': 'bekliyor',
+      });
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Şikayetiniz alındı. İnceleyeceğiz.")));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Hata: $e")));
+    }
+  }
+
+  // --- YENİ: ENGELLE ---
+  Future<void> _engelle(String proId) async {
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        backgroundColor: _dark,
+        title: const Text("Profesyoneli Engelle", style: TextStyle(color: Colors.white, fontSize: 13)),
+        content: const Text("Bu profesyoneli engellemek istiyor musun? Artık sana teklif gönderemeyecek ve listede görünmeyecek.", style: TextStyle(color: Colors.white70, fontSize: 11)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text("İptal", style: TextStyle(color: _gray))),
+          TextButton(onPressed: () => Navigator.pop(c, true), child: const Text("ENGELLE", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold))),
+        ],
+      ),
+    );
+    if (onay != true) return;
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      await FirebaseFirestore.instance.collection('engellenenler').add({
+        'engelleyenId': uid,
+        'engellenenId': proId,
+        'projeId': widget.projeId ?? widget.davetId ?? 'GENEL',
+        'tur': 'hug_pro',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      setState(() {
+        _engellenenIds.add(proId);
+        _secilenProIds.remove(proId);
+        _secilenProData.remove(proId);
+      });
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Profesyonel engellendi.")));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Hata: $e")));
+    }
   }
 
   Future<void> _talepleriGonder() async {
@@ -232,6 +301,7 @@ class _ProProfilKartlariListesiScreenState extends State<ProProfilKartlariListes
 
                 final uygunProlar = snap.data!.docs.where((doc) {
                   final data = doc.data() as Map<String, dynamic>;
+                  if (_engellenenIds.contains(doc.id)) return false;
                   return _proUygunMu(data, widget.ihtiyacIds);
                 }).toList();
 
@@ -256,32 +326,58 @@ class _ProProfilKartlariListesiScreenState extends State<ProProfilKartlariListes
                     final proId = doc.id;
                     final data = doc.data() as Map<String, dynamic>;
                     final isSelected = _secilenProIds.contains(proId);
-                    // FIX: PARA BADGE KALDIRILDI - MÜŞTERİ PARA GÖRMEZ
-                    return ProProfilKarti(
-                      proData: {...data, 'id': proId},
-                      isSelected: isSelected,
-                      onTap: () {
-                        setState(() {
-                          if (isSelected) {
-                            _secilenProIds.remove(proId);
-                            _secilenProData.remove(proId);
-                          } else {
-                            _secilenProIds.add(proId);
-                            _secilenProData[proId] = {...data, 'id': proId};
-                          }
-                        });
-                      },
-                      onSelectChanged: () {
-                        setState(() {
-                          if (isSelected) {
-                            _secilenProIds.remove(proId);
-                            _secilenProData.remove(proId);
-                          } else {
-                            _secilenProIds.add(proId);
-                            _secilenProData[proId] = {...data, 'id': proId};
-                          }
-                        });
-                      },
+                    return Column(
+                      children: [
+                        ProProfilKarti(
+                          proData: {...data, 'id': proId},
+                          isSelected: isSelected,
+                          onTap: () {
+                            setState(() {
+                              if (isSelected) {
+                                _secilenProIds.remove(proId);
+                                _secilenProData.remove(proId);
+                              } else {
+                                _secilenProIds.add(proId);
+                                _secilenProData[proId] = {...data, 'id': proId};
+                              }
+                            });
+                          },
+                          onSelectChanged: () {
+                            setState(() {
+                              if (isSelected) {
+                                _secilenProIds.remove(proId);
+                                _secilenProData.remove(proId);
+                              } else {
+                                _secilenProIds.add(proId);
+                                _secilenProData[proId] = {...data, 'id': proId};
+                              }
+                            });
+                          },
+                        ),
+                        Container(
+                          width: double.infinity,
+                          color: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () => _sikayetEt(proId),
+                                icon: const Icon(Icons.flag_outlined, size: 13, color: Colors.orange),
+                                label: const Text("Şikayet Et", style: TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.w600)),
+                                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), minimumSize: const Size(0, 28), tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                              ),
+                              const SizedBox(width: 4),
+                              TextButton.icon(
+                                onPressed: () => _engelle(proId),
+                                icon: const Icon(Icons.block, size: 13, color: Colors.red),
+                                label: const Text("Engelle", style: TextStyle(fontSize: 10, color: Colors.red, fontWeight: FontWeight.w600)),
+                                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), minimumSize: const Size(0, 28), tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     );
                   },
                 );

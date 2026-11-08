@@ -162,6 +162,82 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
     );
   }
 
+  // --- APPLE 5.1.1 - HESABI KALICI OLARAK SIL ---
+  Future<void> _hesabiSil() async {
+    final onay1 = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Hesabımı Kalıcı Olarak Sil"),
+        content: const Text("Hesabın ve tüm verilerin (tekliflerin, mesajların, cüzdan geçmişin, kişisel bilgilerin) kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam etmek istiyor musun?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Vazgeç")),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("Devam Et"),
+          ),
+        ],
+      ),
+    );
+    if (onay1 != true) return;
+
+    final onay2 = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Emin misin?"),
+        content: const Text("Son kez soruyoruz: Hesabını kalıcı olarak silmek istediğine emin misin?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Vazgeç")),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("Evet, Hesabımı Sil"),
+          ),
+        ],
+      ),
+    );
+    if (onay2 != true) return;
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final uid = user.uid;
+
+      await _cagriSubscription?.cancel();
+      _cagriSubscription = null;
+
+      await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+      await user.delete();
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Hesabın kalıcı olarak silindi."), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating),
+      );
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+      GoRouter.of(context).go('/home');
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      if (e.code == 'requires-recent-login') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Güvenlik için tekrar giriş yapıp öyle silmen lazım. Önce çıkış yap, tekrar giriş yap."), backgroundColor: Colors.orange),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Hata: ${e.message}"), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Hata: $e"), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = _authService.currentUser;
@@ -262,6 +338,8 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                 ),
                 const SizedBox(height: 30),
                 _buildLogoutButton(),
+                const SizedBox(height: 12),
+                _buildDeleteAccountButton(),
                 const SizedBox(height: 20),
               ],
             ),
@@ -535,7 +613,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
     );
   }
 
-  // === SADECE BURASI DÜZELTİLDİ - KESIN ANA SAYFAYA ATMA + MESAJ ===
   Widget _buildLogoutButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -578,7 +655,6 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                 ),
               );
 
-              // KESIN ANA SAYFAYA FIRLAT - MUSTERI ILE AYNI FIX
               if (Navigator.canPop(context)) {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }
@@ -593,6 +669,26 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
           },
           icon: const Icon(Icons.logout_rounded, color: Colors.red),
           label: const Text("Çıkış Yap", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 15)),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Color(0xFFFFCDD2)),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- APPLE 5.1.1 - HESABI SIL BUTONU ---
+  Widget _buildDeleteAccountButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: _hesabiSil,
+          icon: const Icon(Icons.delete_forever, color: Colors.red),
+          label: const Text("Hesabımı Kalıcı Olarak Sil", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 14)),
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Color(0xFFFFCDD2)),
             padding: const EdgeInsets.symmetric(vertical: 14),
