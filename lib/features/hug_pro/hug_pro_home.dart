@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'hug_proje_olustur_page.dart'; // [EKLENDI] - HUG PROJE OLUSTUR PAGE
 import 'pro_bul/pro_bul_screen.dart'; // pro_bul_screen.dart -> hug_pro/pro_bul/ içinde
 
@@ -31,23 +32,54 @@ class HugProHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _offWhite,
-      body: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
-          child: Column(
-            children: [
-              _hero(),
-              _intent(),
-              _profVeTurler(),
-              _aktifProjeler(),
-              _asamalar(),
-              _verified(),
-              _ecosystemClean(),
-              _ctaFinal(),
-            ],
+      body: Stack(
+        children: [
+          SafeArea(
+            bottom: false,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 24),
+              child: Column(
+                children: [
+                  _hero(),
+                  _intent(),
+                  _profVeTurler(),
+                  _aktifProjeler(),
+                  _asamalar(),
+                  _verified(),
+                  _ecosystemClean(),
+                  _ctaFinal(),
+                ],
+              ),
+            ),
           ),
-        ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 12,
+            left: 16,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/home');
+                  }
+                },
+                customBorder: const CircleBorder(),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _black.withOpacity(0.55),
+                    border: Border.all(color: _gold.withOpacity(0.5), width: 0.8),
+                  ),
+                  child: const Icon(Icons.arrow_back, size: 18, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

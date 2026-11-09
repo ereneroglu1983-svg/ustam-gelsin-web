@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ustam_gelsin/core/models/ilan_model.dart';
 import 'package:ustam_gelsin/core/services/location_service.dart';
 import 'package:ustam_gelsin/core/managers/price_calculation_manager.dart';
@@ -354,7 +355,25 @@ class _MusteriIlanDetaySayfasiState extends State<MusteriIlanDetaySayfasi> {
           lng: _lng,
           onResult: (t, c) {
             Navigator.pop(context);
-            showDialog(context: context, builder: (context) => AlertDialog(backgroundColor: const Color(0xFF203A43), title: Text(t, style: const TextStyle(color: Colors.white)), content: Text(c, style: const TextStyle(color: Colors.white70)), actions: [TextButton(onPressed: () { Navigator.pop(context); Navigator.pushReplacementNamed(context, '/musteri_profil'); }, child: const Text("Tamam", style: TextStyle(color: Color(0xFF2DB34A))))]));
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (dialogContext) => AlertDialog(
+                backgroundColor: const Color(0xFF203A43),
+                title: Text(t, style: const TextStyle(color: Colors.white)),
+                content: Text(c, style: const TextStyle(color: Colors.white70)),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      final router = GoRouter.of(context);
+                      Navigator.of(dialogContext).pop();
+                      router.go('/home');
+                    },
+                    child: const Text("Tamam", style: TextStyle(color: Color(0xFF2DB34A))),
+                  ),
+                ],
+              ),
+            );
           }
       );
     } catch (e) {

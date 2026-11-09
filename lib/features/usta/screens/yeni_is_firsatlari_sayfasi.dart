@@ -33,6 +33,44 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
     "Hepsi", "Boya", "Tesisat", "Elektrik", "Mobilya", "Tadilat", "Temizlik", "Zemin", "Çatı", "Isıtma"
   ];
 
+  // REVIZE - Ham Firestore key'lerini Türkçe etikete çevirir
+  String _etiketCevir(String key) {
+    const etiketler = {
+      'tadilat_detay': 'Tadilat Detayı',
+      'ekipman_ev': 'Ekipman',
+      'is_kapsami': 'İş Kapsamı',
+      'durum_ev': 'Evin Durumu',
+      'm2_ev': 'Metrekare',
+      'tavan_boyasi': 'Tavan Boyası',
+      'duvar_boyasi': 'Duvar Boyası',
+      'oda_sayisi': 'Oda Sayısı',
+      'yapi_cesidi': 'Yapı Çeşidi',
+      'alan_kademe': 'Alan',
+      'banyo_sayisi': 'Banyo Sayısı',
+      'mutfak_durumu': 'Mutfak Durumu',
+      'zemin_tipi': 'Zemin Tipi',
+      'cati_tipi': 'Çatı Tipi',
+      'tesisat_tipi': 'Tesisat Tipi',
+      'elektrik_isleri': 'Elektrik İşleri',
+      'mobilya_tipi': 'Mobilya Tipi',
+      'temizlik_tipi': 'Temizlik Tipi',
+      'is_acil': 'Acil Mi',
+    };
+    if (etiketler.containsKey(key)) return etiketler[key]!;
+    // Bilinmeyen key: alt çizgiyi boşluk yap, ilk harfi büyüt
+    final temiz = key.replaceAll('_', ' ').trim();
+    if (temiz.isEmpty) return key;
+    return temiz[0].toUpperCase() + temiz.substring(1);
+  }
+
+  // REVIZE - Liste değerlerini köşeli parantezsiz basar
+  String _degerFormatla(dynamic value) {
+    if (value is List) {
+      return value.map((e) => e.toString()).join(', ');
+    }
+    return value.toString();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -69,7 +107,7 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
     }
   }
 
-  // ADIM 1 - 【entity-APPLE¦canonical_name=Apple】 1.2: Engelledigim musterileri getir, onlarin ilanlarini gizle
+  // ADIM 1 - APPLE 1.2: Engelledigim musterileri getir, onlarin ilanlarini gizle
   Future<void> _engellenenleriGetir() async {
     final ustaId = FirebaseAuth.instance.currentUser?.uid;
     if (ustaId == null) return;
@@ -87,7 +125,7 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
     }
   }
 
-  // ADIM 1 - 【entity-APPLE¦canonical_name=Apple】 1.2: Ilani sikayet et
+  // ADIM 1 - APPLE 1.2: Ilani sikayet et
   Future<void> _sikayetEt(IlanModel ilan) async {
     final ustaId = FirebaseAuth.instance.currentUser?.uid;
     if (ustaId == null) return;
@@ -132,7 +170,7 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
     }
   }
 
-  // ADIM 1 - 【entity-APPLE¦canonical_name=Apple】 1.2: Musteriyi engelle - bir daha onun ilanlarini gorme
+  // ADIM 1 - APPLE 1.2: Musteriyi engelle - bir daha onun ilanlarini gorme
   Future<void> _musteriyiEngelle(IlanModel ilan) async {
     final ustaId = FirebaseAuth.instance.currentUser?.uid;
     if (ustaId == null) return;
@@ -322,7 +360,7 @@ class _YeniIsFirsatlariSayfariState extends State<YeniIsFirsatlariSayfasi> {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: Colors.white.withOpacity(0.1)),
                     ),
-                    child: Text("${e.key}: ${e.value}", style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                    child: Text("${_etiketCevir(e.key)}: ${_degerFormatla(e.value)}", style: const TextStyle(color: Colors.white70, fontSize: 11)),
                   ))
                       .toList(),
                 ),

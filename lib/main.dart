@@ -1,4 +1,4 @@
-// lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX + HUG MARKET ROUTE FIX + B ŞIKKI ADMIN EKLENDI - IMPORT FIX + KOMSU HELPER EKLENDI + ANALYTICS EKLENDI + HUG PROJE ROUTE EKLENDI + FIRESTORE WEB FIX b815
+// lib/main.dart - FINAL REVIZE - HIZLI AÇILIŞ + BEYAZ EKRAN FIX + HUG MARKET ROUTE FIX + B ŞIKKI ADMIN EKLENDI - IMPORT FIX + KOMSU HELPER EKLENDI + ANALYTICS EKLENDI + HUG PROJE ROUTE EKLENDI + FIRESTORE WEB FIX b815 + PRO ISLEMLERI WEB ROUTE EKLENDI
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +58,8 @@ import 'package:ustam_gelsin/utils/komsu_helper.dart';
 // HUG PROJE IMPORTLARI EKLENDI
 import 'package:ustam_gelsin/features/hug_pro/hug_pro_home.dart';
 import 'package:ustam_gelsin/features/hug_pro/hug_proje_olustur_page.dart';
+// WEB PRO ISLEMLERI EKLENDI - PRO GIRIS / KAYIT - WEB ICIN - EKLENEN SATIR 1
+import 'package:ustam_gelsin/web_dosyalari/pro_islemleri_web.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -81,6 +83,7 @@ final GoRouter _router = GoRouter(
     GoRoute(path: '/hug-market-admin', builder: (context, state) => const KategoriMunhasirMotoruPage()),
     GoRoute(path: '/hug-proje', builder: (context, state) => const HugProHomePage()),
     GoRoute(path: '/hug-proje-olustur', builder: (context, state) => const HugProjeOlusturPage()),
+    GoRoute(path: '/pro-islemleri', builder: (context, state) => const ProIslemleriWebScreen()),
     GoRoute(
       path: '/rehber/:slug',
       builder: (context, state) {

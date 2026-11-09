@@ -173,7 +173,7 @@ class _ProGelenTekliflerScreenState extends State<ProGelenTekliflerScreen> {
         title: const Text('GELEN TEKLİFLER', style: TextStyle(color: Colors.white, fontSize: 11, letterSpacing: 3, fontWeight: FontWeight.bold)),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(32),
-          child: Container(width: double.infinity, color: _black, padding: const EdgeInsets.fromLTRB(16, 0, 16, 10), child: Row(children: [Container(width: 20, height: 1, color: _gold), const SizedBox(width: 8), const Expanded(child: Text("MÜŞTERİ SENİ SEÇTİ - %4 ÖDE - TEKLİF VER", style: TextStyle(color: Colors.white54, fontSize: 7, letterSpacing: 1.2)))])),
+          child: Container(width: double.infinity, color: _black, padding: const EdgeInsets.fromLTRB(16, 0, 16, 10), child: Row(children: [Container(width: 20, height: 1, color: _gold), const SizedBox(width: 8), const Expanded(child: Text("GELEN TEKLİFLERİ İNCELE - TEKLİF VER", style: TextStyle(color: Colors.white54, fontSize: 7, letterSpacing: 1.2)))])),
         ),
       ),
       body: Column(

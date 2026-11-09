@@ -29,6 +29,12 @@ import 'package:ustam_gelsin/features/hug_market/kategoriler/asansor.dart';
 import 'package:ustam_gelsin/features/hug_market/cozum_ortagi_page.dart';
 import 'package:ustam_gelsin/features/hug_pro/hug_pro_home.dart';
 import 'package:ustam_gelsin/features/hug_pro/hug_proje_olustur_page.dart';
+// REVIZE - DÜZELTİLDİ: profile/screens değil, musteri/screens - main.dart'taki gibi
+import 'package:ustam_gelsin/features/musteri/screens/musteri_profil_sayfasi.dart';
+import 'package:ustam_gelsin/features/usta/screens/acil_ilanlar.dart';
+import 'package:ustam_gelsin/features/admin/screens/admin_dashboard.dart';
+import 'package:ustam_gelsin/features/admin/screens/blog_ekle_screen.dart';
+import 'package:ustam_gelsin/features/admin/hug_market/kategori_munhasir_motoru.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -40,6 +46,12 @@ final appRouter = GoRouter(
     ),
     GoRoute(path: '/', builder: (c, s) => const HomeScreen()),
     GoRoute(path: '/home', redirect: (c, s) => '/'),
+    // REVIZE - main.dart'ta olan ama burada olmayan route'lar eklendi
+    GoRoute(path: '/musteri_profil', builder: (c, s) => const MusteriProfilSayfasi()),
+    GoRoute(path: '/acil_ilanlar', builder: (c, s) => AcilIlanlarSayfasi()),
+    GoRoute(path: '/admin', builder: (c, s) => const AdminDashboard()),
+    GoRoute(path: '/admin/blog-ekle', builder: (c, s) => const BlogEkleScreen()),
+    GoRoute(path: '/hug-market-admin', builder: (c, s) => const KategoriMunhasirMotoruPage()),
     GoRoute(path: '/insaat-rehberi', redirect: (c, s) => '/rehber'),
     GoRoute(
       path: '/rehber',

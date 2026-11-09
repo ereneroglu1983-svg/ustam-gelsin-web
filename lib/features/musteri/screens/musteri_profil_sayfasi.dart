@@ -45,19 +45,18 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
 
       if (!mounted) return;
 
+      final router = GoRouter.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("✅ Başarıyla çıkış yapıldı"),
-          backgroundColor: Color(0xFF2DB34A),
-          behavior: SnackBarBehavior.floating,
+          content: Text("BAŞARIYLA PROFİLDEN ÇIKIŞ YAPILDI", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          backgroundColor: Colors.black,
+          duration: Duration(milliseconds: 1200),
         ),
       );
-
-      if (Navigator.canPop(context)) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      }
-      GoRouter.of(context).go('/home');
-
+      await Future.delayed(const Duration(milliseconds: 1200));
+      if (!mounted) return;
+      if (context.canPop()) context.pop();
+      router.go('/home');
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -118,13 +117,8 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
       await user.delete();
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Hesabın kalıcı olarak silindi."), backgroundColor: Colors.redAccent, behavior: SnackBarBehavior.floating),
-      );
-      if (Navigator.canPop(context)) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      }
-      GoRouter.of(context).go('/home');
+      // REVIZE: Navigator.popUntil KALDIRILDI - GoRouter ile çakışıyordu
+      context.go('/home');
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       if (e.code == 'requires-recent-login') {
@@ -184,6 +178,14 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
         elevation: 0,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
+        // REVIZE - 2. SORUN: AppBar'a Ana Sayfa butonu eklendi
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home, color: Colors.white),
+            tooltip: "Ana Sayfaya Git",
+            onPressed: () => context.go('/home'),
+          ),
+        ],
       ),
       body: Container(
         height: double.infinity,
@@ -200,6 +202,31 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
           child: Column(
             children: [
               _buildMesajBildirimHanesi(user?.uid, context),
+              // REVIZE - 2. SORUN: Body'ye de görünür Ana Sayfaya Git butonu eklendi
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: GestureDetector(
+                  onTap: () => context.go('/home'),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.home, color: Color(0xFF2DB34A), size: 22),
+                        SizedBox(width: 10),
+                        Text("ANA SAYFAYA GİT", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: GestureDetector(

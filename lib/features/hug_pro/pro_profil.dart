@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import 'profil/pro_tekliflerim.dart';
 import 'profil/pro_gelen_teklifler.dart';
 import 'profil/pro_projelerim.dart';
@@ -37,6 +38,34 @@ class _ProProfilScreenState extends State<ProProfilScreen> {
     if (doc.exists) setState(() { _proData = doc.data(); _loading = false; });
   }
 
+  Future<void> _cikisYap() async {
+    final router = GoRouter.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: _black,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        duration: const Duration(milliseconds: 900),
+        content: Row(
+          children: [
+            Container(width: 22, height: 22, decoration: const BoxDecoration(color: _gold, shape: BoxShape.circle), child: const Icon(Icons.check, size: 12, color: _black)),
+            const SizedBox(width: 10),
+            const Expanded(child: Text('BAŞARIYLA ÇIKIŞ YAPILDI', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1))),
+            Container(width: 24, height: 1, color: _gold),
+          ],
+        ),
+      ),
+    );
+    await FirebaseAuth.instance.signOut();
+    await Future.delayed(const Duration(milliseconds: 900));
+    if (!mounted) {
+      router.go('/home');
+      return;
+    }
+    if (Navigator.canPop(context)) Navigator.pop(context);
+    router.go('/home');
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) return const Scaffold(backgroundColor: _black, body: Center(child: CircularProgressIndicator(color: _gold)));
@@ -62,138 +91,182 @@ class _ProProfilScreenState extends State<ProProfilScreen> {
 
     return Scaffold(
       backgroundColor: _offWhite,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              color: _black,
-              child: Stack(
-                children: [
-                  Positioned.fill(child: CustomPaint(painter: _ArchGridPainter())),
-                  Column(
-                    children: [
-                      const SizedBox(height: 56),
-                      const Text('H U G', style: TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 9, fontWeight: FontWeight.w300)),
-                      const SizedBox(height: 14),
-                      const _LightSweepLine(width: 88, height: 1),
-                      const SizedBox(height: 14),
-                      const Text('P R O J E', style: TextStyle(color: Colors.white, fontSize: 11, letterSpacing: 7, fontWeight: FontWeight.w300)),
-                      const SizedBox(height: 20),
-                      Container(
-                        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: _gold.withOpacity(0.5), width: 1)),
-                        padding: const EdgeInsets.all(3),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(56),
-                          child: data['profilFotoUrl'] != null
-                              ? CachedNetworkImage(imageUrl: data['profilFotoUrl'], width: 112, height: 112, fit: BoxFit.cover, errorWidget: (_,__,___) => Container(width: 112, height: 112, color: _dark, child: const Icon(Icons.person, color: Colors.white30, size: 48)))
-                              : Container(width: 112, height: 112, color: _dark, child: const Icon(Icons.person, color: Colors.white30, size: 48)),
+      appBar: AppBar(
+        backgroundColor: _black,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
+        ),
+        title: const Text('PROFİL', style: TextStyle(color: Colors.white, fontSize: 12, letterSpacing: 2, fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        top: false,
+        bottom: true,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                color: _black,
+                child: Stack(
+                  children: [
+                    Positioned.fill(child: CustomPaint(painter: _ArchGridPainter())),
+                    Column(
+                      children: [
+                        const SizedBox(height: 56),
+                        const Text('H U G', style: TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 9, fontWeight: FontWeight.w300)),
+                        const SizedBox(height: 14),
+                        const _LightSweepLine(width: 88, height: 1),
+                        const SizedBox(height: 14),
+                        const Text('P R O J E', style: TextStyle(color: Colors.white, fontSize: 11, letterSpacing: 7, fontWeight: FontWeight.w300)),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: _gold.withOpacity(0.5), width: 1)),
+                          padding: const EdgeInsets.all(3),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(56),
+                            child: data['profilFotoUrl'] != null
+                                ? CachedNetworkImage(imageUrl: data['profilFotoUrl'], width: 112, height: 112, fit: BoxFit.cover, errorWidget: (_,__,___) => Container(width: 112, height: 112, color: _dark, child: const Icon(Icons.person, color: Colors.white30, size: 48)))
+                                : Container(width: 112, height: 112, color: _dark, child: const Icon(Icons.person, color: Colors.white30, size: 48)),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(isim.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-                      const SizedBox(height: 6),
-                      Text(data['email'] ?? '', style: const TextStyle(color: Colors.white38, fontSize: 10, letterSpacing: 1)),
-                      const SizedBox(height: 8),
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(border: Border.all(color: _gold.withOpacity(0.4))), child: Text('$tamamlanan TAMAMLANAN PROJE', style: const TextStyle(color: _gold, fontSize: 8, letterSpacing: 1.5))),
-                      const SizedBox(height: 32),
-                    ],
-                  ),
-                ],
+                        const SizedBox(height: 16),
+                        Text(isim.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+                        const SizedBox(height: 6),
+                        Text(data['email'] ?? '', style: const TextStyle(color: Colors.white38, fontSize: 10, letterSpacing: 1)),
+                        const SizedBox(height: 8),
+                        Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(border: Border.all(color: _gold.withOpacity(0.4))), child: Text('$tamamlanan TAMAMLANAN PROJE', style: const TextStyle(color: _gold, fontSize: 8, letterSpacing: 1.5))),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              color: isActive ? _black : const Color(0xFF1A1A1A),
-              padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(width: 24, height: 1, color: _gold),
-                      const SizedBox(width: 8),
-                      Text(isActive ? 'ABONELİK AKTİF' : 'ABONELİK PASİF', style: TextStyle(color: isActive ? _gold : Colors.white38, fontSize: 8, letterSpacing: 2, fontWeight: FontWeight.bold)),
-                      const Spacer(),
-                      Container(width: 8, height: 8, decoration: BoxDecoration(color: isActive ? Colors.green : Colors.red, shape: BoxShape.circle)),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              Container(
+                width: double.infinity,
+                color: isActive ? _black : const Color(0xFF1A1A1A),
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(width: 24, height: 1, color: _gold),
+                        const SizedBox(width: 8),
+                        Text(isActive ? 'ABONELİK AKTİF' : 'ABONELİK PASİF', style: TextStyle(color: isActive ? _gold : Colors.white38, fontSize: 8, letterSpacing: 2, fontWeight: FontWeight.bold)),
+                        const Spacer(),
+                        Container(width: 8, height: 8, decoration: BoxDecoration(color: isActive ? Colors.green : Colors.red, shape: BoxShape.circle)),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(paketAdStr, style: TextStyle(color: isActive ? Colors.white : Colors.white30, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                              const SizedBox(height: 4),
+                              if (isActive && bitisTarihi != null)
+                                Text('BİTİŞ: ${bitisTarihi.day.toString().padLeft(2, '0')}.${bitisTarihi.month.toString().padLeft(2, '0')}.${bitisTarihi.year} • $kalanGun GÜN KALDI', style: const TextStyle(color: Colors.white54, fontSize: 9, letterSpacing: 0.5))
+                              else
+                                const Text('ABONELİK ALMAK İÇİN CÜZDAN\'A GİT', style: const TextStyle(color: Colors.white30, fontSize: 9, letterSpacing: 0.5)),
+                              if (lastPaymentAmount != null && isActive)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text('SON ÖDEME: $lastPaymentAmount TL', style: const TextStyle(color: Colors.white24, fontSize: 8, letterSpacing: 0.5)),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(color: isActive ? _gold : Colors.white10, border: Border.all(color: isActive ? _gold : Colors.white24, width: 0.8)),
+                          child: Text(isActive ? 'AKTİF' : 'PASİF', style: TextStyle(color: isActive ? _black : Colors.white38, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                        ),
+                      ],
+                    ),
+                    if (!isActive) ...[
+                      const SizedBox(height: 14),
+                      Container(height: 1, color: Colors.white10),
+                      const SizedBox(height: 12),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const ProCuzdanScreen()));
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(paketAdStr, style: TextStyle(color: isActive ? Colors.white : Colors.white30, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                            const SizedBox(height: 4),
-                            if (isActive && bitisTarihi != null)
-                              Text('BİTİŞ: ${bitisTarihi.day.toString().padLeft(2, '0')}.${bitisTarihi.month.toString().padLeft(2, '0')}.${bitisTarihi.year} • $kalanGun GÜN KALDI', style: const TextStyle(color: Colors.white54, fontSize: 9, letterSpacing: 0.5))
-                            else
-                              const Text('ABONELİK ALMAK İÇİN CÜZDAN\'A GİT', style: const TextStyle(color: Colors.white30, fontSize: 9, letterSpacing: 0.5)),
-                            if (lastPaymentAmount != null && isActive)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Text('SON ÖDEME: $lastPaymentAmount TL', style: const TextStyle(color: Colors.white24, fontSize: 8, letterSpacing: 0.5)),
-                              ),
+                            const Icon(Icons.account_balance_wallet_outlined, size: 12, color: _gold),
+                            const SizedBox(width: 6),
+                            const Text('ABONELİK AL →', style: TextStyle(color: _gold, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1)),
                           ],
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        decoration: BoxDecoration(color: isActive ? _gold : Colors.white10, border: Border.all(color: isActive ? _gold : Colors.white24, width: 0.8)),
-                        child: Text(isActive ? 'AKTİF' : 'PASİF', style: TextStyle(color: isActive ? _black : Colors.white38, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                      ),
                     ],
-                  ),
-                  if (!isActive) ...[
-                    const SizedBox(height: 14),
-                    Container(height: 1, color: Colors.white10),
-                    const SizedBox(height: 12),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ProCuzdanScreen()));
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.account_balance_wallet_outlined, size: 12, color: _gold),
-                          const SizedBox(width: 6),
-                          const Text('ABONELİK AL →', style: TextStyle(color: _gold, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                        ],
-                      ),
-                    ),
                   ],
-                ],
+                ),
               ),
-            ),
-            Container(height: 1, color: _gold.withOpacity(0.6)),
-            Container(
-              width: double.infinity,
-              color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [Container(width: 24, height: 1, color: _gold), const SizedBox(width: 8), const Text('YETKİNLİKLER', style: TextStyle(fontSize: 8, letterSpacing: 2, color: _gray))]),
-                const SizedBox(height: 12),
-                Wrap(spacing: 8, runSpacing: 8, children: meslekler.map<Widget>((m) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: _offWhite, border: Border.all(color: Colors.black12)), child: Text('${m['anaDalId']}/${m['altDalId']} - ${m['unvanId']}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600)))).toList()),
-                if (meslekler.isEmpty) const Text('Yetkinlik yok', style: TextStyle(fontSize: 10, color: _gray)),
-              ]),
-            ),
-            const SizedBox(height: 8),
-            _proMenuTile(n: '01', title: 'TEKLİF VERDİĞİM PROJELER', desc: 'Gönderdiğin teklifler', icon: Icons.send_outlined, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProTekliflerimScreen())); }),
-            _proMenuTile(n: '02', title: 'GELEN TEKLİFLER', desc: 'Sana gelen proje davetleri', icon: Icons.inbox_outlined, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProGelenTekliflerScreen())); }),
-            _proMenuTile(n: '03', title: 'PROJELER', desc: 'TEKLİF VERİLEN - RED EDİLEN - DEVAM EDEN', icon: Icons.folder_open_outlined, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProProjelerimScreen())); }, hasBadge: true),
-            _proMenuTile(n: '04', title: 'TAMAMLANAN PROJELER', desc: 'Künyende görünecek - $tamamlanan proje', icon: Icons.verified_outlined, isGold: true, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProTamamlananScreen())); }),
-            _proMenuTile(n: '05', title: 'CÜZDAN', desc: 'Abonelik al / Para yükle / Bakiye', icon: Icons.account_balance_wallet_outlined, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProCuzdanScreen())); }),
-            const SizedBox(height: 24),
-            Container(height: 1, color: Colors.black12, margin: const EdgeInsets.symmetric(horizontal: 16)),
-            const SizedBox(height: 8),
-            _proMenuTile(n: '06', title: 'ÇIKIŞ YAP', desc: 'Hesaptan çık', icon: Icons.logout, isExit: true, onTap: () async { await FirebaseAuth.instance.signOut(); if (mounted) Navigator.popUntil(context, (r) => r.isFirst); }),
-            _proMenuTile(n: '07', title: 'HESABIMI KALICI OLARAK SİL', desc: 'Tüm veriler silinir - geri alınamaz', icon: Icons.delete_forever_outlined, isDanger: true, onTap: () => _showDeleteDialog()),
-            const SizedBox(height: 32),
-            const Text('© 2026 HUG PROJE - PROFESSIONAL', style: TextStyle(color: _gray, fontSize: 8, letterSpacing: 1)),
-            const SizedBox(height: 24),
-          ],
+              Container(height: 1, color: _gold.withOpacity(0.6)),
+              Container(
+                width: double.infinity,
+                color: Colors.white,
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [Container(width: 24, height: 1, color: _gold), const SizedBox(width: 8), const Text('YETKİNLİKLER', style: TextStyle(fontSize: 8, letterSpacing: 2, color: _gray))]),
+                  const SizedBox(height: 12),
+                  Wrap(spacing: 8, runSpacing: 8, children: meslekler.map<Widget>((m) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: _offWhite, border: Border.all(color: Colors.black12)), child: Text('${m['anaDalId']}/${m['altDalId']} - ${m['unvanId']}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600)))).toList()),
+                  if (meslekler.isEmpty) const Text('Yetkinlik yok', style: TextStyle(fontSize: 10, color: _gray)),
+                ]),
+              ),
+              const SizedBox(height: 8),
+              _proMenuTile(n: '01', title: 'TEKLİF VERDİĞİM PROJELER', desc: 'Gönderdiğin teklifler', icon: Icons.send_outlined, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProTekliflerimScreen())); }),
+              _proMenuTile(n: '02', title: 'GELEN TEKLİFLER', desc: 'Sana gelen proje davetleri', icon: Icons.inbox_outlined, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProGelenTekliflerScreen())); }),
+              _proMenuTile(n: '03', title: 'PROJELER', desc: 'TEKLİF VERİLEN - RED EDİLEN - DEVAM EDEN', icon: Icons.folder_open_outlined, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProProjelerimScreen())); }, hasBadge: true),
+              _proMenuTile(n: '04', title: 'TAMAMLANAN PROJELER', desc: 'Künyende görünecek - $tamamlanan proje', icon: Icons.verified_outlined, isGold: true, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProTamamlananScreen())); }),
+              _proMenuTile(n: '05', title: 'CÜZDAN', desc: 'Abonelik al / Para yükle / Bakiye', icon: Icons.account_balance_wallet_outlined, onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const ProCuzdanScreen())); }),
+              const SizedBox(height: 24),
+              Container(height: 1, color: Colors.black12, margin: const EdgeInsets.symmetric(horizontal: 16)),
+              const SizedBox(height: 8),
+              _proMenuTile(n: '06', title: 'ÇIKIŞ YAP', desc: 'Hesaptan çık', icon: Icons.logout, isExit: true, onTap: () => _cikisYap()),
+              _proMenuTile(n: '07', title: 'HESABIMI KALICI OLARAK SİL', desc: 'Tüm veriler silinir - geri alınamaz', icon: Icons.delete_forever_outlined, isDanger: true, onTap: () => _showDeleteDialog()),
+              const SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: InkWell(
+                  onTap: () {
+                    final router = GoRouter.of(context);
+                    if (Navigator.canPop(context)) Navigator.pop(context);
+                    router.go('/home');
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    color: _black,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(width: 14, height: 1, color: _gold),
+                        const SizedBox(width: 8),
+                        const Text('ANA SAYFAYA DÖN', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1, color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('© 2026 HUG PROJE - PROFESSIONAL', style: TextStyle(color: _gray, fontSize: 8, letterSpacing: 1)),
+              SizedBox(height: 24 + MediaQuery.of(context).padding.bottom + 32),
+            ],
+          ),
         ),
       ),
     );
@@ -244,7 +317,7 @@ class _ProProfilScreenState extends State<ProProfilScreen> {
                 batch.delete(FirebaseFirestore.instance.collection('users_pro').doc(uid));
                 await batch.commit();
                 await user?.delete();
-                if (mounted) Navigator.popUntil(context, (r) => r.isFirst);
+                if (mounted) context.go('/home');
               } catch (e) {
                 if (mounted) {
                   Navigator.pop(context);
