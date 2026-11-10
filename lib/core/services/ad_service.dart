@@ -196,6 +196,17 @@ class AdService {
         'acilMi': acilMi,
       });
 
+      // TEKLİF SAYISI ARTSIN - SADECE EKLENEN KISIM
+      if (acilMi) {
+        transaction.update(_firestore.collection("acil_cagri").doc(ilanId), {
+          'teklifSayisi': FieldValue.increment(1),
+        });
+      } else {
+        transaction.update(_firestore.collection(_collectionName).doc(ilanId), {
+          'teklifSayisi': FieldValue.increment(1),
+        });
+      }
+
       await _analyticsService.logTeklifVerildi(kategoriId, teklifFiyat);
       return true;
     });

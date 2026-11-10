@@ -25,8 +25,11 @@ import { projeTurleri } from '../data/proje-turleri'
 import { ihtiyaclar } from '../data/ihtiyaclar'
 import { cities } from '../data/cities'
 
+<<<<<<< HEAD
 export const dynamic = 'force-static'
 
+=======
+>>>>>>> b7540fb6 (fix: hug-proje ignore + deploy-hug-pro - node_modules yok)
 function toEntry(
   path: string,
   priority: number,

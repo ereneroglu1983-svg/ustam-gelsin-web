@@ -16,10 +16,18 @@ seo/.next/
 seo/out/
 seo/.vercel/
 
+<<<<<<< HEAD
 # HUG-PROJE-SEO - ESKİ PROJE, NODE_MODULES GİT'E GİRMESİN
 hug-proje-seo/node_modules/
 hug-proje-seo/.next/
 hug-proje-seo/out/
+=======
+# HUG PROJE SEO - NEXT.JS
+hug-proje-seo/node_modules/
+hug-proje-seo/.next/
+hug-proje-seo/out/
+hug-proje-seo/.vercel/
+>>>>>>> b7540fb6 (fix: hug-proje ignore + deploy-hug-pro - node_modules yok)
 
 # Firebase / Functions - TÜM CODEBASE'LER
 [STRIPPED 194 bytes]

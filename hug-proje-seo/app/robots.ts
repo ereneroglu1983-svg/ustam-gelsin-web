@@ -15,8 +15,11 @@
 import type { MetadataRoute } from 'next'
 import { getHugProjeUrl } from '../lib/constants'
 
+<<<<<<< HEAD
 export const dynamic = 'force-static'
 
+=======
+>>>>>>> b7540fb6 (fix: hug-proje ignore + deploy-hug-pro - node_modules yok)
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [

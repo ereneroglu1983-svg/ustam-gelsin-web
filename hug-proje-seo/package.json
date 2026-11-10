@@ -16,7 +16,13 @@
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+<<<<<<< HEAD
     "typescript": "^5.9.2",
     "wrangler": "^4.158.0"
   }
 }
+=======
+    "typescript": "^5.9.2"
+  }
+}
+>>>>>>> b7540fb6 (fix: hug-proje ignore + deploy-hug-pro - node_modules yok)

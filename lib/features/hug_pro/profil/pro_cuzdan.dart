@@ -22,6 +22,7 @@ class _ProCuzdanScreenState extends State<ProCuzdanScreen> {
   Map<String, dynamic>? _proData;
   bool _loading = true;
   bool _odemeLoading = false;
+  num _bakiye = 0;
 
   final Map<PaketTipi, Map<String, dynamic>> _paketler = {
     PaketTipi.MONTHLY: {'ad': 'AYLIK', 'fiyat': 2990, 'fiyatStr': '2.990 TL', 'aciklama': '1 Ay - 1 Ücretsiz Başvuru', 'renk': _black},
@@ -39,8 +40,22 @@ class _ProCuzdanScreenState extends State<ProCuzdanScreen> {
   Future<void> _loadPro() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
-    final doc = await FirebaseFirestore.instance.collection('users_pro').doc(uid).get();
-    if (doc.exists) setState(() { _proData = doc.data(); _loading = false; });
+    final proDoc = await FirebaseFirestore.instance.collection('users_pro').doc(uid).get();
+    // DUZELTME: Bakiye wallets koleksiyonunda, users_pro icinde degil.
+    // Eski kod: data['bakiye'] -> users_pro'da bakiye yok, hep 0 gosteriyordu.
+    final walletDoc = await FirebaseFirestore.instance.collection('wallets').doc(uid).get();
+    if (proDoc.exists) {
+      setState(() {
+        _proData = proDoc.data();
+        _bakiye = (walletDoc.data()?['balance'] as num?) ?? 0;
+        _loading = false;
+      });
+    } else {
+      setState(() {
+        _bakiye = (walletDoc.data()?['balance'] as num?) ?? 0;
+        _loading = false;
+      });
+    }
   }
 
   Future<void> _iyzicoIleSatinAl(PaketTipi tip) async {
@@ -102,8 +117,8 @@ class _ProCuzdanScreenState extends State<ProCuzdanScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) return const Scaffold(backgroundColor: _black, body: Center(child: CircularProgressIndicator(color: _gold)));
-    final data = _proData!;
-    final bakiye = data['bakiye'] ?? 0;
+    final data = _proData ?? {};
+    final bakiye = _bakiye;
     final abonelikBitis = data['subscriptionExpiry'] as Timestamp?;
     final isActive = data['isActive'] ?? false;
     final paketAdi = data['subscriptionType'] ?? 'YOK';
