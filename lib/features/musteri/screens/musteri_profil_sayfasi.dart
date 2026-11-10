@@ -1,8 +1,10 @@
 // lib/features/profile/screens/musteri_profil_sayfasi.dart - FINAL KESIN COZUM - ANA SAYFAYA FIRLATIR
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
+import '../../home/screens/home_screen.dart';
 import '../../musteri/screens/musteri_is_secimi_sayfasi.dart';
 import '../../musteri/screens/musteri_kisisel_bilgiler_sayfasi.dart';
 import '../../musteri/screens/musteri_ilanlarim_sayfasi.dart';
@@ -19,6 +21,21 @@ class MusteriProfilSayfasi extends StatefulWidget {
 }
 
 class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
+
+  // GARANTI HOME - GERI TUŞU = HOME PAGE DARTI, ANA SAYFAYA GIT = HOME PAGE DARTI
+  // /home yoluna gitmiyor, direkt HomeScreen dosyasini aciyor, arkadaki her seyi siliyor
+  void _homeSayfasinaGit() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+    );
+    // EKLENEN TEK SATIR - DEFTERI DUZELT
+    // Ekranda HomeScreen acildi ama GoRouter defterinde hala profil yaziyordu.
+    // Simdi deftere de ana sayfadayim yaziyoruz ki yenilenince geri profile atmasin.
+    Future.microtask(() {
+      if (mounted) GoRouter.of(context).go('/home');
+    });
+  }
 
   Future<void> _cikisYap() async {
     final onay = await showDialog<bool>(
@@ -45,22 +62,22 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
 
       if (!mounted) return;
 
-      final router = GoRouter.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("BAŞARIYLA PROFİLDEN ÇIKIŞ YAPILDI", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          backgroundColor: Colors.black,
-          duration: Duration(milliseconds: 1200),
+          content: Text("✅ Başarıyla çıkış yapıldı"),
+          backgroundColor: Color(0xFF2DB34A),
+          behavior: SnackBarBehavior.floating,
         ),
       );
-      await Future.delayed(const Duration(milliseconds: 1200));
+
+      // ANDROID + iOS AYNI - DIREKT HOME PAGE DARTI
+      await Future.delayed(const Duration(milliseconds: 800));
       if (!mounted) return;
-      if (context.canPop()) context.pop();
-      router.go('/home');
+      _homeSayfasinaGit();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Hata: $e"), backgroundColor: Colors.redAccent),
+        SnackBar(content: Text("Çıkış hatası: $e"), backgroundColor: Colors.red),
       );
     }
   }
@@ -117,8 +134,7 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
       await user.delete();
 
       if (!mounted) return;
-      // REVIZE: Navigator.popUntil KALDIRILDI - GoRouter ile çakışıyordu
-      context.go('/home');
+      _homeSayfasinaGit();
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       if (e.code == 'requires-recent-login') {
@@ -150,6 +166,11 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F2027),
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          tooltip: "Geri",
+          onPressed: _homeSayfasinaGit,
+        ),
         title: StreamBuilder<DocumentSnapshot>(
           stream: FirebaseFirestore.instance.collection('users').doc(user?.uid).snapshots(),
           builder: (context, snapshot) {
@@ -183,7 +204,7 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
           IconButton(
             icon: const Icon(Icons.home, color: Colors.white),
             tooltip: "Ana Sayfaya Git",
-            onPressed: () => context.go('/home'),
+            onPressed: _homeSayfasinaGit,
           ),
         ],
       ),
@@ -206,7 +227,7 @@ class _MusteriProfilSayfasiState extends State<MusteriProfilSayfasi> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: GestureDetector(
-                  onTap: () => context.go('/home'),
+                  onTap: _homeSayfasinaGit,
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),

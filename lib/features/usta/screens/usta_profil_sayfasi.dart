@@ -14,6 +14,7 @@ import 'package:ustam_gelsin/core/models/ilan_model.dart';
 import 'package:ustam_gelsin/core/services/profile_image_service.dart';
 import 'package:ustam_gelsin/core/services/acil_is_yonetim_servisi.dart';
 import 'package:ustam_gelsin/core/services/notification_service.dart';
+import '../../home/screens/home_screen.dart';
 import 'package:ustam_gelsin/features/usta/screens/yeni_is_firsatlari_sayfasi.dart';
 import 'package:ustam_gelsin/features/usta/screens/acil_ilanlar.dart';
 import 'package:ustam_gelsin/features/usta/screens/usta_tekliflerim_sayfasi.dart';
@@ -39,6 +40,20 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
   final NotificationService _notificationService = NotificationService();
 
   StreamSubscription? _cagriSubscription;
+
+  // GARANTI HOME - MUSTERI ILE AYNI FIX - GERI TUŞU = HOME PAGE DARTI, ÇIKIŞ = HOME PAGE DARTI
+  // /home yoluna gitmiyor, direkt HomeScreen dosyasini aciyor, arkadaki her seyi siliyor
+  void _homeSayfasinaGit() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+    );
+    // DEFTERI DUZELT - Ekranda HomeScreen acildi ama defterde hala profil yaziyordu.
+    // Simdi deftere de ana sayfadayim yaziyoruz ki yenilenince geri profile atmasin.
+    Future.microtask(() {
+      if (mounted) GoRouter.of(context).go('/home');
+    });
+  }
 
   @override
   void initState() {
@@ -248,7 +263,7 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
       appBar: AppBar(
         leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.of(context).pop()),
+            onPressed: _homeSayfasinaGit),
         title: const Text("USTA PANELİ",
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
         backgroundColor: Colors.white,
@@ -655,10 +670,8 @@ class _UstaProfilSayfasiState extends State<UstaProfilSayfasi> {
                 ),
               );
 
-              if (Navigator.canPop(context)) {
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              }
-              GoRouter.of(context).go('/home');
+              // KESIN ANA SAYFAYA FIRLAT - MUSTERI ILE AYNI FIX - DIREKT HOME PAGE DARTI
+              _homeSayfasinaGit();
 
             } catch (e) {
               if (!mounted) return;
